@@ -1,0 +1,6 @@
+k6_frac_N10_40nm.xml  -> Only CLBs
+k6_frac_N10_mem32K_no_mult_40nm.xml -> CLBs, RAMs
+k6_frac_N10_mem32K_40nm.xml -> CLBs, RAMs, Mult
+k6_frac_N10_frac_chain_mem32K_no_mult_40nm.xml -> CLBs, Adders, RAMs
+k6_frac_N10_frac_chain_mem32K_40nm.xml -> CLBs, Adders, RAMs, Mult
+k6_frac_N10_mem32K_40nm_with_matmul.xml -> CLBs, RAMs, Mult, Matmul

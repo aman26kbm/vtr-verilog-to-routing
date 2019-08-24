@@ -1,0 +1,4 @@
+../scripts/run_vtr_task.pl matmul
+../scripts/parse_vtr_task.pl matmu
+/home/aman/Documents/vtr/vtr-verilog-to-routing/vtr_flow/../vpr/vpr ../../arch/timing/k6_frac_N10_mem32K_40nm_aman.xml mat_mul_hard --circuit_file run023/k6_frac_N10_mem32K_40nm_aman.xml/mat_mul_hard.v/common/mat_mul_hard.pre-vpr.blif --disp on
+
