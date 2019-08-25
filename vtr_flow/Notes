@@ -1,0 +1,31 @@
+Verilog designs:
+Final 4x4 design: matmul.4x4.sys.alt.op_to_mem.direct_interconnect.v
+Final 8x8 from 4x4 design: matmul.8x8_from_4x4.sys.alt.dir_inter.op_to_mem.v
+Final 12x12 design: matmul_12x12_from_4x4.v
+Final 16x16 design: matmul_16x16_from_4x4.v
+
+Please ensure that you have the right code commented out, in the design files, before you run VTR.
+For example, when running the case with no_rams, ensure that the ram model and the top leve that
+has the memories are commented out.
+
+Architectures:
+k6_frac_N10_mem32K_40nm.xml : From VTR 
+k6_frac_N10_mem32K_40nm_with_mult_mac_n_adder.xml : We'll use this as baseline
+k6_frac_N10_mem32K_40nm.matmul4x4.reusable_ctr_logic.dir_inter.op_to_mem.matmuls_together.xml : Final one
+
+Tasks:
+matmul.<n,n>_from_4x4.sys.alt.op_to_mem.dir_int.no_rams.matmuls_together/
+matmul.<n,n>_from_4x4.sys.alt.op_to_mem.dir_int.with_rams.matmuls_together/
+matmul.<n,n>_from_4x4.sys.alt.op_to_mem.no_rams.fpga_with_mac_mult_add/
+matmul.<n,n>_from_4x4.sys.alt.op_to_mem.with_rams.fpga_with_mac_mult_add/
+where n,n is 4x4, 8x8, 12x12, 16x16
+
+
+Which ones to runt through VTR:
+matmul.<n,n>_from_4x4.sys.alt.op_to_mem.dir_int.no_rams.matmuls_together/
+
+Name of the critical path file:
+report_timing.setup.rpt
+
+To show the FPGA diagram:
+Add --disp on to the VPR commmand line
