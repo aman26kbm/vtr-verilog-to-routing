@@ -5,7 +5,7 @@
 `define MEM_SIZE 128
 `define MAT_MUL_SIZE 4
 
-/*
+
 //Design with memories
 module matrix_multiplication(
   clk, 
@@ -103,7 +103,7 @@ matmul_4x4_systolic u_matmul_4x4(
 );
 
 endmodule  
-*/
+/*
 //Design without memories
 module matrix_multiplication(
  clk,
@@ -157,8 +157,8 @@ matmul_4x4_systolic u_matmul_4x4(
 );
 
 endmodule
-
-
+*/
+/*
 module matmul_4x4_systolic(
  clk,
  reset,
@@ -510,7 +510,7 @@ module processing_element(reset, clk, in_a,in_b,out_a,out_b,out_c);
  end
  
 endmodule
-
+*/
 //module mac(mul0, mul1, add, out);
 //input [`DWIDTH-1:0] mul0;
 //input [`DWIDTH-1:0] mul1;
@@ -544,7 +544,7 @@ endmodule
 //endmodule
 
 
-/*
+
 module ram (addr0, d0, we0, q0,  clk);
 
 input [`AWIDTH-1:0] addr0;
@@ -565,5 +565,3 @@ begin
         q0 <= ram[addr0];
 end
 endmodule
-
-*/

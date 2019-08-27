@@ -355,7 +355,7 @@ module matmul_8x8_systolic(
 
 
 endmodule  
-
+/*
 module matmul_4x4_systolic(
  clk,
  reset,
@@ -707,7 +707,7 @@ module processing_element(reset, clk, in_a,in_b,out_a,out_b,out_c);
  end
  
 endmodule
-
+*/
 //module mac(mul0, mul1, add, out);
 //input [`DWIDTH-1:0] mul0;
 //input [`DWIDTH-1:0] mul1;

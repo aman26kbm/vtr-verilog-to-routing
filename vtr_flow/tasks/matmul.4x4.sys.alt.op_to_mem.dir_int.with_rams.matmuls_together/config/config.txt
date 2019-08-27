@@ -17,7 +17,7 @@ circuit_list_add=matmul.4x4.sys.alt.op_to_mem.direct_interconnect.v
 
 # Add architectures to list to sweep
 #arch_list_add=k6_frac_N10_mem32K_40nm_with_matmul.xml
-arch_list_add=k6_frac_N10_mem32K_40nm.matmul4x4.reusable_ctr_logic.dir_inter.op_to_mem.matmuls_together.xml
+arch_list_add=k6_frac_N10_mem32K_40nm.matmul4x4.reusable_ctr_logic.dir_inter.op_to_mem.matmuls_together.4matmuls.xml
 #arch_list_add=k6_frac_N10_mem32K_40nm.xml
 #arch_list_add=k6_frac_N10_40nm.xml
 #arch_list_add=k6_frac_N10_mem32K_no_mult_40nm.xml
