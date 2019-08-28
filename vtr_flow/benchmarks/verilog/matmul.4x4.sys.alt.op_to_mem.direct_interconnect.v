@@ -4,6 +4,7 @@
 `define AWIDTH 7
 `define MEM_SIZE 128
 `define MAT_MUL_SIZE 4
+`define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 
 
 //Design with memories
@@ -35,16 +36,44 @@ module matrix_multiplication(
   input start_mat_mul;
   output done_mat_mul;
 
+  reg enable_writing_to_mem_reg;
+  reg [`AWIDTH-1:0] addr_pi_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      enable_writing_to_mem_reg<= 0;
+      addr_pi_reg <= 0;
+    end else begin
+      enable_writing_to_mem_reg<= enable_writing_to_mem;
+      addr_pi_reg <= addr_pi;
+    end
+  end
 
   wire [4*`DWIDTH-1:0] a_data;
   wire [`AWIDTH-1:0] a_addr;
   wire [`AWIDTH-1:0] a_addr_muxed;
 
-  assign a_addr_muxed = (enable_writing_to_mem) ? addr_pi : a_addr;
+  reg [`AWIDTH-1:0] a_addr_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_reg <= 0;
+    end else begin
+      a_addr_reg <= a_addr;
+    end
+  end
+
+  reg [`AWIDTH-1:0] a_addr_muxed_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_muxed_reg <= 0;
+    end else begin
+      a_addr_muxed_reg<= a_addr_muxed;
+    end
+  end
+  assign a_addr_muxed = (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_reg;
 
   // BRAM matrix A 
   ram matrix_A (
-    .addr0(a_addr_muxed),
+    .addr0(a_addr_muxed_reg),
     .d0(data_pi), 
     .we0(we_a), 
     .q0(a_data), 
@@ -54,11 +83,29 @@ module matrix_multiplication(
   wire [`AWIDTH-1:0] b_addr;
   wire [`AWIDTH-1:0] b_addr_muxed;
 
-  assign b_addr_muxed = (enable_writing_to_mem) ? addr_pi : b_addr;
+  reg [`AWIDTH-1:0] b_addr_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_reg <= 0;
+    end else begin
+      b_addr_reg <= b_addr;
+    end
+  end
+
+  reg [`AWIDTH-1:0] b_addr_muxed_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_muxed_reg <= 0;
+    end else begin
+      b_addr_muxed_reg<= b_addr_muxed;
+    end
+  end
+
+  assign b_addr_muxed = (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_reg;
 
   // BRAM matrix B
   ram matrix_B (
-    .addr0(b_addr_muxed),
+    .addr0(b_addr_muxed_reg),
     .d0(data_pi), 
     .we0(we_b), 
     .q0(b_data), 
@@ -158,6 +205,7 @@ matmul_4x4_systolic u_matmul_4x4(
 
 endmodule
 */
+
 /*
 module matmul_4x4_systolic(
  clk,
@@ -548,20 +596,30 @@ endmodule
 module ram (addr0, d0, we0, q0,  clk);
 
 input [`AWIDTH-1:0] addr0;
-input [4*`DWIDTH-1:0] d0;
+input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] d0;
 input we0;
-output [4*`DWIDTH-1:0] q0;
+output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 input clk;
 
-reg [4*`DWIDTH-1:0] q0;
-reg [4*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//
+//always @(posedge clk)  
+//begin 
+//        if (we0) 
+//        begin 
+//            ram[addr0] <= d0; 
+//        end 
+//        q0 <= ram[addr0];
+//end
 
-always @(posedge clk)  
-begin 
-        if (we0) 
-        begin 
-            ram[addr0] <= d0; 
-        end 
-        q0 <= ram[addr0];
-end
+single_port_ram u_single_port_ram(
+  .data(d0),
+  .we(we0),
+  .addr(addr0),
+  .clk(clk),
+  .out(q0)
+);
 endmodule
+
+

@@ -3,6 +3,7 @@
 `define AWIDTH 7
 `define MEM_SIZE 128
 `define MAT_MUL_SIZE 4
+`define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 
 
 module matrix_multiplication(
@@ -33,90 +34,215 @@ module matrix_multiplication(
   input start_mat_mul;
   output done_mat_mul;
 
+  reg enable_writing_to_mem_reg;
+  reg [`AWIDTH-1:0] addr_pi_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      enable_writing_to_mem_reg<= 0;
+      addr_pi_reg <= 0;
+    end else begin
+      enable_writing_to_mem_reg<= enable_writing_to_mem;
+      addr_pi_reg <= addr_pi;
+    end
+  end
 
   /////////////////////////////////////////////////////////////////
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_00;
+  // BRAMs to store matrix A
+  /////////////////////////////////////////////////////////////////
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_00;
   wire [`AWIDTH-1:0] a_addr_00;
   wire [`AWIDTH-1:0] a_addr_muxed_00;
 
-  assign a_addr_muxed_00 = (enable_writing_to_mem) ? addr_pi : a_addr_00;
+  reg [`AWIDTH-1:0] a_addr_00_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_00_reg <= 0;
+    end else begin
+      a_addr_00_reg <= a_addr_00;
+    end
+  end
+
+  reg [`AWIDTH-1:0] a_addr_muxed_00_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_muxed_00_reg <= 0;
+    end else begin
+      a_addr_muxed_00_reg<= a_addr_muxed_00;
+    end
+  end
+
+  assign a_addr_muxed_00 = (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_00_reg;
 
   // BRAM matrix A 00
   ram matrix_A_00 (
-    .addr0(a_addr_muxed_00),
+    .addr0(a_addr_muxed_00_reg),
     .d0(data_pi), 
     .we0(we_a), 
     .q0(a_data_00), 
     .clk(clk));
 
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_10;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_10;
   wire [`AWIDTH-1:0] a_addr_10;
   wire [`AWIDTH-1:0] a_addr_muxed_10;
 
-  assign a_addr_muxed_10 = (enable_writing_to_mem) ? addr_pi : a_addr_10;
+  reg [`AWIDTH-1:0] a_addr_10_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_10_reg <= 0;
+    end else begin
+      a_addr_10_reg <= a_addr_10;
+    end
+  end
+
+  reg [`AWIDTH-1:0] a_addr_muxed_10_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_muxed_10_reg <= 0;
+    end else begin
+      a_addr_muxed_10_reg<= a_addr_muxed_10;
+    end
+  end
+
+
+  assign a_addr_muxed_10= (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_10_reg;
 
   // BRAM matrix A 10
   ram matrix_A_10 (
-    .addr0(a_addr_muxed_10),
+    .addr0(a_addr_muxed_10_reg),
     .d0(data_pi), 
     .we0(we_a), 
     .q0(a_data_10), 
     .clk(clk));  
 
- wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_20;
+ wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_20;
   wire [`AWIDTH-1:0] a_addr_20;
   wire [`AWIDTH-1:0] a_addr_muxed_20;
 
-  assign a_addr_muxed_20 = (enable_writing_to_mem) ? addr_pi : a_addr_20;
+  reg [`AWIDTH-1:0] a_addr_20_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_20_reg <= 0;
+    end else begin
+      a_addr_20_reg <= a_addr_20;
+    end
+  end
+
+  reg [`AWIDTH-1:0] a_addr_muxed_20_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      a_addr_muxed_20_reg <= 0;
+    end else begin
+      a_addr_muxed_20_reg<= a_addr_muxed_20;
+    end
+  end
+
+  assign a_addr_muxed_20= (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_20_reg;
 
   // BRAM matrix A 20
   ram matrix_A_20 (
-    .addr0(a_addr_muxed_20),
+    .addr0(a_addr_muxed_20_reg),
     .d0(data_pi), 
     .we0(we_a), 
     .q0(a_data_20), 
     .clk(clk));
 
 
+
+  /////////////////////////////////////////////////////////////////
+  // BRAMs to store matrix B
   /////////////////////////////////////////////////////////////////
 
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_00;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_00;
   wire [`AWIDTH-1:0] b_addr_00;
   wire [`AWIDTH-1:0] b_addr_muxed_00;
 
-  assign b_addr_muxed_00 = (enable_writing_to_mem) ? addr_pi : b_addr_00;
+  reg [`AWIDTH-1:0] b_addr_00_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_00_reg <= 0;
+    end else begin
+      b_addr_00_reg <= b_addr_00;
+    end
+  end
+
+  reg [`AWIDTH-1:0] b_addr_muxed_00_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_muxed_00_reg <= 0;
+    end else begin
+      b_addr_muxed_00_reg<= b_addr_muxed_00;
+    end
+  end
+
+  assign b_addr_muxed_00= (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_00_reg;
 
   // BRAM matrix B 00
   ram matrix_B_00 (
-    .addr0(b_addr_muxed_00),
+    .addr0(b_addr_muxed_00_reg),
     .d0(data_pi), 
     .we0(we_b), 
     .q0(b_data_00), 
     .clk(clk));
 
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_01;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_01;
   wire [`AWIDTH-1:0] b_addr_01;
   wire [`AWIDTH-1:0] b_addr_muxed_01;
 
-  assign b_addr_muxed_01 = (enable_writing_to_mem) ? addr_pi : b_addr_01;
+  reg [`AWIDTH-1:0] b_addr_01_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_01_reg <= 0;
+    end else begin
+      b_addr_01_reg <= b_addr_01;
+    end
+  end
+
+  reg [`AWIDTH-1:0] b_addr_muxed_01_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_muxed_01_reg <= 0;
+    end else begin
+      b_addr_muxed_01_reg<= b_addr_muxed_01;
+    end
+  end
+
+  assign b_addr_muxed_01= (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_01_reg;
 
   // BRAM matrix B 01
   ram matrix_B_01 (
-    .addr0(b_addr_muxed_01),
+    .addr0(b_addr_muxed_01_reg),
     .d0(data_pi), 
     .we0(we_b), 
     .q0(b_data_01), 
     .clk(clk));
 
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_02;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_02;
   wire [`AWIDTH-1:0] b_addr_02;
   wire [`AWIDTH-1:0] b_addr_muxed_02;
 
-  assign b_addr_muxed_02 = (enable_writing_to_mem) ? addr_pi : b_addr_02;
+  reg [`AWIDTH-1:0] b_addr_02_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_02_reg <= 0;
+    end else begin
+      b_addr_02_reg <= b_addr_02;
+    end
+  end
+
+  reg [`AWIDTH-1:0] b_addr_muxed_02_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      b_addr_muxed_02_reg <= 0;
+    end else begin
+      b_addr_muxed_02_reg<= b_addr_muxed_02;
+    end
+  end
+
+  assign b_addr_muxed_02= (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_02_reg;
 
   // BRAM matrix B 02
   ram matrix_B_02 (
-    .addr0(b_addr_muxed_02),
+    .addr0(b_addr_muxed_02_reg),
     .d0(data_pi), 
     .we0(we_b), 
     .q0(b_data_02), 
@@ -1051,21 +1177,29 @@ endmodule
 module ram (addr0, d0, we0, q0,  clk);
 
 input [`AWIDTH-1:0] addr0;
-input [`MAT_MUL_SIZE*`DWIDTH-1:0] d0;
+input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] d0;
 input we0;
-output [`MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 input clk;
 
-reg [`MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-reg [`MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//
+//always @(posedge clk)  
+//begin 
+//        if (we0) 
+//        begin 
+//            ram[addr0] <= d0; 
+//        end 
+//        q0 <= ram[addr0];
+//end
 
-always @(posedge clk)  
-begin 
-        if (we0) 
-        begin 
-            ram[addr0] <= d0; 
-        end 
-        q0 <= ram[addr0];
-end
+single_port_ram u_single_port_ram(
+  .data(d0),
+  .we(we0),
+  .addr(addr0),
+  .clk(clk),
+  .out(q0)
+);
 endmodule
 

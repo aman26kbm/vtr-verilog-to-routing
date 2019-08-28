@@ -16,7 +16,7 @@ circuit_list_add=matmul_16x16_from_4x4.v
 #circuit_list_add=ch_intrinsics.v
 
 # Add architectures to list to sweep
-arch_list_add=k6_frac_N10_mem32K_40nm.matmul4x4.reusable_ctr_logic.dir_inter.op_to_mem.matmuls_together.cols_mem_clb.xml
+arch_list_add=k6_frac_N10_mem32K_40nm.matmul4x4.reusable_ctr_logic.dir_inter.op_to_mem.columns.xml
 #arch_list_add=k6_frac_N10_mem32K_40nm_with_matmul.xml
 #arch_list_add=k6_frac_N10_mem32K_40nm.xml
 #arch_list_add=k6_frac_N10_40nm.xml
