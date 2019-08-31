@@ -1,0 +1,31 @@
+##############################################
+# Configuration file for running experiments
+##############################################
+
+# Path to directory of circuits to use
+circuits_dir=benchmarks/verilog/scripts
+
+# Path to directory of architectures to use
+archs_dir=arch/timing
+
+# Add circuits to list to sweep
+#circuit_list_add=mat_mul.v
+#circuit_list_add=matmul_16x16_from_4x4.v
+circuit_list_add=scripts.matmul.20x20_from_4x4_with_ram.v
+#circuit_list_add=mat_mul_almost_parallel.v
+#circuit_list_add=simple_mem.v
+#circuit_list_add=ch_intrinsics.v
+
+# Add architectures to list to sweep
+#arch_list_add=k6_frac_N10_mem32K_40nm_with_matmul.xml
+arch_list_add=k6_frac_N10_mem32K_40nm.matmul4x4.reusable_ctr_logic.dir_inter.op_to_mem.columns.xml
+#arch_list_add=k6_frac_N10_mem32K_40nm.xml
+#arch_list_add=k6_frac_N10_40nm.xml
+#arch_list_add=k6_frac_N10_mem32K_no_mult_40nm.xml
+#arch_list_add=k6_frac_N10_frac_chain_mem32K_40nm.xml
+
+# Parse info and how to parse
+parse_file=vpr_standard.txt
+
+# Pass requirements
+pass_requirements_file=pass_requirements.txt

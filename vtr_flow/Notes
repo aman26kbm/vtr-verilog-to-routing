@@ -29,3 +29,9 @@ report_timing.setup.rpt
 
 To show the FPGA diagram:
 Add --disp on to the VPR commmand line
+
+longest one: second design
+column.xml: third design
+
+module single port ram
+two flops reg added to the bram
