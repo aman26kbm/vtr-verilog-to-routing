@@ -228,7 +228,7 @@ matmul_4x4_systolic u_matmul_4x4(
 
 endmodule
 */
-
+/*
 module matmul_4x4_systolic(
  clk,
  reset,
@@ -594,7 +594,7 @@ endmodule
 //
 //assign c = a + b;
 //endmodule
-
+*/
 
 
 module ram (addr0, d0, we0, q0,  clk);
@@ -605,25 +605,25 @@ input we0;
 output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 input clk;
 
-reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//
+//always @(posedge clk)  
+//begin 
+//        if (we0) 
+//        begin 
+//            ram[addr0] <= d0; 
+//        end 
+//        q0 <= ram[addr0];
+//end
 
-always @(posedge clk)  
-begin 
-        if (we0) 
-        begin 
-            ram[addr0] <= d0; 
-        end 
-        q0 <= ram[addr0];
-end
-
-//single_port_ram u_single_port_ram(
-//  .data(d0),
-//  .we(we0),
-//  .addr(addr0),
-//  .clk(clk),
-//  .out(q0)
-//);
+single_port_ram u_single_port_ram(
+  .data(d0),
+  .we(we0),
+  .addr(addr0),
+  .clk(clk),
+  .out(q0)
+);
 endmodule
 
 
