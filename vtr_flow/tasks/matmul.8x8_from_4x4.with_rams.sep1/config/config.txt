@@ -3,14 +3,16 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog
+circuits_dir=benchmarks/verilog/scripts3
+#circuits_dir=benchmarks/verilog
 
 # Path to directory of architectures to use
 archs_dir=arch/timing
 
 # Add circuits to list to sweep
 #circuit_list_add=mat_mul.v
-circuit_list_add=matmul.8x8_from_4x4.sep1.v
+circuit_list_add=scripts2.matmul.8x8_from_4x4_with_ram.v
+#circuit_list_add=matmul.8x8_from_4x4.sep1.v
 #circuit_list_add=mat_mul_almost_parallel.v
 #circuit_list_add=simple_mem.v
 #circuit_list_add=ch_intrinsics.v
