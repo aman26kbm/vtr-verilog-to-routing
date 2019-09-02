@@ -666,8 +666,7 @@
 
     <!-- Define mac begin -->
 
-<!-- Area is 15% more than the multiplier block. 396000 * 1.15 = -->
-    <pb_type name="mac_32" height="4" area="455400">
+    <pb_type name="mac_32" height="1" area="72619">
 
       <input name="a" num_pins="16"/>
       <input name="b" num_pins="16"/>
@@ -680,7 +679,6 @@
                 <input name="b" num_pins="16"/>
                 <input name="c" num_pins="32"/>
                 <output name="out" num_pins="32"/>
-<!-- Delay is same as the multiplier block. 1.523 = -->
                 <delay_constant max="1.523e-9" in_port="mac_16x16.a" out_port="mac_16x16.out"/>
                 <delay_constant max="1.523e-9" in_port="mac_16x16.b" out_port="mac_16x16.out"/>
                 <delay_constant max="1.523e-9" in_port="mac_16x16.c" out_port="mac_16x16.out"/>
@@ -714,8 +712,7 @@
     <!-- Define mac end -->
 
     <!-- Define adder begin-->
-<!-- Area is 30% of the the multiplier block. 396000 * 0.3 = -->
-    <pb_type name="add_16" height="2" area="118800">
+    <pb_type name="add_16" height="1" area="72619">
 
       <input name="a" num_pins="16"/>
       <input name="b" num_pins="16"/>
