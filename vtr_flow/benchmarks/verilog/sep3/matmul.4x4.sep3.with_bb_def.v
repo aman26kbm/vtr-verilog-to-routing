@@ -546,7 +546,7 @@ processing_element pe33(.reset(reset), .clk(clk), .in_a(a32to33), .in_b(b23to33)
 
 assign a_data_out = {a33to34,a23to24,a13to14,a03to04};
 assign b_data_out = {b33to43,b32to42,b31to41,b30to40};
-assign c_data_out = {row3_shift_reg, row2_shift_reg, row1_shift_reg, row0_shift_reg};
+assign c_data_out = {row3_shift_reg[15:0], row2_shift_reg[15:0], row1_shift_reg[15:0], row0_shift_reg[15:0]};
 endmodule
 
 
