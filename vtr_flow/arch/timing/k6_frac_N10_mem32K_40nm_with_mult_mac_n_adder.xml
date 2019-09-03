@@ -146,25 +146,23 @@
 
   <!-- Physical descriptions begin -->
   <layout>
-    <auto_layout aspect_ratio="1.0">
+    <!--<auto_layout aspect_ratio="1.0">-->
+    <fixed_layout name="mylayout" width="150" height="150">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
         <!--Column of 'mac_32' with 'EMPTY' blocks wherever a 'mac_32' does not fit. Vertical offset by 1 for perimeter.-->
-        <col type="mac_32" startx="6" starty="1" repeatx="10" priority="20"/>
-        <col type="EMPTY" startx="6" repeatx="10" starty="1" priority="19"/>
+        <col type="mac_32" startx="5" starty="1" repeatx="10" priority="30"/>
         <!--Column of 'add_16' with 'EMPTY' blocks wherever a 'add_36' does not fit. Vertical offset by 1 for perimeter.-->
-        <col type="add_16" startx="8" starty="1" repeatx="10" priority="20"/>
-        <col type="EMPTY" startx="8" repeatx="10" starty="1" priority="19"/>
+        <col type="add_16" startx="6" starty="1" repeatx="10" priority="25"/>
         <!--Column of 'mult_36' with 'EMPTY' blocks wherever a 'mult_36' does not fit. Vertical offset by 1 for perimeter.-->
-        <col type="mult_36" startx="10" starty="1" repeatx="10" priority="20"/>
-        <col type="EMPTY" startx="10" repeatx="10" starty="1" priority="19"/>
+        <col type="mult_36" startx="7" starty="1" repeatx="10" priority="20"/>
         <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. Vertical offset by 1 for perimeter.-->
-        <col type="memory" startx="2" starty="1" repeatx="4" priority="20"/>
-        <col type="EMPTY" startx="2" repeatx="4" starty="1" priority="19"/>
-        </auto_layout>
+        <col type="memory" startx="8" starty="1" repeatx="10" priority="18"/>
+    </fixed_layout>
+<!--        </auto_layout> -->
 </layout>
 
   <device>
@@ -774,7 +772,7 @@
            tile according to D. Lewis et al, "Architectural Enhancements in Stratix V," FPGA 2013. Hence we should subtract 0.3 * 2.2 * 84,375 MWTUs to
            obtain a RAM core area (not including inter-block routing) of 548,000 MWTU areas for our 32 kb RAM in a 40 nm process.
     -->
-    <pb_type name="memory" height="6" area="548000">
+    <pb_type name="memory" height="3" width="2" area="548000">
 
       <input name="addr1" num_pins="15"/>
       <input name="addr2" num_pins="15"/>

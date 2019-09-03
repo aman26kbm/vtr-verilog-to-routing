@@ -6,7 +6,7 @@
 `define MAT_MUL_SIZE 4
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 
-
+/*
 //Design with memories
 module matrix_multiplication(
   clk, 
@@ -137,11 +137,20 @@ module matrix_multiplication(
 end
 
 wire [4*`DWIDTH-1:0] c_data_out;
+reg  [4*`DWIDTH-1:0] c_data_out_reg;
 
+always @(posedge clk) begin
+  if (reset) begin
+    c_data_out_reg<= 0;
+  end
+  else if (start_mat_mul) begin
+      c_data_out_reg<= c_data_out;
+  end
+end
   // BRAM matrix C
   ram matrix_C (
     .addr0(c_addr_muxed_reg),
-    .d0(c_data_out),
+    .d0(c_data_out_reg),
     .we0(we_c),
     .q0(data_from_out_mat),
     .clk(clk));
@@ -172,7 +181,7 @@ matmul_4x4_systolic u_matmul_4x4(
 );
 
 endmodule  
-
+*/
 /*
 //Design without memories
 module matrix_multiplication(
@@ -621,7 +630,7 @@ endmodule
 //endmodule
 
 
-
+/*
 module ram (addr0, d0, we0, q0,  clk);
 
 input [`AWIDTH-1:0] addr0;
@@ -651,4 +660,4 @@ single_port_ram u_single_port_ram(
 );
 endmodule
 
-
+*/
