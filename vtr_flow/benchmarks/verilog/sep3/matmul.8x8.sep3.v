@@ -175,7 +175,7 @@ matmul_8x8_systolic u_matmul_8x8(
   .b_data_out(b_data_out_NC),
   .a_addr(a_addr),
   .b_addr(b_addr),
-  .final_mat_mul_size(8'd`BB_MAT_MUL_SIZE),
+  .final_mat_mul_size(8'd8),
   .a_loc(8'd0),
   .b_loc(8'd0)
 );

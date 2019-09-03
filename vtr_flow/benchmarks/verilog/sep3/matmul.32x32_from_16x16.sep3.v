@@ -334,7 +334,7 @@ matmul_16x16_systolic u_matmul_16x16_systolic_0_0(
   .b_data_out(b_data_0_0_to_1_0),
   .a_addr(a_addr_0_0),
   .b_addr(b_addr_0_0),
-  .final_mat_mul_size(8'd`FINAL_MAT_MUL_SIZE),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd0),
   .b_loc(8'd0)
 );
@@ -364,7 +364,7 @@ matmul_16x16_systolic u_matmul_16x16_systolic_0_1(
   .b_data_out(b_data_0_1_to_1_1),
   .a_addr(a_addr_0_1_NC),
   .b_addr(b_addr_0_1),
-  .final_mat_mul_size(8'd`FINAL_MAT_MUL_SIZE),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd0),
   .b_loc(8'd1)
 );
@@ -395,7 +395,7 @@ matmul_16x16_systolic u_matmul_16x16_systolic_1_0(
   .b_data_out(b_data_1_0_to_2_0),
   .a_addr(a_addr_1_0),
   .b_addr(b_addr_1_0_NC),
-  .final_mat_mul_size(8'd`FINAL_MAT_MUL_SIZE),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd1),
   .b_loc(8'd0)
 );
@@ -426,7 +426,7 @@ matmul_16x16_systolic u_matmul_16x16_systolic_1_1(
   .b_data_out(b_data_1_1_to_2_1),
   .a_addr(a_addr_1_1_NC),
   .b_addr(b_addr_1_1_NC),
-  .final_mat_mul_size(8'd`FINAL_MAT_MUL_SIZE),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd1),
   .b_loc(8'd1)
 );
