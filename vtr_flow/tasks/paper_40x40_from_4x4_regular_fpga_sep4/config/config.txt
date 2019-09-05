@@ -1,0 +1,21 @@
+##############################################
+# Configuration file for running experiments
+##############################################
+
+# Path to directory of circuits to use
+circuits_dir=benchmarks/verilog/design_for_paper/regular_fpga
+
+# Path to directory of architectures to use
+archs_dir=arch/timing/arch_for_paper/regular_fpga
+
+# Add circuits to list to sweep
+circuit_list_add=40x40_from_4x4_regular_fpga.v
+
+# Add architectures to list to sweep
+arch_list_add=regular_fpga.xml
+
+# Parse info and how to parse
+parse_file=vpr_standard.txt
+
+# Pass requirements
+pass_requirements_file=pass_requirements.txt
