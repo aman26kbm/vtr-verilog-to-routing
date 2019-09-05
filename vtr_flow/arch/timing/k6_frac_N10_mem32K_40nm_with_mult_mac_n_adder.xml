@@ -93,7 +93,7 @@
       </output_ports>
     </model>
 
-    <model name="add_block">
+    <model name="multiply">
       <input_ports>
         <port name="a" combinational_sink_ports="out"/>
         <port name="b" combinational_sink_ports="out"/>
@@ -103,13 +103,15 @@
       </output_ports>
     </model>
 
-    <model name="multiply">
+    <model name="adder">
       <input_ports>
-        <port name="a" combinational_sink_ports="out"/>
-        <port name="b" combinational_sink_ports="out"/>
+      <port name="a" combinational_sink_ports="sumout cout"/>     
+      <port name="b" combinational_sink_ports="sumout cout"/>  
+      <port name="cin" combinational_sink_ports="sumout cout"/> 
       </input_ports>
       <output_ports>
-        <port name="out"/>
+      <port name="cout"/>
+      <port name="sumout"/>
       </output_ports>
     </model>
 
@@ -156,7 +158,7 @@
         <!--Column of 'mac_32' with 'EMPTY' blocks wherever a 'mac_32' does not fit. Vertical offset by 1 for perimeter.-->
         <col type="mac_32" startx="6" starty="1" repeatx="10" priority="30"/>
         <!--Column of 'add_16' with 'EMPTY' blocks wherever a 'add_36' does not fit. Vertical offset by 1 for perimeter.-->
-        <col type="add_16" startx="7" starty="1" repeatx="10" priority="25"/>
+        <col type="myadder" startx="7" starty="1" repeatx="10" priority="25"/>
         <!--Column of 'mult_36' with 'EMPTY' blocks wherever a 'mult_36' does not fit. Vertical offset by 1 for perimeter.-->
         <col type="mult_36" startx="8" starty="1" repeatx="10" priority="20"/>
         <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. Vertical offset by 1 for perimeter.-->
@@ -710,45 +712,41 @@
     <!-- Define mac end -->
 
     <!-- Define adder begin-->
-    <pb_type name="add_16" height="1" area="72619">
+    <pb_type name="myadder" height="1" width="1" area="9000">
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <input name="cin" num_pins="1"/>
+            <output name="sumout" num_pins="16"/>
+            <output name="cout" num_pins="1"/>
 
-      <input name="a" num_pins="16"/>
-      <input name="b" num_pins="16"/>
-      <output name="out" num_pins="32"/>
+      <mode name="one_adder">
 
-          <mode name="add_16x16_mode">
-              <pb_type name="add_16x16" blif_model=".subckt add_block" num_pb="1">
-                <input name="a" num_pins="16"/>
-                <input name="b" num_pins="16"/>
-                <output name="out" num_pins="32"/>
-<!-- Delay is same as the multiplier block. 1.523  -->
-                <delay_constant max="1.523e-9" in_port="add_16x16.a" out_port="add_16x16.out"/>
-                <delay_constant max="1.523e-9" in_port="add_16x16.b" out_port="add_16x16.out"/>
+          <pb_type name="adder_pb" blif_model=".subckt adder" num_pb="1">
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <input name="cin" num_pins="1"/>
+            <output name="sumout" num_pins="16"/>
+            <output name="cout" num_pins="1"/>
+            <!-- Carry link delays included in cin->cout delay -->
+            <delay_constant max="25e-12" in_port="adder_pb.a" out_port="adder_pb.sumout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.b" out_port="adder_pb.sumout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.cin" out_port="adder_pb.sumout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.a" out_port="adder_pb.cout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.b" out_port="adder_pb.cout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.cin" out_port="adder_pb.cout"/>
+          </pb_type>
+          <interconnect>
+            <direct name="atoa" input="myadder.a" output="adder_pb.a"></direct>
+            <direct name="btob" input="myadder.b" output="adder_pb.b"></direct>
+            <direct name="cintocin" input="myadder.cin" output="adder_pb.cin"></direct>
+            <direct name="sumouttosumout" input="adder_pb.sumout" output="myadder.sumout"></direct>
+            <direct name="couttocout" input="adder_pb.cout" output="myadder.cout"></direct>
 
-              <power method="pin-toggle">
-                <port name="a" energy_per_toggle="1.09e-12"/>
-                <port name="b" energy_per_toggle="1.09e-12"/>
-                <static_power power_per_instance="0.0"/>					
-              </power>
-            </pb_type>
-        <interconnect>
-          <!-- Stratix IV input delay of 207ps is conservative for this architecture because this architecture does not have an input crossbar in the multiplier. 
-		   Subtract 72.5 ps delay, which is already in the connection block input mux, leading
-              -->
-          <direct name="a2a" input="add_16.a" output="add_16x16.a">
-          </direct>
-          <direct name="b2b" input="add_16.b" output="add_16x16.b">
-          </direct>
-          <direct name="out2out" input="add_16x16.out" output="add_16.out">
-          </direct>
         </interconnect>
       </mode>
-
-
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
       <pinlocations pattern="spread"/>
 
-      <!-- Place this multiplier block every 8 columns from (and including) the sixth column -->
       <power method="sum-of-children"/>
     </pb_type>
     <!-- Define adder end -->
@@ -1365,4 +1363,7 @@
   <clocks>
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
+  <directlist>
+      <direct name="adder_carry" from_pin="myadder.cout" to_pin="myadder.cin" x_offset="0" y_offset="-1" z_offset="0"/>
+  </directlist>
 </architecture>
