@@ -20,7 +20,7 @@
 	<debug_outputs>
 		<!-- Various debug options -->
 		<debug_output_path>.</debug_output_path>
-		<output_ast_graphs>1</output_ast_graphs>
-		<output_netlist_graphs>1</output_netlist_graphs>
+		<output_ast_graphs>0</output_ast_graphs>
+		<output_netlist_graphs>0</output_netlist_graphs>
 	</debug_outputs>
 </config>
