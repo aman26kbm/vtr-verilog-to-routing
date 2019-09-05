@@ -8,12 +8,21 @@ address_width = 7
 mem_size = 128
 
 #Sep 2: added flop to bram of c 
-#Sep 3: updated the version to 
+#Sep 3: updated the version for the larger basic block
+#Sep 4: fix the bug for the reset, and start_mat_mul mismatch
+def ceiling_div(a, b):
+	if(a == 0):
+		return 0
+
+	if(a % b == 0):
+		return a//b
+
+	return a//b + 1
 
 def write_with_ram(file, basic_block_size, final_block_size):
 		#write the top module
 	num_of_bram = int(int(final_block_size)/int(basic_block_size))
-	num_of_IO   = int(num_of_bram*num_of_bram/4)
+	num_of_IO   = ceiling_div(num_of_bram*num_of_bram, 4)
 	file.write(	'module matrix_multiplication(\n'
 				'  clk,\n')
 				#'  reset,\n'
@@ -478,7 +487,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
 def write_systolic_matmul(file, basic_block_size, final_block_size):
 
 	num_of_bram = int(int(final_block_size)/int(basic_block_size))
-	num_of_IO   = int(num_of_bram*num_of_bram/4)
+	num_of_IO   = ceiling_div(num_of_bram*num_of_bram, 4)
 	file.write(	'module matmul_{0}x{0}_systolic(\n'
 				'  clk,\n  done_mat_mul,\n'.format(final_block_size))  
 	for i in range(num_of_IO):
