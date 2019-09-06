@@ -266,7 +266,8 @@
 	       This also leads to the switch being 46% of the total wire delay, which is reasonable. -->
     <switch type="mux" name="0" R="551" Cin=".77e-15" Cout="4e-15" Tdel="58e-12" mux_trans_size="2.630740" buf_size="27.645901"/>
   <!--switch ipin_cblock resistance set to yeild for 4x minimum drive strength buffer-->
-        <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="7.247000e-11" mux_trans_size="1.222260" buf_size="auto"/>
+    <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="7.247000e-11" mux_trans_size="1.222260" buf_size="auto"/>
+    <switch type="short" name="electrical_short" R="0" Cin="0" Tdel="0"/>
         </switchlist>
   <segmentlist>
     <!--- VB & JL: using ITRS metal stack data, 96 nm half pitch wires, which are intermediate metal width/space.  
@@ -719,8 +720,8 @@
 
     <pb_type name="matmul_4x4" height="3" width="3" area="899102">
 
-      <input name="reset" num_pins="1"/>
-      <input name="start_mat_mul" num_pins="1"/>
+      <input name="reset" num_pins="1" is_non_clock_global="true"/>
+      <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
       <input name="a_data" num_pins="64"/>
       <input name="b_data" num_pins="64"/>
       <input name="a_data_in" num_pins="64"/>
@@ -907,7 +908,8 @@
       </mode>
 
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-      <pinlocations pattern="spread"/>
+      <pinlocations pattern="perimeter"/>
+      <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
 
       <power method="sum-of-children"/>
     </pb_type>
