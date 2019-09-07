@@ -82,6 +82,17 @@
        that describe them.
   -->
   <models>
+    <model name="mac_block">
+      <input_ports>
+        <port name="a" combinational_sink_ports="out"/>
+        <port name="b" combinational_sink_ports="out"/>
+        <port name="c" combinational_sink_ports="out"/>
+      </input_ports>
+      <output_ports>
+        <port name="out"/>
+      </output_ports>
+    </model>
+
     <model name="multiply">
       <input_ports>
         <port name="a" combinational_sink_ports="out"/>
@@ -92,44 +103,15 @@
       </output_ports>
     </model>
 
-    <model name="matmul_4x4_systolic">
+    <model name="adder">
       <input_ports>
-        <port name="clk" is_clock="1"/>  
-        <port name="reset" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="start_mat_mul" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="a_data" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="b_data" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="final_mat_mul_size" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="a_loc" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="b_loc" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="a_data_in" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="b_data_in" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="c_data_in" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
+      <port name="a" combinational_sink_ports="sumout cout"/>     
+      <port name="b" combinational_sink_ports="sumout cout"/>  
+      <port name="cin" combinational_sink_ports="sumout cout"/> 
       </input_ports>
       <output_ports>
-        <port name="done_mat_mul" clock="clk"/>
-        <port name="a_data_out" clock="clk"/>
-        <port name="b_data_out" clock="clk"/>
-        <port name="a_addr" clock="clk"/>
-        <port name="b_addr" clock="clk"/>
-        <port name="c_data_out" clock="clk"/>
-      </output_ports>
-    </model>
-
-    <model name="activations">
-      <input_ports>
-        <port name="clk" is_clock="1"/>  
-        <port name="start" clock="clk"/>  
-        <port name="mode" clock="clk"/>  
-        <port name="in_dataI" clock="clk"/>
-      </input_ports>
-      <output_ports>
-        <port name="out_addrI" clock="clk"/>
-        <port name="out_renI" clock="clk"/>
-        <port name="out_addrO"  clock="clk"/>
-        <port name="out_wenO"  clock="clk"/>
-        <port name="out_dataO" clock="clk"/>
-        <port name="done" clock="clk"/>
+      <port name="cout"/>
+      <port name="sumout"/>
       </output_ports>
     </model>
 
@@ -166,388 +148,27 @@
 
   <!-- Physical descriptions begin -->
   <layout>
-    <fixed_layout name="mylaout" width="56" height="56">
+    <!--<auto_layout aspect_ratio="1.0">-->
+    <fixed_layout name="mylayout" width="202" height="242">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
+		<!--Column of 'add_16' with 'EMPTY' blocks wherever a 'add_36' does not fit. Vertical offset by 1 for perimeter.-->
+		<col type="mac_32" startx="6" starty="1" repeatx="20" priority="30"/>
+		<col type="myadder" startx="7" starty="1" repeatx="20" priority="25"/>
+		<col type="myadder" startx="8" starty="1" repeatx="20" priority="25"/>
+		<col type="mult_36" startx="9" starty="1" repeatx="20" priority="20"/>
+		<col type="memory"  startx="10" starty="1" repeatx="20" priority="18"/>
+		<col type="mult_36" startx="12" starty="1" repeatx="20" priority="20"/>
+		<col type="myadder" startx="13" starty="1" repeatx="20" priority="25"/>
+		<col type="myadder" startx="14" starty="1" repeatx="20" priority="25"/>
+		<col type="mac_32" startx="15" starty="1" repeatx="20" priority="30"/>
 
-        <!--Column of 'matmul_4x4' with 'EMPTY' blocks wherever a 'matmul_4x4' does not fit. Vertical offset by 1 for perimeter.-->
-		
-		<single type="matmul_4x4" x="4"  y="4" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="4" priority="25"/>
-		<single type="matmul_4x4" x="10" y="4" priority="25"/>
-		<single type="matmul_4x4" x="13" y="4" priority="25"/>
-		<single type="matmul_4x4" x="16" y="4" priority="25"/>
-		<single type="matmul_4x4" x="19" y="4" priority="25"/>
-		<single type="matmul_4x4" x="22" y="4" priority="25"/>
-		<single type="matmul_4x4" x="25" y="4" priority="25"/>
-		<single type="matmul_4x4" x="28" y="4" priority="25"/>
-		<single type="matmul_4x4" x="31" y="4" priority="25"/>
-		<single type="matmul_4x4" x="34" y="4" priority="25"/>
-		<single type="matmul_4x4" x="37" y="4" priority="25"/>
-		<single type="matmul_4x4" x="40" y="4" priority="25"/>
-		<single type="matmul_4x4" x="43" y="4" priority="25"/>
-		<single type="matmul_4x4" x="46" y="4" priority="25"/>
-		<single type="matmul_4x4" x="49" y="4" priority="25"/>
-		
-		
-        <single type="matmul_4x4" x="4"  y="7" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="7" priority="25"/>
-        <single type="matmul_4x4" x="10" y="7" priority="25"/>
-        <single type="matmul_4x4" x="13" y="7" priority="25"/>
-		<single type="matmul_4x4" x="16" y="7" priority="25"/>
-		<single type="matmul_4x4" x="19" y="7" priority="25"/>
-		<single type="matmul_4x4" x="22" y="7" priority="25"/>
-		<single type="matmul_4x4" x="25" y="7" priority="25"/>
-		<single type="matmul_4x4" x="28" y="7" priority="25"/>
-		<single type="matmul_4x4" x="31" y="7" priority="25"/>
-		<single type="matmul_4x4" x="34" y="7" priority="25"/>
-		<single type="matmul_4x4" x="37" y="7" priority="25"/>
-		<single type="matmul_4x4" x="40" y="7" priority="25"/>
-		<single type="matmul_4x4" x="43" y="7" priority="25"/>
-		<single type="matmul_4x4" x="46" y="7" priority="25"/>
-		<single type="matmul_4x4" x="49" y="7" priority="25"/>
-
-        <single type="matmul_4x4" x="4"  y="10" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="10" priority="25"/>
-        <single type="matmul_4x4" x="10" y="10" priority="25"/>
-        <single type="matmul_4x4" x="13" y="10" priority="25"/>
-		<single type="matmul_4x4" x="16" y="10" priority="25"/>
-        <single type="matmul_4x4" x="19" y="10" priority="25"/>
-		<single type="matmul_4x4" x="22" y="10" priority="25"/>
-        <single type="matmul_4x4" x="25" y="10" priority="25"/>
-		<single type="matmul_4x4" x="28" y="10" priority="25"/>
-		<single type="matmul_4x4" x="31" y="10" priority="25"/>
-		<single type="matmul_4x4" x="34" y="10" priority="25"/>
-		<single type="matmul_4x4" x="37" y="10" priority="25"/>
-		<single type="matmul_4x4" x="40" y="10" priority="25"/>
-		<single type="matmul_4x4" x="43" y="10" priority="25"/>
-		<single type="matmul_4x4" x="46" y="10" priority="25"/>
-		<single type="matmul_4x4" x="49" y="10" priority="25"/>
-
-        <single type="matmul_4x4" x="4"  y="13" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="13" priority="25"/>
-        <single type="matmul_4x4" x="10" y="13" priority="25"/>
-        <single type="matmul_4x4" x="13" y="13" priority="25"/>
-        <single type="matmul_4x4" x="16" y="13" priority="25"/>
-        <single type="matmul_4x4" x="19" y="13" priority="25"/>
-		<single type="matmul_4x4" x="22" y="13" priority="25"/>
-        <single type="matmul_4x4" x="25" y="13" priority="25"/>
-		<single type="matmul_4x4" x="28" y="13" priority="25"/>
-		<single type="matmul_4x4" x="31" y="13" priority="25"/>
-		<single type="matmul_4x4" x="34" y="13" priority="25"/>
-		<single type="matmul_4x4" x="37" y="13" priority="25"/>
-		<single type="matmul_4x4" x="40" y="13" priority="25"/>
-		<single type="matmul_4x4" x="43" y="13" priority="25"/>
-		<single type="matmul_4x4" x="46" y="13" priority="25"/>
-		<single type="matmul_4x4" x="49" y="13" priority="25"/>
-
-		<single type="matmul_4x4" x="4"  y="16" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="16" priority="25"/>
-        <single type="matmul_4x4" x="10" y="16" priority="25"/>
-        <single type="matmul_4x4" x="13" y="16" priority="25"/>
-        <single type="matmul_4x4" x="16" y="16" priority="25"/>
-        <single type="matmul_4x4" x="19" y="16" priority="25"/>
-		<single type="matmul_4x4" x="22" y="16" priority="25"/>
-        <single type="matmul_4x4" x="25" y="16" priority="25"/>
-		<single type="matmul_4x4" x="28" y="16" priority="25"/>
-		<single type="matmul_4x4" x="31" y="16" priority="25"/>
-		<single type="matmul_4x4" x="34" y="16" priority="25"/>
-		<single type="matmul_4x4" x="37" y="16" priority="25"/>
-		<single type="matmul_4x4" x="40" y="16" priority="25"/>
-		<single type="matmul_4x4" x="43" y="16" priority="25"/>
-		<single type="matmul_4x4" x="46" y="16" priority="25"/>
-		<single type="matmul_4x4" x="49" y="16" priority="25"/>
-
-		<single type="matmul_4x4" x="4"  y="19" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="19" priority="25"/>
-        <single type="matmul_4x4" x="10" y="19" priority="25"/>
-        <single type="matmul_4x4" x="13" y="19" priority="25"/>
-        <single type="matmul_4x4" x="16" y="19" priority="25"/>
-        <single type="matmul_4x4" x="19" y="19" priority="25"/>
-		<single type="matmul_4x4" x="22" y="19" priority="25"/>
-        <single type="matmul_4x4" x="25" y="19" priority="25"/>
-		<single type="matmul_4x4" x="28" y="19" priority="25"/>
-		<single type="matmul_4x4" x="31" y="19" priority="25"/>
-		<single type="matmul_4x4" x="34" y="19" priority="25"/>
-		<single type="matmul_4x4" x="37" y="19" priority="25"/>
-		<single type="matmul_4x4" x="40" y="19" priority="25"/>
-		<single type="matmul_4x4" x="43" y="19" priority="25"/>
-		<single type="matmul_4x4" x="46" y="19" priority="25"/>
-		<single type="matmul_4x4" x="49" y="19" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="22" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="22" priority="25"/>
-        <single type="matmul_4x4" x="10" y="22" priority="25"/>
-        <single type="matmul_4x4" x="13" y="22" priority="25"/>
-        <single type="matmul_4x4" x="16" y="22" priority="25"/>
-        <single type="matmul_4x4" x="19" y="22" priority="25"/>
-		<single type="matmul_4x4" x="22" y="22" priority="25"/>
-        <single type="matmul_4x4" x="25" y="22" priority="25"/>
-		<single type="matmul_4x4" x="28" y="22" priority="25"/>
-		<single type="matmul_4x4" x="31" y="22" priority="25"/>
-		<single type="matmul_4x4" x="34" y="22" priority="25"/>
-		<single type="matmul_4x4" x="37" y="22" priority="25"/>
-		<single type="matmul_4x4" x="40" y="22" priority="25"/>
-		<single type="matmul_4x4" x="43" y="22" priority="25"/>
-		<single type="matmul_4x4" x="46" y="22" priority="25"/>
-		<single type="matmul_4x4" x="49" y="22" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="25" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="25" priority="25"/>
-        <single type="matmul_4x4" x="10" y="25" priority="25"/>
-        <single type="matmul_4x4" x="13" y="25" priority="25"/>
-        <single type="matmul_4x4" x="16" y="25" priority="25"/>
-        <single type="matmul_4x4" x="19" y="25" priority="25"/>
-		<single type="matmul_4x4" x="22" y="25" priority="25"/>
-        <single type="matmul_4x4" x="25" y="25" priority="25"/>
-		<single type="matmul_4x4" x="28" y="25" priority="25"/>
-        <single type="matmul_4x4" x="31" y="25" priority="25"/>
-		<single type="matmul_4x4" x="34" y="25" priority="25"/>
-		<single type="matmul_4x4" x="37" y="25" priority="25"/>
-		<single type="matmul_4x4" x="40" y="25" priority="25"/>
-		<single type="matmul_4x4" x="43" y="25" priority="25"/>
-		<single type="matmul_4x4" x="46" y="25" priority="25"/>
-		<single type="matmul_4x4" x="49" y="25" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="28" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="28" priority="25"/>
-        <single type="matmul_4x4" x="10" y="28" priority="25"/>
-        <single type="matmul_4x4" x="13" y="28" priority="25"/>
-        <single type="matmul_4x4" x="16" y="28" priority="25"/>
-        <single type="matmul_4x4" x="19" y="28" priority="25"/>
-		<single type="matmul_4x4" x="22" y="28" priority="25"/>
-        <single type="matmul_4x4" x="25" y="28" priority="25"/>
-		<single type="matmul_4x4" x="28" y="28" priority="25"/>
-        <single type="matmul_4x4" x="31" y="28" priority="25"/>
-		<single type="matmul_4x4" x="34" y="28" priority="25"/>
-		<single type="matmul_4x4" x="37" y="28" priority="25"/>
-		<single type="matmul_4x4" x="40" y="28" priority="25"/>
-		<single type="matmul_4x4" x="43" y="28" priority="25"/>
-		<single type="matmul_4x4" x="46" y="28" priority="25"/>
-		<single type="matmul_4x4" x="49" y="28" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="31" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="31" priority="25"/>
-        <single type="matmul_4x4" x="10" y="31" priority="25"/>
-        <single type="matmul_4x4" x="13" y="31" priority="25"/>
-        <single type="matmul_4x4" x="16" y="31" priority="25"/>
-        <single type="matmul_4x4" x="19" y="31" priority="25"/>
-		<single type="matmul_4x4" x="22" y="31" priority="25"/>
-        <single type="matmul_4x4" x="25" y="31" priority="25"/>
-		<single type="matmul_4x4" x="28" y="31" priority="25"/>
-        <single type="matmul_4x4" x="31" y="31" priority="25"/>
-		<single type="matmul_4x4" x="34" y="31" priority="25"/>
-		<single type="matmul_4x4" x="37" y="31" priority="25"/>
-		<single type="matmul_4x4" x="40" y="31" priority="25"/>
-		<single type="matmul_4x4" x="43" y="31" priority="25"/>
-		<single type="matmul_4x4" x="46" y="31" priority="25"/>
-		<single type="matmul_4x4" x="49" y="31" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="34" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="34" priority="25"/>
-        <single type="matmul_4x4" x="10" y="34" priority="25"/>
-        <single type="matmul_4x4" x="13" y="34" priority="25"/>
-        <single type="matmul_4x4" x="16" y="34" priority="25"/>
-        <single type="matmul_4x4" x="19" y="34" priority="25"/>
-		<single type="matmul_4x4" x="22" y="34" priority="25"/>
-        <single type="matmul_4x4" x="25" y="34" priority="25"/>
-		<single type="matmul_4x4" x="28" y="34" priority="25"/>
-        <single type="matmul_4x4" x="31" y="34" priority="25"/>
-		<single type="matmul_4x4" x="34" y="34" priority="25"/>
-		<single type="matmul_4x4" x="37" y="34" priority="25"/>
-		<single type="matmul_4x4" x="40" y="34" priority="25"/>
-		<single type="matmul_4x4" x="43" y="34" priority="25"/>
-		<single type="matmul_4x4" x="46" y="34" priority="25"/>
-		<single type="matmul_4x4" x="49" y="34" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="37" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="37" priority="25"/>
-        <single type="matmul_4x4" x="10" y="37" priority="25"/>
-        <single type="matmul_4x4" x="13" y="37" priority="25"/>
-        <single type="matmul_4x4" x="16" y="37" priority="25"/>
-        <single type="matmul_4x4" x="19" y="37" priority="25"/>
-		<single type="matmul_4x4" x="22" y="37" priority="25"/>
-        <single type="matmul_4x4" x="25" y="37" priority="25"/>
-		<single type="matmul_4x4" x="28" y="37" priority="25"/>
-        <single type="matmul_4x4" x="31" y="37" priority="25"/>
-		<single type="matmul_4x4" x="34" y="37" priority="25"/>
-		<single type="matmul_4x4" x="37" y="37" priority="25"/>
-		<single type="matmul_4x4" x="40" y="37" priority="25"/>
-		<single type="matmul_4x4" x="43" y="37" priority="25"/>
-		<single type="matmul_4x4" x="46" y="37" priority="25"/>
-		<single type="matmul_4x4" x="49" y="37" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="40" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="40" priority="25"/>
-        <single type="matmul_4x4" x="10" y="40" priority="25"/>
-        <single type="matmul_4x4" x="13" y="40" priority="25"/>
-        <single type="matmul_4x4" x="16" y="40" priority="25"/>
-        <single type="matmul_4x4" x="19" y="40" priority="25"/>
-		<single type="matmul_4x4" x="22" y="40" priority="25"/>
-        <single type="matmul_4x4" x="25" y="40" priority="25"/>
-		<single type="matmul_4x4" x="28" y="40" priority="25"/>
-        <single type="matmul_4x4" x="31" y="40" priority="25"/>
-		<single type="matmul_4x4" x="34" y="40" priority="25"/>
-		<single type="matmul_4x4" x="37" y="40" priority="25"/>
-		<single type="matmul_4x4" x="40" y="40" priority="25"/>
-		<single type="matmul_4x4" x="43" y="40" priority="25"/>
-		<single type="matmul_4x4" x="46" y="40" priority="25"/>
-		<single type="matmul_4x4" x="49" y="40" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="43" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="43" priority="25"/>
-        <single type="matmul_4x4" x="10" y="43" priority="25"/>
-        <single type="matmul_4x4" x="13" y="43" priority="25"/>
-        <single type="matmul_4x4" x="16" y="43" priority="25"/>
-        <single type="matmul_4x4" x="19" y="43" priority="25"/>
-		<single type="matmul_4x4" x="22" y="43" priority="25"/>
-        <single type="matmul_4x4" x="25" y="43" priority="25"/>
-		<single type="matmul_4x4" x="28" y="43" priority="25"/>
-        <single type="matmul_4x4" x="31" y="43" priority="25"/>
-		<single type="matmul_4x4" x="34" y="43" priority="25"/>
-		<single type="matmul_4x4" x="37" y="43" priority="25"/>
-		<single type="matmul_4x4" x="40" y="43" priority="25"/>
-		<single type="matmul_4x4" x="43" y="43" priority="25"/>
-		<single type="matmul_4x4" x="46" y="43" priority="25"/>
-		<single type="matmul_4x4" x="49" y="43" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="46" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="46" priority="25"/>
-        <single type="matmul_4x4" x="10" y="46" priority="25"/>
-        <single type="matmul_4x4" x="13" y="46" priority="25"/>
-        <single type="matmul_4x4" x="16" y="46" priority="25"/>
-        <single type="matmul_4x4" x="19" y="46" priority="25"/>
-		<single type="matmul_4x4" x="22" y="46" priority="25"/>
-        <single type="matmul_4x4" x="25" y="46" priority="25"/>
-		<single type="matmul_4x4" x="28" y="46" priority="25"/>
-        <single type="matmul_4x4" x="31" y="46" priority="25"/>
-		<single type="matmul_4x4" x="34" y="46" priority="25"/>
-		<single type="matmul_4x4" x="37" y="46" priority="25"/>
-		<single type="matmul_4x4" x="40" y="46" priority="25"/>
-		<single type="matmul_4x4" x="43" y="46" priority="25"/>
-		<single type="matmul_4x4" x="46" y="46" priority="25"/>
-		<single type="matmul_4x4" x="49" y="46" priority="25"/>
-		
-		<single type="matmul_4x4" x="4"  y="49" priority="25"/>
-        <single type="matmul_4x4" x="7"  y="49" priority="25"/>
-        <single type="matmul_4x4" x="10" y="49" priority="25"/>
-        <single type="matmul_4x4" x="13" y="49" priority="25"/>
-        <single type="matmul_4x4" x="16" y="49" priority="25"/>
-        <single type="matmul_4x4" x="19" y="49" priority="25"/>
-		<single type="matmul_4x4" x="22" y="49" priority="25"/>
-        <single type="matmul_4x4" x="25" y="49" priority="25"/>
-		<single type="matmul_4x4" x="28" y="49" priority="25"/>
-        <single type="matmul_4x4" x="31" y="49" priority="25"/>
-		<single type="matmul_4x4" x="34" y="49" priority="25"/>
-		<single type="matmul_4x4" x="37" y="49" priority="25"/>
-		<single type="matmul_4x4" x="40" y="49" priority="25"/>
-		<single type="matmul_4x4" x="43" y="49" priority="25"/>
-		<single type="matmul_4x4" x="46" y="49" priority="25"/>
-		<single type="matmul_4x4" x="49" y="49" priority="25"/>
-		
-        <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. Vertical offset by 1 for perimeter.-->
-        <single type="memory" x="2"  y="4"  priority="20"/>
-        <single type="memory" x="2"  y="7"  priority="20"/>
-        <single type="memory" x="2"  y="10" priority="20"/>
-        <single type="memory" x="2"  y="13" priority="20"/>
-		<single type="memory" x="2"  y="16" priority="20"/>
-		<single type="memory" x="2"  y="19" priority="20"/>
-		<single type="memory" x="2"  y="22" priority="20"/>
-		<single type="memory" x="2"  y="25" priority="20"/>
-		<single type="memory" x="2"  y="28" priority="20"/>
-		<single type="memory" x="2"  y="31" priority="20"/>
-		<single type="memory" x="2"  y="34" priority="20"/>
-		<single type="memory" x="2"  y="37" priority="20"/>
-		<single type="memory" x="2"  y="40" priority="20"/>
-		<single type="memory" x="2"  y="43" priority="20"/>
-		<single type="memory" x="2"  y="46" priority="20"/>
-		<single type="memory" x="2"  y="49" priority="20"/>
-		
-
-        <single type="memory" x="52" y="4"  priority="20"/>
-        <single type="memory" x="52" y="7"  priority="20"/>
-        <single type="memory" x="52" y="10" priority="20"/>
-        <single type="memory" x="52" y="13" priority="20"/>
-		<single type="memory" x="52" y="16" priority="20"/>
-		<single type="memory" x="52" y="19" priority="20"/>
-		<single type="memory" x="52" y="22" priority="20"/>
-		<single type="memory" x="52" y="25" priority="20"/>
-		<single type="memory" x="52" y="28" priority="20"/>
-		<single type="memory" x="52" y="31" priority="20"/>
-		<single type="memory" x="52" y="34" priority="20"/>
-		<single type="memory" x="52" y="37" priority="20"/>
-		<single type="memory" x="52" y="40" priority="20"/>
-		<single type="memory" x="52" y="43" priority="20"/>
-		<single type="memory" x="52" y="46" priority="20"/>
-		<single type="memory" x="52" y="49" priority="20"/>
-		
-
-        <single type="memory" x="4"  y="52" priority="20"/>
-        <single type="memory" x="7"  y="52" priority="20"/>
-        <single type="memory" x="10" y="52" priority="20"/>
-        <single type="memory" x="13" y="52" priority="20"/>
-		<single type="memory" x="16" y="52" priority="20"/>
-		<single type="memory" x="19" y="52" priority="20"/>
-		<single type="memory" x="22" y="52" priority="20"/>
-		<single type="memory" x="25" y="52" priority="20"/>
-		<single type="memory" x="28" y="52" priority="20"/>
-		<single type="memory" x="31" y="52" priority="20"/>
-		<single type="memory" x="34" y="52" priority="20"/>
-		<single type="memory" x="37" y="52" priority="20"/>
-		<single type="memory" x="40" y="52" priority="20"/>
-		<single type="memory" x="43" y="52" priority="20"/>
-		<single type="memory" x="46" y="52" priority="20"/>
-		<single type="memory" x="49" y="52" priority="20"/>
-		
-		
-
-        <single type="memory" x="4"  y="1" priority="20"/>
-        <single type="memory" x="7"  y="1" priority="20"/>
-        <single type="memory" x="10" y="1" priority="20"/>
-        <single type="memory" x="13" y="1" priority="20"/>
-		<single type="memory" x="16" y="1" priority="20"/>
-		<single type="memory" x="19" y="1" priority="20"/>
-		<single type="memory" x="22" y="1" priority="20"/>
-		<single type="memory" x="25" y="1" priority="20"/>
-		<single type="memory" x="28" y="1" priority="20"/>
-		<single type="memory" x="31" y="1" priority="20"/>
-		<single type="memory" x="34" y="1" priority="20"/>
-		<single type="memory" x="37" y="1" priority="20"/>
-		<single type="memory" x="40" y="1" priority="20"/>
-		<single type="memory" x="43" y="1" priority="20"/>
-		<single type="memory" x="46" y="1" priority="20"/>
-		<single type="memory" x="49" y="1" priority="20"/>
-
-
+		         
     </fixed_layout>
-
-	<!-- Alternate representation, but this is not correct. Keeping it here for future reference
-        <perimeter type="io" priority="150"/>
-        <corners type="EMPTY" priority="151"/>
-        <col type="clb" startx="2" starty="1" repeatx="4" incry="4" priority="15"/>
-        <col type="clb" startx="4" starty="3" repeatx="4" incry="4" priority="16"/>
-	<col type="clb" startx="9" starty="1" priority="103"/>
-        <col type="clb" startx="10" starty="1" priority="102"/>
-	<row type="clb" starty="9" startx="1" priority="100"/>
-        <row type="clb" starty="10" startx="1" priority="101"/>
-        <single type="clb" x="2" y="9" priority="200"/>
-        <single type="clb" x="6" y="9" priority="200"/>
-        <single type="clb" x="14" y="9" priority="200"/>
-        <single type="clb" x="18" y="9" priority="200"/>
-        <single type="clb" x="10" y="1" priority="200"/>
-        <single type="clb" x="10" y="5" priority="200"/>
-	<single type="clb" x="10" y="13" priority="200"/>
-        <single type="clb" x="10" y="17" priority="200"/>
-        <col type="memory" startx="1" starty="3" repeatx="4" incry="4" priority="20"/>
-        <col type="memory" startx="3" starty="1" repeatx="4" incry="4" priority="21"/>
-        <col type="matmul_4x4" startx="1" starty="1" repeatx="4" incry="4" priority="30"/>
-        <col type="matmul_4x4" startx="3" starty="3" repeatx="4" incry="4" priority="31"/>
-        <col type="activation" startx="2" starty="2" repeatx="4" incry="4" priority="45"/>
-        <col type="activation" startx="4" starty="4" repeatx="4" incry="4" priority="55"/>
-	-->
+<!--        </auto_layout> -->
 </layout>
 
   <device>
@@ -571,7 +192,7 @@
     <!-- The grid_logic_tile_area below will be used for all blocks that do not explicitly set their own (non-routing)
      	  area; set to 0 since we explicitly set the area of all blocks currently in this architecture file.
 	  -->
-    <area grid_logic_tile_area="0"/>
+		<area grid_logic_tile_area="0"/>
     <chan_width_distr>
       <x distr="uniform" peak="1.000000"/>
       <y distr="uniform" peak="1.000000"/>
@@ -595,8 +216,7 @@
 	       This also leads to the switch being 46% of the total wire delay, which is reasonable. -->
     <switch type="mux" name="0" R="551" Cin=".77e-15" Cout="4e-15" Tdel="58e-12" mux_trans_size="2.630740" buf_size="27.645901"/>
   <!--switch ipin_cblock resistance set to yeild for 4x minimum drive strength buffer-->
-    <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="7.247000e-11" mux_trans_size="1.222260" buf_size="auto"/>
-    <switch type="short" name="electrical_short" R="0" Cin="0" Tdel="0"/>
+        <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="7.247000e-11" mux_trans_size="1.222260" buf_size="auto"/>
         </switchlist>
   <segmentlist>
     <!--- VB & JL: using ITRS metal stack data, 96 nm half pitch wires, which are intermediate metal width/space.  
@@ -675,7 +295,7 @@
 	   assume, but note that the total routing area really includes the crossbar, which would push
 	   routing area up significantly, we estimate into the ~70% range. 
 	   -->
-    <pb_type name="clb" height="1" width="1" area="53894">
+    <pb_type name="clb" area="53894">
       <input name="I" num_pins="40" equivalent="full"/>
       <output name="O" num_pins="20" equivalent="none"/>
       <clock name="clk" num_pins="1"/>
@@ -857,6 +477,7 @@
       </pb_type>
     <!-- Define general purpose logic block (CLB) ends -->
 
+
     <!-- Define fracturable multiplier begin -->
     <!-- This multiplier can operate as a 36x36 multiplier that can fracture to two 18x18 multipliers each of which can further fracture to two 9x9 multipliers 
 	   For delay modelling, the 36x36 DSP multiplier in Stratix IV has a delay of 1.523 ns + 1.93 ns
@@ -880,7 +501,7 @@
 		 area associated with our DSP block is four times that of a logic tile, where the routing area of a logic tile was calculated above (at W = 300)
 		 as 30481 MWTAs. Hence the (core, non-routing) area our DSP block is approximately 518,000 - 4 * 30,481 = 396,000 MWTUs.
       -->
-    <pb_type name="mult_36" height="4" width="1" area="396000">
+    <pb_type name="mult_36" height="4" area="396000">
 
       <input name="a" num_pins="36"/>
       <input name="b" num_pins="36"/>
@@ -1040,323 +661,51 @@
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
       <pinlocations pattern="spread"/>
 
+      <!-- Place this multiplier block every 8 columns from (and including) the sixth column -->
       <power method="sum-of-children"/>
     </pb_type>
     <!-- Define fracturable multiplier end -->
 
-	
-    <!-- Define matrix multiplier begin -->
 
-    <pb_type name="matmul_4x4" height="3" width="3" area="899102">
 
-      <input name="reset" num_pins="1" is_non_clock_global="true"/>
-      <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
-      <input name="a_data" num_pins="64"/>
-      <input name="b_data" num_pins="64"/>
-      <input name="a_data_in" num_pins="64"/>
-      <input name="b_data_in" num_pins="64"/>
-      <input name="c_data_in" num_pins="64"/>
-      <input name="final_mat_mul_size" num_pins="8"/>
-      <input name="a_loc" num_pins="8"/>
-      <input name="b_loc" num_pins="8"/>
+    <!-- Define mac begin -->
 
-      <output name="done_mat_mul"  num_pins="1"/>
-      <output name="a_data_out"  num_pins="64"/>
-      <output name="b_data_out"  num_pins="64"/>
-      <output name="c_data_out"  num_pins="64"/>
-      <output name="a_addr"  num_pins="7"/>
-      <output name="b_addr"  num_pins="7"/>
+    <pb_type name="mac_32" height="1" area="72619">
 
-      <clock name="clk" num_pins="1"/>
+      <input name="a" num_pins="16"/>
+      <input name="b" num_pins="16"/>
+      <input name="c" num_pins="32"/>
+      <output name="out" num_pins="32"/>
 
-      <mode name="matmult_4x4_mode">
-        <pb_type name="matmul_4x4_pb" blif_model=".subckt matmul_4x4_systolic" num_pb="1">
+          <mode name="mac_16x16_mode">
+              <pb_type name="mac_16x16" blif_model=".subckt mac_block" num_pb="1">
+                <input name="a" num_pins="16"/>
+                <input name="b" num_pins="16"/>
+                <input name="c" num_pins="32"/>
+                <output name="out" num_pins="32"/>
+                <delay_constant max="1.523e-9" in_port="mac_16x16.a" out_port="mac_16x16.out"/>
+                <delay_constant max="1.523e-9" in_port="mac_16x16.b" out_port="mac_16x16.out"/>
+                <delay_constant max="1.523e-9" in_port="mac_16x16.c" out_port="mac_16x16.out"/>
 
-          <input name="reset" num_pins="1"/>
-          <input name="start_mat_mul" num_pins="1"/>
-          <input name="a_data" num_pins="64"/>
-          <input name="b_data" num_pins="64"/>
-          <input name="a_data_in" num_pins="64"/>
-          <input name="b_data_in" num_pins="64"/>
-          <input name="c_data_in" num_pins="64"/>
-          <input name="final_mat_mul_size" num_pins="8"/>
-          <input name="a_loc" num_pins="8"/>
-          <input name="b_loc" num_pins="8"/>
+              <power method="pin-toggle">
+                <port name="a" energy_per_toggle="1.09e-12"/>
+                <port name="b" energy_per_toggle="1.09e-12"/>
+                <port name="c" energy_per_toggle="1.09e-12"/>
+                <static_power power_per_instance="0.0"/>					
+              </power>
+            </pb_type>
+            <interconnect>
+              <direct name="a2a" input="mac_32.a" output="mac_16x16.a">
+              </direct>
+              <direct name="b2b" input="mac_32.b" output="mac_16x16.b">
+              </direct>
+              <direct name="c2c" input="mac_32.c" output="mac_16x16.c">
+              </direct>
+              <direct name="out2out" input="mac_16x16.out" output="mac_32.out">
+              </direct>
+            </interconnect>
+          </mode>
 
-          <output name="done_mat_mul"  num_pins="1"/>
-          <output name="a_data_out"  num_pins="64"/>
-          <output name="b_data_out"  num_pins="64"/>
-          <output name="c_data_out"  num_pins="64"/>
-          <output name="a_addr"  num_pins="7"/>
-          <output name="b_addr"  num_pins="7"/>
-
-          <clock name="clk" num_pins="1"/>
-
-<!-- Setup = 0.094ns
-     Hold  = 0
-     ClktoQ = 0.22ns-->
-
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.reset" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.start_mat_mul" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_data" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_data" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_data_in" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_data_in" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.c_data_in" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.final_mat_mul_size" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_loc" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_loc" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.done_mat_mul" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_data_out" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_data_out" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_addr" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_addr" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.c_data_out" clock="clk"/>
-
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.reset" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.start_mat_mul" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_data" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_data" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_data_in" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_data_in" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.c_data_in" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.final_mat_mul_size" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_loc" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_loc" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.done_mat_mul" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_data_out" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_data_out" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_addr" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_addr" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.c_data_out" clock="clk"/>
-
-<!-- Internal combo delay = Critical path delay (1.588ns) - Setup (0.06) - Clock-to-q (0.11) -->
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_data_out"/>
-
-<!-- 
-          <power method="pin-toggle">
-            <port name="start" energy_per_toggle="2.13e-12"/>
-            <port name="in_dataA" energy_per_toggle="2.13e-12"/>
-            <port name="in_dataB" energy_per_toggle="2.13e-12"/>
-            <port name="out_dataC" energy_per_toggle="2.13e-12"/>
-            <port name="done" energy_per_toggle="2.13e-12"/>
-            <port name="clk" energy_per_toggle="9.0e-12"/>					
-            <static_power power_per_instance="0.0"/>
-          </power>
--->
-        </pb_type>
-
-        <interconnect>
-          <direct name="reset" input="matmul_4x4.reset" output="matmul_4x4_pb.reset"></direct>
-          <direct name="start_mat_mul" input="matmul_4x4.start_mat_mul"    output="matmul_4x4_pb.start_mat_mul"></direct>
-          <direct name="a_data" input="matmul_4x4.a_data"    output="matmul_4x4_pb.a_data"></direct>
-          <direct name="b_data" input="matmul_4x4.b_data"    output="matmul_4x4_pb.b_data"></direct>
-          <direct name="a_data_in" input="matmul_4x4.a_data_in"    output="matmul_4x4_pb.a_data_in"></direct>
-          <direct name="b_data_in" input="matmul_4x4.b_data_in"    output="matmul_4x4_pb.b_data_in"></direct>
-          <direct name="c_data_in" input="matmul_4x4.c_data_in"    output="matmul_4x4_pb.c_data_in"></direct>
-          <direct name="final_mat_mul_size" input="matmul_4x4.final_mat_mul_size"    output="matmul_4x4_pb.final_mat_mul_size"></direct>
-          <direct name="a_loc" input="matmul_4x4.a_loc"    output="matmul_4x4_pb.a_loc"></direct>
-          <direct name="b_loc" input="matmul_4x4.b_loc"    output="matmul_4x4_pb.b_loc"></direct>
-          <direct name="done_mat_mul" input="matmul_4x4_pb.done_mat_mul" output="matmul_4x4.done_mat_mul"></direct>
-          <direct name="a_data_out" input="matmul_4x4_pb.a_data_out" output="matmul_4x4.a_data_out"></direct>
-          <direct name="b_data_out" input="matmul_4x4_pb.b_data_out" output="matmul_4x4.b_data_out"></direct>
-          <direct name="a_addr" input="matmul_4x4_pb.a_addr" output="matmul_4x4.a_addr"></direct>
-          <direct name="b_addr" input="matmul_4x4_pb.b_addr" output="matmul_4x4.b_addr"></direct>
-          <direct name="c_data_out" input="matmul_4x4_pb.c_data_out" output="matmul_4x4.c_data_out"></direct>
-          <direct name="clk" input="matmul_4x4.clk" output="matmul_4x4_pb.clk"></direct>
-        </interconnect>
-
-      </mode>
-
-      <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-      <pinlocations pattern="perimeter"/>
-      <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
-
-      <power method="sum-of-children"/>
-    </pb_type>
-    <!-- Define matrix multiplier end -->
-
-    <!-- Define activation block begin -->
-    <!--  For now, I am assuming that the interface of the activation block is such that it sends out addresses (32-bit) 
-          to the memory and receives 64 bytes (512 bits) of data at a time. This is similar to cache line sizes in GPUs/CPUs.
-          It has one input port to memory (for reading elements of one input matrix/array).
-          Similarly, it has one output port to memory - it can write 512 bits to the memory, to a 32-bit address.
-	  An activation block has 3 functionalities in it. It can do Relu, or Sigmoid, or Tanh.
-	  There is a 2-bit mode input that can be used to control the mode.
-    -->
-
-    <pb_type name="activation" height="1" width="1" area="396000">
-
-      <output name="out_addrI" num_pins="9"/>
-      <output name="out_renI"  num_pins="1"/>
-      <input name="in_dataI" num_pins="64"/>
-
-      <output name="out_addrO" num_pins="9"/>
-      <output name="out_wenO"  num_pins="1"/>
-      <output name="out_dataO" num_pins="64"/>
-
-      <clock name="clk" num_pins="1"/>
-      <input name="start" num_pins="1"/>
-      <input name="mode" num_pins="2"/>
-      <output name="done" num_pins="1"/>
-
-      <mode name="activation_mode">
-        <pb_type name="activation_pb" blif_model=".subckt activations" num_pb="1">
-          <output name="out_addrI" num_pins="9"/>
-          <output name="out_renI"  num_pins="1"/>
-          <input name="in_dataI" num_pins="64"/>
-
-          <output name="out_addrO" num_pins="9"/>
-          <output name="out_wenO"  num_pins="1"/>
-          <output name="out_dataO" num_pins="64"/>
-
-          <clock name="clk" num_pins="1"/>
-          <input name="start" num_pins="1"/>
-          <input name="mode" num_pins="2"/>
-          <output name="done" num_pins="1"/>
-
-	<T_setup value="3.88e-10" port="activation_pb.start" clock="clk"/>
-	<T_setup value="3.88e-10" port="activation_pb.mode" clock="clk"/>
-	<T_setup value="3.88e-10" port="activation_pb.in_dataI" clock="clk"/>
-
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.start" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.mode" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.in_dataI" clock="clk"/>
-
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.out_addrI" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.out_renI" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.out_addrO" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.out_wenO" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.out_dataO" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="activation_pb.done" clock="clk"/>
-
-<!--
-	<delay_constant max="5.99e-7" in_port="activation_pb.start" out_port="activation_pb.out_dataO"/>
-	<delay_constant max="5.99e-7" in_port="activation_pb.mode" out_port="activation_pb.out_dataO"/>
-	<delay_constant max="5.99e-7" in_port="activation_pb.in_dataI" out_port="activation_pb.out_dataO"/>
--->
-
-<!--
-	<T_clock_to_Q max="3.88e-10" port="matmul_4x4_pb.out_addrA" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="matmul_4x4_pb.out_renA" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="matmul_4x4_pb.out_addrB" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="matmul_4x4_pb.out_renB" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="matmul_4x4_pb.out_addrC" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="matmul_4x4_pb.out_wenC" clock="clk"/>
-	<T_clock_to_Q max="3.88e-10" port="matmul_4x4_pb.out_dataC" clock="clk"/>
--->
-          <power method="pin-toggle">
-            <port name="start" energy_per_toggle="2.13e-12"/>
-            <port name="mode" energy_per_toggle="2.13e-12"/>
-            <port name="in_dataI" energy_per_toggle="2.13e-12"/>
-            <port name="out_dataO" energy_per_toggle="2.13e-12"/>
-            <port name="done" energy_per_toggle="2.13e-12"/>
-            <port name="clk" energy_per_toggle="9.0e-12"/>					
-            <static_power power_per_instance="0.0"/>
-          </power>
-        </pb_type>
-
-        <interconnect>
-          <direct name="start" input="activation.start" output="activation_pb.start">
-            <delay_constant max="134e-12" in_port="activation.start" out_port="activation_pb.start"/>
-          </direct>
-          <direct name="done" input="activation_pb.done" output="activation.done">
-            <delay_constant max="134e-12" in_port="activation_pb.done" out_port="activation.done"/>
-          </direct>
-          <direct name="mode" input="activation.mode" output="activation_pb.mode">
-            <delay_constant max="134e-12" in_port="activation.mode" out_port="activation_pb.mode"/>
-          </direct>
-          <direct name="datai2i" input="activation.in_dataI" output="activation_pb.in_dataI">
-            <delay_constant max="134e-12" in_port="activation.in_dataI" out_port="activation_pb.in_dataI"/>
-          </direct>
-          <direct name="datao2o" input="activation_pb.out_dataO" output="activation.out_dataO">
-            <delay_constant max="134e-12" in_port="activation_pb.out_dataO" out_port="activation.out_dataO"/>
-          </direct>
-          <direct name="clk" input="activation.clk" output="activation_pb.clk">
-          </direct>
-          <direct name="addri2i" input="activation_pb.out_addrI" output="activation.out_addrI">
-            <delay_constant max="134e-12" in_port="activation_pb.out_addrI" out_port="activation.out_addrI"/>
-          </direct>
-          <direct name="addro2o" input="activation_pb.out_addrO" output="activation.out_addrO">
-            <delay_constant max="134e-12" in_port="activation_pb.out_addrO" out_port="activation.out_addrO"/>
-          </direct>
-          <direct name="reni2i" input="activation_pb.out_renI" output="activation.out_renI">
-            <delay_constant max="134e-12" in_port="activation_pb.out_renI" out_port="activation.out_renI"/>
-          </direct>
-          <direct name="weno2o" input="activation_pb.out_wenO" output="activation.out_wenO">
-            <delay_constant max="134e-12" in_port="activation_pb.out_wenO" out_port="activation.out_wenO"/>
-          </direct>
-        </interconnect>
-
-      </mode>
 
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
       <pinlocations pattern="spread"/>
@@ -1364,7 +713,47 @@
       <!-- Place this multiplier block every 8 columns from (and including) the sixth column -->
       <power method="sum-of-children"/>
     </pb_type>
-    <!-- Define activation end -->
+    <!-- Define mac end -->
+
+    <!-- Define adder begin-->
+    <pb_type name="myadder" height="1" width="1" area="9000">
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <input name="cin" num_pins="1"/>
+            <output name="sumout" num_pins="16"/>
+            <output name="cout" num_pins="1"/>
+
+      <mode name="one_adder">
+
+          <pb_type name="adder_pb" blif_model=".subckt adder" num_pb="1">
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <input name="cin" num_pins="1"/>
+            <output name="sumout" num_pins="16"/>
+            <output name="cout" num_pins="1"/>
+            <!-- Carry link delays included in cin->cout delay -->
+            <delay_constant max="25e-12" in_port="adder_pb.a" out_port="adder_pb.sumout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.b" out_port="adder_pb.sumout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.cin" out_port="adder_pb.sumout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.a" out_port="adder_pb.cout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.b" out_port="adder_pb.cout"/>
+            <delay_constant max="25e-12" in_port="adder_pb.cin" out_port="adder_pb.cout"/>
+          </pb_type>
+          <interconnect>
+            <direct name="atoa" input="myadder.a" output="adder_pb.a"></direct>
+            <direct name="btob" input="myadder.b" output="adder_pb.b"></direct>
+            <direct name="cintocin" input="myadder.cin" output="adder_pb.cin"></direct>
+            <direct name="sumouttosumout" input="adder_pb.sumout" output="myadder.sumout"></direct>
+            <direct name="couttocout" input="adder_pb.cout" output="myadder.cout"></direct>
+
+        </interconnect>
+      </mode>
+      <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+      <pinlocations pattern="spread"/>
+
+      <power method="sum-of-children"/>
+    </pb_type>
+    <!-- Define adder end -->
 
     <!-- Define fracturable memory begin -->
     <!-- 32 Kb Memory that can operate from 512x64 to 32Kx1 for single-port mode and 1024x32 to 32Kx1 for dual-port mode.  
@@ -1978,4 +1367,7 @@
   <clocks>
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
+  <directlist>
+      <direct name="adder_carry" from_pin="myadder.cout" to_pin="myadder.cin" x_offset="0" y_offset="-1" z_offset="0"/>
+  </directlist>
 </architecture>
