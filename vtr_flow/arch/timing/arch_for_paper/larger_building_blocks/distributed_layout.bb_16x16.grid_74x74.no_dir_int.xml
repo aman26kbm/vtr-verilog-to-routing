@@ -166,7 +166,7 @@
 
   <!-- Physical descriptions begin -->
   <layout>
-    <fixed_layout name="mylaout" width="122" height="122">
+    <fixed_layout name="mylaout" width="74" height="74">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
@@ -252,7 +252,8 @@
 	       This also leads to the switch being 46% of the total wire delay, which is reasonable. -->
     <switch type="mux" name="0" R="551" Cin=".77e-15" Cout="4e-15" Tdel="58e-12" mux_trans_size="2.630740" buf_size="27.645901"/>
   <!--switch ipin_cblock resistance set to yeild for 4x minimum drive strength buffer-->
-        <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="7.247000e-11" mux_trans_size="1.222260" buf_size="auto"/>
+    <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="7.247000e-11" mux_trans_size="1.222260" buf_size="auto"/>
+    <switch type="short" name="electrical_short" R="0" Cin="0" Tdel="0"/>
         </switchlist>
   <segmentlist>
     <!--- VB & JL: using ITRS metal stack data, 96 nm half pitch wires, which are intermediate metal width/space.  
@@ -893,7 +894,8 @@
       </mode>
 
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-      <pinlocations pattern="spread"/>
+      <pinlocations pattern="perimeter"/>
+      <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
 
       <power method="sum-of-children"/>
     </pb_type>
@@ -1633,9 +1635,4 @@
   <clocks>
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
-  <directlist>
-    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_16x16.a_data_out" to_pin="matmul_16x16.a_data_in" x_offset="1" y_offset="0" z_offset="0"/>
-    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_16x16.b_data_out" to_pin="matmul_16x16.b_data_in" x_offset="0" y_offset="-1" z_offset="0"/>
-    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_16x16.c_data_out" to_pin="matmul_16x16.c_data_in" x_offset="1" y_offset="0" z_offset="0"/>
-  </directlist>
 </architecture>
