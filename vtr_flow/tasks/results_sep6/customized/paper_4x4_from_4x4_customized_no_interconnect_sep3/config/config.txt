@@ -3,16 +3,16 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog/design_for_paper/regular_fpga
+circuits_dir=benchmarks/verilog/design_for_paper
 
 # Path to directory of architectures to use
-archs_dir=arch/timing/arch_for_paper/regular_fpga
+archs_dir=arch/timing/arch_for_paper/customized_layout
 
 # Add circuits to list to sweep
-circuit_list_add=64x64_from_4x4_regular_fpga.v
+circuit_list_add=matmul.4x4_from_4x4_with_ram.v
 
 # Add architectures to list to sweep
-arch_list_add=regular_fpga_large_300x300.xml
+arch_list_add=4x4_from_4x4.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
