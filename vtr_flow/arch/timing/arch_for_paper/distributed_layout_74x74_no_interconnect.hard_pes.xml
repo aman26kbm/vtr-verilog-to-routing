@@ -92,26 +92,20 @@
       </output_ports>
     </model>
 
-    <model name="matmul_4x4_systolic">
+    <model name="hard_connected_pes">
       <input_ports>
         <port name="clk" is_clock="1"/>  
-        <port name="reset" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="start_mat_mul" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="a_data" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="b_data" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="final_mat_mul_size" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="a_loc" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="b_loc" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="a_data_in" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="b_data_in" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
-        <port name="c_data_in" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
+        <port name="reset" clock="clk"     combinational_sink_ports="a_data_out b_data_out c_data_out " />
+        <port name="a_loc" clock="clk"     combinational_sink_ports="a_data_out b_data_out c_data_out " />
+        <port name="b_loc" clock="clk"     combinational_sink_ports="a_data_out b_data_out c_data_out " />
+        <port name="a_data_in" clock="clk" combinational_sink_ports="a_data_out b_data_out c_data_out " />
+        <port name="b_data_in" clock="clk" combinational_sink_ports="a_data_out b_data_out c_data_out " />
+        <port name="c_data_in" clock="clk" combinational_sink_ports="a_data_out b_data_out c_data_out " />
+        <port name="clk_cnt"   clock="clk" combinational_sink_ports="a_data_out b_data_out c_data_out " />
       </input_ports>
       <output_ports>
-        <port name="done_mat_mul" clock="clk"/>
         <port name="a_data_out" clock="clk"/>
         <port name="b_data_out" clock="clk"/>
-        <port name="a_addr" clock="clk"/>
-        <port name="b_addr" clock="clk"/>
         <port name="c_data_out" clock="clk"/>
       </output_ports>
     </model>
@@ -166,7 +160,7 @@
 
   <!-- Physical descriptions begin -->
   <layout>
-    <fixed_layout name="mylaout" width="202" height="242">
+    <fixed_layout name="mylaout" width="74" height="74">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
@@ -704,48 +698,36 @@
 	
     <!-- Define matrix multiplier begin -->
 
-    <pb_type name="matmul_4x4" height="3" width="3" area="887251">
+    <pb_type name="matmul_4x4" height="3" width="3" area="838969">
 
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
-      <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
-      <input name="a_data" num_pins="64"/>
-      <input name="b_data" num_pins="64"/>
       <input name="a_data_in" num_pins="64"/>
       <input name="b_data_in" num_pins="64"/>
       <input name="c_data_in" num_pins="64"/>
-      <input name="final_mat_mul_size" num_pins="8"/>
       <input name="a_loc" num_pins="8"/>
       <input name="b_loc" num_pins="8"/>
+      <input name="clk_cnt" num_pins="16"/>
 
-      <output name="done_mat_mul"  num_pins="1"/>
       <output name="a_data_out"  num_pins="64"/>
       <output name="b_data_out"  num_pins="64"/>
       <output name="c_data_out"  num_pins="64"/>
-      <output name="a_addr"  num_pins="7"/>
-      <output name="b_addr"  num_pins="7"/>
 
       <clock name="clk" num_pins="1"/>
 
       <mode name="matmult_4x4_mode">
-        <pb_type name="matmul_4x4_pb" blif_model=".subckt matmul_4x4_systolic" num_pb="1">
+        <pb_type name="matmul_4x4_pb" blif_model=".subckt hard_connected_pes" num_pb="1">
 
           <input name="reset" num_pins="1"/>
-          <input name="start_mat_mul" num_pins="1"/>
-          <input name="a_data" num_pins="64"/>
-          <input name="b_data" num_pins="64"/>
           <input name="a_data_in" num_pins="64"/>
           <input name="b_data_in" num_pins="64"/>
           <input name="c_data_in" num_pins="64"/>
-          <input name="final_mat_mul_size" num_pins="8"/>
           <input name="a_loc" num_pins="8"/>
           <input name="b_loc" num_pins="8"/>
+          <input name="clk_cnt" num_pins="16"/>
 
-          <output name="done_mat_mul"  num_pins="1"/>
           <output name="a_data_out"  num_pins="64"/>
           <output name="b_data_out"  num_pins="64"/>
           <output name="c_data_out"  num_pins="64"/>
-          <output name="a_addr"  num_pins="7"/>
-          <output name="b_addr"  num_pins="7"/>
 
           <clock name="clk" num_pins="1"/>
 
@@ -754,109 +736,55 @@
      ClktoQ = 0.22ns-->
 
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.reset" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.start_mat_mul" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_data" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_data" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_data_in" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_data_in" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.c_data_in" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.final_mat_mul_size" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_loc" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_loc" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.done_mat_mul" clock="clk"/>
+	  <T_setup value="0.06e-9" port="matmul_4x4_pb.clk_cnt" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_data_out" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_data_out" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.a_addr" clock="clk"/>
-	  <T_setup value="0.06e-9" port="matmul_4x4_pb.b_addr" clock="clk"/>
 	  <T_setup value="0.06e-9" port="matmul_4x4_pb.c_data_out" clock="clk"/>
 
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.reset" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.start_mat_mul" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_data" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_data" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_data_in" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_data_in" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.c_data_in" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.final_mat_mul_size" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_loc" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_loc" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.done_mat_mul" clock="clk"/>
+	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.clk_cnt" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_data_out" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_data_out" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.a_addr" clock="clk"/>
-	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.b_addr" clock="clk"/>
 	  <T_clock_to_Q max="0.11e-9" port="matmul_4x4_pb.c_data_out" clock="clk"/>
 
 <!-- Internal combo delay = Critical path delay (1.588ns) - Setup (0.06) - Clock-to-q (0.11) -->
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.done_mat_mul"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_data_out"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_addr"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_data_out"/>
 
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_data_out"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_addr"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_data_out"/>
 
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_data_out"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_addr"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_data_out"/>
 
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_data_out"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_addr"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_data_out"/>
 
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.done_mat_mul"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_data_out"/>
-
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_data_out"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_addr"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_data_out"/>
 
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_data_out"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_data_out"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_addr"/>
-	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_addr"/>
 	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_data_out"/>
+
+	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.clk_cnt" out_port="matmul_4x4_pb.a_data_out"/>
+	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.clk_cnt" out_port="matmul_4x4_pb.b_data_out"/>
+	<delay_constant max="1.418e-9" in_port="matmul_4x4_pb.clk_cnt" out_port="matmul_4x4_pb.c_data_out"/>
 
 <!-- 
           <power method="pin-toggle">
@@ -873,20 +801,14 @@
 
         <interconnect>
           <direct name="reset" input="matmul_4x4.reset" output="matmul_4x4_pb.reset"></direct>
-          <direct name="start_mat_mul" input="matmul_4x4.start_mat_mul"    output="matmul_4x4_pb.start_mat_mul"></direct>
-          <direct name="a_data" input="matmul_4x4.a_data"    output="matmul_4x4_pb.a_data"></direct>
-          <direct name="b_data" input="matmul_4x4.b_data"    output="matmul_4x4_pb.b_data"></direct>
           <direct name="a_data_in" input="matmul_4x4.a_data_in"    output="matmul_4x4_pb.a_data_in"></direct>
           <direct name="b_data_in" input="matmul_4x4.b_data_in"    output="matmul_4x4_pb.b_data_in"></direct>
           <direct name="c_data_in" input="matmul_4x4.c_data_in"    output="matmul_4x4_pb.c_data_in"></direct>
-          <direct name="final_mat_mul_size" input="matmul_4x4.final_mat_mul_size"    output="matmul_4x4_pb.final_mat_mul_size"></direct>
           <direct name="a_loc" input="matmul_4x4.a_loc"    output="matmul_4x4_pb.a_loc"></direct>
           <direct name="b_loc" input="matmul_4x4.b_loc"    output="matmul_4x4_pb.b_loc"></direct>
-          <direct name="done_mat_mul" input="matmul_4x4_pb.done_mat_mul" output="matmul_4x4.done_mat_mul"></direct>
+          <direct name="clk_cnt" input="matmul_4x4.clk_cnt"    output="matmul_4x4_pb.clk_cnt"></direct>
           <direct name="a_data_out" input="matmul_4x4_pb.a_data_out" output="matmul_4x4.a_data_out"></direct>
           <direct name="b_data_out" input="matmul_4x4_pb.b_data_out" output="matmul_4x4.b_data_out"></direct>
-          <direct name="a_addr" input="matmul_4x4_pb.a_addr" output="matmul_4x4.a_addr"></direct>
-          <direct name="b_addr" input="matmul_4x4_pb.b_addr" output="matmul_4x4.b_addr"></direct>
           <direct name="c_data_out" input="matmul_4x4_pb.c_data_out" output="matmul_4x4.c_data_out"></direct>
           <direct name="clk" input="matmul_4x4.clk" output="matmul_4x4_pb.clk"></direct>
         </interconnect>

@@ -704,7 +704,7 @@
 	
     <!-- Define matrix multiplier begin -->
 
-    <pb_type name="matmul_4x4" height="3" width="3" area="899102">
+    <pb_type name="matmul_4x4" height="3" width="3" area="887251">
 
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
       <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
@@ -899,17 +899,16 @@
       <fc_override fc_type="frac" fc_val="0" port_name="b_data_in[63:0]"/>
       <fc_override fc_type="frac" fc_val="0" port_name="b_data_out[63:0]"/>
       </fc>
-      <pinlocations pattern="perimeter"/>
-      <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
 <!--
-      <pinlocations pattern="spread"/>
-      <pinlocations pattern="custom">
-        <loc side="left">matmul_4x4.a_data_in[63:0] matmul_4x4.a_data[63:0] matmul_4x4.a_addr[6:0]    matmul_4x4.reset         matmul_4x4.a_loc[7:0]  </loc>
-        <loc side="top">matmul_4x4.b_data_in[63:0] matmul_4x4.b_data[63:0] matmul_4x4.b_addr[6:0]     matmul_4x4.start_mat_mul matmul_4x4.done_mat_mul matmul_4x4.clk</loc>
-        <loc side="right">matmul_4x4.a_data_out[63:0] matmul_4x4.c_data_out[63:0] matmul_4x4.b_loc[7:0]          </loc>
-        <loc side="bottom">matmul_4x4.b_data_out[63:0] matmul_4x4.c_data_in[63:0] matmul_4x4.final_mat_mul_size[7:0] </loc>
-      </pinlocations>
+      <pinlocations pattern="perimeter"/>
 -->
+      <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
+      <pinlocations pattern="custom">
+        <loc side="left">matmul_4x4.a_data_in[63:0] matmul_4x4.a_data[63:0] matmul_4x4.a_addr[6:0]             matmul_4x4.a_loc[3:0]  </loc>
+        <loc side="top">matmul_4x4.b_data_in[63:0] matmul_4x4.b_data[63:0] matmul_4x4.b_addr[6:0]     matmul_4x4.start_mat_mul matmul_4x4.done_mat_mul matmul_4x4.clk</loc>
+        <loc side="right">matmul_4x4.a_data_out[63:0] matmul_4x4.c_data_out[63:0] matmul_4x4.b_loc[7:0]    matmul_4x4.reset      </loc>
+        <loc side="bottom">matmul_4x4.b_data_out[63:0] matmul_4x4.c_data_in[63:0] matmul_4x4.final_mat_mul_size[7:0] matmul_4x4.a_loc[7:4]</loc>
+      </pinlocations>
 
       <power method="sum-of-children"/>
     </pb_type>
@@ -1651,6 +1650,6 @@
   </clocks>
   <directlist>
     <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_4x4.a_data_out[63:0]" to_pin="matmul_4x4.a_data_in[63:0]" x_offset="6" y_offset="0" z_offset="0" switch_name="0"/>
-    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_4x4.b_data_out[63:0]" to_pin="matmul_4x4.b_data_in[63:0]" x_offset="0" y_offset="-1" z_offset="0" switch_name="0"/>
+    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_4x4.b_data_out[63:0]" to_pin="matmul_4x4.b_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="0"/>
   </directlist>
 </architecture>

@@ -1,242 +1,457 @@
-
 `timescale 1ns/1ns
 `define DWIDTH 16
 `define AWIDTH 7
 `define MEM_SIZE 128
 `define MAT_MUL_SIZE 4
-`define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
+`define BB_MAT_MUL_SIZE 4
 
-/*
-//Design with memories
+
 module matrix_multiplication(
-  clk, 
-  reset, 
-  enable_writing_to_mem, 
-  enable_reading_from_mem, 
+  clk,
+  reset_0,
+  enable_writing_to_mem,
+  enable_reading_from_mem,
   data_pi,
-  addr_pi, 
+  addr_pi,
   we_a,
   we_b,
   we_c,
   data_from_out_mat,
-  start_mat_mul,
+  start_mat_mul_0,
   done_mat_mul
 );
 
   input clk;
-  input reset;
   input enable_writing_to_mem;
   input enable_reading_from_mem;
-  input [4*`DWIDTH-1:0] data_pi;
+  input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_pi;
   input [`AWIDTH-1:0] addr_pi;
   input we_a;
   input we_b;
   input we_c;
-  output [4*`DWIDTH-1:0] data_from_out_mat;
-  input start_mat_mul;
+  output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
   output done_mat_mul;
 
+
+
+  input reset_0;
+  input start_mat_mul_0;
   reg enable_writing_to_mem_reg;
   reg enable_reading_from_mem_reg;
   reg [`AWIDTH-1:0] addr_pi_reg;
   always @(posedge clk) begin
-    if (reset) begin
-      enable_writing_to_mem_reg<= 0;
-      enable_reading_from_mem_reg<= 0;
+    if(reset_0) begin
+      enable_writing_to_mem_reg <= 0;
+      enable_reading_from_mem_reg <= 0;
       addr_pi_reg <= 0;
     end else begin
-      enable_writing_to_mem_reg<= enable_writing_to_mem;
-      enable_reading_from_mem_reg<= enable_reading_from_mem;
+      enable_writing_to_mem_reg <= enable_writing_to_mem;
+      enable_reading_from_mem_reg <= enable_reading_from_mem;
       addr_pi_reg <= addr_pi;
     end
   end
+/////////////////////////////////////////////////
+// BRAMs to store matrix A
+/////////////////////////////////////////////////
 
-  wire [4*`DWIDTH-1:0] a_data;
-  wire [`AWIDTH-1:0] a_addr;
-  wire [`AWIDTH-1:0] a_addr_muxed;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0;
 
-  reg [`AWIDTH-1:0] a_addr_reg;
+  wire [`AWIDTH-1:0] a_addr_0_0;
+  wire [`AWIDTH-1:0] a_addr_1_0;
+
+  wire [`AWIDTH-1:0] a_addr_muxed_0_0;
+  wire [`AWIDTH-1:0] a_addr_muxed_1_0;
+
+  reg  [`AWIDTH-1:0] a_addr_muxed_0_0_reg;
+  reg  [`AWIDTH-1:0] a_addr_muxed_1_0_reg;
+
+  reg  [`AWIDTH-1:0] a_addr_0_0_reg;
+  reg  [`AWIDTH-1:0] a_addr_1_0_reg;
+
+
   always @(posedge clk) begin
-    if (reset) begin
-      a_addr_reg <= 0;
+    if(reset_0) begin
+      a_addr_0_0_reg <= 0;
+      a_addr_1_0_reg <= 0;
+      a_addr_muxed_0_0_reg <= 0;
+      a_addr_muxed_1_0_reg <= 0;
     end else begin
-      a_addr_reg <= a_addr;
+      a_addr_0_0_reg <= a_addr_0_0;
+      a_addr_1_0_reg <= a_addr_1_0;
+      a_addr_muxed_0_0_reg <= a_addr_muxed_0_0;
+      a_addr_muxed_1_0_reg <= a_addr_muxed_1_0;
     end
   end
 
-  reg [`AWIDTH-1:0] a_addr_muxed_reg;
-  always @(posedge clk) begin
-    if (reset) begin
-      a_addr_muxed_reg <= 0;
-    end else begin
-      a_addr_muxed_reg<= a_addr_muxed;
-    end
-  end
-  assign a_addr_muxed = (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_reg;
+  assign a_addr_muxed_0_0 = (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_0_0_reg;
+  assign a_addr_muxed_1_0 = (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_1_0_reg;
 
-  // BRAM matrix A 
-  ram matrix_A (
-    .addr0(a_addr_muxed_reg),
-    .d0(data_pi), 
-    .we0(we_a), 
-    .q0(a_data), 
+  // BRAM matrix A 0_0
+  ram matrix_A_0_0 (
+    .addr0(a_addr_muxed_0_0_reg),
+    .d0(data_pi),
+    .we0(we_a),
+    .q0(a_data_0_0),
     .clk(clk));
 
-  wire [4*`DWIDTH-1:0] b_data;
-  wire [`AWIDTH-1:0] b_addr;
-  wire [`AWIDTH-1:0] b_addr_muxed;
-
-  reg [`AWIDTH-1:0] b_addr_reg;
-  always @(posedge clk) begin
-    if (reset) begin
-      b_addr_reg <= 0;
-    end else begin
-      b_addr_reg <= b_addr;
-    end
-  end
-
-  reg [`AWIDTH-1:0] b_addr_muxed_reg;
-  always @(posedge clk) begin
-    if (reset) begin
-      b_addr_muxed_reg <= 0;
-    end else begin
-      b_addr_muxed_reg<= b_addr_muxed;
-    end
-  end
-
-  assign b_addr_muxed = (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_reg;
-
-  // BRAM matrix B
-  ram matrix_B (
-    .addr0(b_addr_muxed_reg),
-    .d0(data_pi), 
-    .we0(we_b), 
-    .q0(b_data), 
+  // BRAM matrix A 1_0
+  ram matrix_A_1_0 (
+    .addr0(a_addr_muxed_1_0_reg),
+    .d0(data_pi),
+    .we0(we_a),
+    .q0(a_data_1_0),
     .clk(clk));
+
+/////////////////////////////////////////////////
+// BRAMs to store matrix B
+/////////////////////////////////////////////////
+
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1;
+
+  wire [`AWIDTH-1:0] b_addr_0_0;
+  wire [`AWIDTH-1:0] b_addr_0_1;
+
+  wire [`AWIDTH-1:0] b_addr_muxed_0_0;
+  wire [`AWIDTH-1:0] b_addr_muxed_0_1;
+
+  reg  [`AWIDTH-1:0] b_addr_muxed_0_0_reg;
+  reg  [`AWIDTH-1:0] b_addr_muxed_0_1_reg;
+
+  reg  [`AWIDTH-1:0] b_addr_0_0_reg;
+  reg  [`AWIDTH-1:0] b_addr_0_1_reg;
+
+
+
+  always @(posedge clk) begin
+    if(reset_0) begin
+      b_addr_0_0_reg <= 0;
+      b_addr_0_1_reg <= 0;
+      b_addr_muxed_0_0_reg <= 0;
+      b_addr_muxed_0_1_reg <= 0;
+    end else begin
+      b_addr_0_0_reg <= b_addr_0_0;
+      b_addr_0_1_reg <= b_addr_0_1;
+      b_addr_muxed_0_0_reg <= b_addr_muxed_0_0;
+      b_addr_muxed_0_1_reg <= b_addr_muxed_0_1;
+    end
+  end
+
+  assign b_addr_muxed_0_0 = (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_0_0_reg;
+  assign b_addr_muxed_0_1 = (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_0_1_reg;
+
+  // BRAM matrix B 0_0
+  ram matrix_B_0_0 (
+    .addr0(b_addr_muxed_0_0_reg),
+    .d0(data_pi),
+    .we0(we_b),
+    .q0(b_data_0_0),
+    .clk(clk));
+
+  // BRAM matrix B 0_1
+  ram matrix_B_0_1 (
+    .addr0(b_addr_muxed_0_1_reg),
+    .d0(data_pi),
+    .we0(we_b),
+    .q0(b_data_0_1),
+    .clk(clk));
+
+/////////////////////////////////////////////////
+// BRAMs to store matrix C
+/////////////////////////////////////////////////
 
   reg [`AWIDTH-1:0] c_addr;
-  wire [`AWIDTH-1:0] c_addr_muxed;
-  assign c_addr_muxed = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
 
-  reg [`AWIDTH-1:0] c_addr_muxed_reg;
+  wire [`AWIDTH-1:0] c_addr_muxed_0_0;
+  wire [`AWIDTH-1:0] c_addr_muxed_0_1;
+  reg  [`AWIDTH-1:0] c_addr_muxed_0_0_reg;
+  reg  [`AWIDTH-1:0] c_addr_muxed_0_1_reg;
+
+  assign c_addr_muxed_0_0 = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
+  assign c_addr_muxed_0_1 = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
+
   always @(posedge clk) begin
-    if (reset) begin
-      c_addr_muxed_reg <= 0;
-    end else begin
-      c_addr_muxed_reg<= c_addr_muxed;
+    if(reset_0 || done_mat_mul) begin
+      c_addr <= 0;
+    end
+    else if (start_mat_mul_0) begin
+      c_addr <= c_addr + 1;
     end
   end
 
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_0;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_1;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_0;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_1;
+
+///////////////// ORing the data ///////////////////
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_0;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_1;
   always @(posedge clk) begin
-  if (reset || done_mat_mul) begin
-    c_addr <= 0;
+    if(reset_0) begin
+      c_reg_0 <= 0;
+      c_reg_1 <= 0;
+    end else begin
+      c_reg_0 <= data_from_out_mat_0_0;
+      c_reg_1 <= c_reg_0 | data_from_out_mat_0_1;
+      data_from_out_mat <= c_reg_1;
+    end
   end
-  else if (start_mat_mul) begin
-      c_addr <= c_addr+1;
-  end
-end
 
-wire [4*`DWIDTH-1:0] c_data_out;
-reg  [4*`DWIDTH-1:0] c_data_out_reg;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_0_reg;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_1_reg;
+  always @(posedge clk) begin
+    if(reset_0) begin
+      c_data_row_0_reg <= 0;
+      c_addr_muxed_0_0_reg <= 0;
+      c_data_row_1_reg <= 0;
+      c_addr_muxed_0_1_reg <= 0;
+    end else begin
+      c_data_row_0_reg <= c_data_row_0;
+      c_addr_muxed_0_0_reg <= c_addr_muxed_0_0;
+      c_data_row_1_reg <= c_data_row_1;
+      c_addr_muxed_0_1_reg <= c_addr_muxed_0_1;
+    end
+  end
 
-always @(posedge clk) begin
-  if (reset) begin
-    c_data_out_reg<= 0;
-  end
-  else if (start_mat_mul) begin
-      c_data_out_reg<= c_data_out;
-  end
-end
-  // BRAM matrix C
-  ram matrix_C (
-    .addr0(c_addr_muxed_reg),
-    .d0(c_data_out_reg),
+  //  BRAM matrix C row_0
+  ram matrix_row_0 (
+    .addr0(c_addr_muxed_0_0_reg),
+    .d0(c_data_row_0_reg),
     .we0(we_c),
-    .q0(data_from_out_mat),
+    .q0(data_from_out_mat_0_0),
     .clk(clk));
 
-wire [4*`DWIDTH-1:0] a_data_out_NC;
-wire [4*`DWIDTH-1:0] b_data_out_NC;
-wire [4*`DWIDTH-1:0] a_data_in_NC;
-wire [4*`DWIDTH-1:0] b_data_in_NC;
+  //  BRAM matrix C row_1
+  ram matrix_row_1 (
+    .addr0(c_addr_muxed_0_1_reg),
+    .d0(c_data_row_1_reg),
+    .we0(we_c),
+    .q0(data_from_out_mat_0_1),
+    .clk(clk));
 
-matmul_4x4_systolic u_matmul_4x4(
+/////////////////////////////////////////////////
+// The 8x8 matmul instantiation
+/////////////////////////////////////////////////
+
+matmul_8x8_systolic u_matmul_8x8_systolic (
   .clk(clk),
-  .reset(reset),
-  .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul),
-  .a_data(a_data),
-  .b_data(b_data),
-  .a_data_in(a_data_in_NC),
-  .b_data_in(b_data_in_NC),
+  .reset_0(reset_0),
+  .start_mat_mul_0(start_mat_mul_0),
+  .a_data_0_0(a_data_0_0),
+  .a_addr_0_0(a_addr_0_0),
+  .b_data_0_0(b_data_0_0),
+  .b_addr_0_0(b_addr_0_0),
+  .a_data_1_0(a_data_1_0),
+  .a_addr_1_0(a_addr_1_0),
+  .b_data_0_1(b_data_0_1),
+  .b_addr_0_1(b_addr_0_1),
+
+  .c_data_row_0(c_data_row_0),
+  .c_data_row_1(c_data_row_1)
+);
+endmodule
+
+
+/////////////////////////////////////////////////
+// The 8x8 matmul definition
+/////////////////////////////////////////////////
+
+module matmul_8x8_systolic(
+  clk,
+  done_mat_mul,
+  reset_0,
+  start_mat_mul_0,
+  a_data_0_0,
+  a_addr_0_0,
+  b_data_0_0,
+  b_addr_0_0,
+  a_data_1_0,
+  a_addr_1_0,
+  b_data_0_1,
+  b_addr_0_1,
+
+  c_data_row_0,
+  c_data_row_1
+);
+  input clk;
+  output done_mat_mul;
+
+  input reset_0;
+  input start_mat_mul_0;
+  input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0;
+  input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0;
+
+  input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0;
+  input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1;
+
+  output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_0;
+  output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_1;
+
+  output [`AWIDTH-1:0] a_addr_0_0;
+  output [`AWIDTH-1:0] a_addr_1_0;
+
+  output [`AWIDTH-1:0] b_addr_0_0;
+  output [`AWIDTH-1:0] b_addr_0_1;
+
+  /////////////////////////////////////////////////
+  // ORing all done signals
+  /////////////////////////////////////////////////
+  wire done_mat_mul_0_0;
+  wire done_mat_mul_0_1;
+  wire done_mat_mul_1_0;
+  wire done_mat_mul_1_1;
+
+  assign done_mat_mul =   done_mat_mul_0_0 &&
+  done_mat_mul_0_1 &&
+  done_mat_mul_1_0 &&
+  done_mat_mul_1_1;
+
+  /////////////////////////////////////////////////
+  // Matmul 0_0
+  /////////////////////////////////////////////////
+
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0_to_0_1;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0_to_1_0;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_0_0_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_0_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_0_0_to_0_1;
+
+matmul_4x4_systolic u_matmul_4x4_systolic_0_0(
+  .clk(clk),
+  .reset(reset_0),
+  .start_mat_mul(start_mat_mul_0),
+  .done_mat_mul(done_mat_mul_0_0),
+  .a_data(a_data_0_0),
+  .b_data(b_data_0_0),
+  .a_data_in(a_data_in_0_0_NC),
+  .b_data_in(b_data_in_0_0_NC),
   .c_data_in(64'b0),
-  .c_data_out(c_data_out),
-  .a_data_out(a_data_out_NC),
-  .b_data_out(b_data_out_NC),
-  .a_addr(a_addr),
-  .b_addr(b_addr),
-  .final_mat_mul_size(8'd4),
+  .c_data_out(c_data_0_0_to_0_1),
+  .a_data_out(a_data_0_0_to_0_1),
+  .b_data_out(b_data_0_0_to_1_0),
+  .a_addr(a_addr_0_0),
+  .b_addr(b_addr_0_0),
+  .final_mat_mul_size(8'd8),
   .a_loc(8'd0),
   .b_loc(8'd0)
 );
 
-endmodule  
-*/
-/*
-//Design without memories
-module matrix_multiplication(
- clk,
- reset,
- start_mat_mul,
- done_mat_mul,
- a_data,
- b_data,
- a_data_in, //Data values coming in from previous matmul - systolic connections
- b_data_in,
- c_data_in,
- c_data_out,
- a_data_out,
- b_data_out,
- a_addr,
- b_addr
-);
- input clk;
- input reset;
- input start_mat_mul;
- output done_mat_mul;
- input [4*`DWIDTH-1:0] a_data;
- input [4*`DWIDTH-1:0] b_data;
- input [4*`DWIDTH-1:0] a_data_in;
- input [4*`DWIDTH-1:0] b_data_in;
- input [4*`DWIDTH-1:0] c_data_in;
- output [4*`DWIDTH-1:0] c_data_out;
- output [4*`DWIDTH-1:0] a_data_out;
- output [4*`DWIDTH-1:0] b_data_out;
- output [`AWIDTH-1:0] a_addr;
- output [`AWIDTH-1:0] b_addr;
+  /////////////////////////////////////////////////
+  // Matmul 0_1
+  /////////////////////////////////////////////////
 
-matmul_4x4_systolic u_matmul_4x4(
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_1_to_0_2;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1_to_1_1;
+  wire [`AWIDTH-1:0] a_addr_0_1_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_1_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_1_NC;
+
+matmul_4x4_systolic u_matmul_4x4_systolic_0_1(
   .clk(clk),
-  .reset(reset),
-  .start_mat_mul(start_mat_mul),
-  .done_mat_mul(done_mat_mul),
-  .a_data(a_data),
-  .b_data(b_data),
-  .a_data_in(a_data_in),
-  .b_data_in(b_data_in),
-  .c_data_in(c_data_in),
-  .c_data_out(c_data_out),
-  .a_data_out(a_data_out),
-  .b_data_out(b_data_out),
-  .a_addr(a_addr),
-  .b_addr(b_addr),
-  .final_mat_mul_size(8'd4),
+  .reset(reset_0),
+  .start_mat_mul(start_mat_mul_0),
+  .done_mat_mul(done_mat_mul_0_1),
+  .a_data(a_data_0_1_NC),
+  .b_data(b_data_0_1),
+  .a_data_in(a_data_0_0_to_0_1),
+  .b_data_in(b_data_in_0_1_NC),
+  .c_data_in(c_data_0_0_to_0_1),
+  .c_data_out(c_data_row_0),
+  .a_data_out(a_data_0_1_to_0_2),
+  .b_data_out(b_data_0_1_to_1_1),
+  .a_addr(a_addr_0_1_NC),
+  .b_addr(b_addr_0_1),
+  .final_mat_mul_size(8'd8),
   .a_loc(8'd0),
+  .b_loc(8'd1)
+);
+
+  /////////////////////////////////////////////////
+  // Matmul 1_0
+  /////////////////////////////////////////////////
+
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0_to_1_1;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_0_to_2_0;
+  wire [`AWIDTH-1:0] b_addr_1_0_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_0_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_1_0_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_1_0_to_1_1;
+
+matmul_4x4_systolic u_matmul_4x4_systolic_1_0(
+  .clk(clk),
+  .reset(reset_0),
+  .start_mat_mul(start_mat_mul_0),
+  .done_mat_mul(done_mat_mul_1_0),
+  .a_data(a_data_1_0),
+  .b_data(b_data_1_0_NC),
+  .a_data_in(a_data_in_1_0_NC),
+  .b_data_in(b_data_0_0_to_1_0),
+  .c_data_in(64'b0),
+  .c_data_out(c_data_1_0_to_1_1),
+  .a_data_out(a_data_1_0_to_1_1),
+  .b_data_out(b_data_1_0_to_2_0),
+  .a_addr(a_addr_1_0),
+  .b_addr(b_addr_1_0_NC),
+  .final_mat_mul_size(8'd8),
+  .a_loc(8'd1),
   .b_loc(8'd0)
+);
+
+  /////////////////////////////////////////////////
+  // Matmul 1_1
+  /////////////////////////////////////////////////
+
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_1_to_1_2;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_1_to_2_1;
+  wire [`AWIDTH-1:0] a_addr_1_1_NC;
+  wire [`AWIDTH-1:0] b_addr_1_1_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_1_NC;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_1_NC;
+
+matmul_4x4_systolic u_matmul_4x4_systolic_1_1(
+  .clk(clk),
+  .reset(reset_0),
+  .start_mat_mul(start_mat_mul_0),
+  .done_mat_mul(done_mat_mul_1_1),
+  .a_data(a_data_1_1_NC),
+  .b_data(b_data_1_1_NC),
+  .a_data_in(a_data_1_0_to_1_1),
+  .b_data_in(b_data_0_1_to_1_1),
+  .c_data_in(c_data_1_0_to_1_1),
+  .c_data_out(c_data_row_1),
+  .a_data_out(a_data_1_1_to_1_2),
+  .b_data_out(b_data_1_1_to_2_1),
+  .a_addr(a_addr_1_1_NC),
+  .b_addr(b_addr_1_1_NC),
+  .final_mat_mul_size(8'd8),
+  .a_loc(8'd1),
+  .b_loc(8'd1)
 );
 
 endmodule
-*/
+
+module ram (addr0, d0, we0, q0, clk);
+
+input [`AWIDTH-1:0] addr0;
+input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] d0;
+input we0;
+output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+input clk;
+
+single_port_ram u_single_port_ram(
+  .data(d0),
+  .we(we0),
+  .addr(addr0),
+  .clk(clk),
+  .out(q0)
+);
+endmodule
+
+
 
 module matmul_4x4_systolic(
  clk,
@@ -434,6 +649,86 @@ assign b1 = (a_loc==0) ? b1_data_delayed_1 : b1_data_in;
 assign b2 = (a_loc==0) ? b2_data_delayed_2 : b2_data_in;
 assign b3 = (a_loc==0) ? b3_data_delayed_3 : b3_data_in;
 
+
+
+wire [`DWIDTH-1:0] cin_row0;
+wire [`DWIDTH-1:0] cin_row1;
+wire [`DWIDTH-1:0] cin_row2;
+wire [`DWIDTH-1:0] cin_row3;
+
+
+assign cin_row0 = c_data_in[`DWIDTH-1:0];
+assign cin_row1 = c_data_in[2*`DWIDTH-1:`DWIDTH];
+assign cin_row2 = c_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
+
+hard_connected_pes u_hard_connected_pes(
+ .clk(clk),
+ .reset(reset),
+ .clk_cnt(clk_cnt),
+ .a_loc(a_loc),
+ .b_loc(b_loc),
+ .a_data_in({a3,a2,a1,a0}),
+ .b_data_in({b3,b2,b1,b0}),
+ .c_data_in({cin_row3,cin_row2,cin_row1,cin_row0}),
+ .a_data_out(a_data_out),
+ .b_data_out(b_data_out),
+ .c_data_out(c_data_out)
+);
+
+endmodule
+/*
+module hard_connected_pes( 
+ clk,
+ reset, 
+ clk_cnt,
+ a_loc,
+ b_loc,
+ a_data_in,
+ b_data_in,
+ c_data_in,
+ a_data_out,
+ b_data_out,
+ c_data_out
+  );
+ input clk;
+ input reset;
+ input [15:0] clk_cnt;
+ input [7:0] a_loc;
+ input [7:0] b_loc;
+ input [4*`DWIDTH-1:0] a_data_in;
+ input [4*`DWIDTH-1:0] b_data_in;
+ input [4*`DWIDTH-1:0] c_data_in;
+ output [4*`DWIDTH-1:0] a_data_out;
+ output [4*`DWIDTH-1:0] b_data_out;
+ output [4*`DWIDTH-1:0] c_data_out;
+
+wire [`DWIDTH-1:0] a0;
+wire [`DWIDTH-1:0] a1;
+wire [`DWIDTH-1:0] a2;
+wire [`DWIDTH-1:0] a3;
+wire [`DWIDTH-1:0] b0;
+wire [`DWIDTH-1:0] b1;
+wire [`DWIDTH-1:0] b2;
+wire [`DWIDTH-1:0] b3;
+wire [`DWIDTH-1:0] cin_row0;
+wire [`DWIDTH-1:0] cin_row1;
+wire [`DWIDTH-1:0] cin_row2;
+wire [`DWIDTH-1:0] cin_row3;
+
+assign a0 = a_data_in[`DWIDTH-1:0];
+assign a1 = a_data_in[2*`DWIDTH-1:`DWIDTH];
+assign a2 = a_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign a3 = a_data_in[4*`DWIDTH-1:3*`DWIDTH];
+assign b0 = b_data_in[`DWIDTH-1:0];
+assign b1 = b_data_in[2*`DWIDTH-1:`DWIDTH];
+assign b2 = b_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign b3 = b_data_in[4*`DWIDTH-1:3*`DWIDTH];
+assign cin_row0 = c_data_in[`DWIDTH-1:0];
+assign cin_row1 = c_data_in[2*`DWIDTH-1:`DWIDTH];
+assign cin_row2 = c_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
+
 wire [`DWIDTH-1:0] a00to01, a01to02, a02to03, a03to04;
 wire [`DWIDTH-1:0] a10to11, a11to12, a12to13, a13to14;
 wire [`DWIDTH-1:0] a20to21, a21to22, a22to23, a23to24;
@@ -444,10 +739,6 @@ wire [`DWIDTH-1:0] b01to11, b11to21, b21to31, b31to41;
 wire [`DWIDTH-1:0] b02to12, b12to22, b22to32, b32to42;
 wire [`DWIDTH-1:0] b03to13, b13to23, b23to33, b33to43;
 
-wire [`DWIDTH-1:0] cin_row0;
-wire [`DWIDTH-1:0] cin_row1;
-wire [`DWIDTH-1:0] cin_row2;
-wire [`DWIDTH-1:0] cin_row3;
 reg [4*`DWIDTH-1:0] row0_shift_reg;
 reg [4*`DWIDTH-1:0] row1_shift_reg;
 reg [4*`DWIDTH-1:0] row2_shift_reg;
@@ -473,11 +764,6 @@ wire [`DWIDTH-1:0] matrixC30;
 wire [`DWIDTH-1:0] matrixC31;
 wire [`DWIDTH-1:0] matrixC32;
 wire [`DWIDTH-1:0] matrixC33;
-
-assign cin_row0 = c_data_in[`DWIDTH-1:0];
-assign cin_row1 = c_data_in[2*`DWIDTH-1:`DWIDTH];
-assign cin_row2 = c_data_in[3*`DWIDTH-1:2*`DWIDTH];
-assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
 
 assign row0_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 7));
 assign row1_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 8));
@@ -549,8 +835,6 @@ assign b_data_out = {b33to43,b32to42,b31to41,b30to40};
 assign c_data_out = {row3_shift_reg[15:0], row2_shift_reg[15:0], row1_shift_reg[15:0], row0_shift_reg[15:0]};
 endmodule
 
-
-
 module processing_element(
  reset, 
  clk, 
@@ -596,7 +880,7 @@ module processing_element(
  end
  
 endmodule
-
+*/
 //module mac(mul0, mul1, add, out);
 //input [`DWIDTH-1:0] mul0;
 //input [`DWIDTH-1:0] mul1;
@@ -604,8 +888,8 @@ endmodule
 //output [2*`DWIDTH-1:0] out;
 //
 //wire [2*`DWIDTH-1:0] tmp;
-//qmult mult_u1(.i_multiplicand(mul0), .i_multiplier(mul1), .o_result(tmp));
-//qadd add_u1(.a(tmp), .b(add), .c(out));
+//qmult mult_u1(mul0, mul1, tmp);
+//qadd add_u1(tmp, add, out);
 //
 //endmodule
 //
@@ -629,35 +913,3 @@ endmodule
 //assign c = a + b;
 //endmodule
 
-
-/*
-module ram (addr0, d0, we0, q0,  clk);
-
-input [`AWIDTH-1:0] addr0;
-input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] d0;
-input we0;
-output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-input clk;
-
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
-//
-//always @(posedge clk)  
-//begin 
-//        if (we0) 
-//        begin 
-//            ram[addr0] <= d0; 
-//        end 
-//        q0 <= ram[addr0];
-//end
-
-single_port_ram u_single_port_ram(
-  .data(d0),
-  .we(we0),
-  .addr(addr0),
-  .clk(clk),
-  .out(q0)
-);
-endmodule
-
-*/

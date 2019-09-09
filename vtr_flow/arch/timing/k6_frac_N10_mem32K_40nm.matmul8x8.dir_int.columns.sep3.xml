@@ -705,7 +705,7 @@
 
     <pb_type name="matmul_8x8" height="6" width="6" area="3596408">
 
-      <input name="reset" num_pins="1"/>
+      <input name="reset" num_pins="1" is_non_clock_global="true"/>
       <input name="start_mat_mul" num_pins="1"/>
       <input name="a_data" num_pins="128"/>
       <input name="b_data" num_pins="128"/>

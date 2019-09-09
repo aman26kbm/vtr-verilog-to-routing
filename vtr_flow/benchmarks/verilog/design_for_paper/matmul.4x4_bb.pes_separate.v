@@ -137,20 +137,11 @@ module matrix_multiplication(
 end
 
 wire [4*`DWIDTH-1:0] c_data_out;
-reg  [4*`DWIDTH-1:0] c_data_out_reg;
 
-always @(posedge clk) begin
-  if (reset) begin
-    c_data_out_reg<= 0;
-  end
-  else if (start_mat_mul) begin
-      c_data_out_reg<= c_data_out;
-  end
-end
   // BRAM matrix C
   ram matrix_C (
     .addr0(c_addr_muxed_reg),
-    .d0(c_data_out_reg),
+    .d0(c_data_out),
     .we0(we_c),
     .q0(data_from_out_mat),
     .clk(clk));
@@ -237,7 +228,7 @@ matmul_4x4_systolic u_matmul_4x4(
 
 endmodule
 */
-
+/*
 module matmul_4x4_systolic(
  clk,
  reset,
@@ -434,6 +425,86 @@ assign b1 = (a_loc==0) ? b1_data_delayed_1 : b1_data_in;
 assign b2 = (a_loc==0) ? b2_data_delayed_2 : b2_data_in;
 assign b3 = (a_loc==0) ? b3_data_delayed_3 : b3_data_in;
 
+
+
+wire [`DWIDTH-1:0] cin_row0;
+wire [`DWIDTH-1:0] cin_row1;
+wire [`DWIDTH-1:0] cin_row2;
+wire [`DWIDTH-1:0] cin_row3;
+
+
+assign cin_row0 = c_data_in[`DWIDTH-1:0];
+assign cin_row1 = c_data_in[2*`DWIDTH-1:`DWIDTH];
+assign cin_row2 = c_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
+
+hard_connected_pes u_hard_connected_pes(
+ .clk(clk),
+ .reset(reset),
+ .clk_cnt(clk_cnt),
+ .a_loc(a_loc),
+ .b_loc(b_loc),
+ .a_data_in({a3,a2,a1,a0}),
+ .b_data_in({b3,b2,b1,b0}),
+ .c_data_in({cin_row3,cin_row2,cin_row1,cin_row0}),
+ .a_data_out(a_data_out),
+ .b_data_out(b_data_out),
+ .c_data_out(c_data_out)
+);
+
+endmodule
+*/
+module hard_connected_pes( 
+ clk,
+ reset, 
+ clk_cnt,
+ a_loc,
+ b_loc,
+ a_data_in,
+ b_data_in,
+ c_data_in,
+ a_data_out,
+ b_data_out,
+ c_data_out
+  );
+ input clk;
+ input reset;
+ input [15:0] clk_cnt;
+ input [7:0] a_loc;
+ input [7:0] b_loc;
+ input [4*`DWIDTH-1:0] a_data_in;
+ input [4*`DWIDTH-1:0] b_data_in;
+ input [4*`DWIDTH-1:0] c_data_in;
+ output [4*`DWIDTH-1:0] a_data_out;
+ output [4*`DWIDTH-1:0] b_data_out;
+ output [4*`DWIDTH-1:0] c_data_out;
+
+wire [`DWIDTH-1:0] a0;
+wire [`DWIDTH-1:0] a1;
+wire [`DWIDTH-1:0] a2;
+wire [`DWIDTH-1:0] a3;
+wire [`DWIDTH-1:0] b0;
+wire [`DWIDTH-1:0] b1;
+wire [`DWIDTH-1:0] b2;
+wire [`DWIDTH-1:0] b3;
+wire [`DWIDTH-1:0] cin_row0;
+wire [`DWIDTH-1:0] cin_row1;
+wire [`DWIDTH-1:0] cin_row2;
+wire [`DWIDTH-1:0] cin_row3;
+
+assign a0 = a_data_in[`DWIDTH-1:0];
+assign a1 = a_data_in[2*`DWIDTH-1:`DWIDTH];
+assign a2 = a_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign a3 = a_data_in[4*`DWIDTH-1:3*`DWIDTH];
+assign b0 = b_data_in[`DWIDTH-1:0];
+assign b1 = b_data_in[2*`DWIDTH-1:`DWIDTH];
+assign b2 = b_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign b3 = b_data_in[4*`DWIDTH-1:3*`DWIDTH];
+assign cin_row0 = c_data_in[`DWIDTH-1:0];
+assign cin_row1 = c_data_in[2*`DWIDTH-1:`DWIDTH];
+assign cin_row2 = c_data_in[3*`DWIDTH-1:2*`DWIDTH];
+assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
+
 wire [`DWIDTH-1:0] a00to01, a01to02, a02to03, a03to04;
 wire [`DWIDTH-1:0] a10to11, a11to12, a12to13, a13to14;
 wire [`DWIDTH-1:0] a20to21, a21to22, a22to23, a23to24;
@@ -444,10 +515,6 @@ wire [`DWIDTH-1:0] b01to11, b11to21, b21to31, b31to41;
 wire [`DWIDTH-1:0] b02to12, b12to22, b22to32, b32to42;
 wire [`DWIDTH-1:0] b03to13, b13to23, b23to33, b33to43;
 
-wire [`DWIDTH-1:0] cin_row0;
-wire [`DWIDTH-1:0] cin_row1;
-wire [`DWIDTH-1:0] cin_row2;
-wire [`DWIDTH-1:0] cin_row3;
 reg [4*`DWIDTH-1:0] row0_shift_reg;
 reg [4*`DWIDTH-1:0] row1_shift_reg;
 reg [4*`DWIDTH-1:0] row2_shift_reg;
@@ -473,11 +540,6 @@ wire [`DWIDTH-1:0] matrixC30;
 wire [`DWIDTH-1:0] matrixC31;
 wire [`DWIDTH-1:0] matrixC32;
 wire [`DWIDTH-1:0] matrixC33;
-
-assign cin_row0 = c_data_in[`DWIDTH-1:0];
-assign cin_row1 = c_data_in[2*`DWIDTH-1:`DWIDTH];
-assign cin_row2 = c_data_in[3*`DWIDTH-1:2*`DWIDTH];
-assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
 
 assign row0_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 7));
 assign row1_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 8));
@@ -549,8 +611,6 @@ assign b_data_out = {b33to43,b32to42,b31to41,b30to40};
 assign c_data_out = {row3_shift_reg[15:0], row2_shift_reg[15:0], row1_shift_reg[15:0], row0_shift_reg[15:0]};
 endmodule
 
-
-
 module processing_element(
  reset, 
  clk, 
@@ -578,8 +638,8 @@ module processing_element(
 
  assign out_c = (|out_c_full_precision[2*`DWIDTH-1:`DWIDTH] == 1'b1) ? {`DWIDTH{1'b1}} : out_c_full_precision[`DWIDTH-1:0];
 
- mac_block u_mac(.a(in_a), .b(in_b), .c(out_c_full_precision), .out(out_mac));
- //mac u_mac(.mul0(in_a), .mul1(in_b), .add(out_c_full_precision), .out(out_mac));
+ //mac_block u_mac(.a(in_a), .b(in_b), .c(out_c_full_precision), .out(out_mac));
+ mac u_mac(.mul0(in_a), .mul1(in_b), .add(out_c_full_precision), .out(out_mac));
  //DW02_mac #(16,16) u_mac(.A(in_a), .B(in_b), .C(out_c_full_precision), .TC(1'b0), .MAC(out_mac));
 
  always @(posedge clk)begin
@@ -597,37 +657,38 @@ module processing_element(
  
 endmodule
 
-//module mac(mul0, mul1, add, out);
-//input [`DWIDTH-1:0] mul0;
-//input [`DWIDTH-1:0] mul1;
-//input [2*`DWIDTH-1:0] add;
-//output [2*`DWIDTH-1:0] out;
-//
-//wire [2*`DWIDTH-1:0] tmp;
-//qmult mult_u1(.i_multiplicand(mul0), .i_multiplier(mul1), .o_result(tmp));
-//qadd add_u1(.a(tmp), .b(add), .c(out));
-//
-//endmodule
-//
-//
-//module qmult(i_multiplicand,i_multiplier,o_result);
-//input [`DWIDTH-1:0] i_multiplicand;
-//input [`DWIDTH-1:0] i_multiplier;
-//output [2*`DWIDTH-1:0] o_result;
-//
-//assign o_result = i_multiplicand * i_multiplier;
-////multiply u_mult(.a(i_multiplicand), .b(i_multiplier), .out(o_result));
-////DW02_mult #(16,16) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b0), .PRODUCT(o_result));
-//
-//endmodule
-//
-//module qadd(a,b,c);
-//input [2*`DWIDTH-1:0] a;
-//input [2*`DWIDTH-1:0] b;
-//output [2*`DWIDTH-1:0] c;
-//
-//assign c = a + b;
-//endmodule
+module mac(mul0, mul1, add, out);
+input [`DWIDTH-1:0] mul0;
+input [`DWIDTH-1:0] mul1;
+input [2*`DWIDTH-1:0] add;
+output [2*`DWIDTH-1:0] out;
+
+wire [2*`DWIDTH-1:0] tmp;
+qmult mult_u1(mul0, mul1, tmp);
+qadd add_u1(tmp, add, out);
+
+endmodule
+
+
+module qmult(i_multiplicand,i_multiplier,o_result);
+input [`DWIDTH-1:0] i_multiplicand;
+input [`DWIDTH-1:0] i_multiplier;
+output [2*`DWIDTH-1:0] o_result;
+
+assign o_result = i_multiplicand * i_multiplier;
+//multiply u_mult(.a(i_multiplicand), .b(i_multiplier), .out(o_result));
+//DW02_mult #(16,16) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b0), .PRODUCT(o_result));
+
+endmodule
+
+module qadd(a,b,c);
+input [2*`DWIDTH-1:0] a;
+input [2*`DWIDTH-1:0] b;
+output [2*`DWIDTH-1:0] c;
+
+assign c = a + b;
+endmodule
+
 
 
 /*
@@ -639,25 +700,25 @@ input we0;
 output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 input clk;
 
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
-//
-//always @(posedge clk)  
-//begin 
-//        if (we0) 
-//        begin 
-//            ram[addr0] <= d0; 
-//        end 
-//        q0 <= ram[addr0];
-//end
+reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
 
-single_port_ram u_single_port_ram(
-  .data(d0),
-  .we(we0),
-  .addr(addr0),
-  .clk(clk),
-  .out(q0)
-);
+always @(posedge clk)  
+begin 
+        if (we0) 
+        begin 
+            ram[addr0] <= d0; 
+        end 
+        q0 <= ram[addr0];
+end
+
+//single_port_ram u_single_port_ram(
+//  .data(d0),
+//  .we(we0),
+//  .addr(addr0),
+//  .clk(clk),
+//  .out(q0)
+//);
 endmodule
 
 */
