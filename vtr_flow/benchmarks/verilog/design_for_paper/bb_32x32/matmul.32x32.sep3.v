@@ -139,6 +139,19 @@ end
 wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
 reg  [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out_reg;
 
+/////added on Sep 9 by Zhigang///////
+reg  [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
+wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0;
+
+always @(posedge clk) begin
+  if(reset) begin
+    data_from_out_mat <= 0;
+  end else begin
+    data_from_out_mat <= data_from_out_mat_0;
+  end
+end
+///////////////////////////////////////
+
 always @(posedge clk) begin
   if (reset) begin
     c_data_out_reg<= 0;
@@ -152,7 +165,7 @@ end
     .addr0(c_addr_muxed_reg),
     .d0(c_data_out_reg),
     .we0(we_c),
-    .q0(data_from_out_mat),
+    .q0(data_from_out_mat_0),
     .clk(clk));
 
 wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_out_NC;

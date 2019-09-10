@@ -335,22 +335,23 @@ def write_with_ram(file, basic_block_size, final_block_size):
 	#file.write('  assign data_from_out_mat = data_from_out_mat_0_0\n')
 	#ORING the data_from_out_mat
 	file.write('///////////////// ORing the data ///////////////////\n\n')
-	#file.write('  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;\n')
+	file.write('  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;\n')
 	#for i in range(num_of_bram*num_of_bram):
 	for i in range(num_of_bram):
 		file.write('  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_{0};\n'.format(i))
-
+	for i in range(num_of_bram):
+		file.write('  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_{0}_reg;\n'.format(i))
+	file.write('\n')
+	#latch the data_from_out_mat_0{0}
 	file.write(			'  always @(posedge clk) begin\n'
 						'    if(reset) begin\n')
 	#for i in range(num_of_bram*num_of_bram):
 	for i in range(num_of_bram):
-		file.write(		'      c_reg_{0} <= 0;\n'.format(i))
+		file.write(		'      data_from_out_mat_0_{0}_reg <= 0;\n'.format(i))
 
-	file.write(			'    end else if(start_mat_mul) begin\n')
+	file.write(			'    end else begin\n')
 	for i in range(num_of_bram):
-		if(i == 0):
-			continue;
-		file.write(		'      c_reg_{0} <= c_reg_{0} | c_reg_{1};\n'.format(i, i - 1))
+		file.write(		'      data_from_out_mat_0_{0}_reg <= data_from_out_mat_0_{0};\n'.format(i))
 		#for j in range(num_of_bram):
 		#if(i == 0 and j == 0):
 	# 	if(i == 0):
@@ -359,12 +360,23 @@ def write_with_ram(file, basic_block_size, final_block_size):
 	# 		file.write( '      c_reg_{a} <= c_reg_{b} | data_from_out_mat_0_{c};\n'
 	# 					.format(a = i, b = i - 1 , c = i))
 	# file.write(			'      data_from_out_mat <= c_reg_{0};\n'.format(num_of_bram - 1)) Sep 9
-	file.write(			'    end else begin\n')
-
-	for i in range(num_of_bram):
-				file.write(		'      c_reg_{0} <= data_from_out_mat_0_{0};\n'.format(i))
 	file.write(			'    end\n'
 						'  end\n\n')
+
+	#oring the data
+	file.write(			'  always @(posedge clk) begin\n'
+						'    if(reset) begin\n')
+	for i in range(num_of_bram):
+		file.write(		'      c_reg_{0} <= 0;\n'.format(i))
+	file.write(			'    end else begin\n')
+	for i in range(num_of_bram):
+		if(i == 0):
+			file.write(	'      c_reg_0 <= data_from_out_mat_0_0;\n')
+		else:
+			file.write( '      c_reg_{0} <= c_reg_{1} | data_from_out_mat_0_{2};\n'.format(i, i-1, i))
+	file.write(			'      data_from_out_mat <= c_reg_{0};\n'.format(num_of_bram - 1))
+	file.write(			'    end\n')
+	file.write(			'  end\n\n')
 
 
 	for i in range(num_of_bram):
@@ -382,7 +394,6 @@ def write_with_ram(file, basic_block_size, final_block_size):
 	file.write(		'    end\n'
 					'  end\n\n')
 	
-	file.write(		'  assign data_from_out_mat = c_reg_{0};\n\n'.format(num_of_bram - 1))
 
 	
 
