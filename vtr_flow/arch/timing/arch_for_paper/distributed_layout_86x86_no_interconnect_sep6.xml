@@ -166,7 +166,7 @@
 
   <!-- Physical descriptions begin -->
   <layout>
-    <fixed_layout name="mylaout" width="202" height="242">
+    <fixed_layout name="mylaout" width="86" height="86">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>

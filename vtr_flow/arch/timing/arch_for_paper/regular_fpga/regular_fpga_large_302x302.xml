@@ -149,22 +149,24 @@
   <!-- Physical descriptions begin -->
   <layout>
     <!--<auto_layout aspect_ratio="1.0">-->
-    <fixed_layout name="mylayout" width="317" height="317">
+    <fixed_layout name="mylayout" width="302" height="302">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
 		<!--Column of 'add_16' with 'EMPTY' blocks wherever a 'add_36' does not fit. Vertical offset by 1 for perimeter.-->
-		<col type="mac_32" startx="6" starty="1" repeatx="21" priority="30"/>
-		<col type="myadder" startx="7" starty="1" repeatx="21" priority="25"/>
-		<col type="myadder" startx="8" starty="1" repeatx="21" priority="25"/>
-		<col type="mult_36" startx="9" starty="1" repeatx="21" priority="20"/>
-		<col type="memory"  startx="10" starty="1" repeatx="21" priority="18"/>
-		<col type="mult_36" startx="12" starty="1" repeatx="21" priority="20"/>
-		<col type="myadder" startx="13" starty="1" repeatx="21" priority="25"/>
-		<col type="myadder" startx="14" starty="1" repeatx="21" priority="25"/>
-		<col type="mac_32" startx="15" starty="1" repeatx="21" priority="30"/>
+		<col type="mac_32"  startx="10" starty="1" repeatx="30" priority="30"/>
+		<col type="mac_32"  startx="11" starty="1" repeatx="30" priority="30"/>
+		<col type="myadder" startx="12" starty="1" repeatx="30" priority="25"/>
+		<col type="myadder" startx="13" starty="1" repeatx="30" priority="25"/>
+		<col type="mult_36" startx="14" starty="1" repeatx="30" priority="20"/>
+		<col type="memory"  startx="15" starty="1" repeatx="30" priority="18"/>
+		<col type="mult_36" startx="17" starty="1" repeatx="30" priority="20"/>
+		<col type="mult_36" startx="18" starty="1" repeatx="30" priority="20"/>
+		<col type="myadder" startx="19" starty="1" repeatx="30" priority="25"/>
+		<col type="myadder" startx="20" starty="1" repeatx="30" priority="25"/>
+		<col type="mac_32"  startx="21" starty="1" repeatx="30" priority="30"/>
 
 		         
     </fixed_layout>
