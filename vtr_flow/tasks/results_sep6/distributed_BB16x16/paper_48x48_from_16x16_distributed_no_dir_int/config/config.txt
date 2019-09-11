@@ -1,0 +1,21 @@
+##############################################
+# Configuration file for running experiments
+##############################################
+
+# Path to directory of circuits to use
+circuits_dir=benchmarks/verilog/design_for_paper/bb_16x16
+
+# Path to directory of architectures to use
+archs_dir=arch/timing/arch_for_paper/larger_building_blocks
+
+# Add circuits to list to sweep
+circuit_list_add=script.matmul.48x48_from_16x16.v
+
+# Add architectures to list to sweep
+arch_list_add=distributed_layout.bb_16x16.grid_74x74.no_dir_int.xml
+
+# Parse info and how to parse
+parse_file=vpr_standard.txt
+
+# Pass requirements
+pass_requirements_file=pass_requirements.txt

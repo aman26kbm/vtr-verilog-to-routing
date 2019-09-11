@@ -6,7 +6,7 @@
 `define MAT_MUL_SIZE 4
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 
-/*
+
 //Design with memories
 module matrix_multiplication(
   clk, 
@@ -181,7 +181,7 @@ matmul_4x4_systolic u_matmul_4x4(
 );
 
 endmodule  
-*/
+
 /*
 //Design without memories
 module matrix_multiplication(

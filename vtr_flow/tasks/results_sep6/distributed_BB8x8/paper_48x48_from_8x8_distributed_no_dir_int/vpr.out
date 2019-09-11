@@ -1,0 +1,1704 @@
+
+/usr/bin/env time -v /home/amana/vtr-verilog-to-routing/vtr_flow/../vpr/vpr distributed_layout.bb_8x8.grid_74x74.no_dir_int.xml script.matmul.48x48_from_8x8 --circuit_file script.matmul.48x48_from_8x8.pre-vpr.blif --const_gen_inference comb --seed 654
+VPR FPGA Placement and Routing.
+Version: 8.0.0-rc1+5f15bc48b
+Revision: v8.0.0-rc1-916-g5f15bc48b
+Compiled: 2019-09-05T02:07:41
+Compiler: GNU 7.4.0 on Linux-4.15.0-1040-gcp x86_64
+Build Info: release IPO VTR_ASSERT_LEVEL=2
+
+University of Toronto
+verilogtorouting.org
+vtr-users@googlegroups.com
+This is free open source code under MIT license.
+
+VPR was run with the following command-line:
+/home/amana/vtr-verilog-to-routing/vtr_flow/../vpr/vpr distributed_layout.bb_8x8.grid_74x74.no_dir_int.xml script.matmul.48x48_from_8x8 --circuit_file script.matmul.48x48_from_8x8.pre-vpr.blif --const_gen_inference comb --seed 654
+
+
+Architecture file: distributed_layout.bb_8x8.grid_74x74.no_dir_int.xml
+Circuit name: script.matmul.48x48_from_8x8
+
+# Loading Architecture Description
+# Loading Architecture Description took 0.01 seconds (max_rss 14.8 MiB, delta_rss +2.9 MiB)
+# Building complex block graph
+Warning 1: io[0].clock[0] unconnected pin in architecture.
+# Building complex block graph took 0.26 seconds (max_rss 26.3 MiB, delta_rss +11.6 MiB)
+# Load circuit
+Found constant-zero generator 'matrix_multiplication^done_mat_mul'
+Found constant-zero generator 'gnd'
+Found constant-one generator 'vcc'
+Found constant-zero generator 'unconn'
+# Load circuit took 0.49 seconds (max_rss 56.2 MiB, delta_rss +29.9 MiB)
+# Clean circuit
+Absorbing 1022 LUT buffers
+Inferred    0 additional primitive pins as constant generators since they have no combinationally connected inputs
+Inferred    0 additional primitive pins as constant generators due to constant inputs
+Inferred    0 additional primitive pins as constant generators since they have no combinationally connected inputs
+Inferred    0 additional primitive pins as constant generators due to constant inputs
+Swept input(s)      : 0
+Swept output(s)     : 0 (0 dangling, 0 constant)
+Swept net(s)        : 1992
+Swept block(s)      : 0
+Constant Pins Marked: 0
+# Clean circuit took 0.01 seconds (max_rss 56.2 MiB, delta_rss +0.0 MiB)
+# Compress circuit
+# Compress circuit took 0.02 seconds (max_rss 56.2 MiB, delta_rss +0.0 MiB)
+# Verify circuit
+# Verify circuit took 0.01 seconds (max_rss 56.2 MiB, delta_rss +0.0 MiB)
+Circuit Statistics:
+  Blocks: 6343
+    .input             :     159
+    .latch             :    1855
+    .output            :     129
+    0-LUT              :       3
+    6-LUT              :    1857
+    matmul_8x8_systolic:      36
+    single_port_ram    :    2304
+  Nets  : 18550
+    Avg Fanout:     3.0
+    Max Fanout: 10692.0
+    Min Fanout:     1.0
+  Netlist Clocks: 1
+# Build Timing Graph
+  Timing Graph Nodes: 110474
+  Timing Graph Edges: 8399459
+  Timing Graph Levels: 8
+# Build Timing Graph took 7.02 seconds (max_rss 1154.6 MiB, delta_rss +1098.4 MiB)
+Netlist contains 1 clocks
+  Netlist Clock 'matrix_multiplication^clk' Fanout: 4195 pins (5.7%), 4195 blocks (66.1%)
+# Load Timing Constraints
+
+SDC file 'script.matmul.48x48_from_8x8.sdc' not found
+Setting default timing constraints:
+   * constrain all primay inputs and primary outputs on netlist clock 'matrix_multiplication^clk'
+   * optimize netlist clock to run as fast as possible
+Timing constraints created 1 clocks
+  Constrained Clock 'matrix_multiplication^clk' Source: 'matrix_multiplication^clk.inpad[0]'
+
+# Load Timing Constraints took 0.00 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+Timing analysis: ON
+Circuit netlist file: script.matmul.48x48_from_8x8.net
+Circuit placement file: script.matmul.48x48_from_8x8.place
+Circuit routing file: script.matmul.48x48_from_8x8.route
+Circuit SDC file: script.matmul.48x48_from_8x8.sdc
+
+Packer: ENABLED
+Placer: ENABLED
+Router: ENABLED
+Analysis: ENABLED
+
+NetlistOpts.abosrb_buffer_luts            : true
+NetlistOpts.sweep_dangling_primary_ios    : true
+NetlistOpts.sweep_dangling_nets           : true
+NetlistOpts.sweep_dangling_blocks         : true
+NetlistOpts.sweep_constant_primary_outputs: false
+
+PackerOpts.allow_unrelated_clustering: auto
+PackerOpts.alpha_clustering: 0.750000
+PackerOpts.beta_clustering: 0.900000
+PackerOpts.cluster_seed_type: BLEND2
+PackerOpts.connection_driven: true
+PackerOpts.global_clocks: true
+PackerOpts.hill_climbing_flag: false
+PackerOpts.inter_cluster_net_delay: 1.000000
+PackerOpts.timing_driven: true
+PackerOpts.target_external_pin_util: auto
+PlacerOpts.place_freq: PLACE_ONCE
+PlacerOpts.place_algorithm: PATH_TIMING_DRIVEN_PLACE
+PlacerOpts.pad_loc_type: FREE
+PlacerOpts.place_cost_exp: 1.000000
+PlacerOpts.place_chan_width: 100
+PlacerOpts.inner_loop_recompute_divider: 0
+PlacerOpts.recompute_crit_iter: 1
+PlacerOpts.timing_tradeoff: 0.500000
+PlacerOpts.td_place_exp_first: 1.000000
+PlacerOpts.td_place_exp_last: 8.000000
+PlaceOpts.seed: 654
+AnnealSched.type: AUTO_SCHED
+AnnealSched.inner_num: 1.000000
+
+RouterOpts.route_type: DETAILED
+RouterOpts.router_algorithm: TIMING_DRIVEN
+RouterOpts.base_cost_type: DELAY_NORMALIZED_LENGTH
+RouterOpts.fixed_channel_width: NO_FIXED_CHANNEL_WIDTH
+RouterOpts.trim_empty_chan: false
+RouterOpts.trim_obs_chan: false
+RouterOpts.acc_fac: 1.000000
+RouterOpts.bb_factor: 3
+RouterOpts.bend_cost: 0.000000
+RouterOpts.first_iter_pres_fac: 0.000000
+RouterOpts.initial_pres_fac: 0.500000
+RouterOpts.pres_fac_mult: 1.300000
+RouterOpts.max_router_iterations: 50
+RouterOpts.min_incremental_reroute_fanout: 16
+RouterOpts.astar_fac: 1.200000
+RouterOpts.criticality_exp: 1.000000
+RouterOpts.max_criticality: 0.990000
+RouterOpts.routing_failure_predictor = SAFE
+RouterOpts.routing_budgets_algorithm = DISABLE
+
+AnalysisOpts.gen_post_synthesis_netlist: false
+
+RoutingArch.directionality: UNI_DIRECTIONAL
+RoutingArch.switch_block_type: WILTON
+RoutingArch.Fs: 3
+
+# Packing
+Warning 2: Block type 'mult_36' was not specified in device grid layout
+Warning 3: Block type 'activation' was not specified in device grid layout
+Begin packing 'script.matmul.48x48_from_8x8.pre-vpr.blif'.
+
+After removing unused inputs...
+	total blocks: 6343, total nets: 18550, total inputs: 159, total outputs: 129
+Begin prepacking.
+Finish prepacking.
+Using inter-cluster delay: 1.33777e-09
+Packing with pin utilization targets: io:1,1 clb:0.8,1 mult_36:1,1 matmul_8x8:1,1 activation:1,1 memory:1,1
+Packing with high fanout thresholds: io:128 clb:32 mult_36:128 matmul_8x8:128 activation:128 memory:128
+Warning 4: Block type 'mult_36' was not specified in device grid layout
+Warning 5: Block type 'activation' was not specified in device grid layout
+Not enough resources expand FPGA size to (74 x 74)
+Complex block 0: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_0_0^c_data_out~0' (matmul_8x8) .
+Complex block 1: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_0_1^c_data_out~0' (matmul_8x8) .
+Complex block 2: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_0_2^c_data_out~0' (matmul_8x8) .
+Complex block 3: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_0_3^c_data_out~0' (matmul_8x8) .
+Complex block 4: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_0_4^c_data_out~0' (matmul_8x8) .
+Complex block 5: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_0_5^c_data_out~0' (matmul_8x8) .
+Complex block 6: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_1_0^c_data_out~0' (matmul_8x8) .
+Complex block 7: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_2_0^c_data_out~0' (matmul_8x8) .
+Complex block 8: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_3_0^c_data_out~0' (matmul_8x8) .
+Complex block 9: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_4_0^c_data_out~0' (matmul_8x8) .
+Complex block 10: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_5_0^c_data_out~0' (matmul_8x8) .
+Complex block 11: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_1_5^c_data_out~0' (matmul_8x8) .
+Complex block 12: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_2_5^c_data_out~0' (matmul_8x8) .
+Complex block 13: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_3_5^c_data_out~0' (matmul_8x8) .
+Complex block 14: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_4_5^c_data_out~0' (matmul_8x8) .
+Complex block 15: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_5_5^c_data_out~0' (matmul_8x8) .
+Complex block 16: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_1_4^c_data_out~0' (matmul_8x8) .
+Complex block 17: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_2_4^c_data_out~0' (matmul_8x8) .
+Complex block 18: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_3_4^c_data_out~0' (matmul_8x8) .
+Complex block 19: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_4_4^c_data_out~0' (matmul_8x8) .
+Complex block 20: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_5_4^c_data_out~0' (matmul_8x8) .
+Complex block 21: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_1_3^c_data_out~0' (matmul_8x8) .
+Complex block 22: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_2_3^c_data_out~0' (matmul_8x8) .
+Complex block 23: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_3_3^c_data_out~0' (matmul_8x8) .
+Complex block 24: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_4_3^c_data_out~0' (matmul_8x8) .
+Complex block 25: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_5_3^c_data_out~0' (matmul_8x8) .
+Complex block 26: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_1_2^c_data_out~0' (matmul_8x8) .
+Complex block 27: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_2_2^c_data_out~0' (matmul_8x8) .
+Complex block 28: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_3_2^c_data_out~0' (matmul_8x8) .
+Complex block 29: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_4_2^c_data_out~0' (matmul_8x8) .
+Complex block 30: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_5_2^c_data_out~0' (matmul_8x8) .
+Complex block 31: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_1_1^c_data_out~0' (matmul_8x8) .
+Complex block 32: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_2_1^c_data_out~0' (matmul_8x8) .
+Complex block 33: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_3_1^c_data_out~0' (matmul_8x8) .
+Complex block 34: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_4_1^c_data_out~0' (matmul_8x8) .
+Complex block 35: 'matrix_multiplication.matmul_48x48_systolic+u_matmul_48x48_systolic.matmul_8x8_systolic+u_matmul_8x8_systolic_5_1^c_data_out~0' (matmul_8x8) .
+Complex block 36: 'n26562' (clb) .................
+Complex block 37: 'n17127' (clb) ....................
+Complex block 38: 'n17247' (clb) ....................
+Complex block 39: 'n17367' (clb) ....................
+Complex block 40: 'n17407' (clb) ....................
+Complex block 41: 'n17447' (clb) ....................
+Complex block 42: 'n17487' (clb) ....................
+Complex block 43: 'n17527' (clb) ....................
+Complex block 44: 'n17567' (clb) ....................
+Complex block 45: 'n17607' (clb) ....................
+Complex block 46: 'n17647' (clb) ....................
+Complex block 47: 'n17687' (clb) ....................
+Complex block 48: 'n17727' (clb) ....................
+Complex block 49: 'n17767' (clb) ....................
+Complex block 50: 'n17807' (clb) ....................
+Complex block 51: 'n17847' (clb) ....................
+Complex block 52: 'n17887' (clb) ....................
+Complex block 53: 'n17927' (clb) ....................
+Complex block 54: 'n17967' (clb) ....................
+Complex block 55: 'n18007' (clb) ....................
+Complex block 56: 'n18127' (clb) ....................
+Complex block 57: 'n18247' (clb) ....................
+Complex block 58: 'n18367' (clb) ....................
+Complex block 59: 'n18487' (clb) ....................
+Complex block 60: 'n18607' (clb) ....................
+Complex block 61: 'n18727' (clb) ....................
+Complex block 62: 'n18847' (clb) ....................
+Complex block 63: 'n18967' (clb) ....................
+Complex block 64: 'n19087' (clb) ....................
+Complex block 65: 'n19207' (clb) ....................
+Complex block 66: 'n19327' (clb) ....................
+Complex block 67: 'n19427' (clb) ....................
+Complex block 68: 'n19542' (clb) ....................
+Complex block 69: 'n19657' (clb) ....................
+Complex block 70: 'n19772' (clb) ....................
+Complex block 71: 'n19887' (clb) ....................
+Complex block 72: 'n20007' (clb) ....................
+Complex block 73: 'n20127' (clb) ....................
+Complex block 74: 'n20227' (clb) ....................
+Complex block 75: 'n20342' (clb) ....................
+Complex block 76: 'n20457' (clb) ....................
+Complex block 77: 'n20572' (clb) ....................
+Complex block 78: 'n20687' (clb) ....................
+Complex block 79: 'n20807' (clb) ....................
+Complex block 80: 'n20927' (clb) ....................
+Complex block 81: 'n21027' (clb) ....................
+Complex block 82: 'n21142' (clb) ....................
+Complex block 83: 'n21257' (clb) ....................
+Complex block 84: 'n21372' (clb) ....................
+Complex block 85: 'n21487' (clb) ....................
+Complex block 86: 'n21607' (clb) ....................
+Complex block 87: 'n21727' (clb) ....................
+Complex block 88: 'n21827' (clb) ....................
+Complex block 89: 'n21942' (clb) ....................
+Complex block 90: 'n22057' (clb) ....................
+Complex block 91: 'n22172' (clb) ....................
+Complex block 92: 'n18562' (clb) ....................
+Complex block 93: 'li1679' (clb) ....................
+Complex block 94: 'li1681' (clb) ....................
+Complex block 95: 'li1683' (clb) ....................
+Complex block 96: 'li1685' (clb) ....................
+Complex block 97: 'li1687' (clb) ...................
+Complex block 98: 'n17232' (clb) ....................
+Complex block 99: 'n17352' (clb) ....................
+Complex block 100: 'n18712' (clb) ....................
+Complex block 101: 'n18832' (clb) ....................
+Complex block 102: 'n18952' (clb) ....................
+Complex block 103: 'n19072' (clb) ....................
+Complex block 104: 'n19192' (clb) ....................
+Complex block 105: 'li1025' (clb) ....................
+Complex block 106: 'li1152' (clb) ....................
+Complex block 107: 'li1154' (clb) ....................
+Complex block 108: 'li1156' (clb) ....................
+Complex block 109: 'li1157' (clb) ....................
+Complex block 110: 'li1280' (clb) ....................
+Complex block 111: 'li1281' (clb) ....................
+Complex block 112: 'li1282' (clb) ....................
+Complex block 113: 'li1283' (clb) ....................
+Complex block 114: 'li1284' (clb) ....................
+Complex block 115: 'li1285' (clb) ....................
+Complex block 116: 'li1286' (clb) ....................
+Complex block 117: 'li1408' (clb) ....................
+Complex block 118: 'li1409' (clb) ....................
+Complex block 119: 'li1410' (clb) ....................
+Complex block 120: 'li1411' (clb) ....................
+Complex block 121: 'li1412' (clb) ....................
+Complex block 122: 'li1413' (clb) ....................
+Complex block 123: 'li1536' (clb) ....................
+Complex block 124: 'li1537' (clb) ....................
+Complex block 125: 'li1538' (clb) ....................
+Complex block 126: 'li1539' (clb) ....................
+Complex block 127: 'li1540' (clb) ....................
+Complex block 128: 'li1541' (clb) ....................
+Complex block 129: 'n25777' (clb) .
+Complex block 130: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 131: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~6' (memory) ................................................................
+Complex block 132: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~7' (memory) ................................................................
+Complex block 133: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~8' (memory) ................................................................
+Complex block 134: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~9' (memory) ................................................................
+Complex block 135: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~10' (memory) ................................................................
+Complex block 136: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~11' (memory) ................................................................
+Complex block 137: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~12' (memory) ................................................................
+Complex block 138: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~13' (memory) ................................................................
+Complex block 139: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~14' (memory) ................................................................
+Complex block 140: 'matrix_multiplication.ram+matrix_row_0.single_port_ram+u_single_port_ram^out~41' (memory) ................................................................
+Complex block 141: 'matrix_multiplication.ram+matrix_row_1.single_port_ram+u_single_port_ram^out~69' (memory) ................................................................
+Complex block 142: 'matrix_multiplication.ram+matrix_B_0_5.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 143: 'matrix_multiplication.ram+matrix_B_0_5.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 144: 'matrix_multiplication.ram+matrix_B_0_4.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 145: 'matrix_multiplication.ram+matrix_B_0_4.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 146: 'matrix_multiplication.ram+matrix_B_0_3.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 147: 'matrix_multiplication.ram+matrix_B_0_3.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 148: 'matrix_multiplication.ram+matrix_B_0_2.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 149: 'matrix_multiplication.ram+matrix_B_0_2.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 150: 'matrix_multiplication.ram+matrix_B_0_1.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 151: 'matrix_multiplication.ram+matrix_B_0_1.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 152: 'matrix_multiplication.ram+matrix_A_5_0.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 153: 'matrix_multiplication.ram+matrix_A_5_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 154: 'matrix_multiplication.ram+matrix_A_4_0.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 155: 'matrix_multiplication.ram+matrix_A_4_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 156: 'matrix_multiplication.ram+matrix_A_3_0.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 157: 'matrix_multiplication.ram+matrix_A_3_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 158: 'matrix_multiplication.ram+matrix_A_2_0.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 159: 'matrix_multiplication.ram+matrix_A_2_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 160: 'matrix_multiplication.ram+matrix_A_1_0.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 161: 'matrix_multiplication.ram+matrix_A_1_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 162: 'matrix_multiplication.ram+matrix_A_0_0.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 163: 'matrix_multiplication.ram+matrix_A_0_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 164: 'matrix_multiplication.ram+matrix_B_0_0.single_port_ram+u_single_port_ram^out~127' (memory) ................................................................
+Complex block 165: 'matrix_multiplication.ram+matrix_B_0_0.single_port_ram+u_single_port_ram^out~0' (memory) ................................................................
+Complex block 166: 'out:matrix_multiplication^data_from_out_mat~0' (io) .
+Complex block 167: 'out:matrix_multiplication^data_from_out_mat~1' (io) .
+Complex block 168: 'out:matrix_multiplication^data_from_out_mat~2' (io) .
+Complex block 169: 'out:matrix_multiplication^data_from_out_mat~3' (io) .
+Complex block 170: 'out:matrix_multiplication^data_from_out_mat~4' (io) .
+Complex block 171: 'out:matrix_multiplication^data_from_out_mat~5' (io) .
+Complex block 172: 'out:matrix_multiplication^data_from_out_mat~6' (io) .
+Complex block 173: 'out:matrix_multiplication^data_from_out_mat~7' (io) .
+Complex block 174: 'out:matrix_multiplication^data_from_out_mat~8' (io) .
+Complex block 175: 'out:matrix_multiplication^data_from_out_mat~9' (io) .
+Complex block 176: 'out:matrix_multiplication^data_from_out_mat~10' (io) .
+Complex block 177: 'out:matrix_multiplication^data_from_out_mat~11' (io) .
+Complex block 178: 'out:matrix_multiplication^data_from_out_mat~12' (io) .
+Complex block 179: 'out:matrix_multiplication^data_from_out_mat~13' (io) .
+Complex block 180: 'out:matrix_multiplication^data_from_out_mat~14' (io) .
+Complex block 181: 'out:matrix_multiplication^data_from_out_mat~15' (io) .
+Complex block 182: 'out:matrix_multiplication^data_from_out_mat~16' (io) .
+Complex block 183: 'out:matrix_multiplication^data_from_out_mat~17' (io) .
+Complex block 184: 'out:matrix_multiplication^data_from_out_mat~18' (io) .
+Complex block 185: 'out:matrix_multiplication^data_from_out_mat~19' (io) .
+Complex block 186: 'out:matrix_multiplication^data_from_out_mat~20' (io) .
+Complex block 187: 'out:matrix_multiplication^data_from_out_mat~21' (io) .
+Complex block 188: 'out:matrix_multiplication^data_from_out_mat~22' (io) .
+Complex block 189: 'out:matrix_multiplication^data_from_out_mat~23' (io) .
+Complex block 190: 'out:matrix_multiplication^data_from_out_mat~24' (io) .
+Complex block 191: 'out:matrix_multiplication^data_from_out_mat~25' (io) .
+Complex block 192: 'out:matrix_multiplication^data_from_out_mat~26' (io) .
+Complex block 193: 'out:matrix_multiplication^data_from_out_mat~27' (io) .
+Complex block 194: 'out:matrix_multiplication^data_from_out_mat~28' (io) .
+Complex block 195: 'out:matrix_multiplication^data_from_out_mat~29' (io) .
+Complex block 196: 'out:matrix_multiplication^data_from_out_mat~30' (io) .
+Complex block 197: 'out:matrix_multiplication^data_from_out_mat~31' (io) .
+Complex block 198: 'out:matrix_multiplication^data_from_out_mat~32' (io) .
+Complex block 199: 'out:matrix_multiplication^data_from_out_mat~33' (io) .
+Complex block 200: 'out:matrix_multiplication^data_from_out_mat~34' (io) .
+Complex block 201: 'out:matrix_multiplication^data_from_out_mat~35' (io) .
+Complex block 202: 'out:matrix_multiplication^data_from_out_mat~36' (io) .
+Complex block 203: 'out:matrix_multiplication^data_from_out_mat~37' (io) .
+Complex block 204: 'out:matrix_multiplication^data_from_out_mat~38' (io) .
+Complex block 205: 'out:matrix_multiplication^data_from_out_mat~39' (io) .
+Complex block 206: 'out:matrix_multiplication^data_from_out_mat~40' (io) .
+Complex block 207: 'out:matrix_multiplication^data_from_out_mat~41' (io) .
+Complex block 208: 'out:matrix_multiplication^data_from_out_mat~42' (io) .
+Complex block 209: 'out:matrix_multiplication^data_from_out_mat~43' (io) .
+Complex block 210: 'out:matrix_multiplication^data_from_out_mat~44' (io) .
+Complex block 211: 'out:matrix_multiplication^data_from_out_mat~45' (io) .
+Complex block 212: 'out:matrix_multiplication^data_from_out_mat~46' (io) .
+Complex block 213: 'out:matrix_multiplication^data_from_out_mat~47' (io) .
+Complex block 214: 'out:matrix_multiplication^data_from_out_mat~48' (io) .
+Complex block 215: 'out:matrix_multiplication^data_from_out_mat~49' (io) .
+Complex block 216: 'out:matrix_multiplication^data_from_out_mat~50' (io) .
+Complex block 217: 'out:matrix_multiplication^data_from_out_mat~51' (io) .
+Complex block 218: 'out:matrix_multiplication^data_from_out_mat~52' (io) .
+Complex block 219: 'out:matrix_multiplication^data_from_out_mat~53' (io) .
+Complex block 220: 'out:matrix_multiplication^data_from_out_mat~54' (io) .
+Complex block 221: 'out:matrix_multiplication^data_from_out_mat~55' (io) .
+Complex block 222: 'out:matrix_multiplication^data_from_out_mat~56' (io) .
+Complex block 223: 'out:matrix_multiplication^data_from_out_mat~57' (io) .
+Complex block 224: 'out:matrix_multiplication^data_from_out_mat~58' (io) .
+Complex block 225: 'out:matrix_multiplication^data_from_out_mat~59' (io) .
+Complex block 226: 'out:matrix_multiplication^data_from_out_mat~60' (io) .
+Complex block 227: 'out:matrix_multiplication^data_from_out_mat~61' (io) .
+Complex block 228: 'out:matrix_multiplication^data_from_out_mat~62' (io) .
+Complex block 229: 'out:matrix_multiplication^data_from_out_mat~63' (io) .
+Complex block 230: 'out:matrix_multiplication^data_from_out_mat~64' (io) .
+Complex block 231: 'out:matrix_multiplication^data_from_out_mat~65' (io) .
+Complex block 232: 'out:matrix_multiplication^data_from_out_mat~66' (io) .
+Complex block 233: 'out:matrix_multiplication^data_from_out_mat~67' (io) .
+Complex block 234: 'out:matrix_multiplication^data_from_out_mat~68' (io) .
+Complex block 235: 'out:matrix_multiplication^data_from_out_mat~69' (io) .
+Complex block 236: 'out:matrix_multiplication^data_from_out_mat~70' (io) .
+Complex block 237: 'out:matrix_multiplication^data_from_out_mat~71' (io) .
+Complex block 238: 'out:matrix_multiplication^data_from_out_mat~72' (io) .
+Complex block 239: 'out:matrix_multiplication^data_from_out_mat~73' (io) .
+Complex block 240: 'out:matrix_multiplication^data_from_out_mat~74' (io) .
+Complex block 241: 'out:matrix_multiplication^data_from_out_mat~75' (io) .
+Complex block 242: 'out:matrix_multiplication^data_from_out_mat~76' (io) .
+Complex block 243: 'out:matrix_multiplication^data_from_out_mat~77' (io) .
+Complex block 244: 'out:matrix_multiplication^data_from_out_mat~78' (io) .
+Complex block 245: 'out:matrix_multiplication^data_from_out_mat~79' (io) .
+Complex block 246: 'out:matrix_multiplication^data_from_out_mat~80' (io) .
+Complex block 247: 'out:matrix_multiplication^data_from_out_mat~81' (io) .
+Complex block 248: 'out:matrix_multiplication^data_from_out_mat~82' (io) .
+Complex block 249: 'out:matrix_multiplication^data_from_out_mat~83' (io) .
+Complex block 250: 'out:matrix_multiplication^data_from_out_mat~84' (io) .
+Complex block 251: 'out:matrix_multiplication^data_from_out_mat~85' (io) .
+Complex block 252: 'out:matrix_multiplication^data_from_out_mat~86' (io) .
+Complex block 253: 'out:matrix_multiplication^data_from_out_mat~87' (io) .
+Complex block 254: 'out:matrix_multiplication^data_from_out_mat~88' (io) .
+Complex block 255: 'out:matrix_multiplication^data_from_out_mat~89' (io) .
+Complex block 256: 'out:matrix_multiplication^data_from_out_mat~90' (io) .
+Complex block 257: 'out:matrix_multiplication^data_from_out_mat~91' (io) .
+Complex block 258: 'out:matrix_multiplication^data_from_out_mat~92' (io) .
+Complex block 259: 'out:matrix_multiplication^data_from_out_mat~93' (io) .
+Complex block 260: 'out:matrix_multiplication^data_from_out_mat~94' (io) .
+Complex block 261: 'out:matrix_multiplication^data_from_out_mat~95' (io) .
+Complex block 262: 'out:matrix_multiplication^data_from_out_mat~96' (io) .
+Complex block 263: 'out:matrix_multiplication^data_from_out_mat~97' (io) .
+Complex block 264: 'out:matrix_multiplication^data_from_out_mat~98' (io) .
+Complex block 265: 'out:matrix_multiplication^data_from_out_mat~99' (io) .
+Complex block 266: 'out:matrix_multiplication^data_from_out_mat~100' (io) .
+Complex block 267: 'out:matrix_multiplication^data_from_out_mat~101' (io) .
+Complex block 268: 'out:matrix_multiplication^data_from_out_mat~102' (io) .
+Complex block 269: 'out:matrix_multiplication^data_from_out_mat~103' (io) .
+Complex block 270: 'out:matrix_multiplication^data_from_out_mat~104' (io) .
+Complex block 271: 'out:matrix_multiplication^data_from_out_mat~105' (io) .
+Complex block 272: 'out:matrix_multiplication^data_from_out_mat~106' (io) .
+Complex block 273: 'out:matrix_multiplication^data_from_out_mat~107' (io) .
+Complex block 274: 'out:matrix_multiplication^data_from_out_mat~108' (io) .
+Complex block 275: 'out:matrix_multiplication^data_from_out_mat~109' (io) .
+Complex block 276: 'out:matrix_multiplication^data_from_out_mat~110' (io) .
+Complex block 277: 'out:matrix_multiplication^data_from_out_mat~111' (io) .
+Complex block 278: 'out:matrix_multiplication^data_from_out_mat~112' (io) .
+Complex block 279: 'out:matrix_multiplication^data_from_out_mat~113' (io) .
+Complex block 280: 'out:matrix_multiplication^data_from_out_mat~114' (io) .
+Complex block 281: 'out:matrix_multiplication^data_from_out_mat~115' (io) .
+Complex block 282: 'out:matrix_multiplication^data_from_out_mat~116' (io) .
+Complex block 283: 'out:matrix_multiplication^data_from_out_mat~117' (io) .
+Complex block 284: 'out:matrix_multiplication^data_from_out_mat~118' (io) .
+Complex block 285: 'out:matrix_multiplication^data_from_out_mat~119' (io) .
+Complex block 286: 'out:matrix_multiplication^data_from_out_mat~120' (io) .
+Complex block 287: 'out:matrix_multiplication^data_from_out_mat~121' (io) .
+Complex block 288: 'out:matrix_multiplication^data_from_out_mat~122' (io) .
+Complex block 289: 'out:matrix_multiplication^data_from_out_mat~123' (io) .
+Complex block 290: 'out:matrix_multiplication^data_from_out_mat~124' (io) .
+Complex block 291: 'out:matrix_multiplication^data_from_out_mat~125' (io) .
+Complex block 292: 'out:matrix_multiplication^data_from_out_mat~126' (io) .
+Complex block 293: 'out:matrix_multiplication^data_from_out_mat~127' (io) .
+Complex block 294: 'matrix_multiplication^done_mat_mul' (clb) .
+Complex block 295: 'gnd' (clb) .
+Complex block 296: 'vcc' (clb) .
+Complex block 297: 'out:matrix_multiplication^done_mat_mul' (io) .
+Complex block 298: 'matrix_multiplication^clk' (io) .
+Complex block 299: 'matrix_multiplication^enable_writing_to_mem' (io) .
+Complex block 300: 'matrix_multiplication^enable_reading_from_mem' (io) .
+Complex block 301: 'matrix_multiplication^data_pi~0' (io) .
+Complex block 302: 'matrix_multiplication^data_pi~1' (io) .
+Complex block 303: 'matrix_multiplication^data_pi~2' (io) .
+Complex block 304: 'matrix_multiplication^data_pi~3' (io) .
+Complex block 305: 'matrix_multiplication^data_pi~4' (io) .
+Complex block 306: 'matrix_multiplication^data_pi~5' (io) .
+Complex block 307: 'matrix_multiplication^data_pi~6' (io) .
+Complex block 308: 'matrix_multiplication^data_pi~7' (io) .
+Complex block 309: 'matrix_multiplication^data_pi~8' (io) .
+Complex block 310: 'matrix_multiplication^data_pi~9' (io) .
+Complex block 311: 'matrix_multiplication^data_pi~10' (io) .
+Complex block 312: 'matrix_multiplication^data_pi~11' (io) .
+Complex block 313: 'matrix_multiplication^data_pi~12' (io) .
+Complex block 314: 'matrix_multiplication^data_pi~13' (io) .
+Complex block 315: 'matrix_multiplication^data_pi~14' (io) .
+Complex block 316: 'matrix_multiplication^data_pi~15' (io) .
+Complex block 317: 'matrix_multiplication^data_pi~16' (io) .
+Complex block 318: 'matrix_multiplication^data_pi~17' (io) .
+Complex block 319: 'matrix_multiplication^data_pi~18' (io) .
+Complex block 320: 'matrix_multiplication^data_pi~19' (io) .
+Complex block 321: 'matrix_multiplication^data_pi~20' (io) .
+Complex block 322: 'matrix_multiplication^data_pi~21' (io) .
+Complex block 323: 'matrix_multiplication^data_pi~22' (io) .
+Complex block 324: 'matrix_multiplication^data_pi~23' (io) .
+Complex block 325: 'matrix_multiplication^data_pi~24' (io) .
+Complex block 326: 'matrix_multiplication^data_pi~25' (io) .
+Complex block 327: 'matrix_multiplication^data_pi~26' (io) .
+Complex block 328: 'matrix_multiplication^data_pi~27' (io) .
+Complex block 329: 'matrix_multiplication^data_pi~28' (io) .
+Complex block 330: 'matrix_multiplication^data_pi~29' (io) .
+Complex block 331: 'matrix_multiplication^data_pi~30' (io) .
+Complex block 332: 'matrix_multiplication^data_pi~31' (io) .
+Complex block 333: 'matrix_multiplication^data_pi~32' (io) .
+Complex block 334: 'matrix_multiplication^data_pi~33' (io) .
+Complex block 335: 'matrix_multiplication^data_pi~34' (io) .
+Complex block 336: 'matrix_multiplication^data_pi~35' (io) .
+Complex block 337: 'matrix_multiplication^data_pi~36' (io) .
+Complex block 338: 'matrix_multiplication^data_pi~37' (io) .
+Complex block 339: 'matrix_multiplication^data_pi~38' (io) .
+Complex block 340: 'matrix_multiplication^data_pi~39' (io) .
+Complex block 341: 'matrix_multiplication^data_pi~40' (io) .
+Complex block 342: 'matrix_multiplication^data_pi~41' (io) .
+Complex block 343: 'matrix_multiplication^data_pi~42' (io) .
+Complex block 344: 'matrix_multiplication^data_pi~43' (io) .
+Complex block 345: 'matrix_multiplication^data_pi~44' (io) .
+Complex block 346: 'matrix_multiplication^data_pi~45' (io) .
+Complex block 347: 'matrix_multiplication^data_pi~46' (io) .
+Complex block 348: 'matrix_multiplication^data_pi~47' (io) .
+Complex block 349: 'matrix_multiplication^data_pi~48' (io) .
+Complex block 350: 'matrix_multiplication^data_pi~49' (io) .
+Complex block 351: 'matrix_multiplication^data_pi~50' (io) .
+Complex block 352: 'matrix_multiplication^data_pi~51' (io) .
+Complex block 353: 'matrix_multiplication^data_pi~52' (io) .
+Complex block 354: 'matrix_multiplication^data_pi~53' (io) .
+Complex block 355: 'matrix_multiplication^data_pi~54' (io) .
+Complex block 356: 'matrix_multiplication^data_pi~55' (io) .
+Complex block 357: 'matrix_multiplication^data_pi~56' (io) .
+Complex block 358: 'matrix_multiplication^data_pi~57' (io) .
+Complex block 359: 'matrix_multiplication^data_pi~58' (io) .
+Complex block 360: 'matrix_multiplication^data_pi~59' (io) .
+Complex block 361: 'matrix_multiplication^data_pi~60' (io) .
+Complex block 362: 'matrix_multiplication^data_pi~61' (io) .
+Complex block 363: 'matrix_multiplication^data_pi~62' (io) .
+Complex block 364: 'matrix_multiplication^data_pi~63' (io) .
+Complex block 365: 'matrix_multiplication^data_pi~64' (io) .
+Complex block 366: 'matrix_multiplication^data_pi~65' (io) .
+Complex block 367: 'matrix_multiplication^data_pi~66' (io) .
+Complex block 368: 'matrix_multiplication^data_pi~67' (io) .
+Complex block 369: 'matrix_multiplication^data_pi~68' (io) .
+Complex block 370: 'matrix_multiplication^data_pi~69' (io) .
+Complex block 371: 'matrix_multiplication^data_pi~70' (io) .
+Complex block 372: 'matrix_multiplication^data_pi~71' (io) .
+Complex block 373: 'matrix_multiplication^data_pi~72' (io) .
+Complex block 374: 'matrix_multiplication^data_pi~73' (io) .
+Complex block 375: 'matrix_multiplication^data_pi~74' (io) .
+Complex block 376: 'matrix_multiplication^data_pi~75' (io) .
+Complex block 377: 'matrix_multiplication^data_pi~76' (io) .
+Complex block 378: 'matrix_multiplication^data_pi~77' (io) .
+Complex block 379: 'matrix_multiplication^data_pi~78' (io) .
+Complex block 380: 'matrix_multiplication^data_pi~79' (io) .
+Complex block 381: 'matrix_multiplication^data_pi~80' (io) .
+Complex block 382: 'matrix_multiplication^data_pi~81' (io) .
+Complex block 383: 'matrix_multiplication^data_pi~82' (io) .
+Complex block 384: 'matrix_multiplication^data_pi~83' (io) .
+Complex block 385: 'matrix_multiplication^data_pi~84' (io) .
+Complex block 386: 'matrix_multiplication^data_pi~85' (io) .
+Complex block 387: 'matrix_multiplication^data_pi~86' (io) .
+Complex block 388: 'matrix_multiplication^data_pi~87' (io) .
+Complex block 389: 'matrix_multiplication^data_pi~88' (io) .
+Complex block 390: 'matrix_multiplication^data_pi~89' (io) .
+Complex block 391: 'matrix_multiplication^data_pi~90' (io) .
+Complex block 392: 'matrix_multiplication^data_pi~91' (io) .
+Complex block 393: 'matrix_multiplication^data_pi~92' (io) .
+Complex block 394: 'matrix_multiplication^data_pi~93' (io) .
+Complex block 395: 'matrix_multiplication^data_pi~94' (io) .
+Complex block 396: 'matrix_multiplication^data_pi~95' (io) .
+Complex block 397: 'matrix_multiplication^data_pi~96' (io) .
+Complex block 398: 'matrix_multiplication^data_pi~97' (io) .
+Complex block 399: 'matrix_multiplication^data_pi~98' (io) .
+Complex block 400: 'matrix_multiplication^data_pi~99' (io) .
+Complex block 401: 'matrix_multiplication^data_pi~100' (io) .
+Complex block 402: 'matrix_multiplication^data_pi~101' (io) .
+Complex block 403: 'matrix_multiplication^data_pi~102' (io) .
+Complex block 404: 'matrix_multiplication^data_pi~103' (io) .
+Complex block 405: 'matrix_multiplication^data_pi~104' (io) .
+Complex block 406: 'matrix_multiplication^data_pi~105' (io) .
+Complex block 407: 'matrix_multiplication^data_pi~106' (io) .
+Complex block 408: 'matrix_multiplication^data_pi~107' (io) .
+Complex block 409: 'matrix_multiplication^data_pi~108' (io) .
+Complex block 410: 'matrix_multiplication^data_pi~109' (io) .
+Complex block 411: 'matrix_multiplication^data_pi~110' (io) .
+Complex block 412: 'matrix_multiplication^data_pi~111' (io) .
+Complex block 413: 'matrix_multiplication^data_pi~112' (io) .
+Complex block 414: 'matrix_multiplication^data_pi~113' (io) .
+Complex block 415: 'matrix_multiplication^data_pi~114' (io) .
+Complex block 416: 'matrix_multiplication^data_pi~115' (io) .
+Complex block 417: 'matrix_multiplication^data_pi~116' (io) .
+Complex block 418: 'matrix_multiplication^data_pi~117' (io) .
+Complex block 419: 'matrix_multiplication^data_pi~118' (io) .
+Complex block 420: 'matrix_multiplication^data_pi~119' (io) .
+Complex block 421: 'matrix_multiplication^data_pi~120' (io) .
+Complex block 422: 'matrix_multiplication^data_pi~121' (io) .
+Complex block 423: 'matrix_multiplication^data_pi~122' (io) .
+Complex block 424: 'matrix_multiplication^data_pi~123' (io) .
+Complex block 425: 'matrix_multiplication^data_pi~124' (io) .
+Complex block 426: 'matrix_multiplication^data_pi~125' (io) .
+Complex block 427: 'matrix_multiplication^data_pi~126' (io) .
+Complex block 428: 'matrix_multiplication^data_pi~127' (io) .
+Complex block 429: 'matrix_multiplication^addr_pi~0' (io) .
+Complex block 430: 'matrix_multiplication^addr_pi~1' (io) .
+Complex block 431: 'matrix_multiplication^addr_pi~2' (io) .
+Complex block 432: 'matrix_multiplication^addr_pi~3' (io) .
+Complex block 433: 'matrix_multiplication^addr_pi~4' (io) .
+Complex block 434: 'matrix_multiplication^addr_pi~5' (io) .
+Complex block 435: 'matrix_multiplication^addr_pi~6' (io) .
+Complex block 436: 'matrix_multiplication^we_a' (io) .
+Complex block 437: 'matrix_multiplication^we_b' (io) .
+Complex block 438: 'matrix_multiplication^we_c' (io) .
+Complex block 439: 'matrix_multiplication^reset_0' (io) .
+Complex block 440: 'matrix_multiplication^reset_1' (io) .
+Complex block 441: 'matrix_multiplication^reset_2' (io) .
+Complex block 442: 'matrix_multiplication^reset_3' (io) .
+Complex block 443: 'matrix_multiplication^reset_4' (io) .
+Complex block 444: 'matrix_multiplication^reset_5' (io) .
+Complex block 445: 'matrix_multiplication^reset_6' (io) .
+Complex block 446: 'matrix_multiplication^reset_7' (io) .
+Complex block 447: 'matrix_multiplication^reset_8' (io) .
+Complex block 448: 'matrix_multiplication^start_mat_mul_0' (io) .
+Complex block 449: 'matrix_multiplication^start_mat_mul_1' (io) .
+Complex block 450: 'matrix_multiplication^start_mat_mul_2' (io) .
+Complex block 451: 'matrix_multiplication^start_mat_mul_3' (io) .
+Complex block 452: 'matrix_multiplication^start_mat_mul_4' (io) .
+Complex block 453: 'matrix_multiplication^start_mat_mul_5' (io) .
+Complex block 454: 'matrix_multiplication^start_mat_mul_6' (io) .
+Complex block 455: 'matrix_multiplication^start_mat_mul_7' (io) .
+Complex block 456: 'matrix_multiplication^start_mat_mul_8' (io) .
+
+Pb types usage...
+  inpad        : 159
+  io           : 288
+  lut5inter    : 932
+  memory       : 36
+  clb          : 97
+  matmul_8x8_pb : 36
+  lut5         : 1858
+  lut          : 1860
+  ble6         : 2
+  ff           : 1855
+  matmul_8x8   : 36
+  lut6         : 2
+  mem_512x64_sp : 36
+  fle          : 934
+  outpad       : 129
+  ble5         : 1858
+  memory_slice : 2304
+
+
+Logic Element (fle) detailed count:
+  Total number of Logic Elements used : 934
+  LEs used for logic and registers    : 929
+  LEs used for logic only             : 5
+  LEs used for registers only         : 0
+
+	EMPTY: # blocks: 0, average # input + clock pins used: 0, average # output pins used: 0
+	io: # blocks: 288, average # input + clock pins used: 3.58333, average # output pins used: 4.41667
+	clb: # blocks: 97, average # input + clock pins used: 19.4536, average # output pins used: 10.7113
+	mult_36: # blocks: 0, average # input + clock pins used: 0, average # output pins used: 0
+	matmul_8x8: # blocks: 36, average # input + clock pins used: 667, average # output pins used: 343.667
+	activation: # blocks: 0, average # input + clock pins used: 0, average # output pins used: 0
+	memory: # blocks: 36, average # input + clock pins used: 73, average # output pins used: 64
+Absorbed logical nets 2676 out of 18550 nets, 15874 nets not absorbed.
+Warning 6: Block type 'mult_36' was not specified in device grid layout
+Warning 7: Block type 'activation' was not specified in device grid layout
+FPGA sized to 74 x 74 (mylaout)
+Device Utilization: 0.30 (target 1.00)
+	Block Utilization: 0.12 Type: io
+	Block Utilization: 0.17 Type: clb
+	Block Utilization: 0.38 Type: matmul_8x8
+	Block Utilization: 0.19 Type: memory
+
+
+Netlist conversion complete.
+
+# Packing took 13.59 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+# Load Packing
+Begin loading packed FPGA netlist file.
+Netlist generated from file 'script.matmul.48x48_from_8x8.net'.
+Detected 3 constant generators (to see names run with higher pack verbosity)
+Finished loading packed FPGA netlist file (took 0.664379 seconds).
+Warning 8: Treated 3 constant nets as global which will not be routed (to see net names increase packer verbosity).
+# Load Packing took 0.70 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+Warning 9: Netlist contains 10851 global net to non-global architecture pin connections
+Warning 10: Logic block #294 (matrix_multiplication^done_mat_mul) has only 1 output pin 'matrix_multiplication^done_mat_mul.O[19]'. It may be a constant generator.
+Warning 11: Logic block #295 (gnd) has only 1 output pin 'gnd.O[19]'. It may be a constant generator.
+Warning 12: Logic block #296 (vcc) has only 1 output pin 'vcc.O[19]'. It may be a constant generator.
+
+Netlist num_nets: 15874
+Netlist num_blocks: 457
+Netlist EMPTY blocks: 0.
+Netlist io blocks: 288.
+Netlist clb blocks: 97.
+Netlist mult_36 blocks: 0.
+Netlist matmul_8x8 blocks: 36.
+Netlist activation blocks: 0.
+Netlist memory blocks: 36.
+Netlist inputs pins: 159
+Netlist output pins: 129
+
+# Create Device
+## Build Device Grid
+Warning 13: Block type 'mult_36' was not specified in device grid layout
+Warning 14: Block type 'activation' was not specified in device grid layout
+FPGA sized to 74 x 74: 5476 grid tiles (mylaout)
+
+Resource usage...
+	Netlist      0	blocks of type: EMPTY
+	Architecture 0	blocks of type: EMPTY
+	Netlist      288	blocks of type: io
+	Architecture 2304	blocks of type: io
+	Netlist      97	blocks of type: clb
+	Architecture 576	blocks of type: clb
+	Netlist      0	blocks of type: mult_36
+	Architecture 0	blocks of type: mult_36
+	Netlist      36	blocks of type: matmul_8x8
+	Architecture 96	blocks of type: matmul_8x8
+	Netlist      0	blocks of type: activation
+	Architecture 0	blocks of type: activation
+	Netlist      36	blocks of type: memory
+	Architecture 192	blocks of type: memory
+
+Device Utilization: 0.30 (target 1.00)
+	Block Utilization: 0.00 Type: EMPTY
+	Block Utilization: 0.12 Type: io
+	Block Utilization: 0.17 Type: clb
+	Block Utilization: 0.00 Type: mult_36
+	Block Utilization: 0.38 Type: matmul_8x8
+	Block Utilization: 0.00 Type: activation
+	Block Utilization: 0.19 Type: memory
+
+## Build Device Grid took 0.00 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+## Build routing resource graph
+Warning 15: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 3.53 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 622612
+  RR Graph Edges: 3684212
+# Create Device took 3.85 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+
+# Placement
+## Computing placement delta delay look-up
+### Build routing resource graph
+Warning 16: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+### Build routing resource graph took 3.36 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 611664
+  RR Graph Edges: 3544896
+### Computing delta delays
+### Computing delta delays took 16.80 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+## Computing placement delta delay look-up took 20.57 seconds (max_rss 1154.6 MiB, delta_rss +0.0 MiB)
+
+There are 17641 point to point connections in this circuit.
+
+
+BB estimate of min-dist (placement) wire length: 850249
+
+Completed placement consistency check successfully.
+Initial placement cost: 1 bb_cost: 8857.08 td_cost: 1.4857e-05
+Initial placement estimated Critical Path Delay (CPD): 5.16502 ns
+Initial placement estimated setup Total Negative Slack (sTNS): -103572 ns
+Initial placement estimated setup Worst Negative Slack (sWNS): -5.16502 ns
+
+Initial placement estimated setup slack histogram:
+[ -5.2e-09: -4.7e-09)   207 ( 0.4%) |*
+[ -4.7e-09: -4.2e-09)   657 ( 1.4%) |**
+[ -4.2e-09: -3.7e-09)  1598 ( 3.3%) |****
+[ -3.7e-09: -3.2e-09)  3021 ( 6.3%) |********
+[ -3.2e-09: -2.8e-09)  5241 (10.9%) |*************
+[ -2.8e-09: -2.3e-09)  6800 (14.1%) |*****************
+[ -2.3e-09: -1.8e-09)  8919 (18.5%) |**********************
+[ -1.8e-09: -1.3e-09) 17894 (37.1%) |*********************************************
+[ -1.3e-09: -8.4e-10)  3230 ( 6.7%) |********
+[ -8.4e-10: -3.6e-10)   652 ( 1.4%) |**
+Placement contains 0 placement macros involving 0 blocks (average macro size -nan)
+
+------- ------- ---------- ---------- ------- ---------- -------- ------- ------- ------ -------- --------- ------
+      T Av Cost Av BB Cost Av TD Cost     CPD       sTNS     sWNS Ac Rate Std Dev  R lim Crit Exp Tot Moves  Alpha
+------- ------- ---------- ---------- ------- ---------- -------- ------- ------- ------ -------- --------- ------
+9.2e-01   0.986    8489.50 1.1851e-05   5.059     -1e+05   -5.059   0.999  0.0609   73.0     1.00       3519  0.500
+4.6e-01   0.935    8304.07 1.0641e-05   5.695  -9.78e+04   -5.695   0.999  0.0515   73.0     1.00       7038  0.500
+2.3e-01   0.965    8587.68 1.16e-05     5.486  -1.03e+05   -5.486   0.997  0.0304   73.0     1.00      10557  0.500
+1.1e-01   0.867    8436.26 1.1741e-05   5.740  -1.05e+05   -5.740   0.994  0.0569   73.0     1.00      14076  0.500
+5.7e-02   0.949    8006.91 1.0116e-05   5.647  -1.01e+05   -5.647   0.985  0.0346   73.0     1.00      17595  0.500
+2.9e-02   0.879    7892.54 1.0963e-05   5.383  -1.05e+05   -5.383   0.982  0.0380   73.0     1.00      21114  0.500
+1.4e-02   0.937    7636.65 9.6223e-06   5.644  -9.61e+04   -5.644   0.962  0.0434   73.0     1.00      24633  0.500
+7.2e-03   0.850    6181.82 7.675e-06    5.803  -9.71e+04   -5.803   0.916  0.0537   73.0     1.00      28152  0.900
+6.5e-03   0.953    6110.79 6.71e-06     6.101  -9.52e+04   -6.101   0.908  0.0275   73.0     1.00      31671  0.900
+5.8e-03   0.977    5902.09 7.1855e-06   5.467  -8.97e+04   -5.467   0.896  0.0209   73.0     1.00      35190  0.900
+5.2e-03   0.876    5532.82 7.4158e-06   5.226  -9.59e+04   -5.226   0.904  0.0417   73.0     1.00      38709  0.900
+4.7e-03   0.944    5385.94 7.8827e-06   4.677  -9.13e+04   -4.677   0.892  0.0237   73.0     1.00      42228  0.900
+4.2e-03   0.965    5244.81 6.7169e-06   5.268  -9.35e+04   -5.268   0.878  0.0205   73.0     1.00      45747  0.900
+3.8e-03   0.952    5193.08 6.8959e-06   5.216  -9.09e+04   -5.216   0.880  0.0196   73.0     1.00      49266  0.900
+3.4e-03   0.926    5015.08 6.3292e-06   5.467  -9.29e+04   -5.467   0.862  0.0257   73.0     1.00      52785  0.900
+3.1e-03   0.923    4769.11 6.5338e-06   5.019  -8.71e+04   -5.019   0.855  0.0339   73.0     1.00      56304  0.900
+2.8e-03   0.935    4367.61 5.685e-06    5.256  -8.68e+04   -5.256   0.827  0.0199   73.0     1.00      59823  0.900
+2.5e-03   0.954    4351.88 6.1764e-06   4.827  -8.74e+04   -4.827   0.833  0.0272   73.0     1.00      63342  0.900
+2.3e-03   0.913    4146.91 5.2891e-06   5.383  -8.92e+04   -5.383   0.822  0.0269   73.0     1.00      66861  0.900
+2.0e-03   0.956    4081.10 5.6716e-06   4.787  -8.43e+04   -4.787   0.787  0.0169   73.0     1.00      70380  0.950
+1.9e-03   0.980    4053.24 5.4714e-06   4.909  -8.31e+04   -4.909   0.789  0.0159   73.0     1.00      73899  0.950
+1.8e-03   0.943    4037.24 5.8206e-06   4.727  -8.52e+04   -4.727   0.799  0.0184   73.0     1.00      77418  0.950
+1.7e-03   0.954    3936.78 5.6156e-06   4.757  -8.54e+04   -4.757   0.787  0.0145   73.0     1.00      80937  0.950
+1.6e-03   0.949    3834.24 5.5363e-06   4.679  -8.34e+04   -4.679   0.783  0.0187   73.0     1.00      84456  0.950
+1.6e-03   0.953    3828.09 4.5663e-06   5.604  -8.52e+04   -5.604   0.776  0.0127   73.0     1.00      87975  0.950
+1.5e-03   0.970    3750.34 5.3501e-06   4.666  -8.22e+04   -4.666   0.759  0.0140   73.0     1.00      91494  0.950
+1.4e-03   0.936    3592.52 5.3683e-06   4.624  -8.47e+04   -4.624   0.743  0.0180   73.0     1.00      95013  0.950
+1.3e-03   0.946    3502.31 5.0356e-06   4.774  -8.43e+04   -4.774   0.755  0.0179   73.0     1.00      98532  0.950
+1.3e-03   0.948    3508.66 4.9841e-06   4.774  -8.08e+04   -4.774   0.719  0.0186   73.0     1.00     102051  0.950
+1.2e-03   0.967    3422.68 4.9093e-06   4.666  -7.95e+04   -4.666   0.730  0.0142   73.0     1.00     105570  0.950
+1.2e-03   0.964    3415.15 4.9619e-06   4.666  -8.01e+04   -4.666   0.708  0.0122   73.0     1.00     109089  0.950
+1.1e-03   0.957    3374.71 4.7611e-06   4.774  -8.12e+04   -4.774   0.703  0.0143   73.0     1.00     112608  0.950
+1.0e-03   0.966    3342.36 4.5604e-06   4.893  -7.89e+04   -4.893   0.724  0.0129   73.0     1.00     116127  0.950
+9.9e-04   0.967    3297.50 4.763e-06    4.615  -8.04e+04   -4.615   0.709  0.0092   73.0     1.00     119646  0.950
+9.4e-04   0.938    3236.07 4.4265e-06   4.911  -7.95e+04   -4.911   0.694  0.0222   73.0     1.00     123165  0.950
+8.9e-04   0.971    3141.27 4.3324e-06   4.774  -7.91e+04   -4.774   0.668  0.0178   73.0     1.00     126684  0.950
+8.5e-04   0.976    3052.16 4.4138e-06   4.559  -7.56e+04   -4.559   0.662  0.0075   73.0     1.00     130203  0.950
+8.0e-04   0.960    3022.14 4.5914e-06   4.464  -7.86e+04   -4.464   0.666  0.0134   73.0     1.00     133722  0.950
+7.6e-04   0.959    2996.58 3.9106e-06   5.116  -7.82e+04   -5.116   0.632  0.0142   73.0     1.00     137241  0.950
+7.3e-04   0.962    2987.31 4.0269e-06   4.893   -7.8e+04   -4.893   0.621  0.0119   73.0     1.00     140760  0.950
+6.9e-04   0.960    3001.92 4.0919e-06   4.848  -7.83e+04   -4.848   0.633  0.0168   73.0     1.00     144279  0.950
+6.6e-04   0.957    2907.34 3.8166e-06   5.072  -7.58e+04   -5.072   0.599  0.0108   73.0     1.00     147798  0.950
+6.2e-04   0.972    2889.06 3.7201e-06   5.116  -7.78e+04   -5.116   0.614  0.0096   73.0     1.00     151317  0.950
+5.9e-04   0.968    2859.97 3.5413e-06   5.369  -7.61e+04   -5.369   0.598  0.0111   73.0     1.00     154836  0.950
+5.6e-04   0.970    2866.55 3.6493e-06   5.116  -7.65e+04   -5.116   0.601  0.0080   73.0     1.00     158355  0.950
+5.3e-04   0.962    2838.81 3.8352e-06   4.893  -7.63e+04   -4.893   0.599  0.0143   73.0     1.00     161874  0.950
+5.1e-04   0.975    2819.04 3.5885e-06   5.116  -7.45e+04   -5.116   0.586  0.0071   73.0     1.00     165393  0.950
+4.8e-04   0.978    2846.29 3.8235e-06   4.848  -7.49e+04   -4.848   0.575  0.0073   73.0     1.00     168912  0.950
+4.6e-04   0.959    2819.54 3.7956e-06   4.848  -7.79e+04   -4.848   0.579  0.0125   73.0     1.00     172431  0.950
+4.3e-04   0.970    2810.61 3.5791e-06   5.116  -7.56e+04   -5.116   0.574  0.0103   73.0     1.00     175950  0.950
+4.1e-04   0.963    2783.54 3.9036e-06   4.666  -7.44e+04   -4.666   0.571  0.0136   73.0     1.00     179469  0.950
+3.9e-04   0.963    2756.50 3.6532e-06   4.911  -7.45e+04   -4.911   0.538  0.0134   73.0     1.00     182988  0.950
+3.7e-04   0.966    2722.93 3.4697e-06   5.072  -7.41e+04   -5.072   0.544  0.0133   73.0     1.00     186507  0.950
+3.5e-04   0.976    2699.53 3.5689e-06   4.893   -7.5e+04   -4.893   0.523  0.0105   73.0     1.00     190026  0.950
+3.4e-04   0.970    2688.98 3.5883e-06   4.911  -7.57e+04   -4.911   0.546  0.0129   73.0     1.00     193545  0.950
+3.2e-04   0.974    2693.01 3.6866e-06   4.708  -7.44e+04   -4.708   0.521  0.0119   73.0     1.00     197064  0.950
+3.0e-04   0.961    2682.18 3.5891e-06   4.784  -7.42e+04   -4.784   0.504  0.0165   73.0     1.00     200583  0.950
+2.9e-04   0.972    2661.99 3.5322e-06   4.773  -7.44e+04   -4.773   0.510  0.0099   73.0     1.00     204102  0.950
+2.7e-04   0.965    2644.40 3.6497e-06   4.615   -7.5e+04   -4.615   0.502  0.0127   73.0     1.00     207621  0.950
+2.6e-04   0.974    2633.12 3.6332e-06   4.575  -7.37e+04   -4.575   0.474  0.0074   73.0     1.00     211140  0.950
+2.5e-04   0.967    2621.29 3.5196e-06   4.773  -7.28e+04   -4.773   0.494  0.0116   73.0     1.00     214659  0.950
+2.3e-04   0.969    2627.53 3.6357e-06   4.616  -7.25e+04   -4.616   0.476  0.0133   73.0     1.00     218178  0.950
+2.2e-04   0.970    2621.29 3.5818e-06   4.616  -7.26e+04   -4.616   0.466  0.0116   73.0     1.00     221697  0.950
+2.1e-04   0.968    2604.57 3.3464e-06   4.848  -7.26e+04   -4.848   0.443  0.0131   73.0     1.00     225216  0.950
+2.0e-04   0.971    2602.07 3.4747e-06   4.616  -7.28e+04   -4.616   0.431  0.0110   73.0     1.00     228735  0.950
+1.9e-04   0.967    2587.97 3.2809e-06   4.616  -7.22e+04   -4.616   0.472  0.0147   72.3     1.07     232254  0.950
+1.8e-04   0.982    2575.06 3.619e-06    4.358  -7.13e+04   -4.358   0.440  0.0074   73.0     1.00     235773  0.950
+1.7e-04   0.971    2571.04 3.2537e-06   4.848  -7.08e+04   -4.848   0.439  0.0113   73.0     1.00     239292  0.950
+1.6e-04   0.985    2574.06 3.7835e-06   4.130  -7.16e+04   -4.130   0.434  0.0059   72.9     1.01     242811  0.950
+1.6e-04   0.988    2588.84 3.3031e-06   4.448   -7.2e+04   -4.448   0.413  0.0065   72.5     1.05     246330  0.950
+1.5e-04   0.982    2588.92 2.7948e-06   4.291  -7.12e+04   -4.291   0.394  0.0068   70.5     1.25     249849  0.950
+1.4e-04   0.983    2619.20 2.1671e-06   4.227  -7.02e+04   -4.227   0.404  0.0086   67.2     1.56     253368  0.950
+1.3e-04   0.955    2681.36 1.8565e-06   3.979     -7e+04   -3.979   0.379  0.0169   64.8     1.80     256887  0.950
+1.3e-04   0.943    2677.52 1.2882e-06   4.153  -7.06e+04   -4.153   0.389  0.0312   60.8     2.18     260406  0.950
+1.2e-04   0.920    2742.92 1.1427e-06   3.897  -7.12e+04   -3.897   0.389  0.0300   57.8     2.48     263925  0.950
+1.1e-04   0.935    2741.35 1.0766e-06   3.843  -7.08e+04   -3.843   0.391  0.0299   54.8     2.77     267444  0.950
+1.1e-04   0.898    2863.84 7.4457e-07   4.114  -7.14e+04   -4.114   0.392  0.0406   52.1     3.03     270963  0.950
+1.0e-04   0.888    2858.99 7.137e-07    3.948  -7.21e+04   -3.948   0.420  0.0482   49.6     3.27     274482  0.950
+9.8e-05   0.896    2853.64 9.4354e-07   3.558  -7.15e+04   -3.558   0.377  0.0421   48.6     3.37     278001  0.950
+9.3e-05   0.887    2884.22 4.0618e-07   4.247  -7.02e+04   -4.247   0.387  0.0493   45.5     3.67     281520  0.950
+8.9e-05   0.884    2770.54 6.6973e-07   3.599  -6.93e+04   -3.599   0.383  0.0403   43.1     3.91     285039  0.950
+8.4e-05   0.897    2826.81 3.7446e-07   3.948  -7.02e+04   -3.948   0.354  0.0340   40.7     4.14     288558  0.950
+8.0e-05   0.865    2957.16 5.1428e-07   3.609  -6.98e+04   -3.609   0.427  0.0608   37.2     4.48     292077  0.950
+7.6e-05   0.897    3050.22 4.0512e-07   3.624  -6.98e+04   -3.624   0.375  0.0429   36.7     4.53     295596  0.950
+7.2e-05   0.897    3082.89 5.1303e-07   3.234  -7.03e+04   -3.234   0.385  0.0546   34.3     4.76     299115  0.950
+6.9e-05   0.910    3077.77 3.5202e-07   3.451  -6.94e+04   -3.451   0.375  0.0436   32.4     4.94     302634  0.950
+6.5e-05   0.833    2962.21 2.9359e-07   3.520  -6.99e+04   -3.520   0.426  0.0574   30.3     5.15     306153  0.950
+6.2e-05   0.891    2950.31 2.1414e-07   3.728  -7.13e+04   -3.728   0.390  0.0573   29.9     5.19     309672  0.950
+5.9e-05   0.872    3069.27 1.2818e-07   4.169   -6.9e+04   -4.169   0.398  0.0612   28.4     5.34     313191  0.950
+5.6e-05   0.895    2945.26 7.4815e-08   4.291  -6.88e+04   -4.291   0.391  0.0563   27.2     5.45     316710  0.950
+5.3e-05   0.892    2915.04 1.508e-07    3.619  -7.01e+04   -3.619   0.398  0.0530   25.9     5.58     320229  0.950
+5.0e-05   0.899    2887.61 1.0948e-07   3.742  -6.95e+04   -3.742   0.409  0.0534   24.8     5.69     323748  0.950
+4.8e-05   0.908    2850.19 2.5833e-07   3.150  -6.79e+04   -3.150   0.382  0.0409   24.0     5.76     327267  0.950
+4.6e-05   0.920    2844.44 9.8146e-08   3.572  -6.71e+04   -3.572   0.365  0.0397   22.6     5.90     330786  0.950
+4.3e-05   0.918    2873.80 1.5713e-07   3.217  -6.78e+04   -3.217   0.371  0.0391   20.9     6.06     334305  0.950
+4.1e-05   0.904    2821.59 1.1633e-07   3.300   -6.8e+04   -3.300   0.376  0.0462   19.5     6.20     337824  0.950
+3.9e-05   0.921    2823.65 2.153e-07    2.906  -6.71e+04   -2.906   0.357  0.0343   18.2     6.32     341343  0.950
+3.7e-05   0.902    2772.74 1.3123e-07   3.104  -6.67e+04   -3.104   0.361  0.0368   16.7     6.47     344862  0.950
+3.5e-05   0.869    2744.64 9.2777e-08   3.415  -6.78e+04   -3.415   0.398  0.0590   15.4     6.60     348381  0.950
+3.3e-05   0.875    2693.12 1.1154e-07   3.229  -6.78e+04   -3.229   0.391  0.0453   14.7     6.66     351900  0.950
+3.2e-05   0.938    2696.45 2.1221e-07   2.915  -6.62e+04   -2.915   0.369  0.0371   14.0     6.73     355419  0.950
+3.0e-05   0.907    2695.07 2.3257e-07   2.898   -6.7e+04   -2.898   0.360  0.0425   13.0     6.83     358938  0.950
+2.9e-05   0.729    2689.44 1.2786e-07   3.306   -6.7e+04   -3.306   0.437  0.0538   12.0     6.93     362457  0.950
+2.7e-05   0.864    2744.51 1.1766e-07   3.211  -6.63e+04   -3.211   0.357  0.0528   11.9     6.94     365976  0.950
+2.6e-05   0.891    2831.91 6.7766e-08   3.350  -6.75e+04   -3.350   0.382  0.0553   11.0     7.03     369495  0.950
+2.5e-05   0.754    2809.84 1.0385e-07   3.496  -7.02e+04   -3.496   0.490  0.0711   10.3     7.09     373014  0.950
+2.3e-05   0.876    2830.00 9.4327e-08   3.240  -6.67e+04   -3.240   0.369  0.0578   10.8     7.04     376533  0.950
+2.2e-05   0.842    2786.80 1.3817e-07   3.124   -6.7e+04   -3.124   0.402  0.0827   10.1     7.12     380052  0.950
+2.1e-05   0.839    2761.18 1.3087e-07   3.124  -6.61e+04   -3.124   0.381  0.0712    9.7     7.15     383571  0.950
+2.0e-05   0.903    2818.67 1.8138e-07   2.862  -6.65e+04   -2.862   0.380  0.0485    9.1     7.21     387090  0.950
+1.9e-05   0.836    2890.82 1.3293e-07   3.112   -6.6e+04   -3.112   0.404  0.0774    8.6     7.26     390609  0.950
+1.8e-05   0.889    2932.74 1.5145e-07   2.930   -6.6e+04   -2.930   0.353  0.0425    8.3     7.29     394128  0.950
+1.7e-05   0.818    2995.59 1.4069e-07   3.426  -6.82e+04   -3.426   0.487  0.0773    7.5     7.36     397647  0.950
+1.6e-05   0.891    2845.65 2.9464e-07   2.807  -6.74e+04   -2.807   0.384  0.0609    7.9     7.33     401166  0.950
+1.5e-05   0.909    2803.76 1.5622e-07   2.898  -6.64e+04   -2.898   0.350  0.0506    7.5     7.37     404685  0.950
+1.5e-05   0.869    2869.39 2.1003e-07   2.826  -6.63e+04   -2.826   0.375  0.0562    6.8     7.44     408204  0.950
+1.4e-05   0.874    2726.68 1.8529e-07   2.758  -6.67e+04   -2.758   0.365  0.0573    6.3     7.48     411723  0.950
+1.3e-05   0.880    2653.47 6.4819e-08   3.175  -6.54e+04   -3.175   0.335  0.0355    5.9     7.53     415242  0.950
+1.3e-05   0.868    2905.16 9.5985e-08   3.152  -6.68e+04   -3.152   0.410  0.0575    5.3     7.59     418761  0.950
+1.2e-05   0.804    2975.80 1.8347e-07   2.800  -6.84e+04   -2.800   0.365  0.0621    5.1     7.60     422280  0.950
+1.1e-05   0.895    2821.04 6.3876e-08   3.060  -6.62e+04   -3.060   0.333  0.0523    4.7     7.64     425799  0.950
+1.1e-05   0.922    2701.08 1.618e-07    2.679  -6.64e+04   -2.679   0.319  0.0393    4.2     7.69     429318  0.950
+1.0e-05   0.924    2678.26 1.804e-07    2.595  -6.53e+04   -2.595   0.321  0.0388    3.7     7.74     432837  0.950
+9.8e-06   0.908    2625.88 1.4439e-07   2.620  -6.48e+04   -2.620   0.326  0.0391    3.3     7.78     436356  0.950
+9.3e-06   0.904    2576.87 1.187e-07    2.645  -6.48e+04   -2.645   0.339  0.0287    2.9     7.82     439875  0.950
+8.8e-06   0.918    2626.02 1.5478e-07   2.534  -6.41e+04   -2.534   0.330  0.0340    2.6     7.84     443394  0.950
+8.4e-06   0.917    2585.90 1.0612e-07   2.620  -6.44e+04   -2.620   0.307  0.0274    2.3     7.87     446913  0.950
+8.0e-06   0.939    2557.14 8.8597e-08   2.671  -6.39e+04   -2.671   0.297  0.0277    2.0     7.90     450432  0.950
+7.6e-06   0.935    2540.59 6.9289e-08   2.718  -6.33e+04   -2.718   0.350  0.0302    1.7     7.93     453951  0.950
+7.2e-06   0.948    2503.39 1.4408e-07   2.471  -6.35e+04   -2.471   0.337  0.0224    1.6     7.95     457470  0.950
+6.8e-06   0.942    2453.25 1.7608e-07   2.397  -6.28e+04   -2.397   0.341  0.0204    1.4     7.96     460989  0.950
+6.5e-06   0.937    2402.38 1.6651e-07   2.404  -6.34e+04   -2.404   0.326  0.0207    1.3     7.97     464508  0.950
+6.2e-06   0.965    2438.50 1.3681e-07   2.471  -6.32e+04   -2.471   0.308  0.0161    1.1     7.99     468027  0.950
+5.8e-06   0.941    2428.10 1.8417e-07   2.401  -6.35e+04   -2.401   0.321  0.0242    1.0     8.00     471546  0.950
+5.6e-06   0.942    2423.25 1.4046e-07   2.488  -6.35e+04   -2.488   0.331  0.0261    1.0     8.00     475065  0.950
+5.3e-06   0.931    2444.81 1.271e-07    2.534  -6.39e+04   -2.534   0.330  0.0256    1.0     8.00     478584  0.950
+5.0e-06   0.936    2420.82 1.3823e-07   2.488  -6.31e+04   -2.488   0.303  0.0238    1.0     8.00     482103  0.950
+4.8e-06   0.918    2407.92 1.5155e-07   2.478  -6.29e+04   -2.478   0.307  0.0398    1.0     8.00     485622  0.950
+4.5e-06   0.945    2407.76 1.4036e-07   2.478  -6.28e+04   -2.478   0.298  0.0243    1.0     8.00     489141  0.950
+4.3e-06   0.931    2410.94 1.1471e-07   2.534  -6.27e+04   -2.534   0.288  0.0346    1.0     8.00     492660  0.950
+4.1e-06   0.954    2405.72 1.3467e-07   2.478  -6.33e+04   -2.478   0.294  0.0219    1.0     8.00     496179  0.950
+3.9e-06   0.945    2437.07 1.0675e-07   2.562  -6.36e+04   -2.562   0.280  0.0217    1.0     8.00     499698  0.950
+3.7e-06   0.926    2412.05 1.1055e-07   2.562  -6.33e+04   -2.562   0.269  0.0330    1.0     8.00     503217  0.950
+3.5e-06   0.956    2399.06 1.0597e-07   2.562  -6.32e+04   -2.562   0.268  0.0207    1.0     8.00     506736  0.950
+3.3e-06   0.945    2390.15 1.2285e-07   2.562  -6.31e+04   -2.562   0.268  0.0266    1.0     8.00     510255  0.950
+3.2e-06   0.941    2379.22 1.0112e-07   2.620  -6.34e+04   -2.620   0.263  0.0297    1.0     8.00     513774  0.950
+3.0e-06   0.933    2378.88 1.1678e-07   2.562  -6.34e+04   -2.562   0.260  0.0253    1.0     8.00     517293  0.950
+2.9e-06   0.928    2401.16 1.2382e-07   2.562  -6.34e+04   -2.562   0.276  0.0234    1.0     8.00     520812  0.950
+2.7e-06   0.935    2391.01 1.032e-07    2.620  -6.34e+04   -2.620   0.279  0.0257    1.0     8.00     524331  0.950
+2.6e-06   0.892    2390.19 1.0606e-07   2.620  -6.28e+04   -2.620   0.269  0.0379    1.0     8.00     527850  0.950
+2.4e-06   0.893    2417.70 8.9884e-08   2.705  -6.29e+04   -2.705   0.281  0.0433    1.0     8.00     531369  0.950
+2.3e-06   0.876    2412.30 1.5936e-07   2.587  -6.34e+04   -2.587   0.294  0.0817    1.0     8.00     534888  0.950
+2.2e-06   0.929    2399.05 1.1264e-07   2.615  -6.32e+04   -2.615   0.265  0.0321    1.0     8.00     538407  0.950
+2.1e-06   0.945    2373.64 1.3238e-07   2.534  -6.33e+04   -2.534   0.250  0.0219    1.0     8.00     541926  0.950
+2.0e-06   0.946    2384.34 1.0202e-07   2.615  -6.24e+04   -2.615   0.243  0.0249    1.0     8.00     545445  0.950
+1.9e-06   0.898    2409.80 1.427e-07    2.534  -6.31e+04   -2.534   0.250  0.0428    1.0     8.00     548964  0.950
+1.8e-06   0.941    2427.35 1.3093e-07   2.534  -6.31e+04   -2.534   0.237  0.0248    1.0     8.00     552483  0.950
+1.7e-06   0.941    2423.20 1.2521e-07   2.534  -6.32e+04   -2.534   0.243  0.0283    1.0     8.00     556002  0.950
+1.6e-06   0.941    2389.42 9.0482e-08   2.620  -6.27e+04   -2.620   0.240  0.0262    1.0     8.00     559521  0.950
+1.5e-06   0.939    2370.82 9.9428e-08   2.620  -6.34e+04   -2.620   0.249  0.0265    1.0     8.00     563040  0.950
+1.5e-06   0.935    2399.02 1.4978e-07   2.478  -6.31e+04   -2.478   0.238  0.0280    1.0     8.00     566559  0.950
+1.4e-06   0.944    2371.88 9.4105e-08   2.624  -6.34e+04   -2.624   0.229  0.0266    1.0     8.00     570078  0.950
+1.3e-06   0.937    2376.39 1.596e-07    2.534  -6.34e+04   -2.534   0.232  0.0372    1.0     8.00     573597  0.950
+1.3e-06   0.941    2365.37 8.5734e-08   2.671  -6.32e+04   -2.671   0.228  0.0280    1.0     8.00     577116  0.950
+1.2e-06   0.941    2357.21 1.1995e-07   2.562   -6.4e+04   -2.562   0.213  0.0239    1.0     8.00     580635  0.950
+1.1e-06   0.805    2413.20 9.7881e-08   2.724   -6.3e+04   -2.724   0.240  0.0754    1.0     8.00     584154  0.950
+1.1e-06   0.897    2376.23 1.4013e-07   2.562  -6.39e+04   -2.562   0.234  0.0603    1.0     8.00     587673  0.950
+1.0e-06   0.922    2372.42 1.1849e-07   2.562  -6.35e+04   -2.562   0.219  0.0345    1.0     8.00     591192  0.950
+9.7e-07   0.907    2374.64 1.2521e-07   2.562   -6.3e+04   -2.562   0.217  0.0342    1.0     8.00     594711  0.950
+9.2e-07   0.910    2369.03 1.17e-07     2.595  -6.38e+04   -2.595   0.225  0.0423    1.0     8.00     598230  0.950
+8.8e-07   0.923    2354.66 2.1246e-07   2.380  -6.29e+04   -2.380   0.231  0.0257    1.0     8.00     601749  0.950
+8.3e-07   0.924    2343.93 1.3347e-07   2.534  -6.35e+04   -2.534   0.191  0.0317    1.0     8.00     605268  0.950
+7.9e-07   0.942    2345.83 1.2271e-07   2.534  -6.39e+04   -2.534   0.212  0.0271    1.0     8.00     608787  0.950
+7.5e-07   0.941    2342.51 1.1903e-07   2.562  -6.34e+04   -2.562   0.213  0.0338    1.0     8.00     612306  0.950
+7.1e-07   0.912    2304.48 1.0114e-07   2.620  -6.33e+04   -2.620   0.222  0.0328    1.0     8.00     615825  0.950
+6.8e-07   0.905    2303.44 1.1824e-07   2.562  -6.22e+04   -2.562   0.207  0.0383    1.0     8.00     619344  0.950
+6.4e-07   0.937    2295.96 9.6988e-08   2.620  -6.26e+04   -2.620   0.218  0.0332    1.0     8.00     622863  0.950
+6.1e-07   0.931    2307.66 1.1092e-07   2.562  -6.33e+04   -2.562   0.209  0.0268    1.0     8.00     626382  0.950
+5.8e-07   0.938    2313.49 1.1845e-07   2.562  -6.29e+04   -2.562   0.213  0.0299    1.0     8.00     629901  0.950
+5.5e-07   0.937    2340.81 7.802e-08    2.699  -6.34e+04   -2.699   0.212  0.0311    1.0     8.00     633420  0.950
+5.2e-07   0.915    2329.38 9.6526e-08   2.620  -6.31e+04   -2.620   0.208  0.0392    1.0     8.00     636939  0.950
+5.0e-07   0.910    2324.84 1.0159e-07   2.626  -6.31e+04   -2.626   0.199  0.0394    1.0     8.00     640458  0.950
+4.7e-07   0.925    2315.90 1.1767e-07   2.562  -6.31e+04   -2.562   0.199  0.0306    1.0     8.00     643977  0.950
+4.5e-07   0.931    2314.36 1.1247e-07   2.562  -6.33e+04   -2.562   0.204  0.0281    1.0     8.00     647496  0.950
+4.3e-07   0.943    2321.88 1.0793e-07   2.562  -6.22e+04   -2.562   0.197  0.0241    1.0     8.00     651015  0.950
+4.1e-07   0.938    2317.99 9.2281e-08   2.615  -6.24e+04   -2.615   0.179  0.0238    1.0     8.00     654534  0.950
+3.9e-07   0.943    2324.69 9.173e-08    2.615  -6.25e+04   -2.615   0.181  0.0228    1.0     8.00     658053  0.950
+3.7e-07   0.936    2319.77 1.0784e-07   2.562  -6.28e+04   -2.562   0.171  0.0222    1.0     8.00     661572  0.950
+3.5e-07   0.946    2315.90 9.2546e-08   2.620  -6.26e+04   -2.620   0.191  0.0220    1.0     8.00     665091  0.950
+3.3e-07   0.945    2314.57 8.9939e-08   2.620  -6.27e+04   -2.620   0.198  0.0272    1.0     8.00     668610  0.950
+3.1e-07   0.936    2307.56 1.0101e-07   2.562  -6.25e+04   -2.562   0.188  0.0257    1.0     8.00     672129  0.950
+3.0e-07   0.959    2306.03 1.0138e-07   2.562   -6.3e+04   -2.562   0.161  0.0205    1.0     8.00     675648  0.950
+3.0e-07   0.897    2309.73 1.0029e-07   2.562  -6.25e+04   -2.562   0.158  0.0215    1.0     8.00     679167  0.000
+
+BB estimate of min-dist (placement) wire length: 220888
+
+Completed placement consistency check successfully.
+
+Swaps called: 679624
+
+Placement estimated critical path delay: 2.56163 ns
+Placement estimated setup Total Negative Slack (sTNS): -62562.1 ns
+Placement estimated setup Worst Negative Slack (sWNS): -2.56163 ns
+
+Placement estimated setup slack histogram:
+[ -2.6e-09: -2.3e-09)   271 ( 0.6%) |*
+[ -2.3e-09: -2.1e-09)   353 ( 0.7%) |*
+[ -2.1e-09: -1.9e-09)  1526 ( 3.2%) |****
+[ -1.9e-09: -1.6e-09)  4834 (10.0%) |************
+[ -1.6e-09: -1.4e-09) 18053 (37.4%) |*********************************************
+[ -1.4e-09: -1.1e-09)  5189 (10.8%) |*************
+[ -1.1e-09: -9.1e-10)  7160 (14.8%) |******************
+[ -9.1e-10: -6.8e-10)  3767 ( 7.8%) |*********
+[ -6.8e-10: -4.4e-10)  7058 (14.6%) |******************
+[ -4.4e-10: -2.1e-10)     8 ( 0.0%) |
+
+Placement cost: 0.865523, bb_cost: 2301.09, td_cost: 9.39073e-08, 
+Placement total # of swap attempts: 679624
+	Swaps accepted: 303858 (44.7 %)
+	Swaps rejected: 375766 (55.3 %)
+	Swaps aborted :      0 ( 0.0 %)
+
+Aborted Move Reasons:
+# Placement took 170.40 seconds (max_rss 1631.5 MiB, delta_rss +476.9 MiB)
+
+# Routing
+Initializing minimum channel width search based on maximum CLB pins
+
+Attempting to route at 154 channels (binary search bounds: [-1, -1])
+## Build routing resource graph
+Warning 17: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 6.02 seconds (max_rss 3467.9 MiB, delta_rss +207.8 MiB)
+  RR Graph Nodes: 770436
+  RR Graph Edges: 5568508
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   40.7     0.0    0 9.8e+07   15870   17641   21505 ( 2.791%)  355218 (21.9%)    3.694 -7.231e+04     -3.694     -26.64     -0.288      N/A
+
+** (process:12310): WARNING **: 06:07:26.768: Duplicate key (MainCanvas) ignored in application::add_canvas.
+   2   29.4     0.5 2313 7.4e+07   14859   16630   18406 ( 2.389%)  349322 (21.6%)    3.832 -7.550e+04     -3.832     -23.84     -0.288      N/A
+   3   35.6     0.6 1498 8.9e+07   13909   15663   17511 ( 2.273%)  397717 (24.6%)    4.087 -7.745e+04     -4.087     -14.09     -0.288      N/A
+   4   38.8     0.8 2592 9.1e+07   13505   15274   16283 ( 2.113%)  408580 (25.2%)    4.184 -7.897e+04     -4.184     -16.67     -0.288      N/A
+   5   38.4     1.1 2460 9.0e+07   12838   14607   14686 ( 1.906%)  422200 (26.1%)    4.666 -8.225e+04     -4.666     -21.11     -0.179      N/A
+   6   38.4     1.4 2306 8.7e+07   12357   14125   13343 ( 1.732%)  436426 (27.0%)    4.728 -8.182e+04     -4.728     -21.36     -0.288      N/A
+   7   36.6     1.9 2224 8.2e+07   11691   13459   12322 ( 1.599%)  451897 (27.9%)    5.586 -8.490e+04     -5.586     -20.99     -0.288      N/A
+   8   38.4     2.4 2153 8.0e+07   11152   12919   11716 ( 1.521%)  470195 (29.0%)    6.422 -8.786e+04     -6.422     -20.38     -0.288      N/A
+   9   39.3     3.1 2097 7.9e+07   10822   12587   10991 ( 1.427%)  486167 (30.0%)    7.650 -9.291e+04     -7.650     -16.03     -0.288      N/A
+  10   42.9     4.1 2042 8.1e+07   10531   12285   10549 ( 1.369%)  504037 (31.1%)    8.006 -9.515e+04     -8.006     -13.86     -0.288      140
+  11   43.7     5.3 1963 8.2e+07   10260   12020   10484 ( 1.361%)  523090 (32.3%)   10.269 -9.771e+04    -10.269     -15.83     -0.288      168
+Routing aborted, the predicted iteration for a successful route (168.4) is too high.
+Routing failed.
+Router Stats: total_nets_routed: 137794 total_connections_routed: 157210 total_heap_pushes: 933070680 total_heap_pops: 398826017
+
+Attempting to route at 308 channels (binary search bounds: [154, -1])
+## Build routing resource graph
+Warning 18: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 15.21 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 1192012
+  RR Graph Edges: 10928076
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   73.2     0.0    0 1.6e+08   15870   17641   17474 ( 1.466%)  338553 (10.5%)    3.836 -7.122e+04     -3.836     -30.53     -0.289      N/A
+   2   41.5     0.5 1837 9.2e+07   12384   14140   11582 ( 0.972%)  327389 (10.1%)    3.836 -7.393e+04     -3.836     -27.68     -0.289      N/A
+   3   43.4     0.6  814 9.0e+07    9855   11604    8094 ( 0.679%)  343327 (10.6%)    3.836 -7.453e+04     -3.836     -27.42     -0.289      N/A
+   4   38.6     0.8  979 7.7e+07    7659    9383    5291 ( 0.444%)  351589 (10.9%)    3.708 -7.466e+04     -3.708     -27.88     -0.289      N/A
+   5   30.5     1.1  901 5.8e+07    5523    7224    3150 ( 0.264%)  356574 (11.0%)    3.798 -7.492e+04     -3.798     -27.31     -0.289      N/A
+   6   21.5     1.4  675 4.0e+07    3665    5311    1874 ( 0.157%)  362801 (11.2%)    3.535 -7.509e+04     -3.535     -27.29     -0.289      N/A
+   7   14.6     1.9  547 2.7e+07    2392    4005    1113 ( 0.093%)  366301 (11.3%)    3.577 -7.510e+04     -3.577     -27.70     -0.289      N/A
+   8    9.7     2.4  350 1.7e+07    1392    2898     611 ( 0.051%)  369879 (11.4%)    3.871 -7.551e+04     -3.871     -27.56     -0.289      N/A
+   9    6.3     3.1  255 1.0e+07     766    2136     295 ( 0.025%)  373491 (11.5%)    3.828 -7.589e+04     -3.828     -27.21     -0.289      N/A
+  10    4.2     4.1  194 5898373     369    1424     106 ( 0.009%)  375653 (11.6%)    3.689 -7.592e+04     -3.689     -27.48     -0.289       19
+  11    3.0     5.3  110 3193897     167     874      33 ( 0.003%)  376225 (11.6%)    3.884 -7.613e+04     -3.884     -27.49     -0.289       17
+  12    2.0     6.9   58 1256784      59     401      11 ( 0.001%)  376813 (11.6%)    3.440 -7.579e+04     -3.440     -27.55     -0.289       16
+  13    1.6     9.0   26  278075      16     118       1 ( 0.000%)  376845 (11.6%)    3.774 -7.617e+04     -3.774     -27.55     -0.289       15
+  14    1.5    11.6    6  184603       8      63       0 ( 0.000%)  376841 (11.6%)    3.406 -7.591e+04     -3.406     -27.51     -0.289       14
+Restoring best routing
+Critical path: 3.40607 ns
+Successfully routed after 14 routing iterations.
+Router Stats: total_nets_routed: 60125 total_connections_routed: 77222 total_heap_pushes: 582328758 total_heap_pops: 227853753
+
+Attempting to route at 232 channels (binary search bounds: [154, 308])
+## Build routing resource graph
+Warning 19: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 10.04 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 983964
+  RR Graph Edges: 8285788
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   67.6     0.0    0 1.3e+08   15870   17641   18609 ( 1.891%)  339883 (13.9%)    3.843 -7.140e+04     -3.843     -30.86     -0.288      N/A
+   2   45.7     0.5 1911 8.5e+07   13478   15247   14555 ( 1.479%)  330210 (13.5%)    3.843 -7.442e+04     -3.843     -28.06     -0.288      N/A
+   3   51.6     0.6  955 9.1e+07   11663   13425   10787 ( 1.096%)  358146 (14.7%)    3.843 -7.555e+04     -3.843     -22.67     -0.288      N/A
+   4   49.4     0.8 1515 8.4e+07   10042   11801    8105 ( 0.824%)  368907 (15.1%)    3.843 -7.590e+04     -3.843     -23.85     -0.288      N/A
+   5   44.5     1.1 1378 7.3e+07    8193    9936    5880 ( 0.598%)  377086 (15.5%)    3.843 -7.612e+04     -3.843     -24.46     -0.288      N/A
+   6   37.3     1.4 1158 6.0e+07    6592    8338    4454 ( 0.453%)  385868 (15.8%)    4.045 -7.685e+04     -4.045     -17.77     -0.288      N/A
+   7   29.1     1.9 1054 4.8e+07    5308    6998    3394 ( 0.345%)  395944 (16.2%)    4.259 -7.826e+04     -4.259     -23.27     -0.288      N/A
+   8   22.8     2.4  906 3.7e+07    4152    5863    2456 ( 0.250%)  405908 (16.6%)    4.424 -7.786e+04     -4.424     -23.21     -0.288      N/A
+   9   18.0     3.1  770 2.8e+07    3100    4728    1766 ( 0.179%)  415910 (17.1%)    4.197 -7.837e+04     -4.197     -22.73     -0.288      N/A
+  10   14.5     4.1  686 2.3e+07    2392    3966    1380 ( 0.140%)  424125 (17.4%)    4.556 -7.887e+04     -4.556     -22.91     -0.288       34
+  11   11.7     5.3  574 1.7e+07    1831    3399     952 ( 0.097%)  432900 (17.8%)    4.983 -8.057e+04     -4.983     -23.42     -0.288       34
+  12   10.7     6.9  486 1.5e+07    1341    2815     636 ( 0.065%)  441883 (18.1%)    5.189 -8.103e+04     -5.189     -23.42     -0.288       33
+  13    8.8     9.0  407 1.2e+07     930    2142     435 ( 0.044%)  448962 (18.4%)    5.171 -8.226e+04     -5.171     -23.33     -0.288       32
+  14    7.4    11.6  303 9054015     686    1561     306 ( 0.031%)  455115 (18.7%)    5.231 -8.302e+04     -5.231     -23.33     -0.288       31
+  15    5.6    15.1  244 6269376     486    1000     202 ( 0.021%)  460847 (18.9%)    5.814 -8.322e+04     -5.814     -23.33     -0.288       30
+  16    4.7    19.7  183 4781015     323     708     137 ( 0.014%)  464850 (19.1%)    5.835 -8.471e+04     -5.835     -23.33     -0.288       30
+  17    3.5    25.6  120 2938420     236     418     106 ( 0.011%)  467874 (19.2%)    6.730 -8.496e+04     -6.730     -23.33     -0.288       29
+  18    3.3    33.3   92 2641683     173     309      87 ( 0.009%)  471190 (19.3%)    7.105 -8.508e+04     -7.105     -23.33     -0.288       30
+  19    2.8    43.3   77 1974683     146     270      63 ( 0.006%)  473797 (19.4%)    6.730 -8.545e+04     -6.730     -23.31     -0.288       30
+  20    2.5    56.2   74 1540368     116     151      56 ( 0.006%)  476201 (19.5%)    7.105 -8.569e+04     -7.105     -23.31     -0.288       31
+  21    2.2    73.1   60 1105239      98     147      49 ( 0.005%)  477172 (19.6%)    7.118 -8.575e+04     -7.118     -23.31     -0.288       32
+  22    1.9    95.0   42  693100      78     112      43 ( 0.004%)  478398 (19.6%)    7.629 -8.617e+04     -7.629     -23.31     -0.288       33
+  23    1.9   123.5   31  708537      82     128      47 ( 0.005%)  479273 (19.7%)    9.125 -8.601e+04     -9.125     -21.95     -0.288       35
+  24    2.4   160.6   35 1304814      72     142      31 ( 0.003%)  479657 (19.7%)    7.198 -8.644e+04     -7.198     -23.31     -0.288       37
+  25    1.9   208.8   31  678382      62      85      31 ( 0.003%)  480629 (19.7%)    8.900 -8.613e+04     -8.900     -21.95     -0.288       39
+  26    1.9   271.4   29  618380      54      65      27 ( 0.003%)  480936 (19.7%)    8.878 -8.614e+04     -8.878     -21.95     -0.288       40
+  27    1.8   352.8   22  490957      54      65      31 ( 0.003%)  481503 (19.7%)    7.040 -8.615e+04     -7.040     -21.95     -0.288       43
+  28    2.1   458.7   23  796863      53      90      31 ( 0.003%)  481835 (19.8%)    8.483 -8.654e+04     -8.483     -21.95     -0.288       45
+  29    2.0   596.3   19  752400      53      75      25 ( 0.003%)  482608 (19.8%)    6.730 -8.642e+04     -6.730     -21.95     -0.288       50
+  30    1.9   775.1   26  672319      48      70      23 ( 0.002%)  483081 (19.8%)    6.730 -8.640e+04     -6.730     -21.95     -0.288       51
+  31    1.9  1007.7   19  478948      34      47      19 ( 0.002%)  483624 (19.8%)   14.033 -8.654e+04    -14.033     -21.95     -0.288       56
+  32    1.8  1310.0   13  417595      36      47      20 ( 0.002%)  483749 (19.8%)    6.730 -8.654e+04     -6.730     -21.95     -0.288       56
+  33    1.6  1703.0   13  186255      33      33      16 ( 0.002%)  483794 (19.8%)    6.730 -8.655e+04     -6.730     -21.95     -0.288       60
+  34    1.8  2213.9    9  403041      30      30      14 ( 0.001%)  483898 (19.8%)    9.718 -8.655e+04     -9.718     -21.95     -0.288       60
+  35    1.6  2878.1   10  200616      30      30      17 ( 0.002%)  483724 (19.8%)    6.730 -8.654e+04     -6.730     -21.95     -0.288       62
+  36    1.6  3741.5    6  168607      24      24      13 ( 0.001%)  483964 (19.8%)    6.730 -8.655e+04     -6.730     -21.95     -0.288       64
+  37    1.6  4863.9    7  175117      25      26      16 ( 0.002%)  484108 (19.9%)    6.730 -8.662e+04     -6.730     -21.95     -0.288       66
+  38    1.5  6323.1    9  139012      20      21      14 ( 0.001%)  484320 (19.9%)    6.730 -8.672e+04     -6.730     -21.95     -0.288       68
+  39    1.6  8220.0    8  210295      23      24      13 ( 0.001%)  484348 (19.9%)    6.730 -8.656e+04     -6.730     -21.95     -0.288       70
+  40    1.9 10686.0    7  520096      26      49      13 ( 0.001%)  484458 (19.9%)    6.730 -8.664e+04     -6.730     -21.95     -0.288       71
+  41    1.9 13891.9    9  510434      20      32      10 ( 0.001%)  484980 (19.9%)    6.730 -8.666e+04     -6.730     -21.95     -0.288       74
+  42    1.5 18059.4   11  146027      19      19      12 ( 0.001%)  485139 (19.9%)    6.730 -8.666e+04     -6.730     -21.95     -0.288       73
+  43    1.7 23477.2    8  327427      21      54       7 ( 0.001%)  485658 (19.9%)    9.605 -8.667e+04     -9.605     -21.95     -0.288       76
+  44    1.6 30520.4   11  220801      15      26       9 ( 0.001%)  485426 (19.9%)    7.049 -8.667e+04     -7.049     -21.97     -0.288       73
+  45    1.6 39676.5    3  221608      15      26      10 ( 0.001%)  485532 (19.9%)    6.763 -8.667e+04     -6.763     -21.95     -0.288       74
+  46    1.6 51579.5    8  253652      21      43      10 ( 0.001%)  485365 (19.9%)    6.730 -8.667e+04     -6.730     -21.95     -0.288       76
+  47    1.5 67053.3   11   87870      19      29       8 ( 0.001%)  486213 (19.9%)    9.578 -8.668e+04     -9.578     -21.95     -0.288       80
+  48    1.5 87169.3    5  107081      15      19       7 ( 0.001%)  486157 (19.9%)    8.149 -8.668e+04     -8.149     -21.95     -0.288       80
+  49    1.5 1.1e+05    6   98414      16      16       7 ( 0.001%)  485867 (19.9%)    7.013 -8.667e+04     -7.013     -21.95     -0.288       79
+  50    1.5 1.5e+05    5   87464      19      19      10 ( 0.001%)  486535 (19.9%)   11.854 -8.669e+04    -11.854     -21.95     -0.288       80
+Routing failed.
+Router Stats: total_nets_routed: 88173 total_connections_routed: 112309 total_heap_pushes: 743168419 total_heap_pops: 294177784
+
+Attempting to route at 270 channels (binary search bounds: [232, 308])
+## Build routing resource graph
+Warning 20: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 12.55 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 1087988
+  RR Graph Edges: 9610784
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   66.2     0.0    0 1.4e+08   15870   17641   18332 ( 1.685%)  338394 (11.9%)    3.841 -7.130e+04     -3.841     -30.59     -0.289      N/A
+   2   41.6     0.5 1827 9.0e+07   12994   14752   13022 ( 1.197%)  328282 (11.6%)    3.841 -7.425e+04     -3.841     -29.93     -0.289      N/A
+   3   44.8     0.6  871 9.1e+07   10684   12438    9158 ( 0.842%)  349948 (12.3%)    3.841 -7.481e+04     -3.841     -28.09     -0.288      N/A
+   4   43.4     0.8 1233 8.1e+07    8758   10509    6469 ( 0.595%)  359347 (12.7%)    3.841 -7.577e+04     -3.841     -21.54     -0.288      N/A
+   5   35.8     1.1 1149 6.5e+07    6742    8485    4126 ( 0.379%)  366292 (12.9%)    4.447 -7.678e+04     -4.447     -28.54     -0.288      N/A
+   6   27.1     1.4  894 4.7e+07    4726    6453    2710 ( 0.249%)  374359 (13.2%)    4.094 -7.629e+04     -4.094     -26.72     -0.288      N/A
+   7   19.8     1.9  695 3.5e+07    3485    5193    1826 ( 0.168%)  379194 (13.4%)    4.067 -7.740e+04     -4.067     -26.46     -0.288      N/A
+   8   14.1     2.4  566 2.4e+07    2289    3919    1139 ( 0.105%)  384452 (13.5%)    3.863 -7.668e+04     -3.863     -21.42     -0.288      N/A
+   9   10.0     3.1  423 1.6e+07    1444    2945     716 ( 0.066%)  390358 (13.8%)    3.942 -7.658e+04     -3.942     -21.15     -0.288      N/A
+  10    7.2     4.1  301 1.1e+07     894    2345     357 ( 0.033%)  395107 (13.9%)    3.826 -7.711e+04     -3.826     -21.40     -0.288       24
+  11    4.9     5.3  246 6797986     467    1601     180 ( 0.017%)  397678 (14.0%)    4.064 -7.693e+04     -4.064     -21.25     -0.288       22
+  12    3.5     6.9  161 3956195     219     952      79 ( 0.007%)  399819 (14.1%)    4.013 -7.734e+04     -4.013     -21.27     -0.288       21
+  13    2.8     9.0   75 2530713     127     679      30 ( 0.003%)  400585 (14.1%)    4.071 -7.736e+04     -4.071     -21.23     -0.288       19
+  14    2.0    11.6   50  988845      52     316       9 ( 0.001%)  400855 (14.1%)    3.970 -7.739e+04     -3.970     -21.17     -0.288       18
+  15    1.7    15.1   21  471579      23     166       3 ( 0.000%)  401143 (14.1%)    3.973 -7.739e+04     -3.973     -21.17     -0.288       17
+  16    1.7    19.7   15  387600      17     127       1 ( 0.000%)  401087 (14.1%)    3.970 -7.740e+04     -3.970     -21.21     -0.288       17
+  17    1.6    25.6   11  236196      10      87       1 ( 0.000%)  401137 (14.1%)    3.970 -7.740e+04     -3.970     -21.17     -0.288       16
+  18    1.5    33.3    9  208608      10      76       1 ( 0.000%)  401261 (14.1%)    4.263 -7.740e+04     -4.263     -21.21     -0.288       17
+  19    1.5    43.3    8   59799       3      14       1 ( 0.000%)  401200 (14.1%)    3.970 -7.740e+04     -3.970     -21.21     -0.288       17
+  20    1.5    56.2    2  178287       9      75       0 ( 0.000%)  401312 (14.1%)    3.970 -7.740e+04     -3.970     -21.17     -0.288       17
+Restoring best routing
+Critical path: 3.96991 ns
+Successfully routed after 20 routing iterations.
+Router Stats: total_nets_routed: 68823 total_connections_routed: 88773 total_heap_pushes: 620256374 total_heap_pops: 243757294
+
+Attempting to route at 252 channels (binary search bounds: [232, 270])
+## Build routing resource graph
+Warning 21: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 11.24 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 1038712
+  RR Graph Edges: 8977480
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   64.5     0.0    0 1.4e+08   15870   17641   18435 ( 1.775%)  343527 (13.0%)    3.752 -7.138e+04     -3.752     -28.59     -0.289      N/A
+   2   40.7     0.5 2038 9.0e+07   13173   14930   13787 ( 1.327%)  334707 (12.6%)    3.782 -7.422e+04     -3.782     -27.84     -0.289      N/A
+   3   45.7     0.6  989 9.3e+07   11138   12888    9999 ( 0.963%)  357130 (13.5%)    4.356 -7.468e+04     -4.356     -23.65     -0.289      N/A
+   4   41.3     0.8 1375 8.3e+07    9391   11135    7196 ( 0.693%)  365277 (13.8%)    3.529 -7.576e+04     -3.529     -22.84     -0.289      N/A
+   5   34.9     1.1 1241 6.9e+07    7434    9180    5007 ( 0.482%)  371074 (14.0%)    3.732 -7.506e+04     -3.732     -27.39     -0.289      N/A
+   6   29.2     1.4  967 5.5e+07    5678    7402    3454 ( 0.333%)  379379 (14.3%)    4.054 -7.567e+04     -4.054     -24.08     -0.289      N/A
+   7   21.9     1.9  849 4.1e+07    4138    5852    2407 ( 0.232%)  388850 (14.7%)    3.731 -7.699e+04     -3.731     -24.09     -0.289      N/A
+   8   18.0     2.4  707 3.1e+07    3082    4735    1667 ( 0.160%)  394227 (14.9%)    4.081 -7.728e+04     -4.081     -25.85     -0.289      N/A
+   9   12.4     3.1  576 2.1e+07    2094    3714    1030 ( 0.099%)  402226 (15.2%)    4.783 -7.945e+04     -4.783     -25.65     -0.289      N/A
+  10    8.8     4.1  470 1.5e+07    1359    2903     613 ( 0.059%)  409050 (15.4%)    4.288 -7.884e+04     -4.288     -25.47     -0.289       27
+  11    6.4     5.3  346 9932033     895    2238     399 ( 0.038%)  414188 (15.6%)    4.147 -8.014e+04     -4.147     -25.28     -0.289       25
+  12    4.9     6.9  264 6686802     559    1624     245 ( 0.024%)  417257 (15.8%)    3.996 -7.944e+04     -3.996     -25.19     -0.289       25
+  13    3.9     9.0  169 4653919     352    1206     113 ( 0.011%)  420808 (15.9%)    4.419 -7.891e+04     -4.419     -26.55     -0.289       24
+  14    3.1    11.6  145 2825329     173     656      52 ( 0.005%)  422591 (16.0%)    4.620 -7.918e+04     -4.620     -26.49     -0.289       23
+  15    2.2    15.1   76 1238477      79     320      22 ( 0.002%)  423989 (16.0%)    4.236 -7.939e+04     -4.236     -26.47     -0.289       21
+  16    1.9    19.7   37  848047      53     211      18 ( 0.002%)  423953 (16.0%)    4.793 -7.937e+04     -4.793     -26.47     -0.289       21
+  17    1.7    25.6   21  356740      21      87       6 ( 0.001%)  424267 (16.0%)    4.793 -7.939e+04     -4.793     -26.47     -0.289       20
+  18    1.5    33.3    8   67292       8       8       3 ( 0.000%)  424623 (16.0%)    4.793 -7.940e+04     -4.793     -26.47     -0.289       20
+  19    1.6    43.3    5  160226       4      15       2 ( 0.000%)  424745 (16.0%)    4.793 -7.940e+04     -4.793     -26.40     -0.289       20
+  20    1.5    56.2    3  103268       4       4       1 ( 0.000%)  424909 (16.0%)    5.805 -7.940e+04     -5.805     -26.40     -0.289       20
+  21    1.5    73.1    4   47974       3       3       2 ( 0.000%)  424881 (16.0%)    4.793 -7.940e+04     -4.793     -26.40     -0.289       20
+  22    1.6    95.0    2  156538       4      15       1 ( 0.000%)  425013 (16.0%)    4.793 -7.941e+04     -4.793     -26.40     -0.289       21
+  23    1.4   123.5    2    2624       1       1       1 ( 0.000%)  424937 (16.0%)    4.793 -7.940e+04     -4.793     -26.40     -0.289       21
+  24    1.5   160.6    0   10845       2       2       0 ( 0.000%)  424956 (16.0%)    4.793 -7.941e+04     -4.793     -26.40     -0.289       21
+Restoring best routing
+Critical path: 4.79261 ns
+Successfully routed after 24 routing iterations.
+Router Stats: total_nets_routed: 75515 total_connections_routed: 96770 total_heap_pushes: 668389699 total_heap_pops: 263906473
+
+Attempting to route at 242 channels (binary search bounds: [232, 252])
+## Build routing resource graph
+Warning 22: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 10.72 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 1011336
+  RR Graph Edges: 8626928
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   72.1     0.0    0 1.3e+08   15870   17641   19294 ( 1.908%)  341010 (13.4%)    3.627 -7.141e+04     -3.627     -25.44     -0.290      N/A
+   2   47.1     0.5 1851 8.4e+07   13516   15281   14172 ( 1.401%)  332255 (13.1%)    3.706 -7.415e+04     -3.706     -24.91     -0.289      N/A
+   3   51.4     0.6  988 9.0e+07   11497   13246   10583 ( 1.046%)  358555 (14.1%)    3.627 -7.501e+04     -3.627     -23.78     -0.290      N/A
+   4   50.1     0.8 1527 8.3e+07    9799   11546    7856 ( 0.777%)  368772 (14.5%)    3.628 -7.522e+04     -3.628     -16.40     -0.289      N/A
+   5   44.2     1.1 1323 7.1e+07    8043    9742    5504 ( 0.544%)  376402 (14.8%)    3.693 -7.547e+04     -3.693     -19.24     -0.290      N/A
+   6   35.0     1.4 1117 5.6e+07    6279    7986    4098 ( 0.405%)  386306 (15.2%)    3.776 -7.620e+04     -3.776     -19.56     -0.290      N/A
+   7   27.0     1.9  940 4.3e+07    4755    6440    2920 ( 0.289%)  394290 (15.5%)    3.872 -7.604e+04     -3.872     -17.83     -0.290      N/A
+   8   21.0     2.4  824 3.2e+07    3586    5228    2114 ( 0.209%)  401399 (15.8%)    4.162 -7.690e+04     -4.162     -17.24     -0.290      N/A
+   9   16.5     3.1  670 2.4e+07    2661    4329    1462 ( 0.145%)  410086 (16.1%)    4.951 -7.996e+04     -4.951     -17.75     -0.290      N/A
+  10   13.4     4.1  565 1.9e+07    1915    3419     942 ( 0.093%)  419801 (16.5%)    5.105 -8.004e+04     -5.105     -17.75     -0.290       31
+  11   10.7     5.3  506 1.5e+07    1288    2542     609 ( 0.060%)  426270 (16.8%)    5.197 -8.066e+04     -5.197     -17.72     -0.290       29
+  12    8.3     6.9  367 1.1e+07     884    1991     394 ( 0.039%)  431662 (17.0%)    5.105 -8.082e+04     -5.105     -17.71     -0.290       28
+  13    6.9     9.0  286 7956736     571    1408     244 ( 0.024%)  436481 (17.2%)    6.107 -8.118e+04     -6.107     -17.66     -0.290       27
+  14    5.7    11.6  195 6001006     348     987     117 ( 0.012%)  440385 (17.3%)    5.585 -8.192e+04     -5.585     -17.75     -0.290       26
+  15    3.4    15.1  136 2773004     194     413      74 ( 0.007%)  442241 (17.4%)    5.585 -8.208e+04     -5.585     -17.77     -0.290       25
+  16    2.6    19.7   73 1654359     129     288      43 ( 0.004%)  444803 (17.5%)    5.585 -8.209e+04     -5.585     -17.55     -0.290       24
+  17    2.2    25.6   54 1011549      68     135      26 ( 0.003%)  446055 (17.5%)    5.585 -8.216e+04     -5.585     -17.39     -0.290       23
+  18    1.8    33.3   31  504266      42      54      18 ( 0.002%)  446825 (17.6%)    5.585 -8.215e+04     -5.585     -17.39     -0.290       23
+  19    1.7    43.3   16  341582      28      30      10 ( 0.001%)  447532 (17.6%)    6.066 -8.220e+04     -6.066     -17.39     -0.290       23
+  20    1.7    56.2   11  413166      28      40      12 ( 0.001%)  447846 (17.6%)    5.165 -8.239e+04     -5.165     -17.39     -0.290       23
+  21    1.7    73.1   11  330895      20      31       9 ( 0.001%)  448176 (17.6%)    9.161 -8.240e+04     -9.161     -17.39     -0.290       24
+  22    1.5    95.0   10  139653      16      16      10 ( 0.001%)  448412 (17.6%)    7.614 -8.241e+04     -7.614     -17.39     -0.290       25
+  23    1.8   123.5    9  465270      18      29       6 ( 0.001%)  448664 (17.6%)    6.400 -8.242e+04     -6.400     -17.39     -0.290       26
+  24    1.5   160.6   11  114466      13      24       7 ( 0.001%)  448755 (17.6%)    5.408 -8.242e+04     -5.408     -17.39     -0.290       27
+  25    1.7   208.8    5  374096      20      43       7 ( 0.001%)  448815 (17.6%)    6.243 -8.242e+04     -6.243     -17.39     -0.290       28
+  26    1.5   271.4   10  102430      15      17       7 ( 0.001%)  448652 (17.6%)    6.151 -8.245e+04     -6.151     -17.39     -0.290       30
+  27    1.5   352.8    6  108946       9      10       3 ( 0.000%)  448840 (17.6%)    6.613 -8.271e+04     -6.613     -17.39     -0.290       32
+  28    1.5   458.7    5  100465       6      18       1 ( 0.000%)  448860 (17.6%)    6.528 -8.273e+04     -6.528     -17.39     -0.290       32
+  29    1.5   596.3    3   69994       3       4       2 ( 0.000%)  449007 (17.7%)    7.626 -8.256e+04     -7.626     -17.39     -0.290       31
+  30    1.5   775.1    3  105955       3      14       2 ( 0.000%)  448779 (17.6%)    5.580 -8.255e+04     -5.580     -17.39     -0.290       31
+  31    1.5  1007.7    1   83383       6       7       2 ( 0.000%)  448981 (17.6%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       32
+  32    1.5  1310.0    4  105769       7      10       1 ( 0.000%)  449037 (17.7%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       33
+  33    1.5  1703.0    3  105894       6       7       1 ( 0.000%)  448997 (17.6%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       33
+  34    1.6  2213.9    2  181959       6       7       1 ( 0.000%)  448959 (17.6%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       33
+  35    1.5  2878.1    0   64546       5       6       1 ( 0.000%)  448979 (17.6%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       33
+  36    1.5  3741.5    1  111032       6       7       1 ( 0.000%)  449015 (17.7%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       34
+  37    1.5  4863.9    1   40829       6       7       1 ( 0.000%)  448979 (17.6%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       34
+  38    1.5  6323.1    1   41716       6       7       0 ( 0.000%)  449063 (17.7%)    5.408 -8.256e+04     -5.408     -17.39     -0.290       34
+Restoring best routing
+Critical path: 5.4076 ns
+Successfully routed after 38 routing iterations.
+Router Stats: total_nets_routed: 81672 total_connections_routed: 103010 total_heap_pushes: 679144691 total_heap_pops: 270416940
+
+Attempting to route at 238 channels (binary search bounds: [232, 242])
+## Build routing resource graph
+Warning 23: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 10.55 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 1000388
+  RR Graph Edges: 8491632
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   65.5     0.0    0 1.3e+08   15870   17641   18801 ( 1.879%)  342178 (13.7%)    3.588 -7.160e+04     -3.588     -26.27     -0.289      N/A
+   2   44.0     0.5 1961 8.5e+07   13631   15391   14452 ( 1.445%)  334443 (13.4%)    3.588 -7.429e+04     -3.588     -25.87     -0.289      N/A
+   3   48.5     0.6 1017 8.8e+07   11628   13380   10587 ( 1.058%)  360466 (14.4%)    4.464 -7.613e+04     -4.464     -21.12     -0.289      N/A
+   4   46.0     0.8 1540 8.0e+07    9789   11538    7830 ( 0.783%)  370710 (14.8%)    3.647 -7.630e+04     -3.647     -24.64     -0.289      N/A
+   5   43.7     1.1 1421 7.2e+07    8113    9853    5687 ( 0.568%)  375596 (15.0%)    3.713 -7.579e+04     -3.713     -24.27     -0.289      N/A
+   6   34.0     1.4 1127 5.6e+07    6278    8000    4061 ( 0.406%)  385521 (15.4%)    4.583 -7.676e+04     -4.583     -23.68     -0.289      N/A
+   7   25.8     1.9  995 4.3e+07    4864    6597    2931 ( 0.293%)  394467 (15.8%)    4.185 -7.871e+04     -4.185     -21.79     -0.289      N/A
+   8   21.6     2.4  816 3.4e+07    3788    5499    2217 ( 0.222%)  402521 (16.1%)    4.864 -8.045e+04     -4.864     -22.09     -0.289      N/A
+   9   17.5     3.1  692 2.7e+07    2777    4447    1506 ( 0.151%)  412032 (16.5%)    4.185 -7.929e+04     -4.185     -21.40     -0.187      N/A
+  10   13.4     4.1  617 2.0e+07    2112    3712    1225 ( 0.122%)  418690 (16.7%)    4.968 -7.897e+04     -4.968     -22.26     -0.289       31
+  11   10.8     5.3  521 1.5e+07    1511    2992     722 ( 0.072%)  427839 (17.1%)    4.515 -8.049e+04     -4.515     -22.04     -0.289       33
+  12    8.3     6.9  444 1.1e+07    1052    2250     515 ( 0.051%)  433278 (17.3%)    4.720 -8.040e+04     -4.720     -22.18     -0.289       31
+  13    7.3     9.0  323 8998187     717    1714     297 ( 0.030%)  439059 (17.5%)    4.653 -8.182e+04     -4.653     -22.15     -0.289       30
+  14    5.4    11.6  244 6092449     489    1179     216 ( 0.022%)  442540 (17.7%)    4.497 -8.160e+04     -4.497     -22.14     -0.289       28
+  15    4.0    15.1  186 3977145     326     826     138 ( 0.014%)  446698 (17.9%)    4.997 -8.204e+04     -4.997     -22.18     -0.289       28
+  16    3.6    19.7  129 3097808     206     471      87 ( 0.009%)  449754 (18.0%)    5.206 -8.225e+04     -5.206     -22.12     -0.289       27
+  17    2.7    25.6   93 1807995     156     300      67 ( 0.007%)  451390 (18.0%)    4.957 -8.248e+04     -4.957     -22.18     -0.289       27
+  18    2.4    33.3   70 1455201     123     225      45 ( 0.004%)  452922 (18.1%)    4.710 -8.252e+04     -4.710     -22.18     -0.289       27
+  19    2.4    43.3   54 1375612      96     229      39 ( 0.004%)  453923 (18.1%)    5.053 -8.257e+04     -5.053     -22.18     -0.289       27
+  20    2.0    56.2   38  795177      77     110      32 ( 0.003%)  455728 (18.2%)    8.514 -8.261e+04     -8.514     -22.18     -0.289       28
+  21    1.7    73.1   35  441925      51      63      25 ( 0.002%)  456753 (18.3%)    6.335 -8.264e+04     -6.335     -22.18     -0.289       29
+  22    1.7    95.0   27  443590      43      43      18 ( 0.002%)  457154 (18.3%)    6.265 -8.265e+04     -6.265     -22.18     -0.289       30
+  23    1.8   123.5   24  477200      32      43      15 ( 0.001%)  457899 (18.3%)    8.268 -8.267e+04     -8.268     -22.18     -0.289       30
+  24    1.6   160.6   18  183787      26      37      12 ( 0.001%)  457870 (18.3%)    6.606 -8.267e+04     -6.606     -22.18     -0.289       31
+  25    1.6   208.8    8  174805      25      36       8 ( 0.001%)  458089 (18.3%)    6.299 -8.268e+04     -6.299     -22.18     -0.289       32
+  26    1.5   271.4   10  119127      16      16       7 ( 0.001%)  458256 (18.3%)    6.784 -8.268e+04     -6.784     -22.18     -0.289       32
+  27    1.5   352.8    7   73171      14      14       7 ( 0.001%)  458094 (18.3%)    6.147 -8.268e+04     -6.147     -22.18     -0.289       33
+  28    1.5   458.7    4   96891      19      19       8 ( 0.001%)  458456 (18.3%)    6.874 -8.268e+04     -6.874     -22.18     -0.289       33
+  29    1.5   596.3   10  115931      14      25       6 ( 0.001%)  458888 (18.3%)   10.342 -8.270e+04    -10.342     -22.18     -0.289       35
+  30    1.5   775.1   10   88398      13      13       8 ( 0.001%)  458622 (18.3%)    6.202 -8.269e+04     -6.202     -22.18     -0.289       36
+  31    1.5  1007.7    4  145809      16      16       5 ( 0.000%)  459171 (18.4%)    8.223 -8.270e+04     -8.223     -22.18     -0.289       38
+  32    1.5  1310.0    9   99035      10      10       3 ( 0.000%)  459123 (18.4%)    5.682 -8.270e+04     -5.682     -22.18     -0.289       38
+  33    1.6  1703.0    5  180847      11      22       3 ( 0.000%)  459548 (18.4%)    8.961 -8.271e+04     -8.961     -22.18     -0.289       39
+  34    1.5  2213.9    7   46573       7       7       3 ( 0.000%)  459660 (18.4%)    8.961 -8.272e+04     -8.961     -22.18     -0.289       39
+  35    1.5  2878.1    5   80614       7       7       5 ( 0.000%)  459560 (18.4%)    8.961 -8.271e+04     -8.961     -22.18     -0.289       40
+  36    1.5  3741.5    2  110947       7       7       3 ( 0.000%)  459752 (18.4%)    8.961 -8.272e+04     -8.961     -22.18     -0.289       41
+  37    1.5  4863.9    5  115120       5      16       2 ( 0.000%)  459486 (18.4%)    7.610 -8.272e+04     -7.610     -22.18     -0.289       42
+  38    1.5  6323.1    3   90260       5       5       3 ( 0.000%)  459619 (18.4%)    6.349 -8.272e+04     -6.349     -22.18     -0.289       42
+  39    1.6  8220.0    3  120771       6       6       1 ( 0.000%)  459926 (18.4%)    6.349 -8.273e+04     -6.349     -22.18     -0.289       43
+  40    1.5 10686.0    5   84521       3       3       2 ( 0.000%)  459818 (18.4%)    6.349 -8.273e+04     -6.349     -22.18     -0.289       42
+  41    1.5 13891.9    2   28568       4       4       1 ( 0.000%)  459858 (18.4%)    6.349 -8.273e+04     -6.349     -22.18     -0.289       43
+  42    1.5 18059.4    2   93192       6       6       1 ( 0.000%)  459898 (18.4%)    5.682 -8.273e+04     -5.682     -22.18     -0.289       43
+  43    1.6 23477.2    3   66649       6       6       1 ( 0.000%)  459911 (18.4%)    5.809 -8.273e+04     -5.809     -22.18     -0.289       43
+  44    1.5 30520.4    2   72193       5       5       1 ( 0.000%)  459959 (18.4%)    5.809 -8.273e+04     -5.809     -22.18     -0.289       43
+  45    1.5 39676.5    2   25965       6       6       1 ( 0.000%)  459927 (18.4%)    5.809 -8.273e+04     -5.809     -22.18     -0.289       43
+  46    1.5 51579.5    3   25423       6       6       0 ( 0.000%)  460027 (18.4%)    5.809 -8.273e+04     -5.809     -22.18     -0.289       44
+Restoring best routing
+Critical path: 5.80868 ns
+Successfully routed after 46 routing iterations.
+Router Stats: total_nets_routed: 83966 total_connections_routed: 106795 total_heap_pushes: 689843090 total_heap_pops: 274217151
+
+Attempting to route at 236 channels (binary search bounds: [232, 238])
+## Build routing resource graph
+Warning 24: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 10.31 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 994912
+  RR Graph Edges: 8421456
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   66.2     0.0    0 1.3e+08   15870   17641   18455 ( 1.855%)  340391 (13.7%)    3.743 -7.148e+04     -3.743     -28.83     -0.290      N/A
+   2   46.0     0.5 1879 8.5e+07   13528   15294   14505 ( 1.458%)  331202 (13.4%)    3.745 -7.443e+04     -3.745     -26.90     -0.290      N/A
+   3   56.6     0.6  986 9.0e+07   11643   13400   10882 ( 1.094%)  358453 (14.4%)    3.768 -7.569e+04     -3.768     -24.10     -0.288      N/A
+   4   49.3     0.8 1529 8.2e+07   10006   11761    8051 ( 0.809%)  368860 (14.9%)    3.743 -7.583e+04     -3.743     -22.26     -0.288      N/A
+   5   42.4     1.1 1300 7.1e+07    8235    9980    5717 ( 0.575%)  376193 (15.2%)    3.751 -7.677e+04     -3.751     -22.02     -0.288      N/A
+   6   34.9     1.4 1121 5.7e+07    6535    8264    4253 ( 0.427%)  384081 (15.5%)    3.743 -7.652e+04     -3.743     -25.57     -0.290      N/A
+   7   27.8     1.9  983 4.5e+07    5017    6715    3116 ( 0.313%)  392622 (15.8%)    4.011 -7.723e+04     -4.011     -14.73     -0.290      N/A
+   8   21.2     2.4  808 3.4e+07    3861    5486    2231 ( 0.224%)  402416 (16.2%)    4.258 -7.793e+04     -4.258     -20.16     -0.290      N/A
+   9   16.8     3.1  713 2.6e+07    2887    4517    1614 ( 0.162%)  409644 (16.5%)    4.241 -7.811e+04     -4.241     -25.53     -0.290      N/A
+  10   14.4     4.1  596 2.1e+07    2201    3855    1216 ( 0.122%)  418339 (16.9%)    4.576 -7.992e+04     -4.576     -23.26     -0.290       32
+  11   11.6     5.3  523 1.6e+07    1640    3107     831 ( 0.084%)  426151 (17.2%)    4.884 -8.087e+04     -4.884     -24.45     -0.290       32
+  12    9.6     6.9  450 1.3e+07    1134    2443     531 ( 0.053%)  432504 (17.4%)    5.239 -8.173e+04     -5.239     -24.66     -0.290       32
+  13    8.3     9.0  328 1.0e+07     775    1890     378 ( 0.038%)  439417 (17.7%)    5.549 -8.244e+04     -5.549     -24.57     -0.290       30
+  14    6.1    11.6  255 7079476     539    1257     229 ( 0.023%)  443354 (17.9%)    6.630 -8.281e+04     -6.630     -24.72     -0.290       30
+  15    5.2    15.1  183 5259659     345     826     130 ( 0.013%)  448410 (18.1%)    5.466 -8.369e+04     -5.466     -24.61     -0.290       29
+  16    3.5    19.7  145 2862667     221     433     101 ( 0.010%)  449551 (18.1%)    5.058 -8.389e+04     -5.058     -24.71     -0.290       28
+  17    3.4    25.6   87 2610288     176     399      65 ( 0.007%)  452115 (18.2%)    6.005 -8.337e+04     -6.005     -24.61     -0.290       27
+  18    2.4    33.3   75 1214495     114     184      48 ( 0.005%)  453849 (18.3%)    5.457 -8.361e+04     -5.457     -24.61     -0.290       27
+  19    2.0    43.3   48  672512      90     137      38 ( 0.004%)  454856 (18.3%)    6.224 -8.374e+04     -6.224     -24.61     -0.290       27
+  20    2.1    56.2   46  794075      66     113      25 ( 0.003%)  456718 (18.4%)    7.053 -8.380e+04     -7.053     -24.61     -0.290       28
+  21    1.7    73.1   33  278885      44      55      18 ( 0.002%)  458149 (18.5%)    8.574 -8.384e+04     -8.574     -24.61     -0.290       28
+  22    1.6    95.0   26  231394      30      30      14 ( 0.001%)  458245 (18.5%)    9.709 -8.384e+04     -9.709     -24.61     -0.290       28
+  23    1.7   123.5   12  216178      28      28      18 ( 0.002%)  458137 (18.5%)    6.380 -8.384e+04     -6.380     -24.61     -0.290       29
+  24    1.8   160.6   10  381005      27      50      12 ( 0.001%)  458380 (18.5%)    6.782 -8.390e+04     -6.782     -24.61     -0.290       30
+  25    1.7   208.8   10  240998      23      34      13 ( 0.001%)  458169 (18.5%)    5.418 -8.390e+04     -5.418     -24.61     -0.290       31
+  26    1.9   271.4    8  535205      32      76      11 ( 0.001%)  458143 (18.5%)    6.261 -8.390e+04     -6.261     -24.61     -0.290       32
+  27    1.8   352.8   18  430122      22      44       9 ( 0.001%)  458609 (18.5%)   10.234 -8.391e+04    -10.234     -24.61     -0.290       34
+  28    1.6   458.7   10  148722      21      21       7 ( 0.001%)  458690 (18.5%)    7.592 -8.391e+04     -7.592     -24.61     -0.290       35
+  29    1.5   596.3    9  108051      18      18       8 ( 0.001%)  458813 (18.5%)    5.730 -8.391e+04     -5.730     -24.61     -0.290       36
+  30    1.7   775.1    6  269702      16      38       6 ( 0.001%)  459310 (18.5%)    7.395 -8.393e+04     -7.395     -24.61     -0.290       37
+  31    1.6  1007.7    8  142038      10      11       6 ( 0.001%)  459697 (18.5%)   14.602 -8.396e+04    -14.602     -24.61     -0.290       39
+  32    1.6  1310.0    5  176793      11      11       7 ( 0.001%)  459260 (18.5%)    5.659 -8.395e+04     -5.659     -24.61     -0.290       40
+  33    1.7  1703.0    4  334492       9      42       5 ( 0.001%)  459470 (18.5%)    5.659 -8.395e+04     -5.659     -24.61     -0.290       42
+  34    1.7  2213.9    5  304098       8      30       3 ( 0.000%)  459927 (18.5%)   10.772 -8.396e+04    -10.772     -24.61     -0.290       43
+  35    1.5  2878.1    5   49398       8       8       5 ( 0.001%)  460047 (18.5%)    6.434 -8.397e+04     -6.434     -24.61     -0.290       43
+  36    1.6  3741.5    2  151805       9      20       3 ( 0.000%)  460252 (18.6%)    6.725 -8.397e+04     -6.725     -24.61     -0.290       45
+  37    1.5  4863.9    6  114477       5      16       2 ( 0.000%)  460268 (18.6%)    6.319 -8.397e+04     -6.319     -24.61     -0.290       45
+  38    1.7  6323.1    5  257826       5      27       0 ( 0.000%)  460309 (18.6%)    6.319 -8.398e+04     -6.319     -24.61     -0.290       44
+Restoring best routing
+Critical path: 6.31948 ns
+Successfully routed after 38 routing iterations.
+Router Stats: total_nets_routed: 85209 total_connections_routed: 108261 total_heap_pushes: 703312345 total_heap_pops: 279175686
+
+Attempting to route at 234 channels (binary search bounds: [232, 236])
+## Build routing resource graph
+Warning 25: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 10.35 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 989436
+  RR Graph Edges: 8354580
+Confirming router algorithm: TIMING_DRIVEN.
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+Iter   Time    pres  BBs    Heap  Re-Rtd  Re-Rtd Overused RR Nodes      Wirelength      CPD       sTNS       sWNS       hTNS       hWNS Est Succ
+      (sec)     fac Updt    push    Nets   Conns                                       (ns)       (ns)       (ns)       (ns)       (ns)     Iter
+---- ------ ------- ---- ------- ------- ------- ----------------- --------------- -------- ---------- ---------- ---------- ---------- --------
+   1   68.7     0.0    0 1.3e+08   15870   17641   18250 ( 1.844%)  338256 (13.8%)    3.840 -7.125e+04     -3.840     -30.26     -0.290      N/A
+   2   46.3     0.5 1820 8.5e+07   13527   15283   14552 ( 1.471%)  329959 (13.4%)    4.457 -7.489e+04     -4.457     -25.08     -0.289      N/A
+   3   51.0     0.6  955 8.9e+07   11627   13389   10636 ( 1.075%)  358651 (14.6%)    4.171 -7.594e+04     -4.171     -22.85     -0.289      N/A
+   4   50.8     0.8 1590 8.5e+07   10049   11801    8138 ( 0.822%)  366319 (14.9%)    4.456 -7.799e+04     -4.456     -25.76     -0.290      N/A
+   5   45.2     1.1 1377 7.2e+07    8229    9975    5700 ( 0.576%)  376377 (15.3%)    3.818 -7.678e+04     -3.818     -21.22     -0.290      N/A
+   6   37.3     1.4 1219 5.8e+07    6445    8173    4141 ( 0.419%)  384766 (15.6%)    4.315 -7.612e+04     -4.315     -21.89     -0.290      N/A
+   7   27.7     1.9 1030 4.4e+07    4961    6631    2994 ( 0.303%)  395802 (16.1%)    4.485 -7.772e+04     -4.485     -21.43     -0.290      N/A
+   8   21.7     2.4  914 3.4e+07    3838    5475    2229 ( 0.225%)  402481 (16.4%)    4.326 -7.841e+04     -4.326     -20.41     -0.290      N/A
+   9   18.3     3.1  714 2.7e+07    2881    4456    1648 ( 0.167%)  410672 (16.7%)    4.524 -7.877e+04     -4.524     -20.72     -0.290      N/A
+  10   15.3     4.1  642 2.1e+07    2155    3715    1173 ( 0.119%)  419405 (17.1%)    4.171 -7.965e+04     -4.171     -17.86     -0.290       33
+  11   12.1     5.3  515 1.7e+07    1630    3114     880 ( 0.089%)  426125 (17.3%)    4.312 -7.958e+04     -4.312     -16.55     -0.290       33
+  12   10.5     6.9  405 1.4e+07    1233    2599     641 ( 0.065%)  432652 (17.6%)    4.498 -8.091e+04     -4.498     -14.45     -0.290       33
+  13    9.2     9.0  338 1.2e+07     898    2171     418 ( 0.042%)  441206 (17.9%)    5.737 -8.080e+04     -5.737     -14.58     -0.290       33
+  14    8.3    11.6  299 9551044     598    1545     236 ( 0.024%)  447674 (18.2%)    5.924 -8.226e+04     -5.924     -14.53     -0.290       32
+  15    5.4    15.1  232 5459682     368     872     154 ( 0.016%)  451940 (18.4%)    5.670 -8.314e+04     -5.670     -14.53     -0.290       30
+  16    4.9    19.7  144 4456544     256     648     113 ( 0.011%)  454224 (18.5%)    6.341 -8.313e+04     -6.341     -14.39     -0.290       29
+  17    4.1    25.6   97 3273751     161     404      74 ( 0.007%)  457519 (18.6%)    6.065 -8.331e+04     -6.065     -14.29     -0.290       28
+  18    3.1    33.3   71 2230111     145     303      67 ( 0.007%)  459359 (18.7%)    5.770 -8.346e+04     -5.770     -14.29     -0.290       28
+  19    2.6    43.3   66 1544933     120     221      55 ( 0.006%)  461236 (18.8%)    8.013 -8.371e+04     -8.013     -14.13     -0.290       28
+  20    2.9    56.2   53 1750747      92     180      42 ( 0.004%)  462988 (18.8%)    6.471 -8.409e+04     -6.471     -14.12     -0.290       29
+  21    2.6    73.1   47 1295477      74     130      30 ( 0.003%)  464664 (18.9%)    6.315 -8.414e+04     -6.315     -14.12     -0.290       30
+  22    2.5    95.0   32 1232641      61     105      27 ( 0.003%)  464737 (18.9%)    7.856 -8.415e+04     -7.856     -14.12     -0.290       31
+  23    2.0   123.5   24  660071      51      73      23 ( 0.002%)  465048 (18.9%)    7.277 -8.416e+04     -7.277     -14.12     -0.290       32
+  24    1.7   160.6   25  371055      42      45      21 ( 0.002%)  466967 (19.0%)    7.585 -8.422e+04     -7.585     -14.12     -0.290       33
+  25    1.7   208.8   25  380853      48      48      23 ( 0.002%)  466698 (19.0%)    7.049 -8.421e+04     -7.049     -14.12     -0.290       35
+  26    1.8   271.4   20  427294      42      53      21 ( 0.002%)  466727 (19.0%)    6.172 -8.421e+04     -6.172     -14.12     -0.290       36
+  27    2.0   352.8   22  707846      43      65      17 ( 0.002%)  467696 (19.0%)    7.168 -8.423e+04     -7.168     -14.26     -0.290       39
+  28    1.7   458.7   21  351606      30      41      15 ( 0.002%)  467917 (19.0%)    7.624 -8.424e+04     -7.624     -14.26     -0.290       40
+  29    1.8   596.3   13  408307      31      53      17 ( 0.002%)  468464 (19.0%)    8.298 -8.425e+04     -8.298     -14.26     -0.290       43
+  30    1.6   775.1   14  214120      29      40      14 ( 0.001%)  468763 (19.1%)    7.802 -8.425e+04     -7.802     -14.26     -0.290       45
+  31    1.6  1007.7   16  257210      25      47       8 ( 0.001%)  469251 (19.1%)    6.566 -8.427e+04     -6.566     -14.26     -0.290       48
+  32    1.6  1310.0   19  161320      21      22      10 ( 0.001%)  468870 (19.1%)    6.566 -8.438e+04     -6.566     -14.26     -0.290       47
+  33    1.6  1703.0    9  137127      21      22       7 ( 0.001%)  469243 (19.1%)    6.566 -8.431e+04     -6.566     -14.26     -0.290       49
+  34    1.6  2213.9   11  252392      16      38       5 ( 0.001%)  469758 (19.1%)    6.566 -8.442e+04     -6.566     -14.26     -0.290       48
+  35    1.7  2878.1    6  249159      13      24       5 ( 0.001%)  469841 (19.1%)    6.566 -8.443e+04     -6.566     -14.26     -0.290       48
+  36    1.6  3741.5    8  157073      12      23       6 ( 0.001%)  470037 (19.1%)    7.867 -8.443e+04     -7.867     -14.26     -0.290       47
+  37    1.7  4863.9    7  341696      10      43       3 ( 0.000%)  470167 (19.1%)    6.779 -8.444e+04     -6.779     -14.26     -0.290       49
+  38    1.6  6323.1    5  158773       7      18       4 ( 0.000%)  469848 (19.1%)    6.566 -8.443e+04     -6.566     -14.26     -0.290       48
+  39    1.5  8220.0    3   51380      10      10       4 ( 0.000%)  470216 (19.1%)    6.888 -8.444e+04     -6.888     -14.26     -0.290       48
+  40    1.5 10686.0    6   60807      10      10       3 ( 0.000%)  470068 (19.1%)    6.566 -8.443e+04     -6.566     -14.26     -0.290       49
+  41    1.5 13891.9    4   46799       7       7       2 ( 0.000%)  470339 (19.1%)    7.994 -8.444e+04     -7.994     -14.26     -0.290       49
+  42    1.5 18059.4    4   50296       5       5       2 ( 0.000%)  470379 (19.1%)    8.239 -8.444e+04     -8.239     -14.26     -0.290       48
+  43    1.5 23477.2    2   49117       7       7       3 ( 0.000%)  470491 (19.1%)    8.239 -8.444e+04     -8.239     -14.26     -0.290       48
+  44    1.5 30520.4    5   58668       8       8       3 ( 0.000%)  470367 (19.1%)    8.239 -8.444e+04     -8.239     -14.26     -0.290       48
+  45    1.5 39676.5    1   28167       6       6       5 ( 0.001%)  470479 (19.1%)    8.239 -8.444e+04     -8.239     -14.26     -0.290       49
+  46    1.6 51579.5    2  178985      11      33       3 ( 0.000%)  470367 (19.1%)    8.239 -8.445e+04     -8.239     -14.26     -0.290       51
+  47    1.5 67053.3    4   19962       4       4       3 ( 0.000%)  470271 (19.1%)    6.566 -8.445e+04     -6.566     -14.26     -0.290       52
+  48    1.5 87169.3    1   57135       8      11       3 ( 0.000%)  470452 (19.1%)    6.566 -8.448e+04     -6.566     -14.26     -0.290       53
+  49    1.5 1.1e+05    5   37826       7       7       3 ( 0.000%)  470520 (19.1%)    6.566 -8.448e+04     -6.566     -14.26     -0.290       55
+  50    1.5 1.5e+05    4   41062       7       7       5 ( 0.001%)  470529 (19.1%)    6.566 -8.448e+04     -6.566     -14.26     -0.290       56
+Routing failed.
+Router Stats: total_nets_routed: 85749 total_connections_routed: 109601 total_heap_pushes: 721432986 total_heap_pops: 285248249
+## Build routing resource graph
+Warning 26: in check_rr_graph: fringe node 24 IPIN at (0,1) has no fanin.
+	 This is possible on a fringe node based on low Fc_out, N, and certain lengths.
+## Build routing resource graph took 10.50 seconds (max_rss 3467.9 MiB, delta_rss +0.0 MiB)
+  RR Graph Nodes: 994912
+  RR Graph Edges: 8421456
+Best routing used a channel width factor of 236.
+# Routing took 3868.34 seconds (max_rss 3467.9 MiB, delta_rss +208.1 MiB)
+
+Checking to ensure routing is legal...
+Completed routing consistency check successfully.
+
+Serial number (magic cookie) for the routing is: 1662519924
+Circuit successfully routed with a channel width factor of 236.
+
+Average number of bends per net: 3.02527  Maximum # of bends: 76
+
+Number of global nets: 4
+Number of routed nets (nonglobal): 15870
+Wire length results (in units of 1 clb segments)...
+	Total wirelength: 460309, average net length: 29.0050
+	Maximum net length: 718
+
+Wire length results in terms of physical segments...
+	Total wiring segments used: 116627, average wire segments per net: 7.34890
+	Maximum segments used by a net: 181
+	Total local nets with reserved CLB opins: 0
+
+Routing channel utilization histogram:
+[        1:      inf)    0 ( 0.0%) |
+[      0.9:        1)  300 ( 2.8%) |**
+[      0.8:      0.9)  208 ( 2.0%) |**
+[      0.7:      0.8)  440 ( 4.1%) |***
+[      0.5:      0.6)  800 ( 7.5%) |******
+[      0.4:      0.5) 1016 ( 9.5%) |********
+[      0.3:      0.4)  756 ( 7.1%) |******
+[      0.2:      0.3)  386 ( 3.6%) |***
+[      0.1:      0.2)  596 ( 5.6%) |****
+[        0:      0.1) 6156 (57.8%) |**********************************************
+Maximum routing channel utilization:         1 at (45,24)
+
+X - Directed channels:   j max occ ave occ capacity
+                      ---- ------- ------- --------
+                         0     229 119.514      236
+                         1     158  76.162      236
+                         2     153  76.216      236
+                         3     177  98.919      236
+                         4     160  81.757      236
+                         5     149  79.270      236
+                         6     223 137.757      236
+                         7     136  76.338      236
+                         8     144  74.851      236
+                         9     175  99.743      236
+                        10     135  71.568      236
+                        11     143  71.568      236
+                        12     233 151.622      236
+                        13     150  73.689      236
+                        14     158  71.351      236
+                        15     198 102.392      236
+                        16     169  77.486      236
+                        17     163  77.878      236
+                        18     235 157.014      236
+                        19     160  76.243      236
+                        20     146  70.973      236
+                        21     171 101.797      236
+                        22     150  78.635      236
+                        23     149  74.324      236
+                        24     235 153.432      236
+                        25     164  80.216      236
+                        26     163  75.486      236
+                        27     199 102.703      236
+                        28     143  75.243      236
+                        29     138  63.014      236
+                        30     224 136.676      236
+                        31     150  63.514      236
+                        32     137  61.946      236
+                        33     166  85.041      236
+                        34     125  53.270      236
+                        35     111  50.149      236
+                        36     206 117.135      236
+                        37     104  46.865      236
+                        38      97  42.446      236
+                        39     126  52.959      236
+                        40      85  30.324      236
+                        41      37  10.108      236
+                        42     142  74.703      236
+                        43      26   6.595      236
+                        44      27   7.892      236
+                        45      12   4.324      236
+                        46       2   0.162      236
+                        47       0   0.000      236
+                        48       0   0.000      236
+                        49       0   0.000      236
+                        50       0   0.000      236
+                        51       0   0.000      236
+                        52       0   0.000      236
+                        53       0   0.000      236
+                        54       0   0.000      236
+                        55       0   0.000      236
+                        56       0   0.000      236
+                        57       0   0.000      236
+                        58       0   0.000      236
+                        59       0   0.000      236
+                        60       0   0.000      236
+                        61       0   0.000      236
+                        62       0   0.000      236
+                        63       0   0.000      236
+                        64       0   0.000      236
+                        65       0   0.000      236
+                        66       0   0.000      236
+                        67       0   0.000      236
+                        68       0   0.000      236
+                        69       0   0.000      236
+                        70       0   0.000      236
+                        71       0   0.000      236
+                        72       0   0.000      236
+Y - Directed channels:   i max occ ave occ capacity
+                      ---- ------- ------- --------
+                         0       4   0.378      236
+                         1       1   0.162      236
+                         2       0   0.000      236
+                         3       1   0.108      236
+                         4       0   0.000      236
+                         5       0   0.000      236
+                         6       0   0.000      236
+                         7       0   0.000      236
+                         8       0   0.000      236
+                         9       0   0.000      236
+                        10       1   0.216      236
+                        11       3   0.703      236
+                        12      11   2.270      236
+                        13       1   0.162      236
+                        14       5   1.919      236
+                        15       7   2.081      236
+                        16      17   5.622      236
+                        17      26   8.243      236
+                        18     154  66.243      236
+                        19     176  77.284      236
+                        20     142  55.473      236
+                        21     206 102.757      236
+                        22      54  22.486      236
+                        23      41  18.081      236
+                        24      50  24.162      236
+                        25      45  19.351      236
+                        26      48  22.189      236
+                        27     222 112.919      236
+                        28     197 100.027      236
+                        29     147  65.284      236
+                        30     226 112.946      236
+                        31      61  29.000      236
+                        32      64  30.946      236
+                        33      54  27.973      236
+                        34      53  26.324      236
+                        35      41  20.541      236
+                        36     236 117.878      236
+                        37     209 103.054      236
+                        38     148  61.378      236
+                        39     227 119.608      236
+                        40      43  19.865      236
+                        41      51  26.541      236
+                        42      48  25.541      236
+                        43      38  17.973      236
+                        44      36  17.108      236
+                        45     225 117.297      236
+                        46     215  98.811      236
+                        47     145  57.838      236
+                        48     231 115.473      236
+                        49      37  19.378      236
+                        50      37  17.541      236
+                        51      35  16.811      236
+                        52      34  15.784      236
+                        53      26  11.892      236
+                        54     208 104.500      236
+                        55     181  79.743      236
+                        56     110  47.149      236
+                        57     215 101.230      236
+                        58      28  13.189      236
+                        59      31  12.027      236
+                        60      44  17.757      236
+                        61      40  16.459      236
+                        62      31  13.541      236
+                        63     209  89.730      236
+                        64     151  51.797      236
+                        65     109  32.378      236
+                        66     184  55.635      236
+                        67      38  13.108      236
+                        68      23   7.081      236
+                        69      25   5.405      236
+                        70      32   7.892      236
+                        71      30   6.811      236
+                        72     157  38.068      236
+
+Total tracks in x-direction: 17228, in y-direction: 17228
+
+Logic area (in minimum width transistor areas, excludes I/Os and empty grid tiles)...
+	Total logic block area (Warning, need to add pitch of routing to blocks with height > 3): 4.81513e+08
+	Total used logic block area: 1.54427e+08
+
+Routing area (in minimum width transistor areas)...
+	Total routing area: 3.88513e+07, per logic tile: 7094.83
+
+Segment usage by type (index): type utilization
+                               ---- -----------
+                                  0       0.176
+
+Segment usage by length: length utilization
+                         ------ -----------
+                              4       0.176
+
+
+Hold Worst Negative Slack (hWNS): -0.289932 ns
+Hold Total Negative Slack (hTNS): -24.611 ns
+
+Hold slack histogram:
+[ -2.9e-10:  3.6e-10)  6137 (12.7%) |*************
+[  3.6e-10:    1e-09) 16640 (34.5%) |************************************
+[    1e-09:  1.7e-09) 20832 (43.2%) |*********************************************
+[  1.7e-09:  2.3e-09)  3501 ( 7.3%) |********
+[  2.3e-09:    3e-09)   724 ( 1.5%) |**
+[    3e-09:  3.6e-09)   320 ( 0.7%) |*
+[  3.6e-09:  4.3e-09)    43 ( 0.1%) |
+[  4.3e-09:  4.9e-09)    19 ( 0.0%) |
+[  4.9e-09:  5.6e-09)     2 ( 0.0%) |
+[  5.6e-09:  6.2e-09)     1 ( 0.0%) |
+
+Final critical path: 6.31948 ns, Fmax: 158.241 MHz
+Setup Worst Negative Slack (sWNS): -6.31948 ns
+Setup Total Negative Slack (sTNS): -83975.5 ns
+
+Setup slack histogram:
+[ -6.3e-09: -5.7e-09)     1 ( 0.0%) |
+[ -5.7e-09: -5.1e-09)     2 ( 0.0%) |
+[ -5.1e-09: -4.5e-09)    20 ( 0.0%) |
+[ -4.5e-09: -3.9e-09)   511 ( 1.1%) |*
+[ -3.9e-09: -3.3e-09)  1353 ( 2.8%) |***
+[ -3.3e-09: -2.7e-09)  2875 ( 6.0%) |*****
+[ -2.7e-09: -2.1e-09)  6285 (13.0%) |************
+[ -2.1e-09: -1.5e-09) 23693 (49.1%) |*********************************************
+[ -1.5e-09: -8.8e-10) 10248 (21.3%) |*******************
+[ -8.8e-10: -2.8e-10)  3231 ( 6.7%) |******
+
+Timing analysis took 553.981 seconds (550.686 STA, 3.29447 slack) (488 full updates: 196 setup, 0 hold, 292 combined).
+VPR suceeded
+The entire flow of VPR took 4860.56 seconds (max_rss 4045.7 MiB)
+	Command being timed: "/home/amana/vtr-verilog-to-routing/vtr_flow/../vpr/vpr distributed_layout.bb_8x8.grid_74x74.no_dir_int.xml script.matmul.48x48_from_8x8 --circuit_file script.matmul.48x48_from_8x8.pre-vpr.blif --const_gen_inference comb --seed 654"
+	User time (seconds): 4856.30
+	System time (seconds): 3.45
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:21:01
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 4142820
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1241959
+	Voluntary context switches: 18
+	Involuntary context switches: 1602
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 88304
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
