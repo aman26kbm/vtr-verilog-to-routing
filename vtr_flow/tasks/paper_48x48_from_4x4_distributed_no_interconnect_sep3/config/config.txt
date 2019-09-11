@@ -13,7 +13,7 @@ circuit_list_add=matmul.48x48_from_4x4_with_ram.v
 
 # Add architectures to list to sweep
 #arch_list_add=distributed_layout_no_interconnect_sep3.xml
-arch_list_add=distributed_layout_74x74_no_interconnect_sep6.xml
+arch_list_add=distributed_layout_86x86_no_interconnect_sep6.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
