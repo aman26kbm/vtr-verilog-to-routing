@@ -670,7 +670,7 @@
 
     <!-- Define mac begin -->
 
-    <pb_type name="mac_32" height="1" area="72619">
+    <pb_type name="mac_32" height="1" area="68080">
 
       <input name="a" num_pins="16"/>
       <input name="b" num_pins="16"/>
