@@ -7,7 +7,7 @@
 
 module matrix_multiplication(
   clk,
-  reset_0,
+  reset,
   enable_writing_to_mem,
   enable_reading_from_mem,
   data_pi,
@@ -16,7 +16,7 @@ module matrix_multiplication(
   we_b,
   we_c,
   data_from_out_mat,
-  start_mat_mul_0,
+  start_mat_mul,
   done_mat_mul
 );
 
@@ -33,13 +33,13 @@ module matrix_multiplication(
 
 
 
-  input reset_0;
-  input start_mat_mul_0;
+  input reset;
+  input start_mat_mul;
   reg enable_writing_to_mem_reg;
   reg enable_reading_from_mem_reg;
   reg [`AWIDTH-1:0] addr_pi_reg;
   always @(posedge clk) begin
-    if(reset_0) begin
+    if(reset) begin
       enable_writing_to_mem_reg <= 0;
       enable_reading_from_mem_reg <= 0;
       addr_pi_reg <= 0;
@@ -70,7 +70,7 @@ module matrix_multiplication(
 
 
   always @(posedge clk) begin
-    if(reset_0) begin
+    if(reset) begin
       a_addr_0_0_reg <= 0;
       a_addr_1_0_reg <= 0;
       a_addr_muxed_0_0_reg <= 0;
@@ -124,7 +124,7 @@ module matrix_multiplication(
 
 
   always @(posedge clk) begin
-    if(reset_0) begin
+    if(reset) begin
       b_addr_0_0_reg <= 0;
       b_addr_0_1_reg <= 0;
       b_addr_muxed_0_0_reg <= 0;
@@ -171,10 +171,10 @@ module matrix_multiplication(
   assign c_addr_muxed_0_1 = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
 
   always @(posedge clk) begin
-    if(reset_0 || done_mat_mul) begin
+    if(reset || done_mat_mul) begin
       c_addr <= 0;
     end
-    else if (start_mat_mul_0) begin
+    else if (start_mat_mul) begin
       c_addr <= c_addr + 1;
     end
   end
@@ -185,11 +185,25 @@ module matrix_multiplication(
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_1;
 
 ///////////////// ORing the data ///////////////////
+
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_0;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_1;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_0_reg;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_1_reg;
+
   always @(posedge clk) begin
-    if(reset_0) begin
+    if(reset) begin
+      data_from_out_mat_0_0_reg <= 0;
+      data_from_out_mat_0_1_reg <= 0;
+    end else begin
+      data_from_out_mat_0_0_reg <= data_from_out_mat_0_0;
+      data_from_out_mat_0_1_reg <= data_from_out_mat_0_1;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
       c_reg_0 <= 0;
       c_reg_1 <= 0;
     end else begin
@@ -202,7 +216,7 @@ module matrix_multiplication(
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_0_reg;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_1_reg;
   always @(posedge clk) begin
-    if(reset_0) begin
+    if(reset) begin
       c_data_row_0_reg <= 0;
       c_addr_muxed_0_0_reg <= 0;
       c_data_row_1_reg <= 0;
@@ -238,8 +252,8 @@ module matrix_multiplication(
 matmul_8x8_systolic u_matmul_8x8_systolic (
   .clk(clk),
   .done_mat_mul(done_mat_mul),
-  .reset_0(reset_0),
-  .start_mat_mul_0(start_mat_mul_0),
+  .reset(reset),
+  .start_mat_mul(start_mat_mul),
   .a_data_0_0(a_data_0_0),
   .a_addr_0_0(a_addr_0_0),
   .b_data_0_0(b_data_0_0),
@@ -262,8 +276,8 @@ endmodule
 module matmul_8x8_systolic(
   clk,
   done_mat_mul,
-  reset_0,
-  start_mat_mul_0,
+  reset,
+  start_mat_mul,
   a_data_0_0,
   a_addr_0_0,
   b_data_0_0,
@@ -279,8 +293,8 @@ module matmul_8x8_systolic(
   input clk;
   output done_mat_mul;
 
-  input reset_0;
-  input start_mat_mul_0;
+  input reset;
+  input start_mat_mul;
   input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0;
   input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0;
 
@@ -304,10 +318,7 @@ module matmul_8x8_systolic(
   wire done_mat_mul_1_0;
   wire done_mat_mul_1_1;
 
-  assign done_mat_mul =   done_mat_mul_0_0 &&
-  done_mat_mul_0_1 &&
-  done_mat_mul_1_0 &&
-  done_mat_mul_1_1;
+  assign done_mat_mul = done_mat_mul_0_0;
 
   /////////////////////////////////////////////////
   // Matmul 0_0
@@ -321,14 +332,14 @@ module matmul_8x8_systolic(
 
 matmul_4x4_systolic u_matmul_4x4_systolic_0_0(
   .clk(clk),
-  .reset(reset_0),
-  .start_mat_mul(start_mat_mul_0),
+  .reset(reset),
+  .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_0_0),
   .a_data(a_data_0_0),
   .b_data(b_data_0_0),
   .a_data_in(a_data_in_0_0_NC),
   .b_data_in(b_data_in_0_0_NC),
-  .c_data_in(64'b0),
+  .c_data_in({`BB_MAT_MUL_SIZE*`DWIDTH{1'b0}}),
   .c_data_out(c_data_0_0_to_0_1),
   .a_data_out(a_data_0_0_to_0_1),
   .b_data_out(b_data_0_0_to_1_0),
@@ -351,8 +362,8 @@ matmul_4x4_systolic u_matmul_4x4_systolic_0_0(
 
 matmul_4x4_systolic u_matmul_4x4_systolic_0_1(
   .clk(clk),
-  .reset(reset_0),
-  .start_mat_mul(start_mat_mul_0),
+  .reset(reset),
+  .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_0_1),
   .a_data(a_data_0_1_NC),
   .b_data(b_data_0_1),
@@ -382,14 +393,14 @@ matmul_4x4_systolic u_matmul_4x4_systolic_0_1(
 
 matmul_4x4_systolic u_matmul_4x4_systolic_1_0(
   .clk(clk),
-  .reset(reset_0),
-  .start_mat_mul(start_mat_mul_0),
+  .reset(reset),
+  .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_1_0),
   .a_data(a_data_1_0),
   .b_data(b_data_1_0_NC),
   .a_data_in(a_data_in_1_0_NC),
   .b_data_in(b_data_0_0_to_1_0),
-  .c_data_in(64'b0),
+  .c_data_in({`BB_MAT_MUL_SIZE*`DWIDTH{1'b0}}),
   .c_data_out(c_data_1_0_to_1_1),
   .a_data_out(a_data_1_0_to_1_1),
   .b_data_out(b_data_1_0_to_2_0),
@@ -413,8 +424,8 @@ matmul_4x4_systolic u_matmul_4x4_systolic_1_0(
 
 matmul_4x4_systolic u_matmul_4x4_systolic_1_1(
   .clk(clk),
-  .reset(reset_0),
-  .start_mat_mul(start_mat_mul_0),
+  .reset(reset),
+  .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_1_1),
   .a_data(a_data_1_1_NC),
   .b_data(b_data_1_1_NC),
