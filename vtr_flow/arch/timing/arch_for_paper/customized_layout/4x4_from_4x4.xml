@@ -902,7 +902,6 @@
 
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
       <pinlocations pattern="perimeter"/>
-      <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
 
       <power method="sum-of-children"/>
     </pb_type>

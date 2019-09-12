@@ -902,7 +902,6 @@
 <!--
       <pinlocations pattern="perimeter"/>
 -->
-      <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
       <pinlocations pattern="custom">
         <loc side="left">matmul_4x4.a_data_in[63:0] matmul_4x4.a_data[63:0] matmul_4x4.a_addr[6:0]             matmul_4x4.a_loc[3:0]  </loc>
         <loc side="top">matmul_4x4.b_data_in[63:0] matmul_4x4.b_data[63:0] matmul_4x4.b_addr[6:0]     matmul_4x4.start_mat_mul matmul_4x4.done_mat_mul matmul_4x4.clk</loc>
