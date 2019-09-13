@@ -12,7 +12,7 @@ archs_dir=arch/timing/arch_for_paper/regular_fpga
 circuit_list_add=64x64_from_4x4_regular_fpga.v
 
 # Add architectures to list to sweep
-arch_list_add=regular_fpga_large_300x300.xml
+arch_list_add=regular_fpga_DSP.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
