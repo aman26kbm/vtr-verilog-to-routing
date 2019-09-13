@@ -718,17 +718,17 @@
       <fc_override fc_type="frac" fc_val="0" port_name="a_data_out[3:0]"/>
       </fc>
 
+<!--
       <pinlocations pattern="perimeter"/>
+-->
       <switchblock_locations pattern="external_full_internal_straight" internal_switch="electrical_short"/>
 
-<!--
       <pinlocations pattern="custom">
         <loc side="left">myblock.a_data_in[3:0] </loc>
-        <loc side="top">myblock.b_data[3:0]</loc>
+        <loc side="top"></loc>
         <loc side="right">myblock.a_data_out[3:0] </loc>
-        <loc side="bottom"> myblock.clk  myblock.reset</loc>
+        <loc side="bottom"> myblock.clk myblock.b_data[3:0] myblock.reset</loc>
       </pinlocations>
--->
       <power method="sum-of-children"/>
     </pb_type>
     <!-- Define myblock end -->
@@ -1346,6 +1346,6 @@
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
   <directlist>
-    <direct name="direct_interconnect_a" from_pin="myblock.a_data_out[3:0]" to_pin="myblock.a_data_in[3:0]" x_offset="6" y_offset="0" z_offset="0"/>
+    <direct name="direct_interconnect_a" from_pin="myblock.a_data_out[3:0]" from_side="right" to_pin="myblock.a_data_in[3:0]" to_side="left" x_offset="6" y_offset="0" z_offset="0"/>
   </directlist>
 </architecture>

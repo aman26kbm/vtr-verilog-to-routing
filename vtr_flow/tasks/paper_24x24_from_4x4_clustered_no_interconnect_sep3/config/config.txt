@@ -12,7 +12,7 @@ archs_dir=arch/timing/arch_for_paper
 circuit_list_add=matmul.24x24_from_4x4_with_ram.v
 
 # Add architectures to list to sweep
-arch_list_add=clustered_sep3.xml
+arch_list_add=clustered_sep12.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
