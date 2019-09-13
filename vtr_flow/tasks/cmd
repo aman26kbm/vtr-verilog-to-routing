@@ -3,61 +3,61 @@
  nohup [command-line below] &
 
 distributed:
-../scripts/run_vtr_task.pl paper_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_8x8_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-../scripts/run_vtr_task.pl paper_16x16_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-../scripts/run_vtr_task.pl paper_24x24_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-../scripts/run_vtr_task.pl paper_32x32_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-../scripts/run_vtr_task.pl paper_40x40_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-../scripts/run_vtr_task.pl paper_48x48_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-../scripts/run_vtr_task.pl paper_64x64_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_40x40_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 
 clustered:
-../scripts/run_vtr_task.pl paper_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_8x8_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_16x16_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_24x24_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_32x32_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_40x40_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_48x48_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_64x64_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb"
+nohup ../scripts/run_vtr_task.pl paper_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_40x40_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 
 customzied:
-../scripts/run_vtr_task.pl paper_4x4_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_8x8_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_16x16_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_24x24_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_32x32_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_40x40_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_48x48_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_64x64_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb"
+nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_40x40_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 
 regular:
-../scripts/run_vtr_task.pl paper_4x4_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_8x8_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_16x16_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_24x24_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_32x32_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_40x40_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_48x48_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_64x64_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb"
+nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_40x40_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_regular_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 
 BB 8x8 size:
-../scripts/run_vtr_task.pl paper_8x8_from_8x8_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_16x16_from_8x8_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_24x24_from_8x8_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_32x32_from_8x8_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_40x40_from_8x8_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_48x48_from_8x8_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_64x64_from_8x8_no_dir_int/ -s "--const_gen_inference comb"
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_8x8_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_8x8_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_24x24_from_8x8_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_8x8_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_40x40_from_8x8_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_48x48_from_8x8_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_8x8_no_dir_int/ -s "--const_gen_inference comb" &
 
 BB 16x16 size:
-../scripts/run_vtr_task.pl paper_16x16_from_16x16_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_32x32_from_16x16_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_48x48_from_16x16_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_64x64_from_16x16_no_dir_int/ -s "--const_gen_inference comb"
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_16x16_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_16x16_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_48x48_from_16x16_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_16x16_no_dir_int/ -s "--const_gen_inference comb" &
 
 BB 32x32 size:
-../scripts/run_vtr_task.pl paper_32x32_from_32x32_no_dir_int/ -s "--const_gen_inference comb"
-../scripts/run_vtr_task.pl paper_64x64_from_32x32_no_dir_int/ -s "--const_gen_inference comb"
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_32x32_no_dir_int/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_32x32_no_dir_int/ -s "--const_gen_inference comb" &
 
