@@ -764,10 +764,10 @@
 				<T_clock_to_Q max="124e-12" port="mac_16x16.b" clock="clk"/>
 				<T_clock_to_Q max="124e-12" port="mac_16x16.out" clock="clk"/>
 				
-				<delay_constant max="1.6e-9" in_port="mac_16x16.a" out_port="mac_16x16.out"/>
-				<delay_constant max="1.6e-9" in_port="mac_16x16.b" out_port="mac_16x16.out"/>
-				<delay_constant max="1.6e-9" in_port="mac_16x16.reset" out_port="mac_16x16.out"/>
-				<delay_constant max="1.6e-9" in_port="mac_16x16.start_mat_mul" out_port="mac_16x16.out"/>
+				<delay_constant max="2.7e-9" in_port="mac_16x16.a" out_port="mac_16x16.out"/>
+				<delay_constant max="2.7e-9" in_port="mac_16x16.b" out_port="mac_16x16.out"/>
+				<delay_constant max="2.7e-9" in_port="mac_16x16.reset" out_port="mac_16x16.out"/>
+				<delay_constant max="2.7e-9" in_port="mac_16x16.start_mat_mul" out_port="mac_16x16.out"/>
 				
 
             <!--  <power method="pin-toggle">
