@@ -761,7 +761,6 @@ module matrix_multiplication(
 ///////////////// ORing the data ///////////////////
 
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_0;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_1;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_2;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_3;
@@ -776,7 +775,6 @@ module matrix_multiplication(
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_12;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_13;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_14;
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_15;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_0_reg;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_1_reg;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_2_reg;
@@ -834,7 +832,7 @@ module matrix_multiplication(
 
   always @(posedge clk) begin
     if(reset) begin
-      c_reg_0 <= 0;
+      data_from_out_mat <= 0;
       c_reg_1 <= 0;
       c_reg_2 <= 0;
       c_reg_3 <= 0;
@@ -849,25 +847,22 @@ module matrix_multiplication(
       c_reg_12 <= 0;
       c_reg_13 <= 0;
       c_reg_14 <= 0;
-      c_reg_15 <= 0;
     end else begin
-      c_reg_0 <= data_from_out_mat_0_0;
-      c_reg_1 <= c_reg_0 | data_from_out_mat_0_1;
-      c_reg_2 <= c_reg_1 | data_from_out_mat_0_2;
-      c_reg_3 <= c_reg_2 | data_from_out_mat_0_3;
-      c_reg_4 <= c_reg_3 | data_from_out_mat_0_4;
-      c_reg_5 <= c_reg_4 | data_from_out_mat_0_5;
-      c_reg_6 <= c_reg_5 | data_from_out_mat_0_6;
-      c_reg_7 <= c_reg_6 | data_from_out_mat_0_7;
-      c_reg_8 <= c_reg_7 | data_from_out_mat_0_8;
-      c_reg_9 <= c_reg_8 | data_from_out_mat_0_9;
-      c_reg_10 <= c_reg_9 | data_from_out_mat_0_10;
-      c_reg_11 <= c_reg_10 | data_from_out_mat_0_11;
-      c_reg_12 <= c_reg_11 | data_from_out_mat_0_12;
-      c_reg_13 <= c_reg_12 | data_from_out_mat_0_13;
-      c_reg_14 <= c_reg_13 | data_from_out_mat_0_14;
-      c_reg_15 <= c_reg_14 | data_from_out_mat_0_15;
-      data_from_out_mat <= c_reg_15;
+      c_reg_1 <= data_from_out_mat_0_0_reg | data_from_out_mat_0_1_reg;
+      c_reg_2 <= c_reg_1 | data_from_out_mat_0_2_reg;
+      c_reg_3 <= c_reg_2 | data_from_out_mat_0_3_reg;
+      c_reg_4 <= c_reg_3 | data_from_out_mat_0_4_reg;
+      c_reg_5 <= c_reg_4 | data_from_out_mat_0_5_reg;
+      c_reg_6 <= c_reg_5 | data_from_out_mat_0_6_reg;
+      c_reg_7 <= c_reg_6 | data_from_out_mat_0_7_reg;
+      c_reg_8 <= c_reg_7 | data_from_out_mat_0_8_reg;
+      c_reg_9 <= c_reg_8 | data_from_out_mat_0_9_reg;
+      c_reg_10 <= c_reg_9 | data_from_out_mat_0_10_reg;
+      c_reg_11 <= c_reg_10 | data_from_out_mat_0_11_reg;
+      c_reg_12 <= c_reg_11 | data_from_out_mat_0_12_reg;
+      c_reg_13 <= c_reg_12 | data_from_out_mat_0_13_reg;
+      c_reg_14 <= c_reg_13 | data_from_out_mat_0_14_reg;
+      data_from_out_mat <= c_reg_14 | data_from_out_mat_0_15_reg;
     end
   end
 
