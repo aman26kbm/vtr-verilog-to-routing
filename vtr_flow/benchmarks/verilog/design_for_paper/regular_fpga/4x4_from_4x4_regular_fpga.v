@@ -524,25 +524,25 @@ always @(posedge clk) begin
   end
 end
 
-processing_element pe00(.reset(reset), .clk(clk), .in_a(a0),      .in_b(b0),  .out_a(a00to01), .out_b(b00to10), .out_c(matrixC00));
-processing_element pe01(.reset(reset), .clk(clk), .in_a(a00to01), .in_b(b1),  .out_a(a01to02), .out_b(b01to11), .out_c(matrixC01));
-processing_element pe02(.reset(reset), .clk(clk), .in_a(a01to02), .in_b(b2),  .out_a(a02to03), .out_b(b02to12), .out_c(matrixC02));
-processing_element pe03(.reset(reset), .clk(clk), .in_a(a02to03), .in_b(b3),  .out_a(a03to04), .out_b(b03to13), .out_c(matrixC03));
+processing_element pe00(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a0),      .in_b(b0),  .out_a(a00to01), .out_b(b00to10), .out_c(matrixC00));
+processing_element pe01(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a00to01), .in_b(b1),  .out_a(a01to02), .out_b(b01to11), .out_c(matrixC01));
+processing_element pe02(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a01to02), .in_b(b2),  .out_a(a02to03), .out_b(b02to12), .out_c(matrixC02));
+processing_element pe03(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a02to03), .in_b(b3),  .out_a(a03to04), .out_b(b03to13), .out_c(matrixC03));
 
-processing_element pe10(.reset(reset), .clk(clk), .in_a(a1),      .in_b(b00to10), .out_a(a10to11), .out_b(b10to20), .out_c(matrixC10));
-processing_element pe11(.reset(reset), .clk(clk), .in_a(a10to11), .in_b(b01to11), .out_a(a11to12), .out_b(b11to21), .out_c(matrixC11));
-processing_element pe12(.reset(reset), .clk(clk), .in_a(a11to12), .in_b(b02to12), .out_a(a12to13), .out_b(b12to22), .out_c(matrixC12));
-processing_element pe13(.reset(reset), .clk(clk), .in_a(a12to13), .in_b(b03to13), .out_a(a13to14), .out_b(b13to23), .out_c(matrixC13));
+processing_element pe10(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a1),      .in_b(b00to10), .out_a(a10to11), .out_b(b10to20), .out_c(matrixC10));
+processing_element pe11(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a10to11), .in_b(b01to11), .out_a(a11to12), .out_b(b11to21), .out_c(matrixC11));
+processing_element pe12(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a11to12), .in_b(b02to12), .out_a(a12to13), .out_b(b12to22), .out_c(matrixC12));
+processing_element pe13(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a12to13), .in_b(b03to13), .out_a(a13to14), .out_b(b13to23), .out_c(matrixC13));
 
-processing_element pe20(.reset(reset), .clk(clk), .in_a(a2),      .in_b(b10to20), .out_a(a20to21), .out_b(b20to30), .out_c(matrixC20));
-processing_element pe21(.reset(reset), .clk(clk), .in_a(a20to21), .in_b(b11to21), .out_a(a21to22), .out_b(b21to31), .out_c(matrixC21));
-processing_element pe22(.reset(reset), .clk(clk), .in_a(a21to22), .in_b(b12to22), .out_a(a22to23), .out_b(b22to32), .out_c(matrixC22));
-processing_element pe23(.reset(reset), .clk(clk), .in_a(a22to23), .in_b(b13to23), .out_a(a23to24), .out_b(b23to33), .out_c(matrixC23));
+processing_element pe20(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a2),      .in_b(b10to20), .out_a(a20to21), .out_b(b20to30), .out_c(matrixC20));
+processing_element pe21(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a20to21), .in_b(b11to21), .out_a(a21to22), .out_b(b21to31), .out_c(matrixC21));
+processing_element pe22(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a21to22), .in_b(b12to22), .out_a(a22to23), .out_b(b22to32), .out_c(matrixC22));
+processing_element pe23(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a22to23), .in_b(b13to23), .out_a(a23to24), .out_b(b23to33), .out_c(matrixC23));
 
-processing_element pe30(.reset(reset), .clk(clk), .in_a(a3),      .in_b(b20to30), .out_a(a30to31), .out_b(b30to40), .out_c(matrixC30));
-processing_element pe31(.reset(reset), .clk(clk), .in_a(a30to31), .in_b(b21to31), .out_a(a31to32), .out_b(b31to41), .out_c(matrixC31));
-processing_element pe32(.reset(reset), .clk(clk), .in_a(a31to32), .in_b(b22to32), .out_a(a32to33), .out_b(b32to42), .out_c(matrixC32));
-processing_element pe33(.reset(reset), .clk(clk), .in_a(a32to33), .in_b(b23to33), .out_a(a33to34), .out_b(b33to43), .out_c(matrixC33));
+processing_element pe30(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a3),      .in_b(b20to30), .out_a(a30to31), .out_b(b30to40), .out_c(matrixC30));
+processing_element pe31(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a30to31), .in_b(b21to31), .out_a(a31to32), .out_b(b31to41), .out_c(matrixC31));
+processing_element pe32(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a31to32), .in_b(b22to32), .out_a(a32to33), .out_b(b32to42), .out_c(matrixC32));
+processing_element pe33(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul),  .in_a(a32to33), .in_b(b23to33), .out_a(a33to34), .out_b(b33to43), .out_c(matrixC33));
 
 assign a_data_out = {a33to34,a23to24,a13to14,a03to04};
 assign b_data_out = {b33to43,b32to42,b31to41,b30to40};
@@ -558,7 +558,8 @@ module processing_element(
  in_b, 
  out_a, 
  out_b, 
- out_c
+ out_c,
+ start_mat_mul
  );
 
  input reset;
@@ -568,30 +569,26 @@ module processing_element(
  output [`DWIDTH-1:0] out_a;
  output [`DWIDTH-1:0] out_b;
  output [`DWIDTH-1:0] out_c;  //reduced precision
+ input start_mat_mul;
 
- reg [2*`DWIDTH-1:0] out_c_full_precision;
  reg [`DWIDTH-1:0] out_a;
  reg [`DWIDTH-1:0] out_b;
  wire [`DWIDTH-1:0] out_c;
 
  wire [2*`DWIDTH-1:0] out_mac;
 
- assign out_c = (|out_c_full_precision[2*`DWIDTH-1:`DWIDTH] == 1'b1) ? {`DWIDTH{1'b1}} : out_c_full_precision[`DWIDTH-1:0];
+ assign out_c = (|out_mac[2*`DWIDTH-1:`DWIDTH] == 1'b1) ? {`DWIDTH{1'b1}} : out_mac[`DWIDTH-1:0];
 
- mac_block u_mac(.a(in_a), .b(in_b), .c(out_c_full_precision), .out(out_mac));
- //mac u_mac(.mul0(in_a), .mul1(in_b), .add(out_c_full_precision), .out(out_mac));
- //DW02_mac #(16,16) u_mac(.A(in_a), .B(in_b), .C(out_c_full_precision), .TC(1'b0), .MAC(out_mac));
+ mac_block u_mac(.a(in_a), .b(in_b), .out(out_mac), .start_mat_mul(start_mat_mul), .reset(reset), .clk(clk));
 
  always @(posedge clk)begin
     if(reset) begin
       out_a<=0;
       out_b<=0;
-      out_c_full_precision<=0;
     end
     else begin  
       out_a<=in_a;
       out_b<=in_b;
-      out_c_full_precision<=out_mac;
     end
  end
  
@@ -630,7 +627,7 @@ endmodule
 //endmodule
 
 
-/*
+
 module ram (addr0, d0, we0, q0,  clk);
 
 input [`AWIDTH-1:0] addr0;
@@ -660,4 +657,3 @@ single_port_ram u_single_port_ram(
 );
 endmodule
 
-*/
