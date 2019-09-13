@@ -497,7 +497,7 @@
 		 area associated with our DSP block is four times that of a logic tile, where the routing area of a logic tile was calculated above (at W = 300)
 		 as 30481 MWTAs. Hence the (core, non-routing) area our DSP block is approximately 518,000 - 4 * 30,481 = 396,000 MWTUs.
       -->
-    <pb_type name="mult_36" height="4" area="396000">
+    <pb_type name="mult_36" height="4" area="198000">
 
       <input name="a" num_pins="36"/>
       <input name="b" num_pins="36"/>
