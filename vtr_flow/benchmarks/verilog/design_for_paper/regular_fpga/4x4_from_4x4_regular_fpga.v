@@ -3,8 +3,7 @@
 `define DWIDTH 16
 `define AWIDTH 7
 `define MEM_SIZE 128
-`define MAT_MUL_SIZE 4
-`define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
+`define BB_MAT_MUL_SIZE 4
 
 
 //Design with memories
@@ -297,10 +296,10 @@ always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
     a_addr <= `MEM_SIZE-1;//a_loc*16;
   end
-  else if (clk_cnt >= a_loc*`MAT_MUL_SIZE+final_mat_mul_size) begin
+  else if (clk_cnt >= a_loc*`BB_MAT_MUL_SIZE+final_mat_mul_size) begin
     a_addr <= `MEM_SIZE-1; 
   end
-  else if ((clk_cnt >= a_loc*`MAT_MUL_SIZE) && (clk_cnt < a_loc*`MAT_MUL_SIZE+final_mat_mul_size)) begin
+  else if ((clk_cnt >= a_loc*`BB_MAT_MUL_SIZE) && (clk_cnt < a_loc*`BB_MAT_MUL_SIZE+final_mat_mul_size)) begin
     a_addr <= a_addr + 1;
   end
 end  
@@ -353,10 +352,10 @@ always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
     b_addr <= `MEM_SIZE-1;//b_loc*16;
   end
-  else if (clk_cnt >= b_loc*`MAT_MUL_SIZE+final_mat_mul_size) begin
+  else if (clk_cnt >= b_loc*`BB_MAT_MUL_SIZE+final_mat_mul_size) begin
     b_addr <= `MEM_SIZE-1;
   end
-  else if ((clk_cnt >= b_loc*`MAT_MUL_SIZE) && (clk_cnt < b_loc*`MAT_MUL_SIZE+final_mat_mul_size)) begin
+  else if ((clk_cnt >= b_loc*`BB_MAT_MUL_SIZE) && (clk_cnt < b_loc*`BB_MAT_MUL_SIZE+final_mat_mul_size)) begin
     b_addr <= b_addr + 1;
   end
 end  
