@@ -305,10 +305,7 @@ module matmul_8x8_systolic(
   wire done_mat_mul_1_0;
   wire done_mat_mul_1_1;
 
-  assign done_mat_mul =   done_mat_mul_0_0 &&
-  done_mat_mul_0_1 &&
-  done_mat_mul_1_0 &&
-  done_mat_mul_1_1;
+  assign done_mat_mul =   done_mat_mul_0_0;
 
   /////////////////////////////////////////////////
   // Matmul 0_0
@@ -792,7 +789,8 @@ module processing_element(
 
  assign out_c = (|out_c_full_precision[2*`DWIDTH-1:`DWIDTH] == 1'b1) ? {`DWIDTH{1'b1}} : out_c_full_precision[`DWIDTH-1:0];
 
- mac_block u_mac(.a(in_a), .b(in_b), .c(out_c_full_precision), .out(out_mac));
+ mac_block u_mac(.a(in_a), .b(in_b), .out(out_mac), .start_mat_mul(start_mat_mul), .reset(reset), .clk(clk));
+ //mac_block u_mac(.a(in_a), .b(in_b), .c(out_c_full_precision), .out(out_mac));
  //mac u_mac(.mul0(in_a), .mul1(in_b), .add(out_c_full_precision), .out(out_mac));
  //DW02_mac #(16,16) u_mac(.A(in_a), .B(in_b), .C(out_c_full_precision), .TC(1'b0), .MAC(out_mac));
 
