@@ -79,6 +79,10 @@ class GenResults():
     #the infile contains dir names. each dir_name/latest contains a vpr.out file
     for line in infile:
       dirname = line.rstrip()
+      #if the line is commented out, ignore it
+      check_for_comment = re.search(r'^#', dirname)
+      if check_for_comment is not None:
+        continue
       result_dict = {}
       result_dict['dirname'] = dirname 
 
