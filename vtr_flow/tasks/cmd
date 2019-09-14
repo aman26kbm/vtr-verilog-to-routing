@@ -22,15 +22,15 @@ nohup ../scripts/run_vtr_task.pl paper_40x40_from_4x4_clustered_no_interconnect_
 nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 
-customzied:
-nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_40x40_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_customized_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+surround
+nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_40x40_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_surround_sep13/ -s "--const_gen_inference comb" &
 
 regular:
 nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_regular_fpga_sep4/ -s "--const_gen_inference comb" &
@@ -60,4 +60,3 @@ nohup ../scripts/run_vtr_task.pl paper_64x64_from_16x16_no_dir_int/ -s "--const_
 BB 32x32 size:
 nohup ../scripts/run_vtr_task.pl paper_32x32_from_32x32_no_dir_int/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_64x64_from_32x32_no_dir_int/ -s "--const_gen_inference comb" &
-
