@@ -23,8 +23,10 @@ class GenResults():
                     "fpga_arch", \
                     "critical_path", \
                     "frequency", \
-                    "logic_block_area", \
+                    "logic_area", \
                     "routing_area", \
+                    "total_area", \
+                    "area_delay_product", \
                     "channel_width", \
                     "average_net_length", \
                     "max_net_length", \
@@ -87,7 +89,7 @@ class GenResults():
         result_dict['design_size'] = info.group(2)
         result_dict['fpga_arch'] = info.group(3)
       else:
-        print("Unable to experiment info from " + dirname)
+        print("Unable to extract experiment info from " + dirname)
 
       print("Extracting info for " + dirname)
       #try to find vpr.out
@@ -120,10 +122,10 @@ class GenResults():
             result_dict['critical_path'] = critical_path or "Not found"
             result_dict['frequency'] = frequency or "Not found"
 
-          logic_block_area_match = re.search(r'Total used logic block area: (.*)', line)
-          if logic_block_area_match is not None:
-            logic_block_area = logic_block_area_match.group(1)
-            result_dict['logic_block_area'] = logic_block_area or "Not found"
+          logic_area_match = re.search(r'Total used logic block area: (.*)', line)
+          if logic_area_match is not None:
+            logic_area = logic_area_match.group(1)
+            result_dict['logic_area'] = logic_area or "Not found"
 
           routing_area_match = re.search(r'Total routing area: (.*), per logic tile', line)
           if routing_area_match is not None:
@@ -154,6 +156,10 @@ class GenResults():
           if max_segments_used_by_a_net_match is not None:
             max_segments_used_by_a_net = max_segments_used_by_a_net_match.group(1)
             result_dict['max_segments_used_by_a_net'] = max_segments_used_by_a_net or "Not found"
+          
+        #calculated metrics
+        result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
+        result_dict['area_delay_product'] = float(result_dict['total_area']) * float(result_dict['critical_path'])
 
       #append the current results to the main result list
       self.result_list.append(result_dict)
