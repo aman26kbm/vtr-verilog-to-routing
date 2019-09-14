@@ -95,7 +95,7 @@ class GenResults():
         #print(root, dirs, files)
         for filename in files:
           #print(filename)
-          match = re.match(r'vpr.out', filename)
+          match = re.match(r'vpr.crit_path.out', filename)
           if match is not None:
             print("Found vpr.out for " + dirname)
             found = True
