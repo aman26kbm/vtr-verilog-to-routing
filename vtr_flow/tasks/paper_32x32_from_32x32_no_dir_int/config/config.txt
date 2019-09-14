@@ -9,7 +9,7 @@ circuits_dir=benchmarks/verilog/design_for_paper/bb_32x32
 archs_dir=arch/timing/arch_for_paper/larger_building_blocks
 
 # Add circuits to list to sweep
-circuit_list_add=matmul.32x32_from_32x32.v
+circuit_list_add=matmul.32x32.from_32x32.v
 
 # Add architectures to list to sweep
 arch_list_add=distributed_layout.bb_32x32.grid_86x86.no_dir_int.xml
