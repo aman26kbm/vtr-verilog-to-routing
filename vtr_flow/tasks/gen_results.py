@@ -3,6 +3,7 @@ import re
 import argparse
 import csv
 
+
 # ###############################################################
 # Class for parsing VTR results for various experiments
 # ###############################################################
