@@ -704,10 +704,10 @@
 	
     <!-- Define matrix multiplier begin -->
 
-    <pb_type name="matmul_16x16" height="12" width="12" area="14385632">
+    <pb_type name="matmul_16x16" height="12" width="12" area="14196016">
 
-      <input name="reset" num_pins="1"/>
-      <input name="start_mat_mul" num_pins="1"/>
+      <input name="reset" num_pins="1" is_non_clock_global="true"/>
+      <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
       <input name="a_data" num_pins="256"/>
       <input name="b_data" num_pins="256"/>
       <input name="a_data_in" num_pins="256"/>

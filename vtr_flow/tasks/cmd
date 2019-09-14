@@ -3,7 +3,7 @@
  nohup [command-line below] &
 
 distributed:
-nohup ../scripts/run_vtr_task.pl paper_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
@@ -13,7 +13,7 @@ nohup ../scripts/run_vtr_task.pl paper_48x48_from_4x4_distributed_no_interconnec
 nohup ../scripts/run_vtr_task.pl paper_64x64_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 
 clustered:
-nohup ../scripts/run_vtr_task.pl paper_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_24x24_from_4x4_clustered_no_interconnect_sep3/ -s "--const_gen_inference comb" &
