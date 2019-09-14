@@ -43,7 +43,7 @@ class GenResults():
     parser.add_argument("-i",
                         "--infile",
                         action='store',
-                        default=None,
+                        default="list_of_result_dirs",
                         help="File containing list of directories")
     parser.add_argument("-o",
                         "--outfile",
