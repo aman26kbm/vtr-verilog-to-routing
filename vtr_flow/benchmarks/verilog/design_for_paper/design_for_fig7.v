@@ -187,16 +187,24 @@ module matrix_multiplication(
 
 ///////////////// ORing the data ///////////////////
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_0;
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_reg_1;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_0_reg;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_1_reg;
+
   always @(posedge clk) begin
     if(reset_0) begin
-      c_reg_0 <= 0;
-      c_reg_1 <= 0;
+      data_from_out_mat_0_0_reg <= 0;
+      data_from_out_mat_0_1_reg <= 0;
     end else begin
-      c_reg_0 <= data_from_out_mat_0_0;
-      c_reg_1 <= c_reg_0 | data_from_out_mat_0_1;
-      data_from_out_mat <= c_reg_1;
+      data_from_out_mat_0_0_reg <= data_from_out_mat_0_0;
+      data_from_out_mat_0_1_reg <= data_from_out_mat_0_1;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset_0) begin
+      data_from_out_mat <= 0;
+    end else begin
+       data_from_out_mat <= data_from_out_mat_0_1 | data_from_out_mat_0_0;
     end
   end
 
