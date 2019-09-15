@@ -48,3 +48,4 @@ paper_16x16_from_4x4_surround_direct_interconnect
 paper_32x32_from_4x4_surround_direct_interconnect
 paper_4x4_only_clb
 paper_8x8_4_adders
+paper_4x4_from_4x4_regular_fpga_no_ram

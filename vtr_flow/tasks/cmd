@@ -11,12 +11,13 @@ nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_surround_direct_interconne
 nohup ../scripts/run_vtr_task.pl paper.fig7.fpga_with_macs_with_hard_conn -s "--const_gen_inference comb" & 
 
 4x4x4 no memories, fpga with clbs
+nohup ../scripts/run_vtr_task.pl paper_4x4_only_clb/ -s "--const_gen_inference comb" &
 
 4x4x4 no meories, fpga with dsp:
+nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_regular_fpga_no_ram/ -s "--const_gen_inference comb" &
 
 8x8x8 using 4x4x4, fpga with multipliers and adders:
-
-
+nohup ../scripts/run_vtr_task.pl paper_8x8_4_adders/ -s "--const_gen_inference comb" &
 
 distributed:
 nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
