@@ -3,9 +3,19 @@
  nohup [command-line below] &
 
 surround_direct_interconnect: 
-nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_surround_direct_interconnect -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_surround_direct_interconnect -s "--const_gen_inference comb" &
-nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_surround_direct_interconnect -s "--const_gen_inference comb" & 
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_surround_direct_interconnect -s "--place_delay_model delta_override --const_gen_inference comb --seed 888" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_surround_direct_interconnect -s "--place_delay_model delta_override --const_gen_inference comb --seed 888" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_surround_direct_interconnect -s "--place_delay_model delta_override --const_gen_inference comb --seed 888" & 
+
+8x8x8 using 4x4x4, fpga with hard_pes:
+nohup ../scripts/run_vtr_task.pl paper.fig7.fpga_with_macs_with_hard_conn -s "--const_gen_inference comb" & 
+
+4x4x4 no memories, fpga with clbs
+
+4x4x4 no meories, fpga with dsp:
+
+8x8x8 using 4x4x4, fpga with multipliers and adders:
+
 
 
 distributed:
