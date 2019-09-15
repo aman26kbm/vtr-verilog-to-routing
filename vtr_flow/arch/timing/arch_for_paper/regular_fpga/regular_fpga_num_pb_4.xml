@@ -712,7 +712,7 @@
     <!-- Define mac end -->
 
     <!-- Define adder begin-->
-    <pb_type name="myadder" height="1" width="1" area="9000">
+    <pb_type name="myadder" height="1" width="1" area="54644">
             <input name="a" num_pins="64"/>
             <input name="b" num_pins="64"/>
             <input name="cin" num_pins="4"/>
