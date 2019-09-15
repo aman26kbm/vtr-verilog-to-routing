@@ -46,4 +46,5 @@ paper_64x64_from_32x32_no_dir_int
 paper_8x8_from_4x4_surround_direct_interconnect
 paper_16x16_from_4x4_surround_direct_interconnect
 paper_32x32_from_4x4_surround_direct_interconnect
-
+paper_4x4_only_clb
+paper_8x8_4_adders
