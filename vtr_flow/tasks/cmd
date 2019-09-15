@@ -2,6 +2,12 @@
 -On google machine, it is suggested to run the experiment using:
  nohup [command-line below] &
 
+surround_direct_interconnect: 
+nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_surround_direct_interconnect -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_16x16_from_4x4_surround_direct_interconnect -s "--const_gen_inference comb" &
+nohup ../scripts/run_vtr_task.pl paper_32x32_from_4x4_surround_direct_interconnect -s "--const_gen_inference comb" & 
+
+
 distributed:
 nohup ../scripts/run_vtr_task.pl paper_4x4_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
 nohup ../scripts/run_vtr_task.pl paper_8x8_from_4x4_distributed_no_interconnect_sep3/ -s "--const_gen_inference comb" &
