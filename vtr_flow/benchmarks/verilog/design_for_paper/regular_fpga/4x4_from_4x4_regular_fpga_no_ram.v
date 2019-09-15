@@ -194,7 +194,7 @@ matmul_4x4_systolic u_matmul_4x4(
 
 endmodule  
 */
-/*
+
 //Design without memories
 module matrix_multiplication(
  clk,
@@ -248,7 +248,7 @@ matmul_4x4_systolic u_matmul_4x4(
 );
 
 endmodule
-*/
+
 
 module matmul_4x4_systolic(
  clk,
@@ -536,25 +536,25 @@ always @(posedge clk) begin
   end
 end
 
-processing_element pe00(.reset(reset), .clk(clk), .in_a(a0),      .in_b(b0),  .out_a(a00to01), .out_b(b00to10), .out_c(matrixC00)    );
-processing_element pe01(.reset(reset), .clk(clk), .in_a(a00to01), .in_b(b1),  .out_a(a01to02), .out_b(b01to11), .out_c(matrixC01)    );
-processing_element pe02(.reset(reset), .clk(clk), .in_a(a01to02), .in_b(b2),  .out_a(a02to03), .out_b(b02to12), .out_c(matrixC02)    );
-processing_element pe03(.reset(reset), .clk(clk), .in_a(a02to03), .in_b(b3),  .out_a(a03to04), .out_b(b03to13), .out_c(matrixC03)    );
+processing_element pe00(.reset(reset), .clk(clk), .in_a(a0),      .in_b(b0),  .out_a(a00to01), .out_b(b00to10), .out_c(matrixC00),     .start_mat_mul(start_mat_mul));
+processing_element pe01(.reset(reset), .clk(clk), .in_a(a00to01), .in_b(b1),  .out_a(a01to02), .out_b(b01to11), .out_c(matrixC01),     .start_mat_mul(start_mat_mul));
+processing_element pe02(.reset(reset), .clk(clk), .in_a(a01to02), .in_b(b2),  .out_a(a02to03), .out_b(b02to12), .out_c(matrixC02),     .start_mat_mul(start_mat_mul));
+processing_element pe03(.reset(reset), .clk(clk), .in_a(a02to03), .in_b(b3),  .out_a(a03to04), .out_b(b03to13), .out_c(matrixC03),     .start_mat_mul(start_mat_mul));
+                                                                                                                                    
+processing_element pe10(.reset(reset), .clk(clk), .in_a(a1),      .in_b(b00to10), .out_a(a10to11), .out_b(b10to20), .out_c(matrixC10), .start_mat_mul(start_mat_mul));
+processing_element pe11(.reset(reset), .clk(clk), .in_a(a10to11), .in_b(b01to11), .out_a(a11to12), .out_b(b11to21), .out_c(matrixC11), .start_mat_mul(start_mat_mul));
+processing_element pe12(.reset(reset), .clk(clk), .in_a(a11to12), .in_b(b02to12), .out_a(a12to13), .out_b(b12to22), .out_c(matrixC12), .start_mat_mul(start_mat_mul));
+processing_element pe13(.reset(reset), .clk(clk), .in_a(a12to13), .in_b(b03to13), .out_a(a13to14), .out_b(b13to23), .out_c(matrixC13), .start_mat_mul(start_mat_mul));
                                                                                                                                    
-processing_element pe10(.reset(reset), .clk(clk), .in_a(a1),      .in_b(b00to10), .out_a(a10to11), .out_b(b10to20), .out_c(matrixC10));
-processing_element pe11(.reset(reset), .clk(clk), .in_a(a10to11), .in_b(b01to11), .out_a(a11to12), .out_b(b11to21), .out_c(matrixC11));
-processing_element pe12(.reset(reset), .clk(clk), .in_a(a11to12), .in_b(b02to12), .out_a(a12to13), .out_b(b12to22), .out_c(matrixC12));
-processing_element pe13(.reset(reset), .clk(clk), .in_a(a12to13), .in_b(b03to13), .out_a(a13to14), .out_b(b13to23), .out_c(matrixC13));
-                                                                                                                                   
-processing_element pe20(.reset(reset), .clk(clk), .in_a(a2),      .in_b(b10to20), .out_a(a20to21), .out_b(b20to30), .out_c(matrixC20));
-processing_element pe21(.reset(reset), .clk(clk), .in_a(a20to21), .in_b(b11to21), .out_a(a21to22), .out_b(b21to31), .out_c(matrixC21));
-processing_element pe22(.reset(reset), .clk(clk), .in_a(a21to22), .in_b(b12to22), .out_a(a22to23), .out_b(b22to32), .out_c(matrixC22));
-processing_element pe23(.reset(reset), .clk(clk), .in_a(a22to23), .in_b(b13to23), .out_a(a23to24), .out_b(b23to33), .out_c(matrixC23));
+processing_element pe20(.reset(reset), .clk(clk), .in_a(a2),      .in_b(b10to20), .out_a(a20to21), .out_b(b20to30), .out_c(matrixC20), .start_mat_mul(start_mat_mul));
+processing_element pe21(.reset(reset), .clk(clk), .in_a(a20to21), .in_b(b11to21), .out_a(a21to22), .out_b(b21to31), .out_c(matrixC21), .start_mat_mul(start_mat_mul));
+processing_element pe22(.reset(reset), .clk(clk), .in_a(a21to22), .in_b(b12to22), .out_a(a22to23), .out_b(b22to32), .out_c(matrixC22), .start_mat_mul(start_mat_mul));
+processing_element pe23(.reset(reset), .clk(clk), .in_a(a22to23), .in_b(b13to23), .out_a(a23to24), .out_b(b23to33), .out_c(matrixC23), .start_mat_mul(start_mat_mul));
                                                                                                                                   
-processing_element pe30(.reset(reset), .clk(clk), .in_a(a3),      .in_b(b20to30), .out_a(a30to31), .out_b(b30to40), .out_c(matrixC30));
-processing_element pe31(.reset(reset), .clk(clk), .in_a(a30to31), .in_b(b21to31), .out_a(a31to32), .out_b(b31to41), .out_c(matrixC31));
-processing_element pe32(.reset(reset), .clk(clk), .in_a(a31to32), .in_b(b22to32), .out_a(a32to33), .out_b(b32to42), .out_c(matrixC32));
-processing_element pe33(.reset(reset), .clk(clk), .in_a(a32to33), .in_b(b23to33), .out_a(a33to34), .out_b(b33to43), .out_c(matrixC33));
+processing_element pe30(.reset(reset), .clk(clk), .in_a(a3),      .in_b(b20to30), .out_a(a30to31), .out_b(b30to40), .out_c(matrixC30), .start_mat_mul(start_mat_mul));
+processing_element pe31(.reset(reset), .clk(clk), .in_a(a30to31), .in_b(b21to31), .out_a(a31to32), .out_b(b31to41), .out_c(matrixC31), .start_mat_mul(start_mat_mul));
+processing_element pe32(.reset(reset), .clk(clk), .in_a(a31to32), .in_b(b22to32), .out_a(a32to33), .out_b(b32to42), .out_c(matrixC32), .start_mat_mul(start_mat_mul));
+processing_element pe33(.reset(reset), .clk(clk), .in_a(a32to33), .in_b(b23to33), .out_a(a33to34), .out_b(b33to43), .out_c(matrixC33), .start_mat_mul(start_mat_mul));
 
 assign a_data_out = {a33to34,a23to24,a13to14,a03to04};
 assign b_data_out = {b33to43,b32to42,b31to41,b30to40};
@@ -570,7 +570,8 @@ module processing_element(
  in_b, 
  out_a, 
  out_b, 
- out_c
+ out_c,
+ start_mat_mul
  );
 
  input reset;
@@ -580,6 +581,7 @@ module processing_element(
  output [`DWIDTH-1:0] out_a;
  output [`DWIDTH-1:0] out_b;
  output [`DWIDTH-1:0] out_c;  //reduced precision
+ input start_mat_mul;
 
  reg [`DWIDTH-1:0] out_a;
  reg [`DWIDTH-1:0] out_b;
@@ -587,58 +589,54 @@ module processing_element(
 
  wire [2*`DWIDTH-1:0] out_mac;
 
- reg [2*`DWIDTH-1:0] out_c_full_precision;
- assign out_c = (|out_c_full_precision[2*`DWIDTH-1:`DWIDTH] == 1'b1) ? {`DWIDTH{1'b1}} : out_c_full_precision[`DWIDTH-1:0];
+ assign out_c = (|out_mac[2*`DWIDTH-1:`DWIDTH] == 1'b1) ? {`DWIDTH{1'b1}} : out_mac[`DWIDTH-1:0];
 
- //mac_block u_mac(.a(in_a), .b(in_b), .out(out_mac), .start_mat_mul(start_mat_mul), .reset(reset), .clk(clk));
- mac u_mac(.mul0(in_a), .mul1(in_b), .add(out_c_full_precision), .out(out_mac));
+ mac_block u_mac(.a(in_a), .b(in_b), .out(out_mac), .start_mat_mul(start_mat_mul), .reset(reset), .clk(clk));
 
  always @(posedge clk)begin
     if(reset) begin
       out_a<=0;
       out_b<=0;
-      out_c_full_precision<=0;
     end
     else begin  
       out_a<=in_a;
       out_b<=in_b;
-      out_c_full_precision<=out_mac;
     end
  end
  
 endmodule
 
-module mac(mul0, mul1, add, out);
-input [`DWIDTH-1:0] mul0;
-input [`DWIDTH-1:0] mul1;
-input [2*`DWIDTH-1:0] add;
-output [2*`DWIDTH-1:0] out;
-
-wire [2*`DWIDTH-1:0] tmp;
-qmult mult_u1(.i_multiplicand(mul0), .i_multiplier(mul1), .o_result(tmp));
-qadd add_u1(.a(tmp), .b(add), .c(out));
-
-endmodule
-
-
-module qmult(i_multiplicand,i_multiplier,o_result);
-input [`DWIDTH-1:0] i_multiplicand;
-input [`DWIDTH-1:0] i_multiplier;
-output [2*`DWIDTH-1:0] o_result;
-
-assign o_result = i_multiplicand * i_multiplier;
-//multiply u_mult(.a(i_multiplicand), .b(i_multiplier), .out(o_result));
-//DW02_mult #(16,16) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b0), .PRODUCT(o_result));
-
-endmodule
-
-module qadd(a,b,c);
-input [2*`DWIDTH-1:0] a;
-input [2*`DWIDTH-1:0] b;
-output [2*`DWIDTH-1:0] c;
-
-assign c = a + b;
-endmodule
+//module mac(mul0, mul1, add, out);
+//input [`DWIDTH-1:0] mul0;
+//input [`DWIDTH-1:0] mul1;
+//input [2*`DWIDTH-1:0] add;
+//output [2*`DWIDTH-1:0] out;
+//
+//wire [2*`DWIDTH-1:0] tmp;
+//qmult mult_u1(mul0, mul1, tmp);
+//qadd add_u1(tmp, add, out);
+//
+//endmodule
+//
+//
+//module qmult(i_multiplicand,i_multiplier,o_result);
+//input [`DWIDTH-1:0] i_multiplicand;
+//input [`DWIDTH-1:0] i_multiplier;
+//output [2*`DWIDTH-1:0] o_result;
+//
+//assign o_result = i_multiplicand * i_multiplier;
+////multiply u_mult(.a(i_multiplicand), .b(i_multiplier), .out(o_result));
+////DW02_mult #(16,16) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b0), .PRODUCT(o_result));
+//
+//endmodule
+//
+//module qadd(a,b,c);
+//input [2*`DWIDTH-1:0] a;
+//input [2*`DWIDTH-1:0] b;
+//output [2*`DWIDTH-1:0] c;
+//
+//assign c = a + b;
+//endmodule
 
 
 /*
