@@ -1,5 +1,19 @@
 `timescale 1ns / 1ps
-
+//`define EXPONENT 5
+//`define MANTISSA 10
+`define EXPONENT 8
+`define MANTISSA 23
+`define ACTUAL_MANTISSA 24
+`define EXPONENT_LSB 23
+`define EXPONENT_MSB 30
+`define MANTISSA_LSB 0
+`define MANTISSA_MSB 22
+`define MANTISSA_MUL_SPLIT_LSB 17
+`define MANTISSA_MUL_SPLIT_MSB 22
+`define SIGN 1
+`define SIGN_LOC 31
+`define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
+`define IEEE_COMPLIANCE 1
 //////////////////////////////////////////////////////////////////////////////////
 //
 // Create Date:    08:40:21 09/19/2012 
@@ -21,11 +35,11 @@ module FPMult(
 	// Input Ports
 	input clk ;							// Clock
 	input rst ;							// Reset signal
-	input [31:0] a;					// Input A, a 32-bit floating point number
-	input [31:0] b;					// Input B, a 32-bit floating point number
+	input [`DWIDTH-1:0] a;					// Input A, a 32-bit floating point number
+	input [`DWIDTH-1:0] b;					// Input B, a 32-bit floating point number
 	
 	// Output ports
-	output [31:0] result ;					// Product, result of the operation, 32-bit FP number
+	output [`DWIDTH-1:0] result ;					// Product, result of the operation, 32-bit FP number
 	output [4:0] flags ;				// Flags indicating exceptions according to IEEE754
 	
 	// Internal signals
@@ -35,10 +49,9 @@ module FPMult(
 	wire Sa ;							// A's sign
 	wire Sb ;							// B's sign
 	wire Sp ;							// Product sign
-	wire [7:0] Ea ;					// A's exponent
-	wire [7:0] Eb ;					// B's exponent
-	wire [8:0] Ep ;					// Product exponent
-	wire [47:0] Mp ;					// Product mantissa
+	wire [`EXPONENT-1:0] Ea ;					// A's exponent
+	wire [`EXPONENT-1:0] Eb ;					// B's exponent
+	wire [2*`ACTUAL_MANTISSA-1:0] Mp ;					// Product mantissa
 	wire [4:0] InputExc ;			// Exceptions in inputs
 	wire [22:0] NormM ;				// Normalized mantissa
 	wire [8:0] NormE ;				// Normalized exponent
@@ -58,10 +71,10 @@ module FPMult(
 	assign flags = pipe_4[4:0] ;
 	
 	// Prepare the operands for alignment and check for exceptions
-	FPMult_PrepModule PrepModule(clk, rst, pipe_0[63:32], pipe_0[31:0], Sa, Sb, Ea[7:0], Eb[7:0], Mp[47:0], InputExc[4:0]) ;
+	FPMult_PrepModule PrepModule(clk, rst, pipe_0_a, pipe_0_b, Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA-1:0], InputExc[4:0]) ;
 	
 	// Perform (unsigned) mantissa multiplication
-	FPMult_ExecuteModule ExecuteModule(pipe_1[92:70], pipe_1[69:53], pipe_1[52:5], pipe_1[68:61], pipe_1[60:53], pipe_1[70], pipe_1[69], Sp, NormE[8:0], NormM[22:0], GRS) ;
+	FPMult_ExecuteModule ExecuteModule(pipe_1_a_mantissa, pipe_1_b_part_mantissa, pipe_1_mp, pipe_1_ea, pipe_1_eb, pipe_1_sa, pipe_1_sb, Sp, NormE[8:0], NormM[22:0], GRS) ;
 
 	// Round result and if necessary, perform a second (post-rounding) normalization step
 	FPMult_NormalizeModule NormalizeModule(pipe_2[22:0], pipe_2[31:23], RoundE[8:0], RoundEP[8:0], RoundM[23:0], RoundMP[23:0]) ;		
@@ -82,7 +95,10 @@ module FPMult(
 				[63:32] A
 				[31:0] B
 			*/
-			pipe_0 <= {a, b} ;
+            //pipe_0 <= {a, b} ;
+			pipe_0_a <= a;
+            pipe_0_b <= b;
+
 			/* PIPE 1
 				[70] Sa
 				[69] Sb
@@ -91,7 +107,16 @@ module FPMult(
 				[52:5] Mp
 				[4:0] InputExc
 			*/
-			pipe_1 <= {pipe_0[54:32], pipe_0[16:0], Sa, Sb, Ea[7:0], Eb[7:0], Mp[47:0], InputExc[4:0]} ;
+			//pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[`MANTISSA_MUL_SPLIT_LSB-1:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA-1:0], InputExc[4:0]} ;
+			pipe_1_a_mantissa <= pipe_0_a[`MANTISSA-1:0];
+            pipe_1_b_part_mantissa <= pipe_0_b[`MANTISSA_MUL_SPLIT_LSB-1:0];
+            pipe_1_sa <= Sa;
+            pipe_1_sb <= Sb;
+            pipe_1_ea <= Ea[`EXPONENT-1:0];
+            pipe_1_eb <= Eb[`EXPONENT-1:0];
+            pipe_1_mp <= Mp[2*`MANTISSA-1:0];
+            pipe_1_inpexc <= InputExc[4:0];
+
 			/* PIPE 2
 				[38:34] InputExc
 				[33] GRS
