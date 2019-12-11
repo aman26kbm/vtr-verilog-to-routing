@@ -1,10 +1,10 @@
-analyze -format verilog {4x4_from_4x4_regular_fpga.fp16.v}
-elaborate matmul_4x4_systolic -architecture verilog -library DEFAULT
+analyze -format verilog {dsp_slice.stratix10.fp16.v}
+elaborate dsp_slice -architecture verilog -library DEFAULT
 link
-#set_implementation pparch */*/*/u_add
-#set_implementation pparch */*/*/u_mult
-create_clock -name "CLK_0" -period 2.92 -waveform { 0 1.46 }  { clk  }
+#set_implementation pparch u_add
+#set_implementation pparch u_mult
 set_dp_smartgen_options -all_options auto -hierarchy -smart_compare true -optimize_for speed -sop2pos_transformation false
+create_clock -name "CLK_0" -period 2.62 -waveform { 0 1.31 }  { clk  }
 set_operating_conditions -library gscl45nm typical
 remove_wire_load_model
 compile -exact_map
