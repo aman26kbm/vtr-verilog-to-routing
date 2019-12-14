@@ -53,21 +53,38 @@ module FPMult(
 	wire [`EXPONENT-1:0] Eb ;					// B's exponent
 	wire [2*`ACTUAL_MANTISSA-1:0] Mp ;					// Product mantissa
 	wire [4:0] InputExc ;			// Exceptions in inputs
-	wire [22:0] NormM ;				// Normalized mantissa
-	wire [8:0] NormE ;				// Normalized exponent
-	wire [23:0] RoundM ;				// Normalized mantissa
-	wire [8:0] RoundE ;				// Normalized exponent
-	wire [23:0] RoundMP ;				// Normalized mantissa
-	wire [8:0] RoundEP ;				// Normalized exponent
+	wire [`MANTISSA-1:0] NormM ;				// Normalized mantissa
+	wire [`EXPONENT:0] NormE ;				// Normalized exponent
+	wire [`MANTISSA:0] RoundM ;				// Normalized mantissa
+	wire [`EXPONENT:0] RoundE ;				// Normalized exponent
+	wire [`MANTISSA:0] RoundMP ;				// Normalized mantissa
+	wire [`EXPONENT:0] RoundEP ;				// Normalized exponent
 	wire GRS ;
 
-	reg [63:0] pipe_0;			// Pipeline register Input->Prep
-	reg [92:0] pipe_1;			// Pipeline register Prep->Execute
-	reg [38:0] pipe_2;			// Pipeline register Execute->Normalize
-	reg [72:0] pipe_3;			// Pipeline register Normalize->Round
-	reg [36:0] pipe_4;			// Pipeline register Round->Output
+	//reg [63:0] pipe_0;			// Pipeline register Input->Prep
+	reg [`DWIDTH-1:0] pipe_0_a;
+	reg [`DWIDTH-1:0] pipe_1_a;
+
+	//reg [92:0] pipe_1;			// Pipeline register Prep->Execute
+	reg [`MANTISSA-1:0] pipe_1_a_mantissa;
+        reg [`MANTISSA_MUL_SPLIT_LSB-1:0] pipe_1_b_part_mantissa;
+        reg pipe_1_sa;
+        reg pipe_1_sb;
+        reg [`EXPONENT-1:0] pipe_1_ea;
+        reg [`EXPONENT-1:0] pipe_1_eb;
+        reg [2*`MANTISSA-1:0] pipe_1_mp;
+        reg [4:0] pipe_1_inpexc;
+
+	//reg [38:0] pipe_2;			// Pipeline register Execute->Normalize
+	reg [`MANTISSA+`EXPONENT+7:0] pipe_2;			// Pipeline register Execute->Normalize
 	
-	assign result = pipe_4[36:5] ;
+	//reg [72:0] pipe_3;			// Pipeline register Normalize->Round
+	reg [2*`MANTISSA+2*`EXPONENT+10:0] pipe_3;			// Pipeline register Normalize->Round
+
+	//reg [36:0] pipe_4;			// Pipeline register Round->Output
+	reg [`DWIDTH+4:0] pipe_4;			// Pipeline register Round->Output
+	
+	assign result = pipe_4[`DWIDTH+4:5] ;
 	assign flags = pipe_4[4:0] ;
 	
 	// Prepare the operands for alignment and check for exceptions
@@ -77,15 +94,26 @@ module FPMult(
 	FPMult_ExecuteModule ExecuteModule(pipe_1_a_mantissa, pipe_1_b_part_mantissa, pipe_1_mp, pipe_1_ea, pipe_1_eb, pipe_1_sa, pipe_1_sb, Sp, NormE[8:0], NormM[22:0], GRS) ;
 
 	// Round result and if necessary, perform a second (post-rounding) normalization step
-	FPMult_NormalizeModule NormalizeModule(pipe_2[22:0], pipe_2[31:23], RoundE[8:0], RoundEP[8:0], RoundM[23:0], RoundMP[23:0]) ;		
+	FPMult_NormalizeModule NormalizeModule(pipe_2[`MANTISSA-1:0], pipe_2[`MANTISSA+`EXPONENT:`MANTISSA], RoundE[8:0], RoundEP[8:0], RoundM[23:0], RoundMP[23:0]) ;		
 
 	// Round result and if necessary, perform a second (post-rounding) normalization step
-	FPMult_RoundModule RoundModule(pipe_3[47:24], pipe_3[23:0], pipe_3[65:57], pipe_3[56:48], pipe_3[66], pipe_3[67], pipe_3[72:68], Z_int[31:0], Flags_int[4:0]) ;		
+	//FPMult_RoundModule RoundModule(pipe_3[47:24], pipe_3[23:0], pipe_3[65:57], pipe_3[56:48], pipe_3[66], pipe_3[67], pipe_3[72:68], Z_int[31:0], Flags_int[4:0]) ;		
+	FPMult_RoundModule RoundModule(pipe_3[2*`MANTISSA+1:`MANTISSA+1], pipe_3[`MANNTISSA:0], pipe_3[2*`MANTISSA+2*`EXPONENT+3:2*`MANTISSA+`EXPONENT+3], pipe_3[2*`MANTISSA+`EXPONENT+2:2*`MANTISSA+2], pipe_3[2*`MANTISSA+2*`EXPONENT+4], pipe_3[2*`MANTISSA+2*`EXPONENT+5], pipe_3[2*`MANTISSA+2*`EXPONENT+10:2*`MANTISSA+2*`EXPONENT+6], Z_int[`DWIDTH-1:0], Flags_int[4:0]) ;		
 
 	always @ (posedge clk) begin	
 		if(rst) begin
-			pipe_0 <= 0;
-			pipe_1 <= 0;
+			pipe_0_a <= 0;
+			pipe_0_b <= 0;
+
+			pipe_1_a_mantissa <= 0;
+                        pipe_1_b_part_mantissa <= 0;
+                        pipe_1_sa <= 0; 
+                        pipe_1_sb <= 0;
+                        pipe_1_ea <= 0;
+                        pipe_1_eb <= 0;
+                        pipe_1_mp <= 0;
+                        pipe_1_inpexc <= 0;
+
 			pipe_2 <= 0; 
 			pipe_3 <= 0;
 			pipe_4 <= 0;
@@ -124,7 +152,7 @@ module FPMult(
 				[31:23] NormE
 				[22:0] NormM
 			*/
-			pipe_2 <= {pipe_1[4:0], GRS, Sp, NormE[8:0], NormM[22:0]} ;
+			pipe_2 <= {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
 			/* PIPE 3
 				[72:68] InputExc
 				[67] GRS
@@ -134,12 +162,12 @@ module FPMult(
 				[47:24] RoundM
 				[23:0] RoundMP
 			*/
-			pipe_3 <= {pipe_2[38:32], RoundE[8:0], RoundEP[8:0], RoundM[23:0], RoundMP[23:0]} ;
+			pipe_3 <= {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
 			/* PIPE 4
 				[36:5] Z
 				[4:0] Flags
 			*/				
-			pipe_4 <= {Z_int[31:0], Flags_int[4:0]} ;
+			pipe_4 <= {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
 		end
 	end
 		

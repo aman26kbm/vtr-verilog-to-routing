@@ -20,7 +20,7 @@ module FPMult_NormalizeModule(
 
 	// Input Ports
 	input [`MANTISSA-1:0] NormM ;									// Normalized mantissa
-	input [`EXPONENT-1:0] NormE ;									// Normalized exponent
+	input [`EXPONENT:0] NormE ;									// Normalized exponent
 
 	// Output Ports
 	output [`EXPONENT-1:0] RoundE ;
