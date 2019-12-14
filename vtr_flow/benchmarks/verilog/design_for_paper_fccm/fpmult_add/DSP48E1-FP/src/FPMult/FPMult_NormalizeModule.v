@@ -19,17 +19,17 @@ module FPMult_NormalizeModule(
     );
 
 	// Input Ports
-	input [22:0] NormM ;									// Normalized mantissa
-	input [8:0] NormE ;									// Normalized exponent
+	input [`MANTISSA-1:0] NormM ;									// Normalized mantissa
+	input [`EXPONENT-1:0] NormE ;									// Normalized exponent
 
 	// Output Ports
-	output [8:0] RoundE ;
-	output [8:0] RoundEP ;
-	output [23:0] RoundM ;
-	output [23:0] RoundMP ; 
+	output [`EXPONENT-1:0] RoundE ;
+	output [`EXPONENT-1:0] RoundEP ;
+	output [`MANTISSA-1:0] RoundM ;
+	output [`MANTISSA-1:0] RoundMP ; 
 	
-	assign RoundE = NormE - 127 ;
-	assign RoundEP = NormE - 126 ;
+	assign RoundE = NormE - 15 ;
+	assign RoundEP = NormE - 14 ;
 	assign RoundM = NormM ;
 	assign RoundMP = NormM + 1 ;
 

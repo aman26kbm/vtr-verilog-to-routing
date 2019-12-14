@@ -22,31 +22,31 @@ module FPMult_RoundModule(
     );
 
 	// Input Ports
-	input [23:0] RoundM ;									// Normalized mantissa
-	input [23:0] RoundMP ;									// Normalized exponent
-	input [8:0] RoundE ;									// Normalized mantissa + 1
-	input [8:0] RoundEP ;									// Normalized exponent + 1
+	input [`MANTISSA:0] RoundM ;									// Normalized mantissa
+	input [`MANTISSA:0] RoundMP ;									// Normalized exponent
+	input [`EXPONENT:0] RoundE ;									// Normalized mantissa + 1
+	input [`EXPONENT:0] RoundEP ;									// Normalized exponent + 1
 	input Sp ;												// Product sign
 	input GRS ;
 	input [4:0] InputExc ;
 	
 	// Output Ports
-	output [31:0] Z ;										// Final product
+	output [`DWIDTH-1:0] Z ;										// Final product
 	output [4:0] Flags ;
 	
 	// Internal Signals
-	wire [8:0] FinalE ;									// Rounded exponent
-	wire [23:0] FinalM;
-	wire [23:0] PreShiftM;
+	wire [`EXPONENT:0] FinalE ;									// Rounded exponent
+	wire [`MANTISSA:0] FinalM;
+	wire [`MANTISSA:0] PreShiftM;
 	
 	assign PreShiftM = GRS ? RoundMP : RoundM ;	// Round up if R and (G or S)
 	
 	// Post rounding normalization (potential one bit shift> use shifted mantissa if there is overflow)
-	assign FinalM = (PreShiftM[23] ? {1'b0, PreShiftM[23:1]} : PreShiftM[23:0]) ;
+	assign FinalM = (PreShiftM[`MANTISSA] ? {1'b0, PreShiftM[`MANTISSA:1]} : PreShiftM[`MANTISSA:0]) ;
 	
-	assign FinalE = (PreShiftM[23] ? RoundEP : RoundE) ; // Increment exponent if a shift was done
+	assign FinalE = (PreShiftM[`MANTISSA] ? RoundEP : RoundE) ; // Increment exponent if a shift was done
 	
-	assign Z = {Sp, FinalE[7:0], FinalM[22:0]} ;   // Putting the pieces together
+	assign Z = {Sp, FinalE[`EXPONENT-1:0], FinalM[`MANTISSA-1:0]} ;   // Putting the pieces together
 	assign Flags = InputExc[4:0];
 
 endmodule
