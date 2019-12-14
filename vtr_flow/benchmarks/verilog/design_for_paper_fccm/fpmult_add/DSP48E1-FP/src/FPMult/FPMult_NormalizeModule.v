@@ -23,10 +23,10 @@ module FPMult_NormalizeModule(
 	input [`EXPONENT:0] NormE ;									// Normalized exponent
 
 	// Output Ports
-	output [`EXPONENT-1:0] RoundE ;
-	output [`EXPONENT-1:0] RoundEP ;
-	output [`MANTISSA-1:0] RoundM ;
-	output [`MANTISSA-1:0] RoundMP ; 
+	output [`EXPONENT:0] RoundE ;
+	output [`EXPONENT:0] RoundEP ;
+	output [`MANTISSA:0] RoundM ;
+	output [`MANTISSA:0] RoundMP ; 
 	
 	assign RoundE = NormE - 15 ;
 	assign RoundEP = NormE - 14 ;
