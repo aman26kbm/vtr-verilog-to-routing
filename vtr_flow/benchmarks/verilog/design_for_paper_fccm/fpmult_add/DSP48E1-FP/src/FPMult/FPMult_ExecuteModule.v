@@ -47,8 +47,8 @@ module FPMult_ExecuteModule(
     
     wire [`ACTUAL_MANTISSA-1:0] inp_a;
     wire [`ACTUAL_MANTISSA-1:0] inp_b;
-    inp_a = {1'b1, a}
-    inp_b = {{(`MANTISSA-`MANTISSA_MUL_SPLIT_LSB){1'b0}}, 1'b0, b};
+    assign inp_a = {1'b1, a};
+    assign inp_b = {{(`MANTISSA-`MANTISSA_MUL_SPLIT_LSB){1'b0}}, 1'b0, b};
     DW02_mult #(`ACTUAL_MANTISSA,`ACTUAL_MANTISSA) u_mult(.A(inp_a), .B(inp_b), .TC(1'b0), .PRODUCT(Mp_temp));
     DW01_add #(2*`ACTUAL_MANTISSA) u_add(.A(Mp_temp), .B(MpC<<`MANTISSA_MUL_SPLIT_LSB), .CI(1'b0), .SUM(Mp), .CO());
 
