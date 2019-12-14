@@ -1,17 +1,17 @@
 `timescale 1ns / 1ps
 //`define EXPONENT 5
 //`define MANTISSA 10
-`define EXPONENT 8
-`define MANTISSA 23
-`define ACTUAL_MANTISSA 24
-`define EXPONENT_LSB 23
-`define EXPONENT_MSB 30
+`define EXPONENT 5
+`define MANTISSA 10
+`define ACTUAL_MANTISSA 11
+`define EXPONENT_LSB 10
+`define EXPONENT_MSB 14
 `define MANTISSA_LSB 0
-`define MANTISSA_MSB 22
-`define MANTISSA_MUL_SPLIT_LSB 17
-`define MANTISSA_MUL_SPLIT_MSB 22
+`define MANTISSA_MSB 9
+`define MANTISSA_MUL_SPLIT_LSB 3
+`define MANTISSA_MUL_SPLIT_MSB 9
 `define SIGN 1
-`define SIGN_LOC 31
+`define SIGN_LOC 15
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
 //////////////////////////////////////////////////////////////////////////////////

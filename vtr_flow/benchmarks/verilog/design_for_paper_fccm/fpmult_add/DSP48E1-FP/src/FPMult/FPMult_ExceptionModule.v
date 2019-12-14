@@ -17,15 +17,15 @@ module FPMult_ExceptionModule(
     );
 
 	// Input ports
-	input [22:0] RoundM ;							// Rounded mantissa
-	input [8:0] RoundE ;								// Rounded exponent
+	input [`MANTISSA-1:0] RoundM ;							// Rounded mantissa
+	input [`EXPONENT:0] RoundE ;								// Rounded exponent
 	input Sgn ;											// Final sign
 	
 	// Output ports
-	output [31:0] P ;									// The product
+	output [`DWIDTH-1:0] P ;									// The product
 	
 	// Add error checking here
 	
-	assign P = {Sgn, RoundE[7:0], RoundM} ;   // Putting the pieces together
+	assign P = {Sgn, RoundE[`EXPONENT-1:0], RoundM} ;   // Putting the pieces together
 	
 endmodule
