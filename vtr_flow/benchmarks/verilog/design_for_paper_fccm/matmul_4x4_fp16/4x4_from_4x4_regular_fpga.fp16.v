@@ -558,22 +558,22 @@ endmodule
 module processing_element(
  reset, 
  clk, 
+ start_mat_mul,
  in_a,
  in_b, 
  out_a, 
  out_b, 
- out_c,
- start_mat_mul
+ out_c
  );
 
  input reset;
  input clk;
+ input start_mat_mul;
  input  [`DWIDTH-1:0] in_a;
  input  [`DWIDTH-1:0] in_b;
  output [`DWIDTH-1:0] out_a;
  output [`DWIDTH-1:0] out_b;
  output [`DWIDTH-1:0] out_c;  //reduced precision
- input start_mat_mul;
 
  reg [`DWIDTH-1:0] out_a;
  reg [`DWIDTH-1:0] out_b;
@@ -599,55 +599,55 @@ module processing_element(
  
 endmodule
 
-module mac_block(a, b, out, start_mat_mul, reset, clk);
-input [`DWIDTH-1:0] a;
-input [`DWIDTH-1:0] b;
-input start_mat_mul;
-input reset;
-input clk;
-output [`DWIDTH-1:0] out;
-
-reg [`DWIDTH-1:0] out;
-reg [`DWIDTH-1:0] mul_out_reg;
-wire [`DWIDTH-1:0] mul_out;
-wire [`DWIDTH-1:0] add_out;
-
+//module mac_block(a, b, out, start_mat_mul, reset, clk);
+//input [`DWIDTH-1:0] a;
+//input [`DWIDTH-1:0] b;
+//input start_mat_mul;
+//input reset;
+//input clk;
+//output [`DWIDTH-1:0] out;
+//
+//reg [`DWIDTH-1:0] out;
+//reg [`DWIDTH-1:0] mul_out_reg;
+//wire [`DWIDTH-1:0] mul_out;
+//wire [`DWIDTH-1:0] add_out;
+//
 //assign mul_out = a * b;
-qmult mult_u1(.i_multiplicand(a), .i_multiplier(b), .o_result(mul_out));
-
-always @(posedge clk) begin
-  if (reset) begin
-    out <= 0;
-    mul_out_reg <= 0;
-  end else begin
-    out <= add_out;
-    mul_out_reg <= mul_out;
-  end
-end
-
+////qmult mult_u1(.i_multiplicand(a), .i_multiplier(b), .o_result(mul_out));
+//
+//always @(posedge clk) begin
+//  if (reset || ~start_mat_mul) begin
+//    out <= 0;
+//    mul_out_reg <= 0;
+//  end else begin
+//    out <= add_out;
+//    mul_out_reg <= mul_out;
+//  end
+//end
+//
 //assign add_out = mul_out + out;
-qadd add_u1(.a(out), .b(mul_out_reg), .c(add_out));
+////qadd add_u1(.a(out), .b(mul_out_reg), .c(add_out));
+//
+//endmodule
 
-endmodule
 
-
-module qmult(i_multiplicand,i_multiplier,o_result);
-input [`DWIDTH-1:0] i_multiplicand;
-input [`DWIDTH-1:0] i_multiplier;
-output [`DWIDTH-1:0] o_result;
-
-//assign o_result = i_multiplicand * i_multiplier;
-DW_fp_mult #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) u_mult (.a(i_multiplicand), .b(i_multiplier), .rnd(3'b000), .z(o_result), .status());
-endmodule
-
-module qadd(a,b,c);
-input [`DWIDTH-1:0] a;
-input [`DWIDTH-1:0] b;
-output [`DWIDTH-1:0] c;
-
-//assign c = a + b;
-DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) u_add(.a(a), .b(b), .z(c),     .rnd(3'b000),    .status());
-endmodule
+//module qmult(i_multiplicand,i_multiplier,o_result);
+//input [`DWIDTH-1:0] i_multiplicand;
+//input [`DWIDTH-1:0] i_multiplier;
+//output [`DWIDTH-1:0] o_result;
+//
+////assign o_result = i_multiplicand * i_multiplier;
+//DW_fp_mult #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) u_mult (.a(i_multiplicand), .b(i_multiplier), .rnd(3'b000), .z(o_result), .status());
+//endmodule
+//
+//module qadd(a,b,c);
+//input [`DWIDTH-1:0] a;
+//input [`DWIDTH-1:0] b;
+//output [`DWIDTH-1:0] c;
+//
+////assign c = a + b;
+//DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) u_add(.a(a), .b(b), .z(c),     .rnd(3'b000),    .status());
+//endmodule
 
 module ram (addr0, d0, we0, q0,  clk);
 
@@ -657,24 +657,24 @@ input we0;
 output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 input clk;
 
-reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//
+//always @(posedge clk)  
+//begin 
+//        if (we0) 
+//        begin 
+//            ram[addr0] <= d0; 
+//        end 
+//        q0 <= ram[addr0];
+//end
 
-always @(posedge clk)  
-begin 
-        if (we0) 
-        begin 
-            ram[addr0] <= d0; 
-        end 
-        q0 <= ram[addr0];
-end
-
-//single_port_ram u_single_port_ram(
-//  .data(d0),
-//  .we(we0),
-//  .addr(addr0),
-//  .clk(clk),
-//  .out(q0)
-//);
+single_port_ram u_single_port_ram(
+  .data(d0),
+  .we(we0),
+  .addr(addr0),
+  .clk(clk),
+  .out(q0)
+);
 endmodule
 

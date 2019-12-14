@@ -137,46 +137,24 @@
       </output_ports>
     </model>
 
-    <model name="mac_block">
-      <input_ports>
-        <port name="a" clock="clk" combinational_sink_ports="out"/>
-        <port name="b" clock="clk" combinational_sink_ports="out"/>
-        <!--<port name="c" combinational_sink_ports="out"/>-->
-		<port name="clk" is_clock="1" />
-		<port name="reset" clock="clk" combinational_sink_ports="out"/>
-		<port name="start_mat_mul" clock="clk" combinational_sink_ports="out"/>
-      </input_ports>
-      <output_ports>
-        <port name="out" clock="clk"/>
-      </output_ports>
-    </model>
-
   </models>
   <!-- ODIN II specific config ends -->
  
   <!-- Physical descriptions begin -->
   <layout>
-
-    <!--<auto_layout aspect_ratio="1.0">-->
-    <fixed_layout name="mylayout" width="302" height="302">
+    <auto_layout aspect_ratio="1.0">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
-        
-		    <!--<col type="dsp" startx="2" starty="1" repeatx="10" priority="30"/>-->
-		    <col type="mult_36" startx="2" starty="1" repeatx="10" priority="30"/>
-        
-    		<col type="dsp" startx="4" starty="1" repeatx="10" priority="25"/>
-        
-	      <col type="memory" startx="5" starty="1" repeatx="10" priority="18"/>
-		
-        <col type="dsp" startx="7" starty="1" repeatx="10" priority="20"/>
-		
-	      <col type="dsp" startx="9" starty="1" repeatx="10" priority="20"/>
-    </fixed_layout>
-<!--        </auto_layout> -->
+        <!--Column of 'mult_36' with 'EMPTY' blocks wherever a 'mult_36' does not fit. Vertical offset by 1 for perimeter.-->
+        <col type="mult_36" startx="6" starty="1" repeatx="8" priority="20"/>
+        <col type="EMPTY" startx="6" repeatx="8" starty="1" priority="19"/>
+        <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. Vertical offset by 1 for perimeter.-->
+        <col type="memory" startx="2" starty="1" repeatx="8" priority="20"/>
+        <col type="EMPTY" startx="2" repeatx="8" starty="1" priority="19"/>
+        </auto_layout>
 </layout>
 
   		<device>
@@ -743,9 +721,10 @@
           <input name="a" num_pins="18"/>
           <input name="b" num_pins="18"/>
           <output name="out" num_pins="36"/>
+
           <!-- Model 9x9 delay and 18x18 delay as the same.  9x9 could be faster, but in Stratix IV
 	          isn't, presumably because the multiplier layout is really optimized for 18x18.
-	      	-->
+		-->
           <mode name="two_mult_9x9">
             <pb_type name="mult_9x9_slice" num_pb="2">
               <input name="A_cfg" num_pins="9"/>
@@ -889,151 +868,16 @@
       </mode>
 
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
-       <fc_override fc_type="frac" fc_val="0" port_name="clk"/> 
+       <!-- clock pins do not connect to local routing TODO uncomment the next line--> 
+      <!-- <fc_override fc_type="frac" fc_val="0" port_name="clk"/> -->
       </fc>
 
-      <pinlocations pattern="spread"/>
-
-      <power method="sum-of-children"/>
-    </pb_type>
-    <!-- Define fracturable multiplier end -->
-
-
-
-    <!-- Define mac begin -->
-
-    <pb_type name="dsp" height="2" area="66000">
-	  <input  name="reset"  num_pins="1" is_non_clock_global="true"/>
-	  <input  name="start_mat_mul"  num_pins="1" is_non_clock_global="true"/>
-	  
-      <input  name="a"      num_pins="16"/>
-      <input  name="b"      num_pins="16"/>
-      <input  name="cin"    num_pins="1" />
-      <output name="out"    num_pins="16"/>
-      <output name="cout"   num_pins="1" />
-	    <clock  name="clk"    num_pins="1" />
-      <!--<output name="sumout" num_pins="16"/>-->
-
-
-      <mode name="mult_16x16">
-        <pb_type name="mult_16x16" blif_model=".subckt multiply" num_pb="1">
-          <input name="a" num_pins="16"/>
-          <input name="b" num_pins="16"/>
-          <output name="out" num_pins="16"/>
-          <delay_constant max="1.47e-9" in_port="mult_16x16.a" out_port="mult_16x16.out"/>
-          <delay_constant max="1.47e-9" in_port="mult_16x16.b" out_port="mult_16x16.out"/>
-        </pb_type>
-
-        <interconnect>
-          <direct name="a2a" input="dsp.a" output="mult_16x16.a">
-		  <delay_constant max="0.1e-9" in_port="dsp.a" out_port="mult_16x16.a"/>
-          </direct>
-          <direct name="b2b" input="dsp.b" output="mult_16x16.b">
-		  <delay_constant max="0.1e-9" in_port="dsp.b" out_port="mult_16x16.b"/>
-          </direct>
-          <direct name="out2out" input="mult_16x16.out" output="dsp.out">
-		  <delay_constant max="0.2e-9" in_port="mult_16x16.out" out_port="dsp.out"/>
-          </direct>
-        </interconnect>
-      </mode>
-
-      <mode name="one_adder">
-        <pb_type name="adder_pb" blif_model=".subckt adder" num_pb="1">
-          <input name="a" num_pins="16"/>
-          <input name="b" num_pins="16"/>
-          <input name="cin" num_pins="1"/>
-          <output name="sumout" num_pins="16"/>
-          <output name="cout" num_pins="1"/>
-          <!-- Carry link delays included in cin->cout delay -->
-          <delay_constant max="0.68e-9" in_port="adder_pb.a" out_port="adder_pb.sumout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.b" out_port="adder_pb.sumout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.cin" out_port="adder_pb.sumout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.a" out_port="adder_pb.cout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.b" out_port="adder_pb.cout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.cin" out_port="adder_pb.cout"/>
-        </pb_type>
-        <interconnect>
-          <direct name="atoa" input="dsp.a" output="adder_pb.a">
-		  <delay_constant max="0.1e-9" in_port="dsp.a" out_port="adder_pb.a"/>
-		  </direct>
-          <direct name="btob" input="dsp.b" output="adder_pb.b">
-		  <delay_constant max="0.1e-9" in_port="dsp.b" out_port="adder_pb.b"/>
-		  </direct>
-          <direct name="cintocin" input="dsp.cin" output="adder_pb.cin">
-		  </direct>
-          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out[15:0]">
-		  <delay_constant max="0.2e-9" in_port="adder_pb.sumout" out_port="dsp.out[15:0]"/>
-		  </direct>
-          <direct name="couttocout" input="adder_pb.cout" output="dsp.cout">
-		  </direct>
-        </interconnect>
-      </mode>
-      <mode name="mac_16x16_mode">
-      	    <pb_type name="mac_16x16" blif_model=".subckt mac_block" num_pb="1">
-				<input name="reset" num_pins="1" />
-				<input name="start_mat_mul" num_pins="1" />
-			
-				<input name="a" num_pins="16"/>
-				<input name="b" num_pins="16"/>
-				<output name="out" num_pins="16"/>
-				
-				<clock name="clk"  num_pins="1" />
-				<T_setup value="66e-12" port="mac_16x16.reset" clock="clk"/>
-				<T_setup value="66e-12" port="mac_16x16.start_mat_mul" clock="clk"/>
-				<T_setup value="66e-12" port="mac_16x16.a" clock="clk"/>
-				<T_setup value="66e-12" port="mac_16x16.b" clock="clk"/>
-				<T_setup value="66e-12" port="mac_16x16.out" clock="clk"/>
-				
-				<T_clock_to_Q max="124e-12" port="mac_16x16.reset" clock="clk"/>
-				<T_clock_to_Q max="124e-12" port="mac_16x16.start_mat_mul" clock="clk"/>
-				<T_clock_to_Q max="124e-12" port="mac_16x16.a" clock="clk"/>
-				<T_clock_to_Q max="124e-12" port="mac_16x16.b" clock="clk"/>
-				<T_clock_to_Q max="124e-12" port="mac_16x16.out" clock="clk"/>
-				
-				<delay_constant max="2.7e-9" in_port="mac_16x16.a" out_port="mac_16x16.out"/>
-				<delay_constant max="2.7e-9" in_port="mac_16x16.b" out_port="mac_16x16.out"/>
-				<delay_constant max="2.7e-9" in_port="mac_16x16.reset" out_port="mac_16x16.out"/>
-				<delay_constant max="2.7e-9" in_port="mac_16x16.start_mat_mul" out_port="mac_16x16.out"/>
-				
-
-            <!--  <power method="pin-toggle">
-                <port name="a" energy_per_toggle="1.09e-12"/>
-                <port name="b" energy_per_toggle="1.09e-12"/>
-                <port name="c" energy_per_toggle="1.09e-12"/>
-                <static_power power_per_instance="0.0"/>					
-              </power>-->
-            </pb_type>
-            <interconnect>
-				<direct name="a2a" input="dsp.a" output="mac_16x16.a">
-				</direct>
-				<direct name="b2b" input="dsp.b" output="mac_16x16.b">
-				</direct>
-				<direct name="reset2reset" input="dsp.reset" output="mac_16x16.reset">
-				</direct>
-				<direct name="startmatmul2startmatmul" input="dsp.start_mat_mul" output="mac_16x16.start_mat_mul">
-				</direct>
-				<direct name="clk2clk" input="dsp.clk" output="mac_16x16.clk">
-				</direct>
-				<direct name="out2out" input="mac_16x16.out" output="dsp.out">
-				<delay_constant max="0.1e-9" in_port="mac_16x16.out" out_port="dsp.out"/>
-				</direct>
-            </interconnect>
-      </mode>
-
-
-      <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
-        <!-- clock pins do not connect to local routing TODO uncomment the next line--> 
-        <fc_override fc_type="frac" fc_val="0" port_name="clk"/> 
-      </fc>
       <pinlocations pattern="spread"/>
 
       <!-- Place this multiplier block every 8 columns from (and including) the sixth column -->
       <power method="sum-of-children"/>
     </pb_type>
-    <!-- Define mac end -->
-
-
-
+    <!-- Define fracturable multiplier end -->
 
     <!-- Define fracturable memory begin -->
     <!-- 32 Kb Memory that can operate from 512x64 to 32Kx1 for single-port mode and 1024x32 to 32Kx1 for dual-port mode.  
@@ -1055,7 +899,7 @@
 		   obtain a RAM core area (not including inter-block routing) of 548,000 MWTU areas for our 32 kb RAM in a 40 nm process.
       -->
  <!-- TODO: fix correct area -->
-    <pb_type name="memory" height="3" width="2" area="548000">
+    <pb_type name="memory" height="6" area="548000">
       <input name="addr1" num_pins="11"/>
       <input name="addr2" num_pins="11"/>
       <input name="data" num_pins="40"/>

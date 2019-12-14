@@ -611,7 +611,7 @@ wire [`DWIDTH-1:0] add_out;
 qmult mult_u1(.i_multiplicand(a), .i_multiplier(b), .o_result(mul_out));
 
 always @(posedge clk) begin
-  if (reset) begin
+  if (reset || ~start_mat_mul) begin
     out <= 0;
     mul_out_reg <= 0;
   end else begin
