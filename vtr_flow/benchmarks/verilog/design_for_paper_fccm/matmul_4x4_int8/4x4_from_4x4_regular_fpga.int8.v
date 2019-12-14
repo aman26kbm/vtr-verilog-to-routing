@@ -524,25 +524,25 @@ always @(posedge clk) begin
   end
 end
 
-processing_element pe00(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a0),      .in_b(b0),  .out_a(a00to01), .out_b(b00to10), .out_c(matrixC00));
-processing_element pe01(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a00to01), .in_b(b1),  .out_a(a01to02), .out_b(b01to11), .out_c(matrixC01));
-processing_element pe02(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a01to02), .in_b(b2),  .out_a(a02to03), .out_b(b02to12), .out_c(matrixC02));
-processing_element pe03(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a02to03), .in_b(b3),  .out_a(a03to04), .out_b(b03to13), .out_c(matrixC03));
+processing_element pe00(.reset(reset), .clk(clk),  .in_a(a0),      .in_b(b0),  .out_a(a00to01), .out_b(b00to10), .out_c(matrixC00));
+processing_element pe01(.reset(reset), .clk(clk),  .in_a(a00to01), .in_b(b1),  .out_a(a01to02), .out_b(b01to11), .out_c(matrixC01));
+processing_element pe02(.reset(reset), .clk(clk),  .in_a(a01to02), .in_b(b2),  .out_a(a02to03), .out_b(b02to12), .out_c(matrixC02));
+processing_element pe03(.reset(reset), .clk(clk),  .in_a(a02to03), .in_b(b3),  .out_a(a03to04), .out_b(b03to13), .out_c(matrixC03));
 
-processing_element pe10(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a1),      .in_b(b00to10), .out_a(a10to11), .out_b(b10to20), .out_c(matrixC10));
-processing_element pe11(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a10to11), .in_b(b01to11), .out_a(a11to12), .out_b(b11to21), .out_c(matrixC11));
-processing_element pe12(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a11to12), .in_b(b02to12), .out_a(a12to13), .out_b(b12to22), .out_c(matrixC12));
-processing_element pe13(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a12to13), .in_b(b03to13), .out_a(a13to14), .out_b(b13to23), .out_c(matrixC13));
+processing_element pe10(.reset(reset), .clk(clk),  .in_a(a1),      .in_b(b00to10), .out_a(a10to11), .out_b(b10to20), .out_c(matrixC10));
+processing_element pe11(.reset(reset), .clk(clk),  .in_a(a10to11), .in_b(b01to11), .out_a(a11to12), .out_b(b11to21), .out_c(matrixC11));
+processing_element pe12(.reset(reset), .clk(clk),  .in_a(a11to12), .in_b(b02to12), .out_a(a12to13), .out_b(b12to22), .out_c(matrixC12));
+processing_element pe13(.reset(reset), .clk(clk),  .in_a(a12to13), .in_b(b03to13), .out_a(a13to14), .out_b(b13to23), .out_c(matrixC13));
 
-processing_element pe20(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a2),      .in_b(b10to20), .out_a(a20to21), .out_b(b20to30), .out_c(matrixC20));
-processing_element pe21(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a20to21), .in_b(b11to21), .out_a(a21to22), .out_b(b21to31), .out_c(matrixC21));
-processing_element pe22(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a21to22), .in_b(b12to22), .out_a(a22to23), .out_b(b22to32), .out_c(matrixC22));
-processing_element pe23(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a22to23), .in_b(b13to23), .out_a(a23to24), .out_b(b23to33), .out_c(matrixC23));
+processing_element pe20(.reset(reset), .clk(clk),  .in_a(a2),      .in_b(b10to20), .out_a(a20to21), .out_b(b20to30), .out_c(matrixC20));
+processing_element pe21(.reset(reset), .clk(clk),  .in_a(a20to21), .in_b(b11to21), .out_a(a21to22), .out_b(b21to31), .out_c(matrixC21));
+processing_element pe22(.reset(reset), .clk(clk),  .in_a(a21to22), .in_b(b12to22), .out_a(a22to23), .out_b(b22to32), .out_c(matrixC22));
+processing_element pe23(.reset(reset), .clk(clk),  .in_a(a22to23), .in_b(b13to23), .out_a(a23to24), .out_b(b23to33), .out_c(matrixC23));
 
-processing_element pe30(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a3),      .in_b(b20to30), .out_a(a30to31), .out_b(b30to40), .out_c(matrixC30));
-processing_element pe31(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a30to31), .in_b(b21to31), .out_a(a31to32), .out_b(b31to41), .out_c(matrixC31));
-processing_element pe32(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a31to32), .in_b(b22to32), .out_a(a32to33), .out_b(b32to42), .out_c(matrixC32));
-processing_element pe33(.reset(reset), .clk(clk), .start_mat_mul(start_mat_mul), .in_a(a32to33), .in_b(b23to33), .out_a(a33to34), .out_b(b33to43), .out_c(matrixC33));
+processing_element pe30(.reset(reset), .clk(clk),  .in_a(a3),      .in_b(b20to30), .out_a(a30to31), .out_b(b30to40), .out_c(matrixC30));
+processing_element pe31(.reset(reset), .clk(clk),  .in_a(a30to31), .in_b(b21to31), .out_a(a31to32), .out_b(b31to41), .out_c(matrixC31));
+processing_element pe32(.reset(reset), .clk(clk),  .in_a(a31to32), .in_b(b22to32), .out_a(a32to33), .out_b(b32to42), .out_c(matrixC32));
+processing_element pe33(.reset(reset), .clk(clk),  .in_a(a32to33), .in_b(b23to33), .out_a(a33to34), .out_b(b33to43), .out_c(matrixC33));
 
 assign a_data_out = {a33to34,a23to24,a13to14,a03to04};
 assign b_data_out = {b33to43,b32to42,b31to41,b30to40};
@@ -558,8 +558,7 @@ module processing_element(
  in_b, 
  out_a, 
  out_b, 
- out_c,
- start_mat_mul
+ out_c
  );
 
  input reset;
@@ -569,7 +568,6 @@ module processing_element(
  output [`DWIDTH-1:0] out_a;
  output [`DWIDTH-1:0] out_b;
  output [`DWIDTH-1:0] out_c;  //reduced precision
- input start_mat_mul;
 
  reg [`DWIDTH-1:0] out_a;
  reg [`DWIDTH-1:0] out_b;
@@ -578,8 +576,8 @@ module processing_element(
  wire [`DWIDTH-1:0] out_mac;
 
  assign out_c = out_mac;
- 
- mac_block u_mac(.a(in_a), .b(in_b), .out(out_mac), .start_mat_mul(start_mat_mul), .reset(reset), .clk(clk));
+
+ mac_block u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(reset), .clk(clk));
 
  always @(posedge clk)begin
     if(reset) begin
@@ -594,73 +592,72 @@ module processing_element(
  
 endmodule
 
-module mac_block(a, b, out, start_mat_mul, reset, clk);
-input [`DWIDTH-1:0] a;
-input [`DWIDTH-1:0] b;
-input start_mat_mul;
-input reset;
-input clk;
-output [`DWIDTH-1:0] out;
-
-reg [`DWIDTH-1:0] out;
-reg [`DWIDTH-1:0] mul_out_reg;
-wire [`DWIDTH-1:0] mul_out;
-wire [`DWIDTH-1:0] add_out;
-
-//assign mul_out = a * b;
-qmult mult_u1(.i_multiplicand(a), .i_multiplier(b), .o_result(mul_out));
-
-always @(posedge clk) begin
-  if (reset || ~start_mat_mul) begin
-    out <= 0;
-    mul_out_reg <= 0;
-  end else begin
-    out <= add_out;
-    mul_out_reg <= mul_out;
-  end
-end
- 
-//we just truncate the higher bits of the product
-//assign add_out = mul_out + out;
-qadd add_u1(.a(out), .b(mul_out_reg), .c(add_out));
-
-endmodule
-
-module qmult(i_multiplicand,i_multiplier,o_result);
-input [`DWIDTH-1:0] i_multiplicand;
-input [`DWIDTH-1:0] i_multiplier;
-output [`DWIDTH-1:0] o_result;
-
-wire [2*`DWIDTH-1:0] o_result_temp;
-
-//assign o_result = i_multiplicand * i_multiplier;
-DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result_temp));
-
-//down cast the result
-assign o_result = 
-    (o_result_temp[2*`DWIDTH-1] == 0) ?  //positive number
-        (
-           (|(o_result_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
-             {o_result_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
-             {o_result_temp[2*`DWIDTH-1] , o_result_temp[`DWIDTH-2:0]} 
-        )
-        : //negative number
-        (
-           (|(o_result_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
-             {o_result_temp[2*`DWIDTH-1] , o_result_temp[`DWIDTH-2:0]} :
-             {o_result_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
-        );
-
-endmodule
-
-module qadd(a,b,c);
-input [`DWIDTH-1:0] a;
-input [`DWIDTH-1:0] b;
-output [`DWIDTH-1:0] c;
-
-//assign c = a + b;
-DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
-endmodule
+//module mac_block(a, b, out, reset, clk);
+//input [`DWIDTH-1:0] a;
+//input [`DWIDTH-1:0] b;
+//input reset;
+//input clk;
+//output [`DWIDTH-1:0] out;
+//
+//reg [`DWIDTH-1:0] out;
+//reg [`DWIDTH-1:0] mul_out_reg;
+//wire [`DWIDTH-1:0] mul_out;
+//wire [`DWIDTH-1:0] add_out;
+//
+////assign mul_out = a * b;
+//qmult mult_u1(.i_multiplicand(a), .i_multiplier(b), .o_result(mul_out));
+//
+//always @(posedge clk) begin
+//  if (reset) begin
+//    out <= 0;
+//    mul_out_reg <= 0;
+//  end else begin
+//    out <= add_out;
+//    mul_out_reg <= mul_out;
+//  end
+//end
+// 
+////we just truncate the higher bits of the product
+////assign add_out = mul_out + out;
+//qadd add_u1(.a(out), .b(mul_out_reg), .c(add_out));
+//
+//endmodule
+//
+//module qmult(i_multiplicand,i_multiplier,o_result);
+//input [`DWIDTH-1:0] i_multiplicand;
+//input [`DWIDTH-1:0] i_multiplier;
+//output [`DWIDTH-1:0] o_result;
+//
+//wire [2*`DWIDTH-1:0] o_result_temp;
+//
+////assign o_result = i_multiplicand * i_multiplier;
+//DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result_temp));
+//
+////down cast the result
+//assign o_result = 
+//    (o_result_temp[2*`DWIDTH-1] == 0) ?  //positive number
+//        (
+//           (|(o_result_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
+//             {o_result_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
+//             {o_result_temp[2*`DWIDTH-1] , o_result_temp[`DWIDTH-2:0]} 
+//        )
+//        : //negative number
+//        (
+//           (|(o_result_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
+//             {o_result_temp[2*`DWIDTH-1] , o_result_temp[`DWIDTH-2:0]} :
+//             {o_result_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
+//        );
+//
+//endmodule
+//
+//module qadd(a,b,c);
+//input [`DWIDTH-1:0] a;
+//input [`DWIDTH-1:0] b;
+//output [`DWIDTH-1:0] c;
+//
+////assign c = a + b;
+//DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
+//endmodule
 
 module ram (addr0, d0, we0, q0,  clk);
 
@@ -670,24 +667,24 @@ input we0;
 output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 input clk;
 
-reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
+//
+//always @(posedge clk)  
+//begin 
+//        if (we0) 
+//        begin 
+//            ram[addr0] <= d0; 
+//        end 
+//        q0 <= ram[addr0];
+//end
 
-always @(posedge clk)  
-begin 
-        if (we0) 
-        begin 
-            ram[addr0] <= d0; 
-        end 
-        q0 <= ram[addr0];
-end
-
-//single_port_ram u_single_port_ram(
-//  .data(d0),
-//  .we(we0),
-//  .addr(addr0),
-//  .clk(clk),
-//  .out(q0)
-//);
+single_port_ram u_single_port_ram(
+  .data(d0),
+  .we(we0),
+  .addr(addr0),
+  .clk(clk),
+  .out(q0)
+);
 endmodule
 
