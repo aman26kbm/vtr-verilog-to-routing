@@ -137,7 +137,7 @@
       </output_ports>
     </model>
 
-    <model name="dsp_adder">
+    <model name="seq_adder">
       <input_ports>
         <port name="a" clock="clk" combinational_sink_ports="sumout cout"/>
         <port name="b" clock="clk" combinational_sink_ports="sumout cout"/>
@@ -151,7 +151,7 @@
       </output_ports>
     </model>
 
-    <model name="dsp_multiply">
+    <model name="seq_multiply">
       <input_ports>
         <port name="a" clock="clk" combinational_sink_ports="out"/>
         <port name="b" clock="clk" combinational_sink_ports="out"/>
@@ -163,7 +163,7 @@
       </output_ports>
     </model>
 
-    <model name="dsp_mac">
+    <model name="seq_mac">
       <input_ports>
         <port name="a" clock="clk" combinational_sink_ports="out"/>
         <port name="b" clock="clk" combinational_sink_ports="out"/>
@@ -189,8 +189,10 @@
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
         
-		    <!--<col type="dsp" startx="2" starty="1" repeatx="10" priority="30"/>-->
-		    <col type="mult_36" startx="2" starty="1" repeatx="10" priority="30"/>
+		    <col type="dsp" startx="2" starty="1" repeatx="10" priority="30"/>
+		    <!--
+        <col type="mult_36" startx="2" starty="1" repeatx="10" priority="30"/> 
+        -->
         
     		<col type="dsp" startx="4" starty="1" repeatx="10" priority="25"/>
         
@@ -810,195 +812,7 @@
         </pb_type>
        <!-- Define general purpose logic block (CLB) ends -->
 
-    <!-- Define fracturable multiplier begin -->
-    <!-- This multiplier can operate as a 36x36 multiplier that can fracture to two 18x18 multipliers each of which can further fracture to two 9x9 multipliers 
-	   For delay modelling, the 36x36 DSP multiplier in Stratix IV has a delay of 1.523 ns + 1.93 ns
-	    = 3.45 ns. The 18x18 mode doesn't need to sum four 18x18 multipliers, so it is a bit
-	   faster: 1.523 ns for the multiplier, and 1.09 ns for the multiplier output block.
-	    For the input and output interconnect delays, unlike Stratix IV, we don't
-	   have any routing/logic flexibility (crossbars) at the inputs.  There is some output muxing
-	   in Stratix IV and this architecture to select which multiplier outputs should go out (e.g.
-	   9x9 outputs, 18x18 or 36x36) so those are very close between the two architectures. 
-	   We take the conservative (slightly pessimistic)
-           approach modelling the input as the same as the Stratix IV input delay and the output delay the same as the Stratix IV DSP out delay.
-		   
-	   We estimate block area by using the published Stratix III data (which is architecturally identical to Stratix IV)
-	      (H. Wong, V. Betz and J. Rose, "Comparing FPGA vs. Custom CMOS and the Impact on Processor Microarchitecture", FPGA 2011) of 0.2623 
-		  mm^2 and scaling from 65 to 40 nm to obtain 0.0993 mm^2. That area is for a DSP block with approximately 2x the functionality of 
-		  the block we use (can implement two 36x36 multiplies instead of our 1, eight 18x18 multiplies instead of our 4, etc.). Hence we 
-		  divide the area by 2 to obtain 0.0497 mm^2. One minimum-width transistor units = 60 L^2 (where L = 40 nm), so is 518,000 MWTUS. 
-		  That area includes routing and the connection block input muxes.  Our DSP block is four 
-		  rows high, and hence includes four horizontal routing channel segments and four vertical ones, which is 4x the routing of a logic 
-		  block (single tile). It also includes 3.6x the outputs of a logic block, and 1.8x the inputs. Hence a slight overestimate of the routing
-		  area associated with our DSP block is four times that of a logic tile, where the routing area of a logic tile was calculated above (at W = 300)
-		  as 30481 MWTAs. Hence the (core, non-routing) area our DSP block is approximately 518,000 - 4 * 30,481 = 396,000 MWTUs.
-      -->
-    <pb_type name="mult_36" height="4" area="396000">
-      <input name="a" num_pins="36"/>
-      <input name="b" num_pins="36"/>
-      <output name="out" num_pins="72"/>
-
-      <mode name="two_divisible_mult_18x18">
-        <pb_type name="divisible_mult_18x18" num_pb="2">
-          <input name="a" num_pins="18"/>
-          <input name="b" num_pins="18"/>
-          <output name="out" num_pins="36"/>
-          <!-- Model 9x9 delay and 18x18 delay as the same.  9x9 could be faster, but in Stratix IV
-	          isn't, presumably because the multiplier layout is really optimized for 18x18.
-	      	-->
-          <mode name="two_mult_9x9">
-            <pb_type name="mult_9x9_slice" num_pb="2">
-              <input name="A_cfg" num_pins="9"/>
-              <input name="B_cfg" num_pins="9"/>
-              <output name="OUT_cfg" num_pins="18"/>
-
-              <pb_type name="mult_9x9" blif_model=".subckt multiply" num_pb="1">
-                <input name="a" num_pins="9"/>
-                <input name="b" num_pins="9"/>
-                <output name="out" num_pins="18"/>
-                <delay_constant max="1.523e-9" in_port="mult_9x9.a" out_port="mult_9x9.out"/>
-                <delay_constant max="1.523e-9" in_port="mult_9x9.b" out_port="mult_9x9.out"/>
-              </pb_type>
-
-              <interconnect>
-                <direct name="a2a" input="mult_9x9_slice.A_cfg" output="mult_9x9.a">
-                </direct>
-                <direct name="b2b" input="mult_9x9_slice.B_cfg" output="mult_9x9.b">
-                </direct>
-                <direct name="out2out" input="mult_9x9.out" output="mult_9x9_slice.OUT_cfg">
-                </direct>
-              </interconnect>
-              <power method="pin-toggle">
-                <port name="A_cfg" energy_per_toggle="1.45e-12"/>
-                <port name="B_cfg" energy_per_toggle="1.45e-12"/>
-                <static_power power_per_instance="0.0"/>
-              </power>
-            </pb_type>
-            <interconnect>
-              <direct name="a2a" input="divisible_mult_18x18.a" output="mult_9x9_slice[1:0].A_cfg">
-              </direct>
-              <direct name="b2b" input="divisible_mult_18x18.b" output="mult_9x9_slice[1:0].B_cfg">
-              </direct>
-              <direct name="out2out" input="mult_9x9_slice[1:0].OUT_cfg" output="divisible_mult_18x18.out">
-              </direct>
-            </interconnect>
-
-          </mode>
-
-          <mode name="mult_18x18">
-            <pb_type name="mult_18x18_slice" num_pb="1">
-              <input name="A_cfg" num_pins="18"/>
-              <input name="B_cfg" num_pins="18"/>
-              <output name="OUT_cfg" num_pins="36"/>
-
-              <pb_type name="mult_18x18" blif_model=".subckt multiply" num_pb="1">
-                <input name="a" num_pins="18"/>
-                <input name="b" num_pins="18"/>
-                <output name="out" num_pins="36"/>
-                <delay_constant max="1.523e-9" in_port="mult_18x18.a" out_port="mult_18x18.out"/>
-                <delay_constant max="1.523e-9" in_port="mult_18x18.b" out_port="mult_18x18.out"/>
-              </pb_type>
-
-              <interconnect>
-                <direct name="a2a" input="mult_18x18_slice.A_cfg" output="mult_18x18.a">
-                </direct>
-                <direct name="b2b" input="mult_18x18_slice.B_cfg" output="mult_18x18.b">
-                </direct>
-                <direct name="out2out" input="mult_18x18.out" output="mult_18x18_slice.OUT_cfg">
-                </direct>
-              </interconnect>
-              <power method="pin-toggle">
-                <port name="A_cfg" energy_per_toggle="1.09e-12"/>
-                <port name="B_cfg" energy_per_toggle="1.09e-12"/>
-                <static_power power_per_instance="0.0"/>					
-              </power>
-            </pb_type>
-            <interconnect>
-              <direct name="a2a" input="divisible_mult_18x18.a" output="mult_18x18_slice.A_cfg">
-              </direct>
-              <direct name="b2b" input="divisible_mult_18x18.b" output="mult_18x18_slice.B_cfg">
-              </direct>
-              <direct name="out2out" input="mult_18x18_slice.OUT_cfg" output="divisible_mult_18x18.out">
-              </direct>
-            </interconnect>
-          </mode>
-
-          <power method="sum-of-children"/>
-        </pb_type>
-        <interconnect>
-          <!-- Stratix IV input delay of 207ps is conservative for this architecture because this architecture does not have an input crossbar in the multiplier. 
-		   Subtract 72.5 ps delay, which is already in the connection block input mux, leading
-              -->
-          <direct name="a2a" input="mult_36.a" output="divisible_mult_18x18[1:0].a">
-            <delay_constant max="134e-12" in_port="mult_36.a" out_port="divisible_mult_18x18[1:0].a"/>
-          </direct>
-          <direct name="b2b" input="mult_36.b" output="divisible_mult_18x18[1:0].b">
-            <delay_constant max="134e-12" in_port="mult_36.b" out_port="divisible_mult_18x18[1:0].b"/>
-          </direct>
-          <direct name="out2out" input="divisible_mult_18x18[1:0].out" output="mult_36.out">
-            <delay_constant max="1.09e-9" in_port="divisible_mult_18x18[1:0].out" out_port="mult_36.out"/>
-          </direct>
-        </interconnect>
-      </mode>
-
-      <mode name="mult_36x36">
-        <pb_type name="mult_36x36_slice" num_pb="1">
-          <input name="A_cfg" num_pins="36"/>
-          <input name="B_cfg" num_pins="36"/>
-          <output name="OUT_cfg" num_pins="72"/>
-
-          <pb_type name="mult_36x36" blif_model=".subckt multiply" num_pb="1">
-            <input name="a" num_pins="36"/>
-            <input name="b" num_pins="36"/>
-            <output name="out" num_pins="72"/>
-            <delay_constant max="1.523e-9" in_port="mult_36x36.a" out_port="mult_36x36.out"/>
-            <delay_constant max="1.523e-9" in_port="mult_36x36.b" out_port="mult_36x36.out"/>
-          </pb_type>
-
-          <interconnect>
-            <direct name="a2a" input="mult_36x36_slice.A_cfg" output="mult_36x36.a">
-            </direct>
-            <direct name="b2b" input="mult_36x36_slice.B_cfg" output="mult_36x36.b">
-            </direct>
-            <direct name="out2out" input="mult_36x36.out" output="mult_36x36_slice.OUT_cfg">
-            </direct>
-          </interconnect>
-
-          <power method="pin-toggle">
-            <port name="A_cfg" energy_per_toggle="2.13e-12"/>
-            <port name="B_cfg" energy_per_toggle="2.13e-12"/>
-            <static_power power_per_instance="0.0"/>
-          </power>
-        </pb_type>
-        <interconnect>
-          <!-- Stratix IV input delay of 207ps is conservative for this architecture because this architecture does not have an input crossbar in the multiplier. 
-		   Subtract 72.5 ps delay, which is already in the connection block input mux, leading
-		   to a 134 ps delay.
-              -->
-          <direct name="a2a" input="mult_36.a" output="mult_36x36_slice.A_cfg">
-            <delay_constant max="134e-12" in_port="mult_36.a" out_port="mult_36x36_slice.A_cfg"/>
-          </direct>
-          <direct name="b2b" input="mult_36.b" output="mult_36x36_slice.B_cfg">
-            <delay_constant max="134e-12" in_port="mult_36.b" out_port="mult_36x36_slice.B_cfg"/>
-          </direct>
-          <direct name="out2out" input="mult_36x36_slice.OUT_cfg" output="mult_36.out">
-            <delay_constant max="1.93e-9" in_port="mult_36x36_slice.OUT_cfg" out_port="mult_36.out"/>
-          </direct>
-        </interconnect>
-
-      </mode>
-
-      <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
-       <fc_override fc_type="frac" fc_val="0" port_name="clk"/> 
-      </fc>
-
-      <pinlocations pattern="spread"/>
-
-      <power method="sum-of-children"/>
-    </pb_type>
-    <!-- Define fracturable multiplier end -->
-
-    <!-- Define mac begin -->
+    <!-- Define DSP begin -->
     <!-- Total area from SNPS = 6462.26 um^2. 
          Converting to MWTA at 60 L^2 / MWTA (1 MWTA = 60 * 40 * 40 nm2 = 96000nm2):
            6462.26um2 = 6462.26 * 1000 * 1000 nm2
@@ -1019,9 +833,66 @@
       <output name="cout"   num_pins="1" />
 	    <clock  name="clk"    num_pins="1" />
 
-      <!-- multiplier mode -->
-      <mode name="mult_8x8">
-        <pb_type name="mult_8x8" blif_model=".subckt dsp_multiply" num_pb="1">
+      <!-- combinatorial multiplier mode -->
+      <mode name="comb_mult_8x8_mode">
+        <pb_type name="mult_8x8" blif_model=".subckt multiply" num_pb="1">
+          <input name="a" num_pins="8"/>
+          <input name="b" num_pins="8"/>
+          <output name="out" num_pins="8"/>
+          <delay_constant max="1.11e-9" in_port="mult_8x8.a" out_port="mult_8x8.out"/>
+          <delay_constant max="1.11e-9" in_port="mult_8x8.b" out_port="mult_8x8.out"/>
+        </pb_type>
+
+        <interconnect>
+          <direct name="a2a" input="dsp.a" output="mult_8x8.a">
+		        <delay_constant max="0.1e-9" in_port="dsp.a" out_port="mult_8x8.a"/>
+          </direct>
+          <direct name="b2b" input="dsp.b" output="mult_8x8.b">
+       		  <delay_constant max="0.1e-9" in_port="dsp.b" out_port="mult_8x8.b"/>
+          </direct>
+          <direct name="out2out" input="mult_8x8.out" output="dsp.out">
+		        <delay_constant max="0.1e-9" in_port="mult_8x8.out" out_port="dsp.out"/>
+          </direct>
+        </interconnect>
+      </mode>
+
+      <!-- combinatorial adder mode -->
+      <mode name="comb_adder_8x8_mode">
+        <pb_type name="adder_pb" blif_model=".subckt adder" num_pb="1">
+          <input name="a" num_pins="8"/>
+          <input name="b" num_pins="8"/>
+          <input name="cin" num_pins="1"/>
+          <output name="sumout" num_pins="8"/>
+          <output name="cout" num_pins="1"/>
+
+          <!-- Carry link delays included in cin->cout delay -->
+          <delay_constant max="0.5e-9" in_port="adder_pb.a" out_port="adder_pb.sumout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.b" out_port="adder_pb.sumout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.cin" out_port="adder_pb.sumout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.a" out_port="adder_pb.cout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.b" out_port="adder_pb.cout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.cin" out_port="adder_pb.cout"/>
+        </pb_type>
+        <interconnect>
+          <direct name="atoa" input="dsp.a" output="adder_pb.a">
+		        <delay_constant max="0.1e-9" in_port="dsp.a" out_port="adder_pb.a"/>
+          </direct>
+          <direct name="btob" input="dsp.b" output="adder_pb.b">
+		        <delay_constant max="0.1e-9" in_port="dsp.b" out_port="adder_pb.b"/>
+		      </direct>
+          <direct name="cintocin" input="dsp.cin" output="adder_pb.cin">
+		      </direct>
+          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out">
+		        <delay_constant max="0.1e-9" in_port="adder_pb.sumout" out_port="dsp.out"/>
+		      </direct>
+          <direct name="couttocout" input="adder_pb.cout" output="dsp.cout">
+		      </direct>
+        </interconnect>
+      </mode>
+
+      <!-- sequential multiplier mode -->
+      <mode name="seq_mult_8x8_mode">
+        <pb_type name="mult_8x8" blif_model=".subckt seq_multiply" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
           <output name="out" num_pins="8"/>
@@ -1044,11 +915,15 @@
         </pb_type>
 
         <interconnect>
+          <!-- The delays here because of the additional mux to expose the combinatorial multiplier -->
           <direct name="a2a" input="dsp.a" output="mult_8x8.a">
+		        <delay_constant max="0.1e-9" in_port="dsp.a" out_port="mult_8x8.a"/>
           </direct>
           <direct name="b2b" input="dsp.b" output="mult_8x8.b">
+       		  <delay_constant max="0.1e-9" in_port="dsp.b" out_port="mult_8x8.b"/>
           </direct>
           <direct name="out2out" input="mult_8x8.out" output="dsp.out">
+		        <delay_constant max="0.1e-9" in_port="mult_8x8.out" out_port="dsp.out"/>
           </direct>
 				  <direct name="reset2reset" input="dsp.reset" output="mult_8x8.reset">
 				  </direct>
@@ -1057,9 +932,9 @@
         </interconnect>
       </mode>
 
-      <!-- adder mode -->
-      <mode name="one_adder">
-        <pb_type name="adder_pb" blif_model=".subckt dsp_adder" num_pb="1">
+      <!-- sequential adder mode -->
+      <mode name="seq_adder_8x8_mode">
+        <pb_type name="adder_pb" blif_model=".subckt seq_adder" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
           <input name="cin" num_pins="1"/>
@@ -1092,14 +967,19 @@
           <delay_constant max="0.5e-9" in_port="adder_pb.cin" out_port="adder_pb.cout"/>
           <delay_constant max="0.5e-9" in_port="adder_pb.reset" out_port="adder_pb.cout"/>
         </pb_type>
+
         <interconnect>
+          <!-- The delays here because of the additional mux to expose the combinatorial adder-->
           <direct name="atoa" input="dsp.a" output="adder_pb.a">
+		        <delay_constant max="0.1e-9" in_port="dsp.a" out_port="adder_pb.a"/>
 		      </direct>
           <direct name="btob" input="dsp.b" output="adder_pb.b">
+		        <delay_constant max="0.1e-9" in_port="dsp.b" out_port="adder_pb.b"/>
     		  </direct>
           <direct name="cintocin" input="dsp.cin" output="adder_pb.cin">
 		      </direct>
           <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out">
+		        <delay_constant max="0.1e-9" in_port="adder_pb.sumout" out_port="dsp.out"/>
 		      </direct>
           <direct name="couttocout" input="adder_pb.cout" output="dsp.cout">
 		      </direct>
@@ -1110,9 +990,9 @@
         </interconnect>
       </mode>
 
-      <!-- mac mode -->
-      <mode name="mac_8x8_mode">
-      	<pb_type name="mac_8x8" blif_model=".subckt dsp_mac" num_pb="1">
+      <!-- sequential mac mode -->
+      <mode name="seq_mac_8x8_mode">
+      	<pb_type name="mac_8x8" blif_model=".subckt seq_mac" num_pb="1">
 				  <input name="a" num_pins="8"/>
 				  <input name="b" num_pins="8"/>
 				  <output name="out" num_pins="8"/>
@@ -1164,7 +1044,7 @@
       <!-- Place this multiplier block every 8 columns from (and including) the sixth column -->
       <power method="sum-of-children"/>
     </pb_type>
-    <!-- Define mac end -->
+    <!-- Define DSP end -->
 
     <!-- Define fracturable memory begin -->
     <!-- 32 Kb Memory that can operate from 512x64 to 32Kx1 for single-port mode and 1024x32 to 32Kx1 for dual-port mode.  

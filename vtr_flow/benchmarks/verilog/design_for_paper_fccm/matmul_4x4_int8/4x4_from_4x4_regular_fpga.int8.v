@@ -4,6 +4,7 @@
 `define AWIDTH 7
 `define MEM_SIZE 128
 `define MAT_MUL_SIZE 4
+`define LOG2_MAT_MUL_SIZE 2
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 `define NUM_CYCLES_IN_MAC 2
 
@@ -284,7 +285,9 @@ always @(posedge clk) begin
     clk_cnt <= 0;
     done_mat_mul <= 0;
   end
-  else if (clk_cnt == 4*final_mat_mul_size-2+4) begin
+  //else if (clk_cnt == 4*final_mat_mul_size-2+4) begin
+  //Writing the line above to avoid multiplication:
+  else if (clk_cnt == (final_mat_mul_size<<2)+2) begin
       done_mat_mul <= 1;
   end
   else if (done_mat_mul == 0) begin
@@ -297,10 +300,14 @@ always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
     a_addr <= `MEM_SIZE-1;//a_loc*16;
   end
-  else if (clk_cnt >= a_loc*`MAT_MUL_SIZE+final_mat_mul_size) begin
+  //else if (clk_cnt >= a_loc*`MAT_MUL_SIZE+final_mat_mul_size) begin
+  //Writing the line above to avoid multiplication:
+  else if (clk_cnt >= (a_loc<<`LOG2_MAT_MUL_SIZE)+final_mat_mul_size) begin
     a_addr <= `MEM_SIZE-1; 
   end
-  else if ((clk_cnt >= a_loc*`MAT_MUL_SIZE) && (clk_cnt < a_loc*`MAT_MUL_SIZE+final_mat_mul_size)) begin
+  //else if ((clk_cnt >= a_loc*`MAT_MUL_SIZE) && (clk_cnt < a_loc*`MAT_MUL_SIZE+final_mat_mul_size)) begin
+  //Writing the line above to avoid multiplication:
+  else if ((clk_cnt >= (a_loc<<`LOG2_MAT_MUL_SIZE)) && (clk_cnt < (a_loc<<`LOG2_MAT_MUL_SIZE)+final_mat_mul_size)) begin
     a_addr <= a_addr + 1;
   end
 end  
@@ -353,10 +360,14 @@ always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
     b_addr <= `MEM_SIZE-1;//b_loc*16;
   end
-  else if (clk_cnt >= b_loc*`MAT_MUL_SIZE+final_mat_mul_size) begin
+  //else if (clk_cnt >= b_loc*`MAT_MUL_SIZE+final_mat_mul_size) begin
+  //Writing the line above to avoid multiplication:
+  else if (clk_cnt >= (b_loc<<`LOG2_MAT_MUL_SIZE)+final_mat_mul_size) begin
     b_addr <= `MEM_SIZE-1;
   end
-  else if ((clk_cnt >= b_loc*`MAT_MUL_SIZE) && (clk_cnt < b_loc*`MAT_MUL_SIZE+final_mat_mul_size)) begin
+  //else if ((clk_cnt >= b_loc*`MAT_MUL_SIZE) && (clk_cnt < b_loc*`MAT_MUL_SIZE+final_mat_mul_size)) begin
+  //Writing the line above to avoid multiplication:
+  else if ((clk_cnt >= (b_loc<<`LOG2_MAT_MUL_SIZE)) && (clk_cnt < (b_loc<<`LOG2_MAT_MUL_SIZE)+final_mat_mul_size)) begin
     b_addr <= b_addr + 1;
   end
 end  
@@ -479,10 +490,15 @@ assign cin_row1 = c_data_in[2*`DWIDTH-1:`DWIDTH];
 assign cin_row2 = c_data_in[3*`DWIDTH-1:2*`DWIDTH];
 assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
 
-assign row0_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 7 +  `NUM_CYCLES_IN_MAC - 1));
-assign row1_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 8 +  `NUM_CYCLES_IN_MAC - 1));
-assign row2_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 9 +  `NUM_CYCLES_IN_MAC - 1));
-assign row3_latch_en = (clk_cnt==(`BB_MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 10 + `NUM_CYCLES_IN_MAC - 1));
+//assign row0_latch_en = (clk_cnt==(`MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 7 +  `NUM_CYCLES_IN_MAC - 1));
+//assign row1_latch_en = (clk_cnt==(`MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 8 +  `NUM_CYCLES_IN_MAC - 1));
+//assign row2_latch_en = (clk_cnt==(`MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 9 +  `NUM_CYCLES_IN_MAC - 1));
+//assign row3_latch_en = (clk_cnt==(`MAT_MUL_SIZE + (a_loc+b_loc) * `BB_MAT_MUL_SIZE + 10 + `NUM_CYCLES_IN_MAC - 1));
+//Writing the line above to avoid multiplication:
+assign row0_latch_en = (clk_cnt==(`MAT_MUL_SIZE + ((a_loc+b_loc) << `LOG2_MAT_MUL_SIZE) + 7 +  `NUM_CYCLES_IN_MAC - 1));
+assign row1_latch_en = (clk_cnt==(`MAT_MUL_SIZE + ((a_loc+b_loc) << `LOG2_MAT_MUL_SIZE) + 8 +  `NUM_CYCLES_IN_MAC - 1));
+assign row2_latch_en = (clk_cnt==(`MAT_MUL_SIZE + ((a_loc+b_loc) << `LOG2_MAT_MUL_SIZE) + 9 +  `NUM_CYCLES_IN_MAC - 1));
+assign row3_latch_en = (clk_cnt==(`MAT_MUL_SIZE + ((a_loc+b_loc) << `LOG2_MAT_MUL_SIZE) + 10 + `NUM_CYCLES_IN_MAC - 1));
 
 always @(posedge clk) begin
   if (reset) begin
@@ -577,7 +593,7 @@ module processing_element(
 
  assign out_c = out_mac;
 
- dsp_mac u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(reset), .clk(clk));
+ seq_mac u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(reset), .clk(clk));
 
  always @(posedge clk)begin
     if(reset) begin
@@ -592,7 +608,7 @@ module processing_element(
  
 endmodule
 
-//module dsp_mac(a, b, out, reset, clk);
+//module seq_mac(a, b, out, reset, clk);
 //input [`DWIDTH-1:0] a;
 //input [`DWIDTH-1:0] b;
 //input reset;
