@@ -238,7 +238,7 @@ matmul_4x4_systolic u_matmul_4x4(
 
 endmodule
 */
-
+/*
 module matmul_4x4_systolic(
  clk,
  reset,
@@ -607,7 +607,7 @@ module processing_element(
  end
  
 endmodule
-
+*/
 //module seq_mac(a, b, out, reset, clk);
 //input [`DWIDTH-1:0] a;
 //input [`DWIDTH-1:0] b;
