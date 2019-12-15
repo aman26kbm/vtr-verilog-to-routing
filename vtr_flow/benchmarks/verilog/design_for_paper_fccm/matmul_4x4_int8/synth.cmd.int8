@@ -3,8 +3,8 @@ elaborate matmul_4x4_systolic -architecture verilog -library DEFAULT
 link
 set_implementation pparch */*/*/u_add
 set_implementation pparch */*/*/u_mult
-#able to synthesize at 1.17. That is, 854 MHz
-create_clock -name "CLK_0" -period 1.17 -waveform { 0 0.585 }  { clk  }
+#able to synthesize at 1.11. That is, 900 MHz
+create_clock -name "CLK_0" -period 1.11 -waveform { 0 0.555 }  { clk  }
 set_dp_smartgen_options -all_options auto -hierarchy -smart_compare true -optimize_for speed -sop2pos_transformation false
 set_operating_conditions -library gscl45nm typical
 remove_wire_load_model

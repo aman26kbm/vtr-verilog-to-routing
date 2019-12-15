@@ -6,7 +6,7 @@
 `define MAT_MUL_SIZE 4
 `define LOG2_MAT_MUL_SIZE 2
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
-`define NUM_CYCLES_IN_MAC 2
+`define NUM_CYCLES_IN_MAC 3
 
 //Design with memories
 module matrix_multiplication(
@@ -608,72 +608,92 @@ module processing_element(
  
 endmodule
 
-//module seq_mac(a, b, out, reset, clk);
-//input [`DWIDTH-1:0] a;
-//input [`DWIDTH-1:0] b;
-//input reset;
-//input clk;
-//output [`DWIDTH-1:0] out;
-//
-//reg [`DWIDTH-1:0] out;
-//reg [`DWIDTH-1:0] mul_out_reg;
-//wire [`DWIDTH-1:0] mul_out;
-//wire [`DWIDTH-1:0] add_out;
-//
-////assign mul_out = a * b;
-//qmult mult_u1(.i_multiplicand(a), .i_multiplier(b), .o_result(mul_out));
-//
-//always @(posedge clk) begin
-//  if (reset) begin
-//    out <= 0;
-//    mul_out_reg <= 0;
-//  end else begin
-//    out <= add_out;
-//    mul_out_reg <= mul_out;
-//  end
-//end
-// 
-////we just truncate the higher bits of the product
-////assign add_out = mul_out + out;
-//qadd add_u1(.a(out), .b(mul_out_reg), .c(add_out));
-//
-//endmodule
-//
-//module qmult(i_multiplicand,i_multiplier,o_result);
-//input [`DWIDTH-1:0] i_multiplicand;
-//input [`DWIDTH-1:0] i_multiplier;
-//output [`DWIDTH-1:0] o_result;
-//
-//wire [2*`DWIDTH-1:0] o_result_temp;
-//
-////assign o_result = i_multiplicand * i_multiplier;
-//DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result_temp));
-//
-////down cast the result
-//assign o_result = 
-//    (o_result_temp[2*`DWIDTH-1] == 0) ?  //positive number
-//        (
-//           (|(o_result_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
-//             {o_result_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
-//             {o_result_temp[2*`DWIDTH-1] , o_result_temp[`DWIDTH-2:0]} 
-//        )
-//        : //negative number
-//        (
-//           (|(o_result_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
-//             {o_result_temp[2*`DWIDTH-1] , o_result_temp[`DWIDTH-2:0]} :
-//             {o_result_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
-//        );
-//
-//endmodule
-//
-//module qadd(a,b,c);
-//input [`DWIDTH-1:0] a;
-//input [`DWIDTH-1:0] b;
-//output [`DWIDTH-1:0] c;
-//
-////assign c = a + b;
-//DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
-//endmodule
+module seq_mac(a, b, out, reset, clk);
+input [`DWIDTH-1:0] a;
+input [`DWIDTH-1:0] b;
+input reset;
+input clk;
+output [`DWIDTH-1:0] out;
+
+reg [`DWIDTH-1:0] out;
+wire [`DWIDTH-1:0] mul_out;
+wire [`DWIDTH-1:0] add_out;
+
+reg [`DWIDTH-1:0] a_flopped;
+reg [`DWIDTH-1:0] b_flopped;
+
+wire [2*`DWIDTH-1:0] mul_out_temp;
+reg [2*`DWIDTH-1:0] mul_out_temp_reg;
+
+always @(posedge clk) begin
+  if (reset) begin
+    a_flopped <= 0;
+    b_flopped <= 0;
+  end else begin
+    a_flopped <= a;
+    b_flopped <= b;
+  end
+end
+
+//assign mul_out = a * b;
+qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
+
+always @(posedge clk) begin
+  if (reset) begin
+    mul_out_temp_reg <= 0;
+  end else begin
+    mul_out_temp_reg <= mul_out_temp;
+  end
+end
+
+//down cast the result
+assign mul_out = 
+    (mul_out_temp_reg[2*`DWIDTH-1] == 0) ?  //positive number
+        (
+           (|(mul_out_temp_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
+             {mul_out_temp_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
+             {mul_out_temp_reg[2*`DWIDTH-1] , mul_out_temp_reg[`DWIDTH-2:0]} 
+        )
+        : //negative number
+        (
+           (|(mul_out_temp_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
+             {mul_out_temp_reg[2*`DWIDTH-1] , mul_out_temp_reg[`DWIDTH-2:0]} :
+             {mul_out_temp_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
+        );
+
+
+//we just truncate the higher bits of the product
+//assign add_out = mul_out + out;
+qadd add_u1(.a(out), .b(mul_out), .c(add_out));
+
+always @(posedge clk) begin
+  if (reset) begin
+    out <= 0;
+  end else begin
+    out <= add_out;
+  end
+end
+
+endmodule
+
+module qmult(i_multiplicand,i_multiplier,o_result);
+input [`DWIDTH-1:0] i_multiplicand;
+input [`DWIDTH-1:0] i_multiplier;
+output [2*`DWIDTH-1:0] o_result;
+
+//assign o_result = i_multiplicand * i_multiplier;
+DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result));
+
+endmodule
+
+module qadd(a,b,c);
+input [`DWIDTH-1:0] a;
+input [`DWIDTH-1:0] b;
+output [`DWIDTH-1:0] c;
+
+//assign c = a + b;
+DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
+endmodule
 
 module ram (addr0, d0, we0, q0,  clk);
 
@@ -683,24 +703,24 @@ input we0;
 output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 input clk;
 
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
-//
-//always @(posedge clk)  
-//begin 
-//        if (we0) 
-//        begin 
-//            ram[addr0] <= d0; 
-//        end 
-//        q0 <= ram[addr0];
-//end
+reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
 
-single_port_ram u_single_port_ram(
-  .data(d0),
-  .we(we0),
-  .addr(addr0),
-  .clk(clk),
-  .out(q0)
-);
+always @(posedge clk)  
+begin 
+        if (we0) 
+        begin 
+            ram[addr0] <= d0; 
+        end 
+        q0 <= ram[addr0];
+end
+
+//single_port_ram u_single_port_ram(
+//  .data(d0),
+//  .we(we0),
+//  .addr(addr0),
+//  .clk(clk),
+//  .out(q0)
+//);
 endmodule
 
