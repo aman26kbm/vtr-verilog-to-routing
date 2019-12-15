@@ -24,7 +24,7 @@ module FPAddSub_ExceptionModule(
     );
 	 
 	// Input ports
-	input [31:0] Z	;					// Final product
+	input [`DWIDTH-1:0] Z	;					// Final product
 	input NegE ;						// Negative exponent?
 	input R ;							// Round bit
 	input S ;							// Sticky bit
@@ -32,7 +32,7 @@ module FPAddSub_ExceptionModule(
 	input EOF ;
 	
 	// Output ports
-	output [31:0] P ;					// Final result
+	output [`DWIDTH-1:0] P ;					// Final result
 	output [4:0] Flags ;				// Exception flags
 	
 	// Internal signals
@@ -51,7 +51,7 @@ module FPAddSub_ExceptionModule(
 	assign Underflow = NegE & (R | S);
 	
 	// Infinite result computed exactly from finite operands
-	assign DivideByZero = &(Z[30:23]) & ~|(Z[30:23]) & ~InputExc[1] & ~InputExc[0];
+	assign DivideByZero = &(Z[`MANTISSA+`EXPONENT-1:`MANTISSA]) & ~|(Z[`MANTISSA+`EXPONENT-1:`MANTISSA]) & ~InputExc[1] & ~InputExc[0];
 	
 	// Invalid inputs or operation
 	assign Invalid = |(InputExc[4:2]) ;
