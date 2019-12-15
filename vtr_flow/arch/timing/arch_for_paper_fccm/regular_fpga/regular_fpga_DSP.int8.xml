@@ -137,11 +137,36 @@
       </output_ports>
     </model>
 
-    <model name="mac_block">
+    <model name="dsp_adder">
+      <input_ports>
+        <port name="a" clock="clk" combinational_sink_ports="sumout cout"/>
+        <port name="b" clock="clk" combinational_sink_ports="sumout cout"/>
+        <port name="cin" clock="clk" combinational_sink_ports="sumout cout"/>
+		    <port name="clk" is_clock="1" />
+		    <port name="reset" clock="clk" combinational_sink_ports="sumout cout"/>
+      </input_ports>
+      <output_ports>
+        <port name="cout" clock="clk"/>
+        <port name="sumout" clock="clk"/>
+      </output_ports>
+    </model>
+
+    <model name="dsp_multiply">
       <input_ports>
         <port name="a" clock="clk" combinational_sink_ports="out"/>
         <port name="b" clock="clk" combinational_sink_ports="out"/>
-        <!--<port name="c" combinational_sink_ports="out"/>-->
+		    <port name="clk" is_clock="1" />
+		    <port name="reset" clock="clk" combinational_sink_ports="out"/>
+      </input_ports>
+      <output_ports>
+        <port name="out" clock="clk"/>
+      </output_ports>
+    </model>
+
+    <model name="dsp_mac">
+      <input_ports>
+        <port name="a" clock="clk" combinational_sink_ports="out"/>
+        <port name="b" clock="clk" combinational_sink_ports="out"/>
 		    <port name="clk" is_clock="1" />
 		    <port name="reset" clock="clk" combinational_sink_ports="out"/>
       </input_ports>
@@ -973,121 +998,166 @@
     </pb_type>
     <!-- Define fracturable multiplier end -->
 
-
     <!-- Define mac begin -->
+    <!-- Total area from SNPS = 6462.26 um^2. 
+         Converting to MWTA at 60 L^2 / MWTA (1 MWTA = 60 * 40 * 40 nm2 = 96000nm2):
+           6462.26um2 = 6462.26 * 1000 * 1000 nm2
+                     = (6462.26 * 1000 * 1000) / (96000) = 67315.20 ~= 67500 MWTAs
 
-    <pb_type name="dsp" height="2" area="66000">
-	    <input  name="reset"  num_pins="1" is_non_clock_global="true"/>
+         Clock duration:
+         MAC mode  : 1.11 
+         Mult mode : 1.11
+         Add mode  : 0.5
+    --> 
+    <pb_type name="dsp" height="2" area="67500">
+	    <!--<input  name="reset"  num_pins="1" is_non_clock_global="true"/> -->
+	    <input  name="reset"  num_pins="1"/>
       <input  name="a"      num_pins="8"/>
       <input  name="b"      num_pins="8"/>
       <input  name="cin"    num_pins="1" />
-      <output name="out"    num_pins="16"/>
+      <output name="out"    num_pins="8"/>
       <output name="cout"   num_pins="1" />
 	    <clock  name="clk"    num_pins="1" />
-      <!--<output name="sumout" num_pins="8"/>-->
 
-
+      <!-- multiplier mode -->
       <mode name="mult_8x8">
-        <pb_type name="mult_8x8" blif_model=".subckt multiply" num_pb="1">
+        <pb_type name="mult_8x8" blif_model=".subckt dsp_multiply" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
-          <output name="out" num_pins="16"/>
-          <delay_constant max="1.47e-9" in_port="mult_8x8.a" out_port="mult_8x8.out"/>
-          <delay_constant max="1.47e-9" in_port="mult_8x8.b" out_port="mult_8x8.out"/>
+          <output name="out" num_pins="8"/>
+	   			<input name="reset" num_pins="1" />
+		  		<clock name="clk"  num_pins="1" />
+
+				  <T_setup value="66e-12" port="mult_8x8.reset" clock="clk"/>
+				  <T_setup value="66e-12" port="mult_8x8.a" clock="clk"/>
+				  <T_setup value="66e-12" port="mult_8x8.b" clock="clk"/>
+				  <T_setup value="66e-12" port="mult_8x8.out" clock="clk"/>
+				  
+				  <T_clock_to_Q max="124e-12" port="mult_8x8.reset" clock="clk"/>
+				  <T_clock_to_Q max="124e-12" port="mult_8x8.a" clock="clk"/>
+				  <T_clock_to_Q max="124e-12" port="mult_8x8.b" clock="clk"/>
+				  <T_clock_to_Q max="124e-12" port="mult_8x8.out" clock="clk"/>
+
+          <delay_constant max="1.11e-9" in_port="mult_8x8.a" out_port="mult_8x8.out"/>
+          <delay_constant max="1.11e-9" in_port="mult_8x8.b" out_port="mult_8x8.out"/>
+          <delay_constant max="1.11e-9" in_port="mult_8x8.reset" out_port="mult_8x8.out"/>
         </pb_type>
 
         <interconnect>
           <direct name="a2a" input="dsp.a" output="mult_8x8.a">
-		  <delay_constant max="0.1e-9" in_port="dsp.a" out_port="mult_8x8.a"/>
           </direct>
           <direct name="b2b" input="dsp.b" output="mult_8x8.b">
-		  <delay_constant max="0.1e-9" in_port="dsp.b" out_port="mult_8x8.b"/>
           </direct>
           <direct name="out2out" input="mult_8x8.out" output="dsp.out">
-		  <delay_constant max="0.2e-9" in_port="mult_8x8.out" out_port="dsp.out"/>
           </direct>
+				  <direct name="reset2reset" input="dsp.reset" output="mult_8x8.reset">
+				  </direct>
+				  <direct name="clk2clk" input="dsp.clk" output="mult_8x8.clk">
+				  </direct>
         </interconnect>
       </mode>
 
+      <!-- adder mode -->
       <mode name="one_adder">
-        <pb_type name="adder_pb" blif_model=".subckt adder" num_pb="1">
+        <pb_type name="adder_pb" blif_model=".subckt dsp_adder" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
           <input name="cin" num_pins="1"/>
           <output name="sumout" num_pins="8"/>
           <output name="cout" num_pins="1"/>
+	   			<input name="reset" num_pins="1" />
+		  		<clock name="clk"  num_pins="1" />
+  
+  				<T_setup value="66e-12" port="adder_pb.reset" clock="clk"/>
+  				<T_setup value="66e-12" port="adder_pb.a" clock="clk"/>
+  				<T_setup value="66e-12" port="adder_pb.b" clock="clk"/>
+  				<T_setup value="66e-12" port="adder_pb.sumout" clock="clk"/>
+  				<T_setup value="66e-12" port="adder_pb.cout" clock="clk"/>
+  				<T_setup value="66e-12" port="adder_pb.cin" clock="clk"/>
+  				
+  				<T_clock_to_Q max="124e-12" port="adder_pb.reset" clock="clk"/>
+  				<T_clock_to_Q max="124e-12" port="adder_pb.a" clock="clk"/>
+  				<T_clock_to_Q max="124e-12" port="adder_pb.b" clock="clk"/>
+  				<T_clock_to_Q max="124e-12" port="adder_pb.sumout" clock="clk"/>
+  				<T_clock_to_Q max="124e-12" port="adder_pb.cout" clock="clk"/>
+  				<T_clock_to_Q max="124e-12" port="adder_pb.cin" clock="clk"/>
+
           <!-- Carry link delays included in cin->cout delay -->
-          <delay_constant max="0.68e-9" in_port="adder_pb.a" out_port="adder_pb.sumout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.b" out_port="adder_pb.sumout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.cin" out_port="adder_pb.sumout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.a" out_port="adder_pb.cout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.b" out_port="adder_pb.cout"/>
-          <delay_constant max="0.68e-9" in_port="adder_pb.cin" out_port="adder_pb.cout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.a" out_port="adder_pb.sumout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.b" out_port="adder_pb.sumout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.cin" out_port="adder_pb.sumout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.reset" out_port="adder_pb.sumout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.a" out_port="adder_pb.cout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.b" out_port="adder_pb.cout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.cin" out_port="adder_pb.cout"/>
+          <delay_constant max="0.5e-9" in_port="adder_pb.reset" out_port="adder_pb.cout"/>
         </pb_type>
         <interconnect>
           <direct name="atoa" input="dsp.a" output="adder_pb.a">
-		  <delay_constant max="0.1e-9" in_port="dsp.a" out_port="adder_pb.a"/>
-		  </direct>
+		      </direct>
           <direct name="btob" input="dsp.b" output="adder_pb.b">
-		  <delay_constant max="0.1e-9" in_port="dsp.b" out_port="adder_pb.b"/>
-		  </direct>
+    		  </direct>
           <direct name="cintocin" input="dsp.cin" output="adder_pb.cin">
-		  </direct>
-          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out[7:0]">
-		  <delay_constant max="0.2e-9" in_port="adder_pb.sumout" out_port="dsp.out[7:0]"/>
-		  </direct>
+		      </direct>
+          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out">
+		      </direct>
           <direct name="couttocout" input="adder_pb.cout" output="dsp.cout">
-		  </direct>
+		      </direct>
+				  <direct name="reset2reset" input="dsp.reset" output="adder_pb.reset">
+				  </direct>
+				  <direct name="clk2clk" input="dsp.clk" output="adder_pb.clk">
+				  </direct>
         </interconnect>
       </mode>
+
+      <!-- mac mode -->
       <mode name="mac_8x8_mode">
-      	<pb_type name="mac_8x8" blif_model=".subckt mac_block" num_pb="1">
-				<input name="reset" num_pins="1" />
-				<input name="a" num_pins="8"/>
-				<input name="b" num_pins="8"/>
-				<output name="out" num_pins="16"/>
-				
-				<clock name="clk"  num_pins="1" />
-				<T_setup value="66e-12" port="mac_8x8.reset" clock="clk"/>
-				<T_setup value="66e-12" port="mac_8x8.a" clock="clk"/>
-				<T_setup value="66e-12" port="mac_8x8.b" clock="clk"/>
-				<T_setup value="66e-12" port="mac_8x8.out" clock="clk"/>
-				
-				<T_clock_to_Q max="124e-12" port="mac_8x8.reset" clock="clk"/>
-				<T_clock_to_Q max="124e-12" port="mac_8x8.a" clock="clk"/>
-				<T_clock_to_Q max="124e-12" port="mac_8x8.b" clock="clk"/>
-				<T_clock_to_Q max="124e-12" port="mac_8x8.out" clock="clk"/>
-				
-				<delay_constant max="2.7e-9" in_port="mac_8x8.a" out_port="mac_8x8.out"/>
-				<delay_constant max="2.7e-9" in_port="mac_8x8.b" out_port="mac_8x8.out"/>
-				<delay_constant max="2.7e-9" in_port="mac_8x8.reset" out_port="mac_8x8.out"/>
+      	<pb_type name="mac_8x8" blif_model=".subckt dsp_mac" num_pb="1">
+				  <input name="a" num_pins="8"/>
+				  <input name="b" num_pins="8"/>
+				  <output name="out" num_pins="8"/>
+				  <input name="reset" num_pins="1" />
+				  <clock name="clk"  num_pins="1" />
 
-            <!--  <power method="pin-toggle">
-                <port name="a" energy_per_toggle="1.09e-12"/>
-                <port name="b" energy_per_toggle="1.09e-12"/>
-                <port name="c" energy_per_toggle="1.09e-12"/>
-                <static_power power_per_instance="0.0"/>					
-              </power>-->
-            </pb_type>
-            <interconnect>
-				<direct name="a2a" input="dsp.a" output="mac_8x8.a">
-				</direct>
-				<direct name="b2b" input="dsp.b" output="mac_8x8.b">
-				</direct>
-				<direct name="reset2reset" input="dsp.reset" output="mac_8x8.reset">
-				</direct>
-				<direct name="clk2clk" input="dsp.clk" output="mac_8x8.clk">
-				</direct>
-				<direct name="out2out" input="mac_8x8.out" output="dsp.out">
-				<delay_constant max="0.1e-9" in_port="mac_8x8.out" out_port="dsp.out"/>
-				</direct>
-            </interconnect>
+				  <T_setup value="66e-12" port="mac_8x8.reset" clock="clk"/>
+				  <T_setup value="66e-12" port="mac_8x8.a" clock="clk"/>
+				  <T_setup value="66e-12" port="mac_8x8.b" clock="clk"/>
+				  <T_setup value="66e-12" port="mac_8x8.out" clock="clk"/>
+				  
+				  <T_clock_to_Q max="124e-12" port="mac_8x8.reset" clock="clk"/>
+				  <T_clock_to_Q max="124e-12" port="mac_8x8.a" clock="clk"/>
+				  <T_clock_to_Q max="124e-12" port="mac_8x8.b" clock="clk"/>
+				  <T_clock_to_Q max="124e-12" port="mac_8x8.out" clock="clk"/>
+				  
+				  <delay_constant max="1.11e-9" in_port="mac_8x8.a" out_port="mac_8x8.out"/>
+				  <delay_constant max="1.11e-9" in_port="mac_8x8.b" out_port="mac_8x8.out"/>
+				  <delay_constant max="1.11e-9" in_port="mac_8x8.reset" out_port="mac_8x8.out"/>
+
+          <!--  <power method="pin-toggle">
+              <port name="a" energy_per_toggle="1.09e-12"/>
+              <port name="b" energy_per_toggle="1.09e-12"/>
+              <port name="c" energy_per_toggle="1.09e-12"/>
+              <static_power power_per_instance="0.0"/>					
+            </power>-->
+        </pb_type>
+        <interconnect>
+				  <direct name="a2a" input="dsp.a" output="mac_8x8.a">
+				  </direct>
+				  <direct name="b2b" input="dsp.b" output="mac_8x8.b">
+				  </direct>
+				  <direct name="reset2reset" input="dsp.reset" output="mac_8x8.reset">
+				  </direct>
+				  <direct name="clk2clk" input="dsp.clk" output="mac_8x8.clk">
+				  </direct>
+				  <direct name="out2out" input="mac_8x8.out" output="dsp.out">
+				  </direct>
+        </interconnect>
       </mode>
-
 
       <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
         <!-- clock pins do not connect to local routing--> 
         <fc_override fc_type="frac" fc_val="0" port_name="clk"/> 
+        <fc_override fc_type="frac" fc_val="0" port_name="reset"/> 
       </fc>
       <pinlocations pattern="spread"/>
 

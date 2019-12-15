@@ -577,7 +577,7 @@ module processing_element(
 
  assign out_c = out_mac;
 
- mac_block u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(reset), .clk(clk));
+ dsp_mac u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(reset), .clk(clk));
 
  always @(posedge clk)begin
     if(reset) begin
@@ -592,7 +592,7 @@ module processing_element(
  
 endmodule
 
-//module mac_block(a, b, out, reset, clk);
+//module dsp_mac(a, b, out, reset, clk);
 //input [`DWIDTH-1:0] a;
 //input [`DWIDTH-1:0] b;
 //input reset;
