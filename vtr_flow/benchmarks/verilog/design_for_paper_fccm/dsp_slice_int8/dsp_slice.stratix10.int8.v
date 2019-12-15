@@ -3,17 +3,18 @@
 `define SIGN 1
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
+
 module dsp_slice(
         clk,
         reset,
         ax,
         ay,
-		az,
+        az,
         carry_in,
         carry_out,
         result,
         multiply,
-		accumulate
+        accumulate
         );
 
   input clk;
@@ -26,7 +27,6 @@ module dsp_slice(
   output [`DWIDTH-1:0] result;
   input multiply;
   input accumulate;
-
 
   reg [`DWIDTH-1:0] ax_flopped;
   reg [`DWIDTH-1:0] ay_flopped;
@@ -54,34 +54,35 @@ module dsp_slice(
   
   DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(inp_a_mult), .B(inp_b_mult), .TC(1'b1), .PRODUCT(out_mult_temp));
 
-  //down cast the result of multiplication
-  assign out_mult = 
-    (out_mult_temp[2*`DWIDTH-1] == 0) ?  //positive number
-        (
-           (|(out_mult_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
-             {out_mult_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
-             {out_mult_temp[2*`DWIDTH-1] , out_mult_temp[`DWIDTH-2:0]} 
-        )
-        : //negative number
-        (
-           (|(out_mult_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
-             {out_mult_temp[2*`DWIDTH-1] , out_mult_temp[`DWIDTH-2:0]} :
-             {out_mult_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
-        );
-
-
-  reg [`DWIDTH-1:0] out_mult_reg;
+  reg [2*`DWIDTH-1:0] out_mult_temp_reg;
 
   always @(posedge clk) begin
     if (reset) begin
-      out_mult_reg <= 0;
+      out_mult_temp_reg <= 0;
     end else begin
-      out_mult_reg <= out_mult;
+      out_mult_temp_reg <= out_mult_temp;
     end
   end
 
+  //down cast the result of multiplication
+  assign out_mult = 
+    (out_mult_temp_reg[2*`DWIDTH-1] == 0) ?  //positive number
+        (
+           (|(out_mult_temp_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
+             {out_mult_temp_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
+             {out_mult_temp_reg[2*`DWIDTH-1] , out_mult_temp_reg[`DWIDTH-2:0]} 
+        )
+        : //negative number
+        (
+           (|(out_mult_temp_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
+             {out_mult_temp_reg[2*`DWIDTH-1] , out_mult_temp_reg[`DWIDTH-2:0]} :
+             {out_mult_temp_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
+        );
+
+
+
   wire [`DWIDTH-1:0] mux1_out;
-  assign mux1_out = accumulate ? out_mult_reg : ay_flopped;
+  assign mux1_out = accumulate ? out_mult: ay_flopped;
 
   //reg [`DWIDTH-1:0] mux1_out_reg;
   //always @(posedge clk) begin
@@ -112,10 +113,10 @@ module dsp_slice(
   assign inp_a_adder = mux2_out;
   assign inp_b_adder = mux1_out;
 
-  DW01_add #(`DWIDTH) u_add(.A(inp_a_adder), .B(inp_b_adder), .CI(1'b0), .SUM(out_adder), .CO());
+  DW01_add #(`DWIDTH) u_add(.A(inp_a_adder), .B(inp_b_adder), .CI(carry_in), .SUM(out_adder), .CO(carry_out));
 
   wire [`DWIDTH-1:0] mux3_out;
-  assign mux3_out = multiply ? out_mult_reg : out_adder;
+  assign mux3_out = multiply ? out_mult: out_adder;
 
   always @(posedge clk) begin 
     if (reset) begin

@@ -1,10 +1,28 @@
-analyze -format verilog {dsp_slice.stratix.int8.v}
+analyze -format verilog {dsp_slice.stratix10.int8.v}
 elaborate dsp_slice -architecture verilog -library DEFAULT
 link
 set_implementation pparch u_add
 set_implementation pparch u_mult
 set_dp_smartgen_options -all_options auto -hierarchy -smart_compare true -optimize_for speed -sop2pos_transformation false
-create_clock -name "CLK_0" -period 1.17 -waveform { 0 0.585 }  { clk  }
+
+#adder mode
+#set_logic_zero multiply
+#set_logic_zero accumulate
+#create_clock -name "CLK_0" -period 0.50 -waveform { 0 0.25 }  { clk  }
+
+#mac mode
+#set_logic_zero multiply
+#set_logic_one accumulate
+#create_clock -name "CLK_0" -period 1.11 -waveform { 0 0.555 }  { clk  }
+
+#multiplier mode
+#set_logic_one multiply
+#set_logic_zero accumulate
+#create_clock -name "CLK_0" -period 1.11 -waveform { 0 0.555 }  { clk  }
+
+#full design
+create_clock -name "CLK_0" -period 1.11 -waveform { 0 0.555 }  { clk  }
+
 set_operating_conditions -library gscl45nm typical
 remove_wire_load_model
 compile -exact_map
