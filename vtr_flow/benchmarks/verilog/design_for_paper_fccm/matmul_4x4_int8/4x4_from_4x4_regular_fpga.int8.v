@@ -115,7 +115,7 @@ module matrix_multiplication(
     .q0(b_data), 
     .clk(clk));
 
-  reg [`AWIDTH-1:0] c_addr;
+  wire [`AWIDTH-1:0] c_addr;
   wire [`AWIDTH-1:0] c_addr_muxed;
   assign c_addr_muxed = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
 
@@ -128,14 +128,7 @@ module matrix_multiplication(
     end
   end
 
-  always @(posedge clk) begin
-  if (reset || done_mat_mul) begin
-    c_addr <= 0;
-  end
-  else if (start_mat_mul) begin
-      c_addr <= c_addr+1;
-  end
-end
+
 
 wire [4*`DWIDTH-1:0] c_data_out;
 reg  [4*`DWIDTH-1:0] c_data_out_reg;
@@ -148,12 +141,25 @@ always @(posedge clk) begin
       c_data_out_reg<= c_data_out;
   end
 end
+
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_temp;
+
+  always @(posedge clk) begin
+    if(reset) begin
+      data_from_out_mat <= 0;
+    end else begin
+      data_from_out_mat <= data_from_out_mat_temp;
+    end
+  end
+
+
   // BRAM matrix C
   ram matrix_C (
     .addr0(c_addr_muxed_reg),
     .d0(c_data_out_reg),
     .we0(we_c),
-    .q0(data_from_out_mat),
+    .q0(data_from_out_mat_temp),
     .clk(clk));
 
 wire [4*`DWIDTH-1:0] a_data_out_NC;
@@ -176,6 +182,7 @@ matmul_4x4_systolic u_matmul_4x4(
   .b_data_out(b_data_out_NC),
   .a_addr(a_addr),
   .b_addr(b_addr),
+  .c_addr(c_addr),
   .final_mat_mul_size(8'd4),
   .a_loc(8'd0),
   .b_loc(8'd0)
@@ -231,6 +238,7 @@ matmul_4x4_systolic u_matmul_4x4(
   .b_data_out(b_data_out),
   .a_addr(a_addr),
   .b_addr(b_addr),
+  .c_addr(c_addr),
   .final_mat_mul_size(8'd4),
   .a_loc(8'd0),
   .b_loc(8'd0)
@@ -238,7 +246,7 @@ matmul_4x4_systolic u_matmul_4x4(
 
 endmodule
 */
-/*
+
 module matmul_4x4_systolic(
  clk,
  reset,
@@ -254,6 +262,7 @@ module matmul_4x4_systolic(
  b_data_out,
  a_addr,
  b_addr,
+ c_addr,
  final_mat_mul_size,
  a_loc,
  b_loc
@@ -273,13 +282,18 @@ module matmul_4x4_systolic(
  output [4*`DWIDTH-1:0] b_data_out;
  output [`AWIDTH-1:0] a_addr;
  output [`AWIDTH-1:0] b_addr;
+ output [`AWIDTH-1:0] c_addr;
  input [7:0] final_mat_mul_size;
  input [7:0] a_loc;
  input [7:0] b_loc;
 
 reg done_mat_mul;
+wire clk_cnt_cout_NC;
+wire [6:0] clk_cnt_inc;
+reg [6:0] clk_cnt;
 
-reg [15:0] clk_cnt;
+//adder u_add_clk_cnt(.a(1'b1), .b(clk_cnt), .cin(1'b0), .sumout(clk_cnt_inc), .cout(clk_cnt_cout_NC));
+
 always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
     clk_cnt <= 0;
@@ -292,9 +306,20 @@ always @(posedge clk) begin
   end
   else if (done_mat_mul == 0) begin
       clk_cnt <= clk_cnt + 1;
+      //clk_cnt <= clk_cnt_inc;
   end    
 end
  
+reg [`AWIDTH-1:0] c_addr;
+always @(posedge clk) begin
+  if (reset || done_mat_mul) begin
+      c_addr <= 0;
+  end
+  else if (start_mat_mul) begin
+      c_addr <= c_addr+1;
+  end
+end
+
 reg [`AWIDTH-1:0] a_addr;
 always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
@@ -607,7 +632,7 @@ module processing_element(
  end
  
 endmodule
-*/
+
 //module seq_mac(a, b, out, reset, clk);
 //input [`DWIDTH-1:0] a;
 //input [`DWIDTH-1:0] b;
