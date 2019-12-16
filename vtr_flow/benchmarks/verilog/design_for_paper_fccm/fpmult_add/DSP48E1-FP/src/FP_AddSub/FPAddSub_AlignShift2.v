@@ -17,15 +17,15 @@ module FPAddSub_AlignShift2(
 	);
 	
 	// Input ports
-	input [23:0] MminP ;						// Smaller mantissa after 16|12|8|4 shift
+	input [`MANTISSA:0] MminP ;						// Smaller mantissa after 16|12|8|4 shift
 	input [1:0] Shift ;						// Shift amount
 	
 	// Output ports
-	output [23:0] Mmin ;						// The smaller mantissa
+	output [`MANTISSA:0] Mmin ;						// The smaller mantissa
 	
 	// Internal Signal
-	reg	  [23:0]		Lvl3 = 0;
-	wire    [47:0]    Stage2;	
+	reg	  [`MANTISSA:0]		Lvl3 = 0;
+	wire    [2*`MANTISSA+1:0]    Stage2;	
 	integer           j;               // Loop variable
 	
 	assign Stage2 = {MminP, MminP};
@@ -33,13 +33,13 @@ module FPAddSub_AlignShift2(
 	always @(*) begin    // Rotate {0 | 1 | 2 | 3} bits
 	  case (Shift[1:0])
 			// Rotate by 0
-			2'b00:  Lvl3 <= Stage2[23:0];   
+			2'b00:  Lvl3 <= Stage2[`MANTISSA:0];   
 			// Rotate by 1
-			2'b01:  begin for (j=0; j<=23; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end Lvl3[23] <= 0; end 
+			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end Lvl3[`MANTISSA] <= 0; end 
 			// Rotate by 2
-			2'b10:  begin for (j=0; j<=23; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end Lvl3[23:22] <= 0; end 
+			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end Lvl3[`MANTISSA:`MANTISSA-1] <= 0; end 
 			// Rotate by 3
-			2'b11:  begin for (j=0; j<=23; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end Lvl3[23:21] <= 0; end 	  
+			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end Lvl3[`MANTISSA:`MANTISSA-2] <= 0; end 	  
 	  endcase
 	end
 	

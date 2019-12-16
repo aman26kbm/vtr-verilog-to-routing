@@ -25,13 +25,13 @@ module FPAddSub_NormalizeShift2(
 	);
 	
 	// Input ports
-	input [32:0] PSSum ;					// The Pre-Shift-Sum
-	input [7:0] CExp ;
+	input [`DWIDTH:0] PSSum ;					// The Pre-Shift-Sum
+	input [`EXPONENT-1:0] CExp ;
 	input [4:0] Shift ;					// Amount to be shifted
 
 	// Output ports
-	output [22:0] NormM ;				// Normalized mantissa
-	output [8:0] NormE ;					// Adjusted exponent
+	output [`MANTISSA-1:0] NormM ;				// Normalized mantissa
+	output [`EXPONENT:0] NormE ;					// Adjusted exponent
 	output ZeroSum ;						// Zero flag
 	output NegE ;							// Flag indicating negative exponent
 	output R ;								// Round bit
