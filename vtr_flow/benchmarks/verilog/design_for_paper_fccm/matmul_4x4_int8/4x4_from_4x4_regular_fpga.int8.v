@@ -115,7 +115,7 @@ module matrix_multiplication(
     .q0(b_data), 
     .clk(clk));
 
-  wire [`AWIDTH-1:0] c_addr;
+  reg  [`AWIDTH-1:0] c_addr;
   wire [`AWIDTH-1:0] c_addr_muxed;
   assign c_addr_muxed = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
 
@@ -124,23 +124,30 @@ module matrix_multiplication(
     if (reset) begin
       c_addr_muxed_reg <= 0;
     end else begin
-      c_addr_muxed_reg<= c_addr_muxed;
+      c_addr_muxed_reg <= c_addr_muxed;
     end
   end
 
-
-
-wire [4*`DWIDTH-1:0] c_data_out;
-reg  [4*`DWIDTH-1:0] c_data_out_reg;
-
-always @(posedge clk) begin
-  if (reset) begin
-    c_data_out_reg<= 0;
+  always @(posedge clk) begin
+    if (reset || done_mat_mul) begin
+        c_addr <= 0;
+    end
+    else if (start_mat_mul) begin
+        c_addr <= c_addr+1;
+    end
   end
-  else if (start_mat_mul) begin
-      c_data_out_reg<= c_data_out;
+  
+  wire [4*`DWIDTH-1:0] c_data_out;
+  reg  [4*`DWIDTH-1:0] c_data_out_reg;
+  
+  always @(posedge clk) begin
+    if (reset) begin
+      c_data_out_reg<= 0;
+    end
+    else if (start_mat_mul) begin
+        c_data_out_reg<= c_data_out;
+    end
   end
-end
 
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_temp;
@@ -152,7 +159,6 @@ end
       data_from_out_mat <= data_from_out_mat_temp;
     end
   end
-
 
   // BRAM matrix C
   ram matrix_C (
@@ -182,7 +188,6 @@ matmul_4x4_systolic u_matmul_4x4(
   .b_data_out(b_data_out_NC),
   .a_addr(a_addr),
   .b_addr(b_addr),
-  .c_addr(c_addr),
   .final_mat_mul_size(8'd4),
   .a_loc(8'd0),
   .b_loc(8'd0)
@@ -238,7 +243,6 @@ matmul_4x4_systolic u_matmul_4x4(
   .b_data_out(b_data_out),
   .a_addr(a_addr),
   .b_addr(b_addr),
-  .c_addr(c_addr),
   .final_mat_mul_size(8'd4),
   .a_loc(8'd0),
   .b_loc(8'd0)
@@ -262,7 +266,6 @@ module matmul_4x4_systolic(
  b_data_out,
  a_addr,
  b_addr,
- c_addr,
  final_mat_mul_size,
  a_loc,
  b_loc
@@ -282,7 +285,6 @@ module matmul_4x4_systolic(
  output [4*`DWIDTH-1:0] b_data_out;
  output [`AWIDTH-1:0] a_addr;
  output [`AWIDTH-1:0] b_addr;
- output [`AWIDTH-1:0] c_addr;
  input [7:0] final_mat_mul_size;
  input [7:0] a_loc;
  input [7:0] b_loc;
@@ -310,16 +312,6 @@ always @(posedge clk) begin
   end    
 end
  
-reg [`AWIDTH-1:0] c_addr;
-always @(posedge clk) begin
-  if (reset || done_mat_mul) begin
-      c_addr <= 0;
-  end
-  else if (start_mat_mul) begin
-      c_addr <= c_addr+1;
-  end
-end
-
 reg [`AWIDTH-1:0] a_addr;
 always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
