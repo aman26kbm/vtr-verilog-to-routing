@@ -9,7 +9,7 @@ circuits_dir=benchmarks/verilog/design_for_paper_fccm/matmul_4x4_int8
 archs_dir=arch/timing/arch_for_paper_fccm/columnar_fpga
 
 # Add circuits to list to sweep
-circuit_list_add=4x4_from_4x4_regular_fpga.int8.v
+circuit_list_add=4x4_from_4x4_special_fpga.int8.v
 
 # Add architectures to list to sweep
 arch_list_add=columnar_fpga_matmul.int8.4x4x4.xml
