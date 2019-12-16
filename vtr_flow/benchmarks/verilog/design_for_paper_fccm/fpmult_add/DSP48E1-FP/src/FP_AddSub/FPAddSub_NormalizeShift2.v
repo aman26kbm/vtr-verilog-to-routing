@@ -40,21 +40,21 @@ module FPAddSub_NormalizeShift2(
 
 	// Internal signals
 	wire MSBShift ;						// Flag indicating that a second shift is needed
-	wire [8:0] ExpOF ;					// MSB set in sum indicates overflow
-	wire [8:0] ExpOK ;					// MSB not set, no adjustment
+	wire [`EXPONENT:0] ExpOF ;					// MSB set in sum indicates overflow
+	wire [`EXPONENT:0] ExpOK ;					// MSB not set, no adjustment
 	
 	// Calculate normalized exponent and mantissa, check for all-zero sum
-	assign MSBShift = PSSum[32] ;		// Check MSB in unnormalized sum
+	assign MSBShift = PSSum[`DWIDTH] ;		// Check MSB in unnormalized sum
 	assign ZeroSum = ~|PSSum ;			// Check for all zero sum
 	assign ExpOK = CExp - Shift ;		// Adjust exponent for new normalized mantissa
-	assign NegE = ExpOK[8] ;			// Check for exponent overflow
+	assign NegE = ExpOK[`EXPONENT] ;			// Check for exponent overflow
 	assign ExpOF = CExp - Shift + 1'b1 ;		// If MSB set, add one to exponent(x2)
 	assign NormE = MSBShift ? ExpOF : ExpOK ;			// Check for exponent overflow
-	assign NormM = PSSum[31:9] ;		// The new, normalized mantissa
+	assign NormM = PSSum[`DWIDTH-1:`EXPONENT+1] ;		// The new, normalized mantissa
 	
 	// Also need to compute sticky and round bits for the rounding stage
-	assign FG = PSSum[8] ; 
-	assign R = PSSum[7] ;
-	assign S = |PSSum[6:0] ;
+	assign FG = PSSum[`EXPONENT] ; 
+	assign R = PSSum[`EXPONENT-1] ;
+	assign S = |PSSum[`EXPONENT-2:0] ;
 	
 endmodule

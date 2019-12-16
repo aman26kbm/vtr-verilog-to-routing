@@ -29,8 +29,8 @@ module FPAddSub_RoundModule(
 
 	// Input ports
 	input ZeroSum ;					// Sum is zero
-	input [8:0] NormE ;				// Normalized exponent
-	input [22:0] NormM ;				// Normalized mantissa
+	input [`EXPONENT:0] NormE ;				// Normalized exponent
+	input [`MANTISSA-1:0] NormM ;				// Normalized mantissa
 	input R ;							// Round bit
 	input S ;							// Sticky bit
 	input G ;
@@ -40,13 +40,13 @@ module FPAddSub_RoundModule(
 	input MaxAB ;
 	
 	// Output ports
-	output [31:0] Z ;					// Final result
+	output [`DWIDTH-1:0] Z ;					// Final result
 	output EOF ;
 	
 	// Internal signals
-	wire [23:0] RoundUpM ;			// Rounded up sum with room for overflow
-	wire [22:0] RoundM ;				// The final rounded sum
-	wire [8:0] RoundE ;				// Rounded exponent (note extra bit due to poential overflow	)
+	wire [`MANTISSA:0] RoundUpM ;			// Rounded up sum with room for overflow
+	wire [`MANTISSA-1:0] RoundM ;				// The final rounded sum
+	wire [`EXPONENT:0] RoundE ;				// Rounded exponent (note extra bit due to poential overflow	)
 	wire RoundUp ;						// Flag indicating that the sum should be rounded up
 	wire ExpAdd ;						// May have to add 1 to compensate for overflow 
 	wire RoundOF ;						// Rounding overflow
@@ -56,20 +56,20 @@ module FPAddSub_RoundModule(
 	
 	// Note that in the other cases (rounding down), the sum is already 'rounded'
 	assign RoundUpM = (NormM + 1) ;								// The sum, rounded up by 1
-	assign RoundM = (RoundUp ? RoundUpM[22:0] : NormM) ; 	// Compute final mantissa	
-	assign RoundOF = RoundUp & RoundUpM[23] ; 				// Check for overflow when rounding up
+	assign RoundM = (RoundUp ? RoundUpM[`MANTISSA-1:0] : NormM) ; 	// Compute final mantissa	
+	assign RoundOF = RoundUp & RoundUpM[`MANTISSA] ; 				// Check for overflow when rounding up
 
 	// Calculate post-rounding exponent
 	assign ExpAdd = (RoundOF ? 1'b1 : 1'b0) ; 				// Add 1 to exponent to compensate for overflow
-	assign RoundE = ZeroSum ? 8'b00000000 : (NormE + ExpAdd) ; 							// Final exponent
+	assign RoundE = ZeroSum ? 5'b00000 : (NormE + ExpAdd) ; 							// Final exponent
 
 	// If zero, need to determine sign according to rounding
 	assign FSgn = (ZeroSum & (Sa ^ Sb)) | (ZeroSum ? (Sa & Sb & ~Ctrl) : ((~MaxAB & Sa) | ((Ctrl ^ Sb) & (MaxAB | Sa)))) ;
 
 	// Assign final result
-	assign Z = {FSgn, RoundE[7:0], RoundM[22:0]} ;
+	assign Z = {FSgn, RoundE[`EXPONENT-1:0], RoundM[`MANTISSA-1:0]} ;
 	
 	// Indicate exponent overflow
-	assign EOF = RoundE[8];
+	assign EOF = RoundE[`EXPONENT];
 	
 endmodule
