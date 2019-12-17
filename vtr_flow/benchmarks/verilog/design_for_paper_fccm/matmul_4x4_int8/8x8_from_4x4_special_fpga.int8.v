@@ -10,6 +10,7 @@
 
 module matrix_multiplication(
   clk,
+  clk_mem,
   reset,
   enable_writing_to_mem,
   enable_reading_from_mem,
@@ -24,6 +25,7 @@ module matrix_multiplication(
 );
 
   input clk;
+  input clk_mem;
   input enable_writing_to_mem;
   input enable_reading_from_mem;
   input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_pi;
@@ -41,7 +43,7 @@ module matrix_multiplication(
   reg enable_writing_to_mem_reg;
   reg enable_reading_from_mem_reg;
   reg [`AWIDTH-1:0] addr_pi_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset) begin
       enable_writing_to_mem_reg <= 0;
       enable_reading_from_mem_reg <= 0;
@@ -72,7 +74,7 @@ module matrix_multiplication(
   reg  [`AWIDTH-1:0] a_addr_1_0_reg;
 
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset) begin
       a_addr_0_0_reg <= 0;
       a_addr_1_0_reg <= 0;
@@ -95,7 +97,7 @@ module matrix_multiplication(
     .d0(data_pi),
     .we0(we_a),
     .q0(a_data_0_0),
-    .clk(clk));
+    .clk(clk_mem));
 
   // BRAM matrix A 1_0
   ram matrix_A_1_0 (
@@ -103,10 +105,10 @@ module matrix_multiplication(
     .d0(data_pi),
     .we0(we_a),
     .q0(a_data_1_0),
-    .clk(clk));
+    .clk(clk_mem));
 
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       a_data_0_0_reg <= 0;
     end
@@ -116,7 +118,7 @@ module matrix_multiplication(
   end
 
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       a_data_1_0_reg <= 0;
     end
@@ -146,7 +148,7 @@ module matrix_multiplication(
 
 
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset) begin
       b_addr_0_0_reg <= 0;
       b_addr_0_1_reg <= 0;
@@ -169,7 +171,7 @@ module matrix_multiplication(
     .d0(data_pi),
     .we0(we_b),
     .q0(b_data_0_0),
-    .clk(clk));
+    .clk(clk_mem));
 
   // BRAM matrix B 0_1
   ram matrix_B_0_1 (
@@ -177,10 +179,10 @@ module matrix_multiplication(
     .d0(data_pi),
     .we0(we_b),
     .q0(b_data_0_1),
-    .clk(clk));
+    .clk(clk_mem));
 
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       b_data_0_0_reg <= 0;
     end
@@ -190,7 +192,7 @@ module matrix_multiplication(
   end
 
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       b_data_0_1_reg <= 0;
     end
@@ -213,7 +215,7 @@ module matrix_multiplication(
   assign c_addr_muxed_0_0 = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
   assign c_addr_muxed_0_1 = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset || done_mat_mul) begin
       c_addr <= 0;
     end
@@ -233,7 +235,7 @@ module matrix_multiplication(
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_0_reg;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_1_reg;
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset) begin
       data_from_out_mat_0_0_reg <= 0;
       data_from_out_mat_0_1_reg <= 0;
@@ -243,7 +245,7 @@ module matrix_multiplication(
     end
   end
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset) begin
       data_from_out_mat <= 0;
     end else begin
@@ -253,7 +255,7 @@ module matrix_multiplication(
 
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_0_reg;
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_1_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset) begin
       c_data_row_0_reg <= 0;
       c_addr_muxed_0_0_reg <= 0;
@@ -273,7 +275,7 @@ module matrix_multiplication(
     .d0(c_data_row_0_reg),
     .we0(we_c),
     .q0(data_from_out_mat_0_0),
-    .clk(clk));
+    .clk(clk_mem));
 
   //  BRAM matrix C row_1
   ram matrix_row_1 (
@@ -281,7 +283,7 @@ module matrix_multiplication(
     .d0(c_data_row_1_reg),
     .we0(we_c),
     .q0(data_from_out_mat_0_1),
-    .clk(clk));
+    .clk(clk_mem));
 
 /////////////////////////////////////////////////
 // The 8x8 matmul instantiation

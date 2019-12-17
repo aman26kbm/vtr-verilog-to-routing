@@ -11,6 +11,7 @@
 //Design with memories
 module matrix_multiplication(
   clk, 
+  clk_mem, 
   reset, 
   enable_writing_to_mem, 
   enable_reading_from_mem, 
@@ -25,6 +26,7 @@ module matrix_multiplication(
 );
 
   input clk;
+  input clk_mem;
   input reset;
   input enable_writing_to_mem;
   input enable_reading_from_mem;
@@ -40,7 +42,7 @@ module matrix_multiplication(
   reg enable_writing_to_mem_reg;
   reg enable_reading_from_mem_reg;
   reg [`AWIDTH-1:0] addr_pi_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       enable_writing_to_mem_reg<= 0;
       enable_reading_from_mem_reg<= 0;
@@ -58,7 +60,7 @@ module matrix_multiplication(
   wire [`AWIDTH-1:0] a_addr_muxed;
 
   reg [`AWIDTH-1:0] a_addr_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       a_addr_reg <= `MEM_SIZE-1; 
     end else begin
@@ -67,7 +69,7 @@ module matrix_multiplication(
   end
 
   reg [`AWIDTH-1:0] a_addr_muxed_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       a_addr_muxed_reg <= `MEM_SIZE-1; 
     end else begin
@@ -82,9 +84,9 @@ module matrix_multiplication(
     .d0(data_pi), 
     .we0(we_a), 
     .q0(a_data), 
-    .clk(clk));
+    .clk(clk_mem));
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       a_data_reg <= 0;
     end
@@ -99,7 +101,7 @@ module matrix_multiplication(
   wire [`AWIDTH-1:0] b_addr_muxed;
 
   reg [`AWIDTH-1:0] b_addr_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       b_addr_reg <= `MEM_SIZE-1;
     end else begin
@@ -108,7 +110,7 @@ module matrix_multiplication(
   end
 
   reg [`AWIDTH-1:0] b_addr_muxed_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       b_addr_muxed_reg <= `MEM_SIZE-1;
     end else begin
@@ -124,9 +126,9 @@ module matrix_multiplication(
     .d0(data_pi), 
     .we0(we_b), 
     .q0(b_data), 
-    .clk(clk));
+    .clk(clk_mem));
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       b_data_reg <= 0;
     end
@@ -140,7 +142,7 @@ module matrix_multiplication(
   assign c_addr_muxed = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
 
   reg [`AWIDTH-1:0] c_addr_muxed_reg;
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       c_addr_muxed_reg <= 0;
     end else begin
@@ -148,7 +150,7 @@ module matrix_multiplication(
     end
   end
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset || done_mat_mul) begin
         c_addr <= 0;
     end
@@ -160,7 +162,7 @@ module matrix_multiplication(
   wire [4*`DWIDTH-1:0] c_data_out;
   reg  [4*`DWIDTH-1:0] c_data_out_reg;
   
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if (reset) begin
       c_data_out_reg<= 0;
     end
@@ -172,7 +174,7 @@ module matrix_multiplication(
   reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_temp;
 
-  always @(posedge clk) begin
+  always @(posedge clk_mem) begin
     if(reset) begin
       data_from_out_mat <= 0;
     end else begin
@@ -186,7 +188,7 @@ module matrix_multiplication(
     .d0(c_data_out_reg),
     .we0(we_c),
     .q0(data_from_out_mat_temp),
-    .clk(clk));
+    .clk(clk_mem));
 
 wire [4*`DWIDTH-1:0] a_data_out_NC;
 wire [4*`DWIDTH-1:0] b_data_out_NC;
