@@ -91,8 +91,8 @@ class GenResults():
       info = re.search(r'fccm_(.*)_(\d*x\d*)_from_(\d*x\d*)_(.*)', dirname)
       if info is not None:
         result_dict['precision'] = info.group(1)
-        result_dict['building_block'] = info.group(2)
-        result_dict['design_size'] = info.group(3)
+        result_dict['design_size'] = info.group(2)
+        result_dict['building_block'] = info.group(3)
         result_dict['fpga_arch'] = info.group(4)
       else:
         print("Unable to extract experiment info from " + dirname)

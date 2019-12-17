@@ -64,8 +64,8 @@ class GenTaskDirs():
       info = re.search(r'fccm_(.*)_(\d*x\d*)_from_(\d*x\d*)_(.*)', dirname)
       if info is not None:
         precision = info.group(1)
-        building_block = info.group(2)
-        design_size = info.group(3)
+        design_size = info.group(2)
+        building_block = info.group(3)
         fpga_arch = info.group(4)
       else:
         print("Unable to extract experiment info from " + dirname)
@@ -74,21 +74,30 @@ class GenTaskDirs():
       #generate the value of 4 fields in the tempalte file
       if fpga_arch == "regular_fpga":
         design_dir = "regular_fpga_" + precision
-        design_file = building_block + "_from_" + design_size + "_regular_fpga." + precision + ".v"
+        design_file = design_size + "_from_" + building_block + "_regular_fpga." + precision + ".v"
         arch_dir = "regular_fpga"
         arch_file = "regular_fpga_DSP." + precision + ".xml"
       else:
         design_dir = "matmul_" + building_block + "_" + precision
-        design_file = building_block + "_from_" + design_size + "_special_fpga." + precision + ".v"
+        design_file = design_size + "_from_" + building_block + "_special_fpga." + precision + ".v"
         if re.search(r'columnar', fpga_arch):
           arch_dir = "columnar_fpga"
-          arch_file = "columnar_fpga." + precision + "." + building_block + ".xml"
+          if re.search(r'dir_int', fpga_arch):
+            arch_file = "columnar_fpga." + precision + "." + building_block + ".dir_int.xml"
+          else:
+            arch_file = "columnar_fpga." + precision + "." + building_block + ".xml"
         if re.search(r'surround', fpga_arch):
           arch_dir = "surround_fpga"
-          arch_file = "surround_fpga." + precision + "." + building_block + ".xml"
+          if re.search(r'dir_int', fpga_arch):
+            arch_file = "surround_fpga." + precision + "." + building_block + ".dir_int.xml"
+          else:
+            arch_file = "surround_fpga." + precision + "." + building_block + ".xml"
         if re.search(r'clustered', fpga_arch):
           arch_dir = "clustered_fpga"
-          arch_file = "clustered_fpga." + precision + "." + building_block + ".xml"
+          if re.search(r'dir_int', fpga_arch):
+            arch_file = "clustered_fpga." + precision + "." + building_block + ".dir_int.xml"
+          else:
+            arch_file = "clustered_fpga." + precision + "." + building_block + ".xml"
       
       #create the config file by replacing tags in the tempalte
       config_filename = dirname + "/config/config.txt"

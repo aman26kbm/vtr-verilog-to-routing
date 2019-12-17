@@ -3,7 +3,7 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog/design_for_paper_fccm/matmul_8x8_int8
+circuits_dir=benchmarks/verilog/design_for_paper_fccm/matmul_4x4_int8
 
 # Path to directory of architectures to use
 archs_dir=arch/timing/arch_for_paper_fccm/columnar_fpga
@@ -12,7 +12,7 @@ archs_dir=arch/timing/arch_for_paper_fccm/columnar_fpga
 circuit_list_add=8x8_from_4x4_special_fpga.int8.v
 
 # Add architectures to list to sweep
-arch_list_add=columnar_fpga.int8.8x8.xml
+arch_list_add=columnar_fpga.int8.4x4.dir_int.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
