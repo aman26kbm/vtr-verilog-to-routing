@@ -1,0 +1,232 @@
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : dsp_slice
+Version: O-2018.06-SP5
+Date   : Tue Dec 17 23:37:54 2019
+****************************************
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: az_flopped_reg[14]
+              (rising edge-triggered flip-flop clocked by CLK_0)
+  Endpoint: out_mult_reg_reg[4]
+            (rising edge-triggered flip-flop clocked by CLK_0)
+  Path Group: CLK_0
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock CLK_0 (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  az_flopped_reg[14]/CLK (DFFPOSX1)                       0.00       0.00 r
+  az_flopped_reg[14]/Q (DFFPOSX1)                         0.11       0.11 f
+  u_mult/B[14] (dsp_slice_DW02_mult_1)                    0.00       0.11 f
+  u_mult/U1541/Y (XNOR2X1)                                0.06       0.17 r
+  u_mult/U2141/Y (AND2X2)                                 0.04       0.21 r
+  u_mult/U1375/Y (INVX2)                                  0.03       0.23 f
+  u_mult/U1374/Y (INVX8)                                  0.02       0.25 r
+  u_mult/U1413/Y (INVX2)                                  0.03       0.28 f
+  u_mult/U1414/Y (INVX8)                                  0.02       0.30 r
+  u_mult/U1150/Y (AND2X1)                                 0.03       0.32 r
+  u_mult/U2124/Y (INVX1)                                  0.02       0.34 f
+  u_mult/U1088/Y (AND2X2)                                 0.03       0.37 f
+  u_mult/U2222/Y (INVX1)                                  0.03       0.41 r
+  u_mult/U399/YS (FAX1)                                   0.11       0.52 r
+  u_mult/U397/YS (FAX1)                                   0.10       0.62 r
+  u_mult/U396/YS (FAX1)                                   0.08       0.70 r
+  u_mult/U2240/Y (AND2X2)                                 0.04       0.74 r
+  u_mult/U2241/Y (INVX1)                                  0.02       0.76 f
+  u_mult/U202/Y (OAI21X1)                                 0.05       0.80 r
+  u_mult/U1650/Y (AND2X2)                                 0.04       0.84 r
+  u_mult/U1523/Y (INVX1)                                  0.02       0.85 f
+  u_mult/U2267/Y (AND2X2)                                 0.04       0.89 f
+  u_mult/U148/Y (OAI21X1)                                 0.04       0.93 r
+  u_mult/U146/Y (AOI21X1)                                 0.02       0.95 f
+  u_mult/U1670/Y (BUFX2)                                  0.04       0.98 f
+  u_mult/U1373/Y (XNOR2X1)                                0.03       1.01 f
+  u_mult/PRODUCT[25] (dsp_slice_DW02_mult_1)              0.00       1.01 f
+  U164/Y (OR2X2)                                          0.05       1.06 f
+  U265/Y (NOR3X1)                                         0.02       1.08 r
+  U267/Y (AND2X2)                                         0.04       1.12 r
+  U268/Y (NAND3X1)                                        0.01       1.13 f
+  U129/Y (BUFX2)                                          0.03       1.16 f
+  U162/Y (INVX1)                                          0.00       1.16 r
+  U143/Y (AND2X2)                                         0.04       1.19 r
+  U125/Y (OR2X2)                                          0.04       1.23 r
+  U123/Y (INVX1)                                          0.02       1.26 f
+  U152/Y (AND2X2)                                         0.03       1.29 f
+  U151/Y (INVX1)                                          0.00       1.29 r
+  U136/Y (AND2X2)                                         0.03       1.32 r
+  U145/Y (INVX1)                                          0.01       1.33 f
+  out_mult_reg_reg[4]/D (DFFPOSX1)                        0.00       1.33 f
+  data arrival time                                                  1.33
+
+  clock CLK_0 (rise edge)                                 1.39       1.39
+  clock network delay (ideal)                             0.00       1.39
+  out_mult_reg_reg[4]/CLK (DFFPOSX1)                      0.00       1.39 r
+  library setup time                                     -0.06       1.33
+  data required time                                                 1.33
+  --------------------------------------------------------------------------
+  data required time                                                 1.33
+  data arrival time                                                 -1.33
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+ 
+****************************************
+Report : area
+Design : dsp_slice
+Version: O-2018.06-SP5
+Date   : Tue Dec 17 23:37:54 2019
+****************************************
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Number of ports:                          185
+Number of nets:                          2127
+Number of cells:                         1884
+Number of combinational cells:           1801
+Number of sequential cells:                80
+Number of macros/black boxes:               0
+Number of buf/inv:                        737
+Number of references:                      13
+
+Combinational area:               4876.965532
+Buf/Inv area:                     1174.657879
+Noncombinational area:             638.247986
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                  5515.213518
+Total area:                 undefined
+1
+Loading db file '/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db'
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : dsp_slice
+Version: O-2018.06-SP5
+Date   : Tue Dec 17 23:37:54 2019
+****************************************
+
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =   1.5742 mW   (74%)
+  Net Switching Power  = 555.4587 uW   (26%)
+                         ---------
+Total Dynamic Power    =   2.1296 mW  (100%)
+
+Cell Leakage Power     =  32.5739 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register           0.9024        4.2026e-02        4.3982e+03            0.9488  (  43.88%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      0.6718            0.5134        2.8176e+04            1.2134  (  56.12%)
+--------------------------------------------------------------------------------------------------
+Total              1.5742 mW         0.5555 mW     3.2574e+04 nW         2.1622 mW
+1
+ 
+****************************************
+Report : design
+Design : dsp_slice
+Version: O-2018.06-SP5
+Date   : Tue Dec 17 23:37:55 2019
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Local Link Library:
+
+    {/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+1
