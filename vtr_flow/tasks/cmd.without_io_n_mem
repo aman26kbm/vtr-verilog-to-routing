@@ -1,0 +1,2 @@
+../scripts/run_vtr_task.pl tasks_for_paper_fccm/try_regular_fpga -s "--const_gen_inference comb --timing_report_detail aggregated --sdc_file /mnt/c/Users/amana/DOCUME~1/WSL/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc"
+
