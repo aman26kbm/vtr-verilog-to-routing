@@ -48,6 +48,7 @@ module FPAddSub_RoundModule(
 	wire [`MANTISSA-1:0] RoundM ;				// The final rounded sum
 	wire [`EXPONENT:0] RoundE ;				// Rounded exponent (note extra bit due to poential overflow	)
 	wire RoundUp ;						// Flag indicating that the sum should be rounded up
+        wire FSgn;
 	wire ExpAdd ;						// May have to add 1 to compensate for overflow 
 	wire RoundOF ;						// Rounding overflow
 	

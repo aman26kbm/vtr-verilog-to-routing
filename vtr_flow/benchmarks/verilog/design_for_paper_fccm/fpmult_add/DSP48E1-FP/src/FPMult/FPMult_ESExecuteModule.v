@@ -28,7 +28,7 @@ module FPMult_ESExecuteModule(
 	output [`EXPONENT:0] Ep ;						// The product exponent
 	output Sp ;								// Product sign
 	
-	assign Ep = (Ea + Eb - 127) ;		// Adding the exponents (adjusting for double bias)
+	assign Ep = (Ea + Eb - 15) ;		// Adding the exponents (adjusting for double bias)
 	
 	assign Sp = (Sa ^ Sb) ;				// Equal signs give a positive product
 

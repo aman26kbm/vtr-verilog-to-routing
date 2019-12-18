@@ -24,8 +24,8 @@ module FPAddSub_AlignShift1(
 	output [`MANTISSA:0] Mmin ;						// The smaller mantissa
 	
 	// Internal signals
-	reg	  [`MANTISSA:0]		Lvl1 = 0;
-	reg	  [`MANTISSA:0]		Lvl2 = 0;
+	reg	  [`MANTISSA:0]		Lvl1;
+	reg	  [`MANTISSA:0]		Lvl2;
 	wire    [2*`MANTISSA+1:0]    Stage1;	
 	integer           i;                // Loop variable
 	
@@ -46,7 +46,7 @@ module FPAddSub_AlignShift1(
 			// Rotate by 8
 			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end Lvl2[`MANTISSA:`MANTISSA-8] <= 0; end
 			// Rotate by 12	
-			2'b11:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+12]; end Lvl2[`MANTISSA:`MANTISSA-12] <= 0; end
+			//2'b11:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+12]; end Lvl2[`MANTISSA:`MANTISSA-12] <= 0; end
 	  endcase
 	end
 	

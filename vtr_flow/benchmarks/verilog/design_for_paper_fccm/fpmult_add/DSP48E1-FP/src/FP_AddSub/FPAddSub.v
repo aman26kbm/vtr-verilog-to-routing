@@ -86,7 +86,7 @@ module FPAddSub(
 	//reg [56:0] pipe_7;							// Pipeline register NormalizeShift2->NormalizeShift3
 	reg [`DWIDTH+`EXPONENT+16:0] pipe_7;							// Pipeline register NormalizeShift2->NormalizeShift3
 
-	i//reg [54:0] pipe_8;							// Pipeline register NormalizeShift3->Round
+	//reg [54:0] pipe_8;							// Pipeline register NormalizeShift3->Round
 	reg [`EXPONENT*2+`MANTISSA+15:0] pipe_8;							// Pipeline register NormalizeShift3->Round
 
 	//reg [40:0] pipe_9;							// Pipeline register NormalizeShift3->Round
@@ -155,7 +155,7 @@ module FPAddSub(
 	// Perform mantissa addition
 	FPAddSub_ExecutionModule ExecutionModule
 	(  // Inputs
-		pipe_4[`MANTISSA*2+5:`MANTISSA+6], pipe_4[`MANTISSA:0], pipe_4[`MANTISSA*2+`EXPONENT+13:0], pipe_4[`MANTISSA*2+`EXPONENT+12:0], pipe_4[`MANTISSA*2+`EXPONENT+11:0], pipe_4[`MANTISSA*2+`EXPONENT+14:0],
+		pipe_4[`MANTISSA*2+5:`MANTISSA+6], pipe_4[`MANTISSA:0], pipe_4[`MANTISSA*2+`EXPONENT+13], pipe_4[`MANTISSA*2+`EXPONENT+12], pipe_4[`MANTISSA*2+`EXPONENT+11], pipe_4[`MANTISSA*2+`EXPONENT+14],
 		// Outputs
 		Sum_4[`DWIDTH:0], PSgn_4, Opr_4) ;
 	
@@ -169,7 +169,7 @@ module FPAddSub(
 	// Normalization Shift Stage 1
 	FPAddSub_NormalizeShift1 NormalizeShift1
 	(  // Inputs
-		pipe_6[`DWIDTH:0], pipe_6[`DWIDTH+`EXPONENT+15:`DWIDTH+`EXPONENT+11],
+		pipe_6[`DWIDTH:0], pipe_6[`DWIDTH+`EXPONENT+14:`DWIDTH+`EXPONENT+11],
 		// Outputs
 		SumS_7[`DWIDTH:0]) ;
 		

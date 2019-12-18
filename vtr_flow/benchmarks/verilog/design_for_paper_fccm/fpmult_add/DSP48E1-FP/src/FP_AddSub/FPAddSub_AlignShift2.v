@@ -24,7 +24,7 @@ module FPAddSub_AlignShift2(
 	output [`MANTISSA:0] Mmin ;						// The smaller mantissa
 	
 	// Internal Signal
-	reg	  [`MANTISSA:0]		Lvl3 = 0;
+	reg	  [`MANTISSA:0]		Lvl3;
 	wire    [2*`MANTISSA+1:0]    Stage2;	
 	integer           j;               // Loop variable
 	

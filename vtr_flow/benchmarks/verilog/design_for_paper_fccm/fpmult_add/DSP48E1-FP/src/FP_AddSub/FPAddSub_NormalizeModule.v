@@ -53,7 +53,7 @@ module FPAddSub_NormalizeModule(
 	//	Sum[7] ? 5'b11001 : 5'b11010
 	);
 	
-	reg	  [`DWIDTH:0]		Lvl1 = 0;
+	reg	  [`DWIDTH:0]		Lvl1;
 	
 	always @(*) begin
 		// Rotate by 16?

@@ -23,9 +23,9 @@ module FPAddSub_NormalizeShift1(
 	// Output ports
 	output [`DWIDTH:0] Mmin ;						// The smaller mantissa
 	
-	reg	  [`DWIDTH:0]		Lvl2 = 0;
+	reg	  [`DWIDTH:0]		Lvl2;
 	wire    [2*`DWIDTH+1:0]    Stage1;	
-	reg	  [`DWIDTH:0]		Lvl3 = 0;
+	reg	  [`DWIDTH:0]		Lvl3;
 	wire    [2*`DWIDTH+1:0]    Stage2;	
 	integer           i;               	// Loop variable
 	
