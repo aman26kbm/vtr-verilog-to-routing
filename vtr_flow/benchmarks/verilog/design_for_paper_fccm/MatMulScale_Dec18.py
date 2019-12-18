@@ -291,7 +291,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   for i in range(num_of_bram):
     file.write(	'      c_data_row_{0}_reg <= c_data_row_{0};\n'
   	        '      c_addr_muxed_0_{0}_reg <= c_addr_muxed_0_{0};\n'.format(i))
-    file.write(	'    end\n'
+  file.write(	'    end\n'
   		'  end\n\n')
   
   for i in range(num_of_bram):

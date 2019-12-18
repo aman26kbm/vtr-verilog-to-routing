@@ -246,9 +246,6 @@ module matrix_multiplication(
     end else begin
       c_data_row_0_reg <= c_data_row_0;
       c_addr_muxed_0_0_reg <= c_addr_muxed_0_0;
-    end
-  end
-
       c_data_row_1_reg <= c_data_row_1;
       c_addr_muxed_0_1_reg <= c_addr_muxed_0_1;
     end
