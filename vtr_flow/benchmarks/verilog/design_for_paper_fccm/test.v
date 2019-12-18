@@ -56,8 +56,8 @@ module matrix_multiplication(
 // BRAMs to store matrix A
 /////////////////////////////////////////////////
 
-  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0;
-  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0_reg;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0_reg;
 
   wire [`AWIDTH-1:0] a_addr_0_0;
   wire [`AWIDTH-1:0] a_addr_1_0;
@@ -171,8 +171,8 @@ module matrix_multiplication(
     .q0(b_data_0_1),
     .clk(clk));
 
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0;
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0_reg;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1_reg;
   always @(posedge clk_mem) begin
     if (reset) begin
       b_data_0_0_reg <= 0;
