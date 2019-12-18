@@ -78,7 +78,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   #pdb.set_trace()
   #delcare the wire
   for i in range(num_of_bram):
-    file.write( '  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_{0}_0_reg;\n'.format(i))
+    file.write( '  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_{0}_0;\n'.format(i))
   file.write('\n')
   for i in range(num_of_bram):
     file.write( '  wire [`AWIDTH-1:0] a_addr_{0}_0;\n'.format(i))
@@ -125,7 +125,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   		.format(i))
 
   for i in range(num_of_bram):
-    file.write( '  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_{0}_0;\n'.format(i))
+    file.write( '  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_{0}_0_reg;\n'.format(i))
   
   file.write(  '  always @(posedge clk_mem) begin\n')
   file.write(  '    if (reset) begin\n')
