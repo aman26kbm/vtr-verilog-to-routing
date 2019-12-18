@@ -1,4 +1,3 @@
-Information: Updating design information... (UID-85)
  
 ****************************************
 Report : timing
@@ -6,17 +5,19 @@ Report : timing
         -delay max
         -max_paths 1
         -sort_by group
-Design : dsp_slice
+Design : matmul_4x4_systolic
 Version: O-2018.06-SP5
-Date   : Tue Dec 17 23:36:40 2019
+Date   : Wed Dec 18 00:00:16 2019
 ****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
 
 Operating Conditions: typical   Library: gscl45nm
 Wire Load Model Mode: top
 
-  Startpoint: az_flopped_reg[11]
+  Startpoint: pe21/u_mac/a_flopped_reg[1]
               (rising edge-triggered flip-flop clocked by CLK_0)
-  Endpoint: out_mult_reg_reg[7]
+  Endpoint: pe21/u_mac/mul_out_reg_reg[5]
             (rising edge-triggered flip-flop clocked by CLK_0)
   Path Group: CLK_0
   Path Type: max
@@ -25,48 +26,50 @@ Wire Load Model Mode: top
   --------------------------------------------------------------------------
   clock CLK_0 (rise edge)                                 0.00       0.00
   clock network delay (ideal)                             0.00       0.00
-  az_flopped_reg[11]/CLK (DFFPOSX1)                       0.00       0.00 r
-  az_flopped_reg[11]/Q (DFFPOSX1)                         0.11       0.11 f
-  u_mult/B[11] (dsp_slice_DW02_mult_1)                    0.00       0.11 f
-  u_mult/U1060/Y (XNOR2X1)                                0.07       0.18 r
-  u_mult/U2126/Y (AND2X2)                                 0.05       0.23 r
-  u_mult/U1486/Y (BUFX4)                                  0.04       0.27 r
-  u_mult/U1919/Y (AND2X2)                                 0.03       0.30 r
-  u_mult/U1920/Y (INVX1)                                  0.01       0.32 f
-  u_mult/U1197/Y (AND2X1)                                 0.03       0.35 f
-  u_mult/U2065/Y (INVX1)                                  0.01       0.35 r
-  u_mult/U441/YC (HAX1)                                   0.06       0.42 r
-  u_mult/U433/YS (FAX1)                                   0.10       0.51 r
-  u_mult/U431/YS (FAX1)                                   0.10       0.61 r
-  u_mult/U430/YS (FAX1)                                   0.08       0.69 f
-  u_mult/U2099/Y (OR2X2)                                  0.04       0.73 f
-  u_mult/U2101/Y (INVX1)                                  0.00       0.73 r
-  u_mult/U1616/Y (OR2X2)                                  0.03       0.77 r
-  u_mult/U1761/Y (INVX1)                                  0.02       0.78 f
-  u_mult/U257/Y (AOI21X1)                                 0.03       0.81 r
-  u_mult/U1634/Y (BUFX2)                                  0.04       0.85 r
-  u_mult/U1804/Y (BUFX2)                                  0.03       0.88 r
-  u_mult/U1444/Y (INVX2)                                  0.03       0.91 f
-  u_mult/U236/Y (AOI21X1)                                 0.03       0.95 r
-  u_mult/U1581/Y (BUFX2)                                  0.04       0.99 r
-  u_mult/U225/Y (XOR2X1)                                  0.03       1.02 f
-  u_mult/PRODUCT[17] (dsp_slice_DW02_mult_1)              0.00       1.02 f
-  U215/Y (OR2X2)                                          0.05       1.07 f
-  U437/Y (NOR3X1)                                         0.05       1.11 r
-  U442/Y (NAND3X1)                                        0.02       1.14 f
-  U226/Y (BUFX2)                                          0.04       1.18 f
-  U444/Y (OAI21X1)                                        0.04       1.22 r
-  U212/Y (INVX2)                                          0.03       1.25 f
-  U300/Y (AND2X2)                                         0.04       1.29 f
-  U301/Y (INVX1)                                          0.00       1.29 r
-  U298/Y (AND2X2)                                         0.03       1.32 r
-  U299/Y (INVX1)                                          0.01       1.33 f
-  out_mult_reg_reg[7]/D (DFFPOSX1)                        0.00       1.33 f
+  pe21/u_mac/a_flopped_reg[1]/CLK (DFFPOSX1)              0.00 #     0.00 r
+  pe21/u_mac/a_flopped_reg[1]/Q (DFFPOSX1)                0.11       0.11 f
+  pe21/u_mac/mult_u1/i_multiplicand[1] (qmult_7)          0.00       0.11 f
+  pe21/u_mac/mult_u1/u_mult/A[1] (qmult_7_DW02_mult_0)
+                                                          0.00       0.11 f
+  pe21/u_mac/mult_u1/u_mult/U501/Y (XOR2X1)               0.15       0.26 r
+  pe21/u_mac/mult_u1/u_mult/U497/Y (MUX2X1)               0.07       0.33 r
+  pe21/u_mac/mult_u1/u_mult/U217/Y (MUX2X1)               0.10       0.42 r
+  pe21/u_mac/mult_u1/u_mult/U597/YS (FAX1)                0.12       0.55 f
+  pe21/u_mac/mult_u1/u_mult/U596/Y (AOI22X1)              0.05       0.59 r
+  pe21/u_mac/mult_u1/u_mult/U394/Y (BUFX2)                0.03       0.63 r
+  pe21/u_mac/mult_u1/u_mult/U455/Y (INVX1)                0.02       0.64 f
+  pe21/u_mac/mult_u1/u_mult/U595/Y (AOI21X1)              0.02       0.66 r
+  pe21/u_mac/mult_u1/u_mult/U393/Y (BUFX2)                0.04       0.70 r
+  pe21/u_mac/mult_u1/u_mult/U421/Y (AND2X2)               0.03       0.73 r
+  pe21/u_mac/mult_u1/u_mult/U422/Y (INVX1)                0.03       0.75 f
+  pe21/u_mac/mult_u1/u_mult/U571/Y (AOI21X1)              0.03       0.79 r
+  pe21/u_mac/mult_u1/u_mult/U443/Y (INVX1)                0.02       0.81 f
+  pe21/u_mac/mult_u1/u_mult/U570/Y (OAI21X1)              0.04       0.85 r
+  pe21/u_mac/mult_u1/u_mult/U316/Y (INVX2)                0.03       0.88 f
+  pe21/u_mac/mult_u1/u_mult/U548/Y (NAND3X1)              0.04       0.92 r
+  pe21/u_mac/mult_u1/u_mult/U364/Y (BUFX2)                0.03       0.95 r
+  pe21/u_mac/mult_u1/u_mult/U362/Y (AND2X2)               0.03       0.98 r
+  pe21/u_mac/mult_u1/u_mult/U363/Y (INVX1)                0.02       1.00 f
+  pe21/u_mac/mult_u1/u_mult/U547/Y (XNOR2X1)              0.03       1.03 f
+  pe21/u_mac/mult_u1/u_mult/PRODUCT[12] (qmult_7_DW02_mult_0)
+                                                          0.00       1.03 f
+  pe21/u_mac/mult_u1/o_result[12] (qmult_7)               0.00       1.03 f
+  pe21/u_mac/U7/Y (OR2X2)                                 0.05       1.08 f
+  pe21/u_mac/U51/Y (NOR3X1)                               0.05       1.13 r
+  pe21/u_mac/U32/Y (AND2X2)                               0.04       1.16 r
+  pe21/u_mac/U33/Y (INVX1)                                0.02       1.18 f
+  pe21/u_mac/U47/Y (OAI21X1)                              0.04       1.22 r
+  pe21/u_mac/U36/Y (INVX2)                                0.03       1.25 f
+  pe21/u_mac/U5/Y (AND2X1)                                0.03       1.29 f
+  pe21/u_mac/U4/Y (INVX1)                                 0.00       1.29 r
+  pe21/u_mac/U28/Y (AND2X2)                               0.03       1.32 r
+  pe21/u_mac/U29/Y (INVX1)                                0.01       1.33 f
+  pe21/u_mac/mul_out_reg_reg[5]/D (DFFPOSX1)              0.00       1.33 f
   data arrival time                                                  1.33
 
   clock CLK_0 (rise edge)                                 1.39       1.39
   clock network delay (ideal)                             0.00       1.39
-  out_mult_reg_reg[7]/CLK (DFFPOSX1)                      0.00       1.39 r
+  pe21/u_mac/mul_out_reg_reg[5]/CLK (DFFPOSX1)            0.00       1.39 r
   library setup time                                     -0.06       1.33
   data required time                                                 1.33
   --------------------------------------------------------------------------
@@ -80,31 +83,31 @@ Wire Load Model Mode: top
  
 ****************************************
 Report : area
-Design : dsp_slice
+Design : matmul_4x4_systolic
 Version: O-2018.06-SP5
-Date   : Tue Dec 17 23:36:40 2019
+Date   : Wed Dec 18 00:00:16 2019
 ****************************************
 
 Library(s) Used:
 
     gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
 
-Number of ports:                          185
-Number of nets:                          2350
-Number of cells:                         2088
-Number of combinational cells:           2005
-Number of sequential cells:                80
+Number of ports:                         3349
+Number of nets:                         13598
+Number of cells:                        10492
+Number of combinational cells:           9339
+Number of sequential cells:              1014
 Number of macros/black boxes:               0
-Number of buf/inv:                        842
-Number of references:                      15
+Number of buf/inv:                       3354
+Number of references:                      34
 
-Combinational area:               5359.875222
-Buf/Inv area:                     1350.176076
-Noncombinational area:             638.247986
+Combinational area:              24945.171827
+Buf/Inv area:                     5467.344879
+Noncombinational area:            8089.793221
 Macro/Black Box area:                0.000000
 Net Interconnect area:      undefined  (No wire load specified)
 
-Total cell area:                  5998.123208
+Total cell area:                 33034.965048
 Total area:                 undefined
 1
 Loading db file '/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db'
@@ -115,9 +118,9 @@ Warning: Design has unannotated sequential cell outputs. (PWR-415)
 ****************************************
 Report : power
         -analysis_effort low
-Design : dsp_slice
+Design : matmul_4x4_systolic
 Version: O-2018.06-SP5
-Date   : Tue Dec 17 23:36:41 2019
+Date   : Wed Dec 18 00:00:17 2019
 ****************************************
 
 
@@ -139,12 +142,12 @@ Power-specific unit information :
     Leakage Power Units = 1nW
 
 
-  Cell Internal Power  =   1.6610 mW   (73%)
-  Net Switching Power  = 620.8250 uW   (27%)
+  Cell Internal Power  =  14.0571 mW   (85%)
+  Net Switching Power  =   2.5641 mW   (15%)
                          ---------
-Total Dynamic Power    =   2.2819 mW  (100%)
+Total Dynamic Power    =  16.6212 mW  (100%)
 
-Cell Leakage Power     =  34.5708 uW
+Cell Leakage Power     = 178.4285 uW
 
 
                  Internal         Switching           Leakage            Total
@@ -154,18 +157,18 @@ io_pad             0.0000            0.0000            0.0000            0.0000 
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
 clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
-register           0.9056        4.1830e-02        4.3982e+03            0.9519  (  41.09%)
+register          11.1629            0.3157        5.5747e+04           11.5344  (  68.66%)
 sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
-combinational      0.7554            0.5790        3.0173e+04            1.3646  (  58.91%)
+combinational      2.8942            2.2484        1.2268e+05            5.2653  (  31.34%)
 --------------------------------------------------------------------------------------------------
-Total              1.6610 mW         0.6208 mW     3.4571e+04 nW         2.3164 mW
+Total             14.0571 mW         2.5641 mW     1.7843e+05 nW        16.7997 mW
 1
  
 ****************************************
 Report : design
-Design : dsp_slice
+Design : matmul_4x4_systolic
 Version: O-2018.06-SP5
-Date   : Tue Dec 17 23:36:41 2019
+Date   : Wed Dec 18 00:00:17 2019
 ****************************************
 
 Design allows ideal nets on clock nets.
@@ -220,7 +223,7 @@ Disabled Timing Arcs:
 
 Required Licenses:
 
-    None Required
+    DesignWare
 
 Design Parameters:
 
