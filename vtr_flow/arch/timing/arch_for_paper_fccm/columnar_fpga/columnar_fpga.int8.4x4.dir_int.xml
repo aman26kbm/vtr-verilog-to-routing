@@ -266,7 +266,7 @@
       <switch type="mux" name="0" R="551" Cin=".77e-15" Cout="4e-15" Tdel="58e-12" mux_trans_size="2.630740" buf_size="27.645901"/>
 		  <!--switch ipin_cblock resistance set to yeild for 4x minimum drive strength buffer-->
       <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="7.247000e-11" mux_trans_size="1.222260" buf_size="auto"/>
-      <switch type="short" name="electrical_short" R="0" Cin="0" Tdel="0"/>
+      <switch type="mux" name="short_switch" R="0" Cin="0" Cout="0" Tdel="1e-12" mux_trans_size="0" buf_size="0"/>
     </switchlist>
 		<segmentlist>
       <!--- VB & JL: using ITRS metal stack data, 96 nm half pitch wires, which are intermediate metal width/space.  
@@ -278,10 +278,6 @@
         <cb type="pattern">1 1 1 1</cb>
 			</segment>
 		</segmentlist>
-
-    <directlist>
-      <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
-    </directlist>
 
 		<complexblocklist>
       
@@ -1277,7 +1273,13 @@
       <fc_override fc_type="frac" fc_val="0" port_name="c_data_in[31:0]"/>
       <fc_override fc_type="frac" fc_val="0" port_name="c_data_out[31:0]"/>
       </fc>
-      <pinlocations pattern="perimeter"/>
+      <!--<pinlocations pattern="perimeter"/>-->
+      <pinlocations pattern="custom">
+        <loc side="left">matmul_4x4.a_data_in[31:0] matmul_4x4.c_data_out[31:0] matmul_4x4.a_addr[6:0]              </loc>
+        <loc side="top">matmul_4x4.b_data_in[31:0] matmul_4x4.b_data[31:0] matmul_4x4.b_addr[6:0]     matmul_4x4.start_mat_mul matmul_4x4.done_mat_mul matmul_4x4.clk</loc>
+        <loc side="right">matmul_4x4.a_data_out[31:0] matmul_4x4.c_data_in[31:0]  matmul_4x4.b_loc[7:0]    matmul_4x4.reset   matmul_4x4.a_loc[3:0]    </loc>
+        <loc side="bottom">matmul_4x4.b_data_out[31:0]  matmul_4x4.a_data[31:0] matmul_4x4.final_mat_mul_size[7:0] matmul_4x4.a_loc[7:4]</loc>
+      </pinlocations>
 
       <power method="sum-of-children"/>
     </pb_type>
@@ -1788,8 +1790,9 @@
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
  <directlist>
-    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_4x4.a_data_out[31:0]" to_pin="matmul_4x4.a_data_in[31:0]" x_offset="7" y_offset="0" z_offset="0" switch_name="0"/>
-    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_4x4.b_data_out[31:0]" to_pin="matmul_4x4.b_data_in[31:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="0"/>
-    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_4x4.c_data_out[31:0]" to_pin="matmul_4x4.c_data_in[31:0]" x_offset="-7" y_offset="0" z_offset="0" switch_name="0"/>
-  </directlist>
+    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_4x4.a_data_out[31:0]" to_pin="matmul_4x4.a_data_in[31:0]" x_offset="7" y_offset="0" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_4x4.b_data_out[31:0]" to_pin="matmul_4x4.b_data_in[31:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_4x4.c_data_out[31:0]" to_pin="matmul_4x4.c_data_in[31:0]" x_offset="-7" y_offset="0" z_offset="0" switch_name="short_switch"/>
+    <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
+ </directlist>
 </architecture>
