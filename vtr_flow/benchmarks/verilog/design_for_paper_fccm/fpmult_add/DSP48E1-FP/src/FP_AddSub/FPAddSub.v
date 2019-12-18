@@ -86,7 +86,7 @@ module FPAddSub(
 	//reg [56:0] pipe_7;							// Pipeline register NormalizeShift2->NormalizeShift3
 	reg [`DWIDTH+`EXPONENT+16:0] pipe_7;							// Pipeline register NormalizeShift2->NormalizeShift3
 
-	i//reg [54:0] pipe_8;							// Pipeline register NormalizeShift3->Round
+	//reg [54:0] pipe_8;							// Pipeline register NormalizeShift3->Round
 	reg [`EXPONENT*2+`MANTISSA+15:0] pipe_8;							// Pipeline register NormalizeShift3->Round
 
 	//reg [40:0] pipe_9;							// Pipeline register NormalizeShift3->Round
