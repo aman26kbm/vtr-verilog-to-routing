@@ -71,7 +71,7 @@ class GenTaskDirs():
         print("Unable to extract experiment info from " + dirname)
         raise SystemExit(0)
 
-      #generate the value of 4 fields in the tempalte file
+      #generate the value of 4 fields in the template file
       if fpga_arch == "regular_fpga":
         design_dir = "regular_fpga_" + precision
         design_file = design_size + "_from_" + building_block + "_regular_fpga." + precision + ".v"
@@ -98,8 +98,14 @@ class GenTaskDirs():
             arch_file = "clustered_fpga." + precision + "." + building_block + ".dir_int.xml"
           else:
             arch_file = "clustered_fpga." + precision + "." + building_block + ".xml"
+        if re.search(r'hybrid', fpga_arch):
+          arch_dir = "hybrid_fpga"
+          if re.search(r'dir_int', fpga_arch):
+            arch_file = "hybrid_fpga." + precision + "." + building_block + ".dir_int.xml"
+          else:
+            arch_file = "hybrid_fpga." + precision + "." + building_block + ".xml"
       
-      #create the config file by replacing tags in the tempalte
+      #create the config file by replacing tags in the template
       config_filename = dirname + "/config/config.txt"
       config_dirname  = dirname + "/config"
      
