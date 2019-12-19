@@ -470,7 +470,7 @@ def write_systolic_matmul(file, basic_block_size, final_block_size):
       else:
         file.write('  .c_data_out(c_data_{a}_{b}_to_{c}_{d}),\n'.format(a = i, b = j, c = i, d = j + 1))
         # file.write(	'  .c_data(c_data_{a}_{b}),\n'
-        file.write(	'  .a_data_out(a_data_{a}_{b}_to_{a}_{c}),\n'
+      file.write(  '  .a_data_out(a_data_{a}_{b}_to_{a}_{c}),\n'
   					'  .b_data_out(b_data_{a}_{b}_to_{d}_{b}),\n'
   		 			.format(a=i, b=j, c=j+1, d=i+1))
   
