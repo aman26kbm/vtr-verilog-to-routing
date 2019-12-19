@@ -30,12 +30,12 @@ module matrix_multiplication(
   input reset;
   input enable_writing_to_mem;
   input enable_reading_from_mem;
-  input [4*`DWIDTH-1:0] data_pi;
+  input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_pi;
   input [`AWIDTH-1:0] addr_pi;
   input we_a;
   input we_b;
   input we_c;
-  output [4*`DWIDTH-1:0] data_from_out_mat;
+  output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
   input start_mat_mul;
   output done_mat_mul;
 
@@ -54,8 +54,8 @@ module matrix_multiplication(
     end
   end
 
-  wire [4*`DWIDTH-1:0] a_data;
-  reg [4*`DWIDTH-1:0] a_data_reg;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_reg;
   wire [`AWIDTH-1:0] a_addr;
   wire [`AWIDTH-1:0] a_addr_muxed;
 
@@ -95,8 +95,8 @@ module matrix_multiplication(
     end
   end
 
-  wire [4*`DWIDTH-1:0] b_data;
-  reg [4*`DWIDTH-1:0] b_data_reg;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data;
+  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_reg;
   wire [`AWIDTH-1:0] b_addr;
   wire [`AWIDTH-1:0] b_addr_muxed;
 
@@ -159,8 +159,8 @@ module matrix_multiplication(
     end
   end
   
-  wire [4*`DWIDTH-1:0] c_data_out;
-  reg  [4*`DWIDTH-1:0] c_data_out_reg;
+  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
+  reg  [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out_reg;
   
   always @(posedge clk_mem) begin
     if (reset) begin
@@ -190,10 +190,10 @@ module matrix_multiplication(
     .q0(data_from_out_mat_temp),
     .clk(clk_mem));
 
-wire [4*`DWIDTH-1:0] a_data_out_NC;
-wire [4*`DWIDTH-1:0] b_data_out_NC;
-wire [4*`DWIDTH-1:0] a_data_in_NC;
-wire [4*`DWIDTH-1:0] b_data_in_NC;
+wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_out_NC;
+wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out_NC;
+wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_NC;
+wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_NC;
 
 matmul_4x4_systolic u_matmul_4x4(
   .clk(clk),
@@ -204,7 +204,7 @@ matmul_4x4_systolic u_matmul_4x4(
   .b_data(b_data_reg),
   .a_data_in(a_data_in_NC),
   .b_data_in(b_data_in_NC),
-  .c_data_in({4*`DWIDTH{1'b0}}),
+  .c_data_in({`BB_MAT_MUL_SIZE*`DWIDTH{1'b0}}),
   .c_data_out(c_data_out),
   .a_data_out(a_data_out_NC),
   .b_data_out(b_data_out_NC),
@@ -239,14 +239,14 @@ module matrix_multiplication(
  input reset;
  input start_mat_mul;
  output done_mat_mul;
- input [4*`DWIDTH-1:0] a_data;
- input [4*`DWIDTH-1:0] b_data;
- input [4*`DWIDTH-1:0] a_data_in;
- input [4*`DWIDTH-1:0] b_data_in;
- input [4*`DWIDTH-1:0] c_data_in;
- output [4*`DWIDTH-1:0] c_data_out;
- output [4*`DWIDTH-1:0] a_data_out;
- output [4*`DWIDTH-1:0] b_data_out;
+ input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data;
+ input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data;
+ input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in;
+ input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in;
+ input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in;
+ output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
+ output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_out;
+ output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out;
  output [`AWIDTH-1:0] a_addr;
  output [`AWIDTH-1:0] b_addr;
 

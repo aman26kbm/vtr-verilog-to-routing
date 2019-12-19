@@ -2,7 +2,7 @@
 `define DWIDTH 8
 `define AWIDTH 7
 `define MEM_SIZE 128
-`define MAT_MUL_SIZE 4
+`define MAT_MUL_SIZE 16
 `define LOG2_MAT_MUL_SIZE 2
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 `define NUM_CYCLES_IN_MAC 3
@@ -268,10 +268,10 @@ module matrix_multiplication(
     .clk(clk_mem));
 
 /////////////////////////////////////////////////
-// The 8x8 matmul instantiation
+// The 32x32 matmul instantiation
 /////////////////////////////////////////////////
 
-matmul_8x8_systolic u_matmul_8x8_systolic (
+matmul_32x32_systolic u_matmul_32x32_systolic (
   .clk(clk),
   .done_mat_mul(done_mat_mul),
   .reset(reset),
@@ -292,10 +292,10 @@ endmodule
 
 
 /////////////////////////////////////////////////
-// The 8x8 matmul definition
+// The 32x32 matmul definition
 /////////////////////////////////////////////////
 
-module matmul_8x8_systolic(
+module matmul_32x32_systolic(
   clk,
   done_mat_mul,
   reset,
@@ -352,7 +352,7 @@ module matmul_8x8_systolic(
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_0_NC;
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_0_0_to_0_1;
 
-matmul_4x4_systolic u_matmul_4x4_systolic_0_0(
+matmul_16x16_systolic u_matmul_16x16_systolic_0_0(
   .clk(clk),
   .reset(reset),
   .start_mat_mul(start_mat_mul),
@@ -367,7 +367,7 @@ matmul_4x4_systolic u_matmul_4x4_systolic_0_0(
   .b_data_out(b_data_0_0_to_1_0),
   .a_addr(a_addr_0_0),
   .b_addr(b_addr_0_0),
-  .final_mat_mul_size(8'd8),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd0),
   .b_loc(8'd0)
 );
@@ -382,7 +382,7 @@ matmul_4x4_systolic u_matmul_4x4_systolic_0_0(
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_1_NC;
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_1_NC;
 
-matmul_4x4_systolic u_matmul_4x4_systolic_0_1(
+matmul_16x16_systolic u_matmul_16x16_systolic_0_1(
   .clk(clk),
   .reset(reset),
   .start_mat_mul(start_mat_mul),
@@ -397,7 +397,7 @@ matmul_4x4_systolic u_matmul_4x4_systolic_0_1(
   .b_data_out(b_data_0_1_to_1_1),
   .a_addr(a_addr_0_1_NC),
   .b_addr(b_addr_0_1),
-  .final_mat_mul_size(8'd8),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd0),
   .b_loc(8'd1)
 );
@@ -413,7 +413,7 @@ matmul_4x4_systolic u_matmul_4x4_systolic_0_1(
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_1_0_NC;
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_1_0_to_1_1;
 
-matmul_4x4_systolic u_matmul_4x4_systolic_1_0(
+matmul_16x16_systolic u_matmul_16x16_systolic_1_0(
   .clk(clk),
   .reset(reset),
   .start_mat_mul(start_mat_mul),
@@ -428,7 +428,7 @@ matmul_4x4_systolic u_matmul_4x4_systolic_1_0(
   .b_data_out(b_data_1_0_to_2_0),
   .a_addr(a_addr_1_0),
   .b_addr(b_addr_1_0_NC),
-  .final_mat_mul_size(8'd8),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd1),
   .b_loc(8'd0)
 );
@@ -444,7 +444,7 @@ matmul_4x4_systolic u_matmul_4x4_systolic_1_0(
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_1_NC;
   wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_1_NC;
 
-matmul_4x4_systolic u_matmul_4x4_systolic_1_1(
+matmul_16x16_systolic u_matmul_16x16_systolic_1_1(
   .clk(clk),
   .reset(reset),
   .start_mat_mul(start_mat_mul),
@@ -459,7 +459,7 @@ matmul_4x4_systolic u_matmul_4x4_systolic_1_1(
   .b_data_out(b_data_1_1_to_2_1),
   .a_addr(a_addr_1_1_NC),
   .b_addr(b_addr_1_1_NC),
-  .final_mat_mul_size(8'd8),
+  .final_mat_mul_size(8'd32),
   .a_loc(8'd1),
   .b_loc(8'd1)
 );
