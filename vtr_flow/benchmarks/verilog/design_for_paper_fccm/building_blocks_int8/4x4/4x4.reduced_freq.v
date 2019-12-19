@@ -8,217 +8,6 @@
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 `define NUM_CYCLES_IN_MAC 3
 
-//Design with memories
-module matrix_multiplication(
-  clk, 
-  clk_mem, 
-  reset, 
-  enable_writing_to_mem, 
-  enable_reading_from_mem, 
-  data_pi,
-  addr_pi, 
-  we_a,
-  we_b,
-  we_c,
-  data_from_out_mat,
-  start_mat_mul,
-  done_mat_mul
-);
-
-  input clk;
-  input clk_mem;
-  input reset;
-  input enable_writing_to_mem;
-  input enable_reading_from_mem;
-  input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_pi;
-  input [`AWIDTH-1:0] addr_pi;
-  input we_a;
-  input we_b;
-  input we_c;
-  output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
-  input start_mat_mul;
-  output done_mat_mul;
-
-  reg enable_writing_to_mem_reg;
-  reg enable_reading_from_mem_reg;
-  reg [`AWIDTH-1:0] addr_pi_reg;
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      enable_writing_to_mem_reg<= 0;
-      enable_reading_from_mem_reg<= 0;
-      addr_pi_reg <= 0;
-    end else begin
-      enable_writing_to_mem_reg<= enable_writing_to_mem;
-      enable_reading_from_mem_reg<= enable_reading_from_mem;
-      addr_pi_reg <= addr_pi;
-    end
-  end
-
-  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data;
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_reg;
-  wire [`AWIDTH-1:0] a_addr;
-  wire [`AWIDTH-1:0] a_addr_muxed;
-
-  reg [`AWIDTH-1:0] a_addr_reg;
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      a_addr_reg <= `MEM_SIZE-1; 
-    end else begin
-      a_addr_reg <= a_addr;
-    end
-  end
-
-  reg [`AWIDTH-1:0] a_addr_muxed_reg;
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      a_addr_muxed_reg <= `MEM_SIZE-1; 
-    end else begin
-      a_addr_muxed_reg <= a_addr_muxed;
-    end
-  end
-  assign a_addr_muxed = (enable_writing_to_mem_reg) ? addr_pi_reg : a_addr_reg;
-
-  // BRAM matrix A 
-  ram matrix_A (
-    .addr0(a_addr_muxed_reg),
-    .d0(data_pi), 
-    .we0(we_a), 
-    .q0(a_data), 
-    .clk(clk_mem));
-
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      a_data_reg <= 0;
-    end
-    else begin
-      a_data_reg <= a_data;
-    end
-  end
-
-  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data;
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_reg;
-  wire [`AWIDTH-1:0] b_addr;
-  wire [`AWIDTH-1:0] b_addr_muxed;
-
-  reg [`AWIDTH-1:0] b_addr_reg;
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      b_addr_reg <= `MEM_SIZE-1;
-    end else begin
-      b_addr_reg <= b_addr;
-    end
-  end
-
-  reg [`AWIDTH-1:0] b_addr_muxed_reg;
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      b_addr_muxed_reg <= `MEM_SIZE-1;
-    end else begin
-      b_addr_muxed_reg <= b_addr_muxed;
-    end
-  end
-
-  assign b_addr_muxed = (enable_writing_to_mem_reg) ? addr_pi_reg : b_addr_reg;
-
-  // BRAM matrix B
-  ram matrix_B (
-    .addr0(b_addr_muxed_reg),
-    .d0(data_pi), 
-    .we0(we_b), 
-    .q0(b_data), 
-    .clk(clk_mem));
-
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      b_data_reg <= 0;
-    end
-    else begin
-      b_data_reg <= b_data;
-    end
-  end
-
-  reg  [`AWIDTH-1:0] c_addr;
-  wire [`AWIDTH-1:0] c_addr_muxed;
-  assign c_addr_muxed = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;
-
-  reg [`AWIDTH-1:0] c_addr_muxed_reg;
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      c_addr_muxed_reg <= 0;
-    end else begin
-      c_addr_muxed_reg <= c_addr_muxed;
-    end
-  end
-
-  always @(posedge clk_mem) begin
-    if (reset || done_mat_mul) begin
-        c_addr <= 0;
-    end
-    else if (start_mat_mul) begin
-        c_addr <= c_addr+1;
-    end
-  end
-  
-  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
-  reg  [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out_reg;
-  
-  always @(posedge clk_mem) begin
-    if (reset) begin
-      c_data_out_reg<= 0;
-    end
-    else if (start_mat_mul) begin
-        c_data_out_reg<= c_data_out;
-    end
-  end
-
-  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat;
-  wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_temp;
-
-  always @(posedge clk_mem) begin
-    if(reset) begin
-      data_from_out_mat <= 0;
-    end else begin
-      data_from_out_mat <= data_from_out_mat_temp;
-    end
-  end
-
-  // BRAM matrix C
-  ram matrix_C (
-    .addr0(c_addr_muxed_reg),
-    .d0(c_data_out_reg),
-    .we0(we_c),
-    .q0(data_from_out_mat_temp),
-    .clk(clk_mem));
-
-wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_out_NC;
-wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out_NC;
-wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_NC;
-wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_NC;
-
-matmul_4x4_systolic u_matmul_4x4(
-  .clk(clk),
-  .reset(reset),
-  .start_mat_mul(start_mat_mul),
-  .done_mat_mul(done_mat_mul),
-  .a_data(a_data_reg),
-  .b_data(b_data_reg),
-  .a_data_in(a_data_in_NC),
-  .b_data_in(b_data_in_NC),
-  .c_data_in({`BB_MAT_MUL_SIZE*`DWIDTH{1'b0}}),
-  .c_data_out(c_data_out),
-  .a_data_out(a_data_out_NC),
-  .b_data_out(b_data_out_NC),
-  .a_addr(a_addr),
-  .b_addr(b_addr),
-  .final_mat_mul_size(8'd4),
-  .a_loc(8'd0),
-  .b_loc(8'd0)
-);
-
-endmodule  
-
-/*
-//Design without memories
 module matrix_multiplication(
  clk,
  reset,
@@ -239,14 +28,14 @@ module matrix_multiplication(
  input reset;
  input start_mat_mul;
  output done_mat_mul;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in;
- output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
- output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_out;
- output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out;
+ input [4*`DWIDTH-1:0] a_data;
+ input [4*`DWIDTH-1:0] b_data;
+ input [4*`DWIDTH-1:0] a_data_in;
+ input [4*`DWIDTH-1:0] b_data_in;
+ input [4*`DWIDTH-1:0] c_data_in;
+ output [4*`DWIDTH-1:0] c_data_out;
+ output [4*`DWIDTH-1:0] a_data_out;
+ output [4*`DWIDTH-1:0] b_data_out;
  output [`AWIDTH-1:0] a_addr;
  output [`AWIDTH-1:0] b_addr;
 
@@ -271,7 +60,7 @@ matmul_4x4_systolic u_matmul_4x4(
 );
 
 endmodule
-*/
+
 
 module matmul_4x4_systolic(
  clk,
@@ -647,119 +436,89 @@ module processing_element(
  
 endmodule
 
-//module seq_mac(a, b, out, reset, clk);
-//input [`DWIDTH-1:0] a;
-//input [`DWIDTH-1:0] b;
-//input reset;
-//input clk;
-//output [`DWIDTH-1:0] out;
-//
-//reg [`DWIDTH-1:0] out;
-//wire [`DWIDTH-1:0] mul_out;
-//wire [`DWIDTH-1:0] add_out;
-//
-//reg [`DWIDTH-1:0] a_flopped;
-//reg [`DWIDTH-1:0] b_flopped;
-//
-//wire [2*`DWIDTH-1:0] mul_out_temp;
-//reg [2*`DWIDTH-1:0] mul_out_temp_reg;
-//
-//always @(posedge clk) begin
-//  if (reset) begin
-//    a_flopped <= 0;
-//    b_flopped <= 0;
-//  end else begin
-//    a_flopped <= a;
-//    b_flopped <= b;
-//  end
-//end
-//
-////assign mul_out = a * b;
-//qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
-//
-//always @(posedge clk) begin
-//  if (reset) begin
-//    mul_out_temp_reg <= 0;
-//  end else begin
-//    mul_out_temp_reg <= mul_out_temp;
-//  end
-//end
-//
-////down cast the result
-//assign mul_out = 
-//    (mul_out_temp_reg[2*`DWIDTH-1] == 0) ?  //positive number
-//        (
-//           (|(mul_out_temp_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
-//             {mul_out_temp_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
-//             {mul_out_temp_reg[2*`DWIDTH-1] , mul_out_temp_reg[`DWIDTH-2:0]} 
-//        )
-//        : //negative number
-//        (
-//           (|(mul_out_temp_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
-//             {mul_out_temp_reg[2*`DWIDTH-1] , mul_out_temp_reg[`DWIDTH-2:0]} :
-//             {mul_out_temp_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
-//        );
-//
-//
-////we just truncate the higher bits of the product
-////assign add_out = mul_out + out;
-//qadd add_u1(.a(out), .b(mul_out), .c(add_out));
-//
-//always @(posedge clk) begin
-//  if (reset) begin
-//    out <= 0;
-//  end else begin
-//    out <= add_out;
-//  end
-//end
-//
-//endmodule
-//
-//module qmult(i_multiplicand,i_multiplier,o_result);
-//input [`DWIDTH-1:0] i_multiplicand;
-//input [`DWIDTH-1:0] i_multiplier;
-//output [2*`DWIDTH-1:0] o_result;
-//
-////assign o_result = i_multiplicand * i_multiplier;
-//DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result));
-//
-//endmodule
-//
-//module qadd(a,b,c);
-//input [`DWIDTH-1:0] a;
-//input [`DWIDTH-1:0] b;
-//output [`DWIDTH-1:0] c;
-//
-////assign c = a + b;
-//DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
-//endmodule
-
-module ram (addr0, d0, we0, q0,  clk);
-
-input [`AWIDTH-1:0] addr0;
-input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] d0;
-input we0;
-output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+module seq_mac(a, b, out, reset, clk);
+input [`DWIDTH-1:0] a;
+input [`DWIDTH-1:0] b;
+input reset;
 input clk;
+output [`DWIDTH-1:0] out;
 
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-//reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] ram[`MEM_SIZE-1:0];
-//
-//always @(posedge clk)  
-//begin 
-//        if (we0) 
-//        begin 
-//            ram[addr0] <= d0; 
-//        end 
-//        q0 <= ram[addr0];
-//end
+reg [`DWIDTH-1:0] out;
+wire [`DWIDTH-1:0] mul_out;
+wire [`DWIDTH-1:0] add_out;
 
-single_port_ram u_single_port_ram(
-  .data(d0),
-  .we(we0),
-  .addr(addr0),
-  .clk(clk),
-  .out(q0)
-);
+reg [`DWIDTH-1:0] a_flopped;
+reg [`DWIDTH-1:0] b_flopped;
+
+wire [2*`DWIDTH-1:0] mul_out_temp;
+reg [`DWIDTH-1:0] mul_out_reg;
+
+always @(posedge clk) begin
+  if (reset) begin
+    a_flopped <= 0;
+    b_flopped <= 0;
+  end else begin
+    a_flopped <= a;
+    b_flopped <= b;
+  end
+end
+
+//assign mul_out = a * b;
+qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
+
+always @(posedge clk) begin
+  if (reset) begin
+    mul_out_reg <= 0;
+  end else begin
+    mul_out_reg <= mul_out;
+  end
+end
+
+//down cast the result
+assign mul_out = 
+    (mul_out_temp[2*`DWIDTH-1] == 0) ?  //positive number
+        (
+           (|(mul_out_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
+             {mul_out_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
+             {mul_out_temp[2*`DWIDTH-1] , mul_out_temp[`DWIDTH-2:0]} 
+        )
+        : //negative number
+        (
+           (|(mul_out_temp[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
+             {mul_out_temp[2*`DWIDTH-1] , mul_out_temp[`DWIDTH-2:0]} :
+             {mul_out_temp[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
+        );
+
+
+//we just truncate the higher bits of the product
+//assign add_out = mul_out + out;
+qadd add_u1(.a(out), .b(mul_out_reg), .c(add_out));
+
+always @(posedge clk) begin
+  if (reset) begin
+    out <= 0;
+  end else begin
+    out <= add_out;
+  end
+end
+
 endmodule
 
+module qmult(i_multiplicand,i_multiplier,o_result);
+input [`DWIDTH-1:0] i_multiplicand;
+input [`DWIDTH-1:0] i_multiplier;
+output [2*`DWIDTH-1:0] o_result;
+
+//assign o_result = i_multiplicand * i_multiplier;
+DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result));
+
+endmodule
+
+module qadd(a,b,c);
+input [`DWIDTH-1:0] a;
+input [`DWIDTH-1:0] b;
+output [`DWIDTH-1:0] c;
+
+//assign c = a + b;
+DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
+endmodule

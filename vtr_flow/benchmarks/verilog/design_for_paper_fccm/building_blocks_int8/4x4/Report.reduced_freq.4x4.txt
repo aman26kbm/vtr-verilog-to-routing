@@ -1,0 +1,259 @@
+Information: Updating design information... (UID-85)
+Warning: Design 'matrix_multiplication' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matrix_multiplication
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:05:40 2019
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4/pe21/u_mac/a_flopped_reg[1]
+              (rising edge-triggered flip-flop clocked by CLK_0)
+  Endpoint: u_matmul_4x4/pe21/u_mac/mul_out_reg_reg[5]
+            (rising edge-triggered flip-flop clocked by CLK_0)
+  Path Group: CLK_0
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock CLK_0 (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  u_matmul_4x4/pe21/u_mac/a_flopped_reg[1]/CLK (DFFPOSX1)
+                                                          0.00 #     0.00 r
+  u_matmul_4x4/pe21/u_mac/a_flopped_reg[1]/Q (DFFPOSX1)
+                                                          0.11       0.11 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/i_multiplicand[1] (qmult_7)
+                                                          0.00       0.11 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/A[1] (qmult_7_DW02_mult_0)
+                                                          0.00       0.11 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U501/Y (XOR2X1)
+                                                          0.15       0.26 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U497/Y (MUX2X1)
+                                                          0.07       0.33 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U217/Y (MUX2X1)
+                                                          0.10       0.42 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U597/YS (FAX1)
+                                                          0.12       0.55 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U596/Y (AOI22X1)
+                                                          0.05       0.59 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U394/Y (BUFX2)
+                                                          0.03       0.63 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U455/Y (INVX1)
+                                                          0.02       0.64 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U595/Y (AOI21X1)
+                                                          0.02       0.66 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U393/Y (BUFX2)
+                                                          0.04       0.70 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U421/Y (AND2X2)
+                                                          0.03       0.73 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U422/Y (INVX1)
+                                                          0.03       0.75 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U571/Y (AOI21X1)
+                                                          0.03       0.79 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U443/Y (INVX1)
+                                                          0.02       0.81 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U570/Y (OAI21X1)
+                                                          0.04       0.85 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U316/Y (INVX2)
+                                                          0.03       0.88 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U548/Y (NAND3X1)
+                                                          0.04       0.92 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U364/Y (BUFX2)
+                                                          0.03       0.95 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U362/Y (AND2X2)
+                                                          0.03       0.98 r
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U363/Y (INVX1)
+                                                          0.02       1.00 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/U547/Y (XNOR2X1)
+                                                          0.03       1.03 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/u_mult/PRODUCT[12] (qmult_7_DW02_mult_0)
+                                                          0.00       1.03 f
+  u_matmul_4x4/pe21/u_mac/mult_u1/o_result[12] (qmult_7)
+                                                          0.00       1.03 f
+  u_matmul_4x4/pe21/u_mac/U7/Y (OR2X2)                    0.05       1.08 f
+  u_matmul_4x4/pe21/u_mac/U51/Y (NOR3X1)                  0.05       1.13 r
+  u_matmul_4x4/pe21/u_mac/U32/Y (AND2X2)                  0.04       1.16 r
+  u_matmul_4x4/pe21/u_mac/U33/Y (INVX1)                   0.02       1.18 f
+  u_matmul_4x4/pe21/u_mac/U47/Y (OAI21X1)                 0.04       1.22 r
+  u_matmul_4x4/pe21/u_mac/U36/Y (INVX2)                   0.03       1.25 f
+  u_matmul_4x4/pe21/u_mac/U5/Y (AND2X1)                   0.03       1.29 f
+  u_matmul_4x4/pe21/u_mac/U4/Y (INVX1)                    0.00       1.29 r
+  u_matmul_4x4/pe21/u_mac/U28/Y (AND2X2)                  0.03       1.32 r
+  u_matmul_4x4/pe21/u_mac/U29/Y (INVX1)                   0.01       1.33 f
+  u_matmul_4x4/pe21/u_mac/mul_out_reg_reg[5]/D (DFFPOSX1)
+                                                          0.00       1.33 f
+  data arrival time                                                  1.33
+
+  clock CLK_0 (rise edge)                                 1.39       1.39
+  clock network delay (ideal)                             0.00       1.39
+  u_matmul_4x4/pe21/u_mac/mul_out_reg_reg[5]/CLK (DFFPOSX1)
+                                                          0.00       1.39 r
+  library setup time                                     -0.06       1.33
+  data required time                                                 1.33
+  --------------------------------------------------------------------------
+  data required time                                                 1.33
+  data arrival time                                                 -1.33
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+ 
+****************************************
+Report : area
+Design : matrix_multiplication
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:05:40 2019
+****************************************
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Number of ports:                         3623
+Number of nets:                         13916
+Number of cells:                        10537
+Number of combinational cells:           9381
+Number of sequential cells:              1014
+Number of macros/black boxes:               0
+Number of buf/inv:                       3355
+Number of references:                       1
+
+Combinational area:              25091.124122
+Buf/Inv area:                     5468.752779
+Noncombinational area:            8089.793221
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                 33180.917343
+Total area:                 undefined
+1
+Loading db file '/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db'
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matrix_multiplication
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:05:41 2019
+****************************************
+
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =  12.2248 mW   (90%)
+  Net Switching Power  =   1.3258 mW   (10%)
+                         ---------
+Total Dynamic Power    =  13.5506 mW  (100%)
+
+Cell Leakage Power     = 179.6277 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register          10.8201            0.1811        5.5747e+04           11.0570  (  80.53%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      1.4046            1.1447        1.2388e+05            2.6732  (  19.47%)
+--------------------------------------------------------------------------------------------------
+Total             12.2248 mW         1.3258 mW     1.7963e+05 nW        13.7302 mW
+1
+ 
+****************************************
+Report : design
+Design : matrix_multiplication
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:05:41 2019
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Local Link Library:
+
+    {/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+1

@@ -1,0 +1,730 @@
+Information: Building the design 'seq_mac'. (HDL-193)
+Warning: Cannot find the design 'seq_mac' in the library 'WORK'. (LBR-1)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_0'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_255'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_254'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_253'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_252'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_251'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_250'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_249'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_248'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_247'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_246'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_245'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_244'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_243'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_242'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_241'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_240'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_239'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_238'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_237'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_236'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_235'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_234'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_233'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_232'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_231'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_230'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_229'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_228'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_227'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_226'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_225'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_224'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_223'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_222'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_221'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_220'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_219'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_218'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_217'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_216'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_215'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_214'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_213'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_212'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_211'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_210'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_209'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_208'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_207'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_206'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_205'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_204'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_203'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_202'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_201'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_200'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_199'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_198'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_197'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_196'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_195'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_194'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_193'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_192'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_191'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_190'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_189'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_188'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_187'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_186'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_185'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_184'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_183'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_182'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_181'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_180'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_179'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_178'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_177'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_176'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_175'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_174'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_173'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_172'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_171'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_170'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_169'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_168'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_167'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_166'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_165'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_164'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_163'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_162'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_161'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_160'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_159'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_158'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_157'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_156'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_155'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_154'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_153'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_152'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_151'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_150'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_149'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_148'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_147'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_146'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_145'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_144'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_143'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_142'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_141'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_140'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_139'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_138'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_137'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_136'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_135'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_134'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_133'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_132'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_131'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_130'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_129'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_128'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_127'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_126'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_125'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_124'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_123'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_122'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_121'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_120'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_119'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_118'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_117'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_116'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_115'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_114'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_113'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_112'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_111'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_110'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_109'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_108'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_107'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_106'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_105'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_104'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_103'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_102'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_101'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_100'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_99'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_98'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_97'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_96'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_95'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_94'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_93'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_92'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_91'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_90'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_89'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_88'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_87'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_86'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_85'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_84'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_83'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_82'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_81'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_80'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_79'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_78'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_77'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_76'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_75'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_74'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_73'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_72'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_71'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_70'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_69'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_68'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_67'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_66'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_65'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_64'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_63'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_62'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_61'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_60'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_59'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_58'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_57'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_56'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_55'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_54'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_53'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_52'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_51'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_50'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_49'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_48'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_47'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_46'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_45'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_44'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_43'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_42'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_41'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_40'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_39'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_38'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_37'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_36'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_35'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_34'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_33'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_32'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_31'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_30'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_29'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_28'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_27'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_26'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_25'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_24'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_23'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_22'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_21'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_20'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_19'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_18'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_17'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_16'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_15'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_14'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_13'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_12'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_11'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_10'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_9'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_8'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_7'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_6'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_5'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_4'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_3'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_2'. (LINK-5)
+Warning: Unable to resolve reference 'seq_mac' in 'processing_element_1'. (LINK-5)
+Warning: Design 'matmul_16x16_systolic' has '256' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Updating design information... (UID-85)
+Warning: Design 'matmul_16x16_systolic' contains 2 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Wed Dec 18 23:53:05 2019
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4_systolic_0_0/clk_cnt_reg[3]
+              (rising edge-triggered flip-flop clocked by CLK_0)
+  Endpoint: u_matmul_4x4_systolic_0_0/row3_shift_reg_reg[0]
+            (rising edge-triggered flip-flop clocked by CLK_0)
+  Path Group: CLK_0
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock CLK_0 (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  u_matmul_4x4_systolic_0_0/clk_cnt_reg[3]/CLK (DFFPOSX1)
+                                                          0.00 #     0.00 r
+  u_matmul_4x4_systolic_0_0/clk_cnt_reg[3]/Q (DFFPOSX1)
+                                                          0.11       0.11 f
+  u_matmul_4x4_systolic_0_0/U155/Y (INVX1)                0.15       0.26 r
+  u_matmul_4x4_systolic_0_0/U585/Y (XOR2X1)               0.06       0.32 r
+  u_matmul_4x4_systolic_0_0/U583/Y (NAND3X1)              0.02       0.34 f
+  u_matmul_4x4_systolic_0_0/U94/Y (BUFX2)                 0.03       0.37 f
+  u_matmul_4x4_systolic_0_0/U3/Y (OR2X1)                  0.04       0.41 f
+  u_matmul_4x4_systolic_0_0/U117/Y (INVX1)                0.00       0.41 r
+  u_matmul_4x4_systolic_0_0/U578/Y (NAND3X1)              0.01       0.42 f
+  u_matmul_4x4_systolic_0_0/U116/Y (BUFX2)                0.04       0.46 f
+  u_matmul_4x4_systolic_0_0/U14/Y (AND2X1)                0.22       0.67 f
+  u_matmul_4x4_systolic_0_0/U515/Y (AOI22X1)              0.09       0.76 r
+  u_matmul_4x4_systolic_0_0/U514/Y (INVX1)                0.02       0.79 f
+  u_matmul_4x4_systolic_0_0/row3_shift_reg_reg[0]/D (DFFPOSX1)
+                                                          0.00       0.79 f
+  data arrival time                                                  0.79
+
+  clock CLK_0 (rise edge)                                 1.11       1.11
+  clock network delay (ideal)                             0.00       1.11
+  u_matmul_4x4_systolic_0_0/row3_shift_reg_reg[0]/CLK (DFFPOSX1)
+                                                          0.00       1.11 r
+  library setup time                                     -0.06       1.05
+  data required time                                                 1.05
+  --------------------------------------------------------------------------
+  data required time                                                 1.05
+  data arrival time                                                 -0.79
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.27
+
+
+1
+Warning: Design 'matmul_16x16_systolic' has '256' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : area
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Wed Dec 18 23:53:05 2019
+****************************************
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Number of ports:                        17932
+Number of nets:                         48236
+Number of cells:                        29216
+Number of combinational cells:          19454
+Number of sequential cells:              8288
+Number of macros/black boxes:               0
+Number of buf/inv:                       5326
+Number of references:                      16
+
+Combinational area:              51177.163969
+Buf/Inv area:                     8069.144037
+Noncombinational area:           64080.097778
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                115257.261747
+Total area:                 undefined
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+Loading db file '/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db'
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+Warning: Design has unannotated black box outputs. (PWR-428)
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Wed Dec 18 23:53:10 2019
+****************************************
+
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  = 109.8982 mW    (9%)
+  Net Switching Power  =   1.0889  W   (91%)
+                         ---------
+Total Dynamic Power    =   1.1988  W  (100%)
+
+Cell Leakage Power     = 712.7504 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      1.3812        1.0874e+03        8.1888e+04        1.0888e+03  (  90.77%)
+register         107.2775            0.4587        4.4158e+05          108.1778  (   9.02%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      1.2390            1.0517        1.8928e+05            2.4799  (   0.21%)
+--------------------------------------------------------------------------------------------------
+Total            109.8976 mW     1.0889e+03 mW     7.1275e+05 nW     1.1995e+03 mW
+1
+Warning: Design 'matmul_16x16_systolic' has '256' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : design
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Wed Dec 18 23:53:10 2019
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Local Link Library:
+
+    {/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+Information: Updating design information... (UID-85)
+Warning: Design 'matmul_16x16_systolic' contains 2 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:11:40 2019
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4_systolic_0_0/pe02/u_mac/a_flopped_reg[3]
+              (rising edge-triggered flip-flop clocked by CLK_0)
+  Endpoint: u_matmul_4x4_systolic_0_0/pe02/u_mac/mul_out_temp_reg_reg[13]
+            (rising edge-triggered flip-flop clocked by CLK_0)
+  Path Group: CLK_0
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock CLK_0 (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/a_flopped_reg[3]/CLK (DFFPOSX1)
+                                                          0.00 #     0.00 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/a_flopped_reg[3]/Q (DFFPOSX1)
+                                                          0.11       0.11 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/i_multiplicand[3] (qmult_254)
+                                                          0.00       0.11 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/A[3] (qmult_254_DW02_mult_0)
+                                                          0.00       0.11 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U513/Y (XOR2X1)
+                                                          0.14       0.25 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U509/Y (MUX2X1)
+                                                          0.07       0.32 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U194/Y (MUX2X1)
+                                                          0.10       0.42 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U606/YS (FAX1)
+                                                          0.13       0.54 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U572/Y (AOI22X1)
+                                                          0.06       0.60 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U399/Y (BUFX2)
+                                                          0.03       0.63 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U456/Y (INVX1)
+                                                          0.02       0.65 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U571/Y (AOI21X1)
+                                                          0.02       0.67 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U398/Y (BUFX2)
+                                                          0.04       0.70 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U296/Y (OR2X1)
+                                                          0.05       0.76 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U450/Y (INVX1)
+                                                          0.02       0.78 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U321/Y (AND2X2)
+                                                          0.04       0.82 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U322/Y (INVX1)
+                                                          0.00       0.82 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U326/Y (AND2X2)
+                                                          0.03       0.85 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U347/Y (INVX1)
+                                                          0.01       0.86 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U304/Y (INVX1)
+                                                          0.02       0.89 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U548/Y (AOI22X1)
+                                                          0.01       0.90 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U325/Y (BUFX2)
+                                                          0.04       0.94 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U547/Y (AOI21X1)
+                                                          0.02       0.95 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U379/Y (BUFX2)
+                                                          0.04       0.99 r
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/U546/Y (XOR2X1)
+                                                          0.03       1.02 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/u_mult/PRODUCT[13] (qmult_254_DW02_mult_0)
+                                                          0.00       1.02 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mult_u1/o_result[13] (qmult_254)
+                                                          0.00       1.02 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/U48/Y (AND2X1)     0.03       1.05 f
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mul_out_temp_reg_reg[13]/D (DFFPOSX1)
+                                                          0.00       1.05 f
+  data arrival time                                                  1.05
+
+  clock CLK_0 (rise edge)                                 1.11       1.11
+  clock network delay (ideal)                             0.00       1.11
+  u_matmul_4x4_systolic_0_0/pe02/u_mac/mul_out_temp_reg_reg[13]/CLK (DFFPOSX1)
+                                                          0.00       1.11 r
+  library setup time                                     -0.06       1.05
+  data required time                                                 1.05
+  --------------------------------------------------------------------------
+  data required time                                                 1.05
+  data arrival time                                                 -1.05
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+ 
+****************************************
+Report : area
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:11:40 2019
+****************************************
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Number of ports:                        54028
+Number of nets:                        223611
+Number of cells:                       172335
+Number of combinational cells:         150797
+Number of sequential cells:             18272
+Number of macros/black boxes:               0
+Number of buf/inv:                      50981
+Number of references:                      16
+
+Combinational area:             403982.350426
+Buf/Inv area:                    83315.296430
+Noncombinational area:          145775.839966
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                549758.190392
+Total area:                 undefined
+1
+Loading db file '/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db'
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:11:51 2019
+****************************************
+
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  = 251.6284 mW   (94%)
+  Net Switching Power  =  15.7738 mW    (6%)
+                         ---------
+Total Dynamic Power    = 267.4021 mW  (100%)
+
+Cell Leakage Power     =   3.0029 mW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register         236.8488            1.9923        1.0045e+06          239.8456  (  88.70%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational     14.7794           13.7814        1.9983e+06           30.5592  (  11.30%)
+--------------------------------------------------------------------------------------------------
+Total            251.6282 mW        15.7737 mW     3.0029e+06 nW       270.4048 mW
+1
+ 
+****************************************
+Report : design
+Design : matmul_16x16_systolic
+Version: O-2018.06-SP5
+Date   : Thu Dec 19 00:11:53 2019
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Local Link Library:
+
+    {/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+1
