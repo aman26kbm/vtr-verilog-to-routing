@@ -4,7 +4,7 @@ from os import path
 import pdb
 import math
 
-data_width = 16
+data_width = 8
 address_width = 7
 mem_size = 128
 
@@ -57,7 +57,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   file.write(	'  reg enable_writing_to_mem_reg;\n'
   			'  reg enable_reading_from_mem_reg;\n'
   			'  reg [`AWIDTH-1:0] addr_pi_reg;\n'
-  			'  always @(posedge clk) begin\n'
+  			'  always @(posedge clk_mem) begin\n'
   			'    if(reset) begin\n'
   			'      enable_writing_to_mem_reg <= 0;\n'
   			'      enable_reading_from_mem_reg <= 0;\n'
@@ -95,7 +95,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   
   
   
-  file.write(   '  always @(posedge clk) begin\n'
+  file.write(   '  always @(posedge clk_mem) begin\n'
   		'    if(reset) begin\n')
   for i in range(num_of_bram):
     file.write(	'      a_addr_{0}_0_reg <= 0;\n'.format(i))
@@ -121,7 +121,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   		'    .d0(data_pi),\n'
   		'    .we0(we_a),\n'
   		'    .q0(a_data_{0}_0),\n'
-  		'    .clk(clk));\n\n'
+  		'    .clk(clk_mem));\n\n'
   		.format(i))
 
   for i in range(num_of_bram):
@@ -160,7 +160,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   file.write('\n\n')
   
   
-  file.write(		'  always @(posedge clk) begin\n'
+  file.write(		'  always @(posedge clk_mem) begin\n'
   				'    if(reset) begin\n')
   for i in range(num_of_bram):
   	file.write(	'      b_addr_0_{0}_reg <= 0;\n'.format(i))
@@ -185,7 +185,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   				'    .d0(data_pi),\n'
   				'    .we0(we_b),\n'
   				'    .q0(b_data_0_{0}),\n'
-  				'    .clk(clk));\n\n'
+  				'    .clk(clk_mem));\n\n'
                                 .format(i))
 
   for i in range(num_of_bram):
@@ -216,7 +216,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   for i in range(num_of_bram):
     file.write('  assign c_addr_muxed_0_{0} = (enable_reading_from_mem_reg) ? addr_pi_reg : c_addr;\n'.format(i))
   file.write('\n')
-  file.write(	'  always @(posedge clk) begin\n'
+  file.write(	'  always @(posedge clk_mem) begin\n'
   			'    if(reset || done_mat_mul) begin\n'
   			'      c_addr <= 0;\n'
   			'    end\n'
@@ -242,7 +242,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
     file.write('  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] data_from_out_mat_0_{0}_reg;\n'.format(i))
   file.write('\n')
   
-  file.write(  '  always @(posedge clk) begin\n'
+  file.write(  '  always @(posedge clk_mem) begin\n'
   	       '    if(reset) begin\n')
 
   for i in range(num_of_bram):
@@ -255,7 +255,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   	       '  end\n\n')
   
   #oring the data
-  file.write(	 '  always @(posedge clk) begin\n'
+  file.write(	 '  always @(posedge clk_mem) begin\n'
   		 '    if(reset) begin\n'
   		 '      data_from_out_mat <= 0;\n')
   for i in range(num_of_bram):
@@ -282,7 +282,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   for i in range(num_of_bram):
     file.write('  reg [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_row_{0}_reg;\n'.format(i))
   
-  file.write( 	'  always @(posedge clk) begin\n'
+  file.write( 	'  always @(posedge clk_mem) begin\n'
   		'    if(reset) begin\n')
   for i in range(num_of_bram):
     file.write(	'      c_data_row_{0}_reg <= 0;\n'
@@ -301,7 +301,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
     		'    .d0(c_data_row_{0}_reg),\n'
     		'    .we0(we_c),\n'
     		'    .q0(data_from_out_mat_0_{0}),\n'
-    		'    .clk(clk));\n\n'
+    		'    .clk(clk_mem));\n\n'
     		.format(i))
   
   #instantiation of systolic matmul
