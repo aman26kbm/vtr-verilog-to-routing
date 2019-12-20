@@ -74,10 +74,10 @@ module matrix_multiplication(
 
   always @(posedge clk_mem) begin
     if(reset) begin
-      a_addr_0_0_reg <= 0;
-      a_addr_1_0_reg <= 0;
-      a_addr_muxed_0_0_reg <= 0;
-      a_addr_muxed_1_0_reg <= 0;
+      a_addr_0_0_reg <= `MEM_SIZE-1;
+      a_addr_1_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_0_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_1_0_reg <= `MEM_SIZE-1;
     end else begin
       a_addr_0_0_reg <= a_addr_0_0;
       a_addr_1_0_reg <= a_addr_1_0;
@@ -112,7 +112,7 @@ module matrix_multiplication(
       a_data_0_0_reg <= 0;
       a_data_1_0_reg <= 0;
     end else begin
-;      a_data_0_0_reg <= a_data_0_0;
+      a_data_0_0_reg <= a_data_0_0;
       a_data_1_0_reg <= a_data_1_0;
     end
   end
@@ -140,10 +140,10 @@ module matrix_multiplication(
 
   always @(posedge clk_mem) begin
     if(reset) begin
-      b_addr_0_0_reg <= 0;
-      b_addr_0_1_reg <= 0;
-      b_addr_muxed_0_0_reg <= 0;
-      b_addr_muxed_0_1_reg <= 0;
+      b_addr_0_0_reg <= `MEM_SIZE-1;
+      b_addr_0_1_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_0_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_1_reg <= `MEM_SIZE-1;
     end else begin
       b_addr_0_0_reg <= b_addr_0_0;
       b_addr_0_1_reg <= b_addr_0_1;
@@ -178,7 +178,7 @@ module matrix_multiplication(
       b_data_0_0_reg <= 0;
       b_data_0_1_reg <= 0;
     end else begin
-;      b_data_0_0_reg <= b_data_0_0;
+      b_data_0_0_reg <= b_data_0_0;
       b_data_0_1_reg <= b_data_0_1;
     end
   end

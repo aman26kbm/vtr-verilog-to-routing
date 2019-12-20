@@ -114,26 +114,26 @@ module matrix_multiplication(
 
   always @(posedge clk_mem) begin
     if(reset) begin
-      a_addr_0_0_reg <= 0;
-      a_addr_1_0_reg <= 0;
-      a_addr_2_0_reg <= 0;
-      a_addr_3_0_reg <= 0;
-      a_addr_4_0_reg <= 0;
-      a_addr_5_0_reg <= 0;
-      a_addr_6_0_reg <= 0;
-      a_addr_7_0_reg <= 0;
-      a_addr_8_0_reg <= 0;
-      a_addr_9_0_reg <= 0;
-      a_addr_muxed_0_0_reg <= 0;
-      a_addr_muxed_1_0_reg <= 0;
-      a_addr_muxed_2_0_reg <= 0;
-      a_addr_muxed_3_0_reg <= 0;
-      a_addr_muxed_4_0_reg <= 0;
-      a_addr_muxed_5_0_reg <= 0;
-      a_addr_muxed_6_0_reg <= 0;
-      a_addr_muxed_7_0_reg <= 0;
-      a_addr_muxed_8_0_reg <= 0;
-      a_addr_muxed_9_0_reg <= 0;
+      a_addr_0_0_reg <= `MEM_SIZE-1;
+      a_addr_1_0_reg <= `MEM_SIZE-1;
+      a_addr_2_0_reg <= `MEM_SIZE-1;
+      a_addr_3_0_reg <= `MEM_SIZE-1;
+      a_addr_4_0_reg <= `MEM_SIZE-1;
+      a_addr_5_0_reg <= `MEM_SIZE-1;
+      a_addr_6_0_reg <= `MEM_SIZE-1;
+      a_addr_7_0_reg <= `MEM_SIZE-1;
+      a_addr_8_0_reg <= `MEM_SIZE-1;
+      a_addr_9_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_0_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_1_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_2_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_3_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_4_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_5_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_6_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_7_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_8_0_reg <= `MEM_SIZE-1;
+      a_addr_muxed_9_0_reg <= `MEM_SIZE-1;
     end else begin
       a_addr_0_0_reg <= a_addr_0_0;
       a_addr_1_0_reg <= a_addr_1_0;
@@ -272,7 +272,7 @@ module matrix_multiplication(
       a_data_8_0_reg <= 0;
       a_data_9_0_reg <= 0;
     end else begin
-;      a_data_0_0_reg <= a_data_0_0;
+      a_data_0_0_reg <= a_data_0_0;
       a_data_1_0_reg <= a_data_1_0;
       a_data_2_0_reg <= a_data_2_0;
       a_data_3_0_reg <= a_data_3_0;
@@ -348,26 +348,26 @@ module matrix_multiplication(
 
   always @(posedge clk_mem) begin
     if(reset) begin
-      b_addr_0_0_reg <= 0;
-      b_addr_0_1_reg <= 0;
-      b_addr_0_2_reg <= 0;
-      b_addr_0_3_reg <= 0;
-      b_addr_0_4_reg <= 0;
-      b_addr_0_5_reg <= 0;
-      b_addr_0_6_reg <= 0;
-      b_addr_0_7_reg <= 0;
-      b_addr_0_8_reg <= 0;
-      b_addr_0_9_reg <= 0;
-      b_addr_muxed_0_0_reg <= 0;
-      b_addr_muxed_0_1_reg <= 0;
-      b_addr_muxed_0_2_reg <= 0;
-      b_addr_muxed_0_3_reg <= 0;
-      b_addr_muxed_0_4_reg <= 0;
-      b_addr_muxed_0_5_reg <= 0;
-      b_addr_muxed_0_6_reg <= 0;
-      b_addr_muxed_0_7_reg <= 0;
-      b_addr_muxed_0_8_reg <= 0;
-      b_addr_muxed_0_9_reg <= 0;
+      b_addr_0_0_reg <= `MEM_SIZE-1;
+      b_addr_0_1_reg <= `MEM_SIZE-1;
+      b_addr_0_2_reg <= `MEM_SIZE-1;
+      b_addr_0_3_reg <= `MEM_SIZE-1;
+      b_addr_0_4_reg <= `MEM_SIZE-1;
+      b_addr_0_5_reg <= `MEM_SIZE-1;
+      b_addr_0_6_reg <= `MEM_SIZE-1;
+      b_addr_0_7_reg <= `MEM_SIZE-1;
+      b_addr_0_8_reg <= `MEM_SIZE-1;
+      b_addr_0_9_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_0_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_1_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_2_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_3_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_4_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_5_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_6_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_7_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_8_reg <= `MEM_SIZE-1;
+      b_addr_muxed_0_9_reg <= `MEM_SIZE-1;
     end else begin
       b_addr_0_0_reg <= b_addr_0_0;
       b_addr_0_1_reg <= b_addr_0_1;
@@ -506,7 +506,7 @@ module matrix_multiplication(
       b_data_0_8_reg <= 0;
       b_data_0_9_reg <= 0;
     end else begin
-;      b_data_0_0_reg <= b_data_0_0;
+      b_data_0_0_reg <= b_data_0_0;
       b_data_0_1_reg <= b_data_0_1;
       b_data_0_2_reg <= b_data_0_2;
       b_data_0_3_reg <= b_data_0_3;

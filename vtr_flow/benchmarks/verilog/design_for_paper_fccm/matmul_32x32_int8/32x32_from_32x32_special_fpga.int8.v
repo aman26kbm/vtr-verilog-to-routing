@@ -195,7 +195,7 @@ wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out_NC;
 wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_NC;
 wire [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_NC;
 
-matmul_8x8_systolic u_matmul_8x8(
+matmul_32x32_systolic u_matmul_32x32(
   .clk(clk),
   .reset(reset),
   .start_mat_mul(start_mat_mul),

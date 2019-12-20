@@ -98,9 +98,9 @@ def write_with_ram(file, basic_block_size, final_block_size):
   file.write(   '  always @(posedge clk_mem) begin\n'
   		'    if(reset) begin\n')
   for i in range(num_of_bram):
-    file.write(	'      a_addr_{0}_0_reg <= 0;\n'.format(i))
+    file.write(	'      a_addr_{0}_0_reg <= `MEM_SIZE-1;\n'.format(i))
   for i in range(num_of_bram):
-    file.write(	'      a_addr_muxed_{0}_0_reg <= 0;\n'.format(i))
+    file.write(	'      a_addr_muxed_{0}_0_reg <= `MEM_SIZE-1;\n'.format(i))
   file.write(		'    end else begin\n')
   for i in range(num_of_bram):
     file.write(	'      a_addr_{0}_0_reg <= a_addr_{0}_0;\n'.format(i))
@@ -131,7 +131,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   file.write(  '    if (reset) begin\n')
   for i in range(num_of_bram):
     file.write('      a_data_{0}_0_reg <= 0;\n'.format(i))
-  file.write(  '    end else begin\n;')
+  file.write(  '    end else begin\n')
   for i in range(num_of_bram):
     file.write('      a_data_{0}_0_reg <= a_data_{0}_0;\n'.format(i))
   file.write(  '    end\n')
@@ -163,9 +163,9 @@ def write_with_ram(file, basic_block_size, final_block_size):
   file.write(		'  always @(posedge clk_mem) begin\n'
   				'    if(reset) begin\n')
   for i in range(num_of_bram):
-  	file.write(	'      b_addr_0_{0}_reg <= 0;\n'.format(i))
+  	file.write(	'      b_addr_0_{0}_reg <= `MEM_SIZE-1;\n'.format(i))
   for i in range(num_of_bram):
-  	file.write(	'      b_addr_muxed_0_{0}_reg <= 0;\n'.format(i))
+  	file.write(	'      b_addr_muxed_0_{0}_reg <= `MEM_SIZE-1;\n'.format(i))
   file.write(		'    end else begin\n')
   for i in range(num_of_bram):
   	file.write(	'      b_addr_0_{0}_reg <= b_addr_0_{0};\n'.format(i))
@@ -195,7 +195,7 @@ def write_with_ram(file, basic_block_size, final_block_size):
   file.write(  '    if (reset) begin\n')
   for i in range(num_of_bram):
     file.write('      b_data_0_{0}_reg <= 0;\n'.format(i))
-  file.write(  '    end else begin\n;')
+  file.write(  '    end else begin\n')
   for i in range(num_of_bram):
     file.write('      b_data_0_{0}_reg <= b_data_0_{0};\n'.format(i))
   file.write(  '    end\n')
@@ -542,10 +542,10 @@ def main():
   		'`define AWIDTH {}\n'
   		'`define MEM_SIZE {}\n'
   		'`define MAT_MUL_SIZE {}\n'
-  		'`define LOG2_MAT_MUL_SIZE 2\n'
+  		'`define LOG2_MAT_MUL_SIZE {}\n'
   		'`define BB_MAT_MUL_SIZE `MAT_MUL_SIZE\n'
   		'`define NUM_CYCLES_IN_MAC 3\n\n\n'
-  		.format(data_width, address_width, mem_size, basic_block_size))
+  		.format(data_width, address_width, mem_size, basic_block_size, str(int(math.log2(int(basic_block_size))))))
   
   #with bram module
   if(with_ram == 1):
