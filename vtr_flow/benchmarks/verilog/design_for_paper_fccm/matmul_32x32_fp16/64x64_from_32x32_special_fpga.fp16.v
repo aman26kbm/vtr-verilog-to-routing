@@ -4,10 +4,10 @@
 `define SIGN 1
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
-`define AWIDTH 16
-`define MEM_SIZE 7
-`define MAT_MUL_SIZE 128
-`define LOG2_MAT_MUL_SIZE 32
+`define AWIDTH 7
+`define MEM_SIZE 128
+`define MAT_MUL_SIZE 32
+`define LOG2_MAT_MUL_SIZE 5
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
 `define NUM_CYCLES_IN_MAC 8
 

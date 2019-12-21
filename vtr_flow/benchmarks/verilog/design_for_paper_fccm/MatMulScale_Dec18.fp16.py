@@ -549,7 +549,7 @@ def main():
   		'`define LOG2_MAT_MUL_SIZE {}\n'
   		'`define BB_MAT_MUL_SIZE `MAT_MUL_SIZE\n'
   		'`define NUM_CYCLES_IN_MAC 8\n\n\n'
-  		.format(data_width, address_width, mem_size, basic_block_size, str(int(math.log2(int(basic_block_size))))))
+  		.format(address_width, mem_size, basic_block_size, str(int(math.log2(int(basic_block_size))))))
   
   #with bram module
   if(with_ram == 1):
