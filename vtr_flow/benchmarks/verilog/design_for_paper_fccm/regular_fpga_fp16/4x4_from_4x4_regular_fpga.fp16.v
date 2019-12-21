@@ -1,4 +1,3 @@
-
 `timescale 1ns/1ns
 `define EXPONENT 5
 `define MANTISSA 10
