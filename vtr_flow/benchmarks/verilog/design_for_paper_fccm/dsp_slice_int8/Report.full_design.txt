@@ -8,15 +8,15 @@ Report : timing
         -sort_by group
 Design : dsp_slice
 Version: O-2018.06-SP5
-Date   : Sat Dec 14 20:57:43 2019
+Date   : Sat Dec 21 09:58:32 2019
 ****************************************
 
 Operating Conditions: typical   Library: gscl45nm
 Wire Load Model Mode: top
 
-  Startpoint: az_flopped_reg[1]
+  Startpoint: ay_flopped_reg[1]
               (rising edge-triggered flip-flop clocked by CLK_0)
-  Endpoint: out_mult_temp_reg_reg[27]
+  Endpoint: out_mult_temp_reg_reg[14]
             (rising edge-triggered flip-flop clocked by CLK_0)
   Path Group: CLK_0
   Path Type: max
@@ -25,48 +25,46 @@ Wire Load Model Mode: top
   --------------------------------------------------------------------------
   clock CLK_0 (rise edge)                                 0.00       0.00
   clock network delay (ideal)                             0.00       0.00
-  az_flopped_reg[1]/CLK (DFFPOSX1)                        0.00       0.00 r
-  az_flopped_reg[1]/Q (DFFPOSX1)                          0.11       0.11 f
-  u_mult/B[1] (dsp_slice_DW02_mult_1)                     0.00       0.11 f
-  u_mult/U1094/Y (XNOR2X1)                                0.06       0.17 r
-  u_mult/U2227/Y (AND2X2)                                 0.04       0.21 r
-  u_mult/U2228/Y (INVX1)                                  0.02       0.22 f
-  u_mult/U2506/Y (OR2X2)                                  0.04       0.26 f
-  u_mult/U1441/Y (AND2X2)                                 0.04       0.30 f
-  u_mult/U413/YS (FAX1)                                   0.09       0.39 r
-  u_mult/U1538/Y (AND2X2)                                 0.03       0.43 r
-  u_mult/U1781/Y (INVX1)                                  0.02       0.44 f
-  u_mult/U2508/Y (NAND3X1)                                0.03       0.48 r
-  u_mult/U1647/Y (BUFX2)                                  0.04       0.52 r
-  u_mult/U403/YS (FAX1)                                   0.07       0.59 r
-  u_mult/U1345/Y (AND2X2)                                 0.03       0.63 r
-  u_mult/U1525/Y (OR2X2)                                  0.04       0.66 r
-  u_mult/U1524/Y (OR2X2)                                  0.04       0.70 r
-  u_mult/U1570/Y (AND2X2)                                 0.03       0.74 r
-  u_mult/U1402/Y (INVX1)                                  0.02       0.75 f
-  u_mult/U202/Y (OAI21X1)                                 0.04       0.80 r
-  u_mult/U1588/Y (AND2X2)                                 0.04       0.83 r
-  u_mult/U1375/Y (OR2X2)                                  0.04       0.88 r
-  u_mult/U1112/Y (INVX2)                                  0.02       0.90 f
-  u_mult/U118/Y (OAI21X1)                                 0.04       0.94 r
-  u_mult/U116/Y (AOI21X1)                                 0.02       0.96 f
-  u_mult/U1639/Y (BUFX2)                                  0.04       1.00 f
-  u_mult/U2329/Y (XNOR2X1)                                0.03       1.02 f
-  u_mult/PRODUCT[27] (dsp_slice_DW02_mult_1)              0.00       1.02 f
-  U360/Y (AND2X1)                                         0.03       1.05 f
-  out_mult_temp_reg_reg[27]/D (DFFPOSX1)                  0.00       1.05 f
+  ay_flopped_reg[1]/CLK (DFFPOSX1)                        0.00       0.00 r
+  ay_flopped_reg[1]/Q (DFFPOSX1)                          0.12       0.12 f
+  u_mult/A[1] (dsp_slice_DW02_mult_0)                     0.00       0.12 f
+  u_mult/U390/Y (INVX2)                                   0.06       0.18 r
+  u_mult/U507/Y (AND2X1)                                  0.04       0.22 r
+  u_mult/U321/Y (INVX1)                                   0.06       0.28 f
+  u_mult/U236/Y (MUX2X1)                                  0.08       0.36 r
+  u_mult/U623/Y (AND2X1)                                  0.07       0.42 r
+  u_mult/U617/Y (AOI22X1)                                 0.05       0.47 f
+  u_mult/U373/Y (BUFX2)                                   0.04       0.51 f
+  u_mult/U616/Y (OAI21X1)                                 0.05       0.56 r
+  u_mult/U615/YS (FAX1)                                   0.09       0.65 f
+  u_mult/U340/Y (OR2X1)                                   0.06       0.71 f
+  u_mult/U435/Y (INVX1)                                   0.01       0.71 r
+  u_mult/U610/Y (OAI21X1)                                 0.02       0.73 f
+  u_mult/U589/Y (AOI21X1)                                 0.02       0.75 r
+  u_mult/U367/Y (BUFX2)                                   0.03       0.78 r
+  u_mult/U475/Y (INVX1)                                   0.01       0.79 f
+  u_mult/U588/Y (OAI21X1)                                 0.05       0.85 r
+  u_mult/U404/Y (INVX2)                                   0.02       0.87 f
+  u_mult/U363/Y (AND2X2)                                  0.04       0.91 f
+  u_mult/U558/Y (AOI21X1)                                 0.03       0.94 r
+  u_mult/U366/Y (BUFX2)                                   0.03       0.97 r
+  u_mult/U380/Y (INVX1)                                   0.02       0.99 f
+  u_mult/U361/Y (XOR2X1)                                  0.03       1.02 f
+  u_mult/PRODUCT[14] (dsp_slice_DW02_mult_0)              0.00       1.02 f
+  U196/Y (AND2X1)                                         0.03       1.05 f
+  out_mult_temp_reg_reg[14]/D (DFFPOSX1)                  0.00       1.05 f
   data arrival time                                                  1.05
 
   clock CLK_0 (rise edge)                                 1.11       1.11
   clock network delay (ideal)                             0.00       1.11
-  out_mult_temp_reg_reg[27]/CLK (DFFPOSX1)                0.00       1.11 r
+  out_mult_temp_reg_reg[14]/CLK (DFFPOSX1)                0.00       1.11 r
   library setup time                                     -0.06       1.05
   data required time                                                 1.05
   --------------------------------------------------------------------------
   data required time                                                 1.05
   data arrival time                                                 -1.05
   --------------------------------------------------------------------------
-  slack (VIOLATED: increase significant digits)                      0.00
+  slack (MET)                                                        0.00
 
 
 1
@@ -75,29 +73,29 @@ Wire Load Model Mode: top
 Report : area
 Design : dsp_slice
 Version: O-2018.06-SP5
-Date   : Sat Dec 14 20:57:43 2019
+Date   : Sat Dec 21 09:58:32 2019
 ****************************************
 
 Library(s) Used:
 
     gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
 
-Number of ports:                          185
-Number of nets:                          2493
-Number of cells:                         2237
-Number of combinational cells:           2138
-Number of sequential cells:                96
+Number of ports:                           97
+Number of nets:                           760
+Number of cells:                          675
+Number of combinational cells:            624
+Number of sequential cells:                48
 Number of macros/black boxes:               0
-Number of buf/inv:                        917
-Number of references:                      15
+Number of buf/inv:                        243
+Number of references:                      11
 
-Combinational area:               5696.363315
-Buf/Inv area:                     1486.742373
-Noncombinational area:             765.897583
+Combinational area:               1623.777974
+Buf/Inv area:                      409.229591
+Noncombinational area:             382.948792
 Macro/Black Box area:                0.000000
 Net Interconnect area:      undefined  (No wire load specified)
 
-Total cell area:                  6462.260898
+Total cell area:                  2006.726766
 Total area:                 undefined
 1
 Loading db file '/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db'
@@ -110,7 +108,7 @@ Report : power
         -analysis_effort low
 Design : dsp_slice
 Version: O-2018.06-SP5
-Date   : Sat Dec 14 20:57:44 2019
+Date   : Sat Dec 21 09:58:32 2019
 ****************************************
 
 
@@ -132,12 +130,12 @@ Power-specific unit information :
     Leakage Power Units = 1nW
 
 
-  Cell Internal Power  =   2.3798 mW   (75%)
-  Net Switching Power  = 804.4191 uW   (25%)
+  Cell Internal Power  = 964.0441 uW   (80%)
+  Net Switching Power  = 235.5326 uW   (20%)
                          ---------
-Total Dynamic Power    =   3.1842 mW  (100%)
+Total Dynamic Power    =   1.1996 mW  (100%)
 
-Cell Leakage Power     =  38.0139 uW
+Cell Leakage Power     =  10.4900 uW
 
 
                  Internal         Switching           Leakage            Total
@@ -147,18 +145,18 @@ io_pad             0.0000            0.0000            0.0000            0.0000 
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
 clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
-register           1.3817        5.9067e-02        5.2778e+03            1.4460  (  44.88%)
+register           0.6830        2.1684e-02        2.6389e+03            0.7073  (  58.45%)
 sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
-combinational      0.9981            0.7454        3.2736e+04            1.7762  (  55.12%)
+combinational      0.2811            0.2138        7.8511e+03            0.5028  (  41.55%)
 --------------------------------------------------------------------------------------------------
-Total              2.3798 mW         0.8044 mW     3.8014e+04 nW         3.2222 mW
+Total              0.9640 mW         0.2355 mW     1.0490e+04 nW         1.2101 mW
 1
  
 ****************************************
 Report : design
 Design : dsp_slice
 Version: O-2018.06-SP5
-Date   : Sat Dec 14 20:57:44 2019
+Date   : Sat Dec 21 09:58:32 2019
 ****************************************
 
 Design allows ideal nets on clock nets.

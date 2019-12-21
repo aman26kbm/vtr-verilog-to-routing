@@ -29,3 +29,5 @@ waves:
 clean:
 	\rm -rf csrc DVEFiles simv.daidir simv ucli.key vcdplus.vpd *.syn *.pvl *.mr *.svf command.log
 
+synth:
+	design_vision -64bit -f synth.cmd.fp16

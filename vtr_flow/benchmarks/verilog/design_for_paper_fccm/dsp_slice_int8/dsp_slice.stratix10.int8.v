@@ -1,8 +1,4 @@
-`define EXPONENT 5
-`define MANTISSA 10
-`define SIGN 1
-`define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
-`define IEEE_COMPLIANCE 1
+`define DWIDTH 8
 
 module dsp_slice(
         clk,
