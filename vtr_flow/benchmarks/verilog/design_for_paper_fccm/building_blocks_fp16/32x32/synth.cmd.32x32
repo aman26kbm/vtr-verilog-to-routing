@@ -1,4 +1,4 @@
-analyze -format verilog {4x4.v 
+analyze -format verilog {32x32.v
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FPMult/FPMult_ESExecuteModule.v  
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FPMult/FPMult_ExceptionModule.v  
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FPMult/FPMult_ExecuteModule.v    
@@ -18,7 +18,7 @@ analyze -format verilog {4x4.v
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FP_AddSub/FPAddSub_NormalizeShift2.v
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FP_AddSub/FPAddSub_RoundModule.v
 }
-elaborate matrix_multiplication -architecture verilog -library DEFAULT
+elaborate matmul_32x32_systolic -architecture verilog -library DEFAULT
 link
 #set_implementation pparch */*/*/*/u_add
 #set_implementation pparch */*/*/*/u_mult
@@ -28,8 +28,8 @@ set_operating_conditions -library gscl45nm typical
 remove_wire_load_model
 #compile -exact_map
 compile_ultra
-uplevel #0 { report_timing -path full -delay max -nworst 1 -max_paths 1 -significant_digits 2 -sort_by group } >> Report.4x4.txt
-uplevel #0 { report_area } >> Report.4x4.txt
-uplevel #0 { report_power -analysis_effort low } >> Report.4x4.txt
-uplevel #0 { report_design -nosplit } >> Report.4x4.txt
+uplevel #0 { report_timing -path full -delay max -nworst 1 -max_paths 1 -significant_digits 2 -sort_by group } >> Report.32x32.txt
+uplevel #0 { report_area } >> Report.32x32.txt
+uplevel #0 { report_power -analysis_effort low } >> Report.32x32.txt
+uplevel #0 { report_design -nosplit } >> Report.32x32.txt
 exit

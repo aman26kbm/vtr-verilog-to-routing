@@ -1,5 +1,5 @@
 Information: Updating design information... (UID-85)
-Warning: Design 'matrix_multiplication' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+Warning: Design 'matmul_16x16_systolic' contains 2 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
  
 ****************************************
 Report : timing
@@ -7,9 +7,9 @@ Report : timing
         -delay max
         -max_paths 1
         -sort_by group
-Design : matrix_multiplication
+Design : matmul_16x16_systolic
 Version: O-2018.06-SP5
-Date   : Sat Dec 21 10:10:18 2019
+Date   : Sat Dec 21 13:05:33 2019
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -17,9 +17,9 @@ Date   : Sat Dec 21 10:10:18 2019
 Operating Conditions: typical   Library: gscl45nm
 Wire Load Model Mode: top
 
-  Startpoint: u_matmul_4x4/pe01/u_mac/u_mult/pipe_1_reg[30]
+  Startpoint: u_matmul_4x4_systolic_0_3/pe13/u_mac/u_mult/pipe_1_reg[32]
               (rising edge-triggered flip-flop clocked by CLK_0)
-  Endpoint: u_matmul_4x4/pe01/u_mac/u_mult/pipe_2_reg[13]
+  Endpoint: u_matmul_4x4_systolic_0_3/pe13/u_mac/u_mult/pipe_2_reg[13]
             (rising edge-triggered flip-flop clocked by CLK_0)
   Path Group: CLK_0
   Path Type: max
@@ -28,51 +28,47 @@ Wire Load Model Mode: top
   --------------------------------------------------------------------------
   clock CLK_0 (rise edge)                                 0.00       0.00
   clock network delay (ideal)                             0.00       0.00
-  u_matmul_4x4/pe01/u_mac/u_mult/pipe_1_reg[30]/CLK (DFFPOSX1)
+  u_matmul_4x4_systolic_0_3/pe13/u_mac/u_mult/pipe_1_reg[32]/CLK (DFFPOSX1)
                                                           0.00 #     0.00 r
-  u_matmul_4x4/pe01/u_mac/u_mult/pipe_1_reg[30]/Q (DFFPOSX1)
-                                                          0.06       0.06 r
-  U13098/Y (BUFX2)                                        0.14       0.21 r
-  U39822/Y (XOR2X1)                                       0.05       0.26 f
-  U29839/Y (AND2X1)                                       0.05       0.31 f
-  U13174/Y (INVX1)                                        0.08       0.39 r
-  U20327/Y (OR2X1)                                        0.05       0.44 r
-  U20325/Y (AND2X1)                                       0.03       0.47 r
-  U20326/Y (INVX1)                                        0.02       0.49 f
-  U39883/YS (HAX1)                                        0.06       0.55 r
-  U14566/Y (OR2X1)                                        0.05       0.60 r
-  U39886/Y (AOI21X1)                                      0.03       0.63 f
-  U24560/Y (BUFX2)                                        0.04       0.67 f
-  U39887/Y (OAI21X1)                                      0.06       0.73 r
-  U39890/Y (AOI21X1)                                      0.03       0.75 f
-  U28952/Y (BUFX2)                                        0.04       0.79 f
-  U39891/Y (OAI21X1)                                      0.06       0.86 r
-  U39893/Y (AOI21X1)                                      0.04       0.90 f
-  U22866/Y (BUFX2)                                        0.04       0.93 f
-  U39921/Y (OAI21X1)                                      0.05       0.98 r
-  U39944/Y (AOI21X1)                                      0.02       1.00 f
-  U22867/Y (BUFX2)                                        0.04       1.04 f
-  U39978/Y (OAI21X1)                                      0.08       1.11 r
-  U39999/Y (AOI21X1)                                      0.03       1.15 f
-  U15876/Y (BUFX2)                                        0.04       1.19 f
-  U40005/Y (XOR2X1)                                       0.04       1.23 f
-  U40047/Y (OAI21X1)                                      0.03       1.26 r
-  U13391/Y (AND2X1)                                       0.05       1.30 r
-  U29388/Y (INVX1)                                        0.03       1.33 f
-  U40050/Y (AOI22X1)                                      0.03       1.36 r
-  U25149/Y (BUFX2)                                        0.04       1.40 r
-  U13065/Y (INVX1)                                        0.02       1.43 f
-  U15796/Y (OAI21X1)                                      0.04       1.47 r
-  U15085/Y (INVX1)                                        0.03       1.50 f
-  U15084/Y (XOR2X1)                                       0.03       1.53 f
-  U40056/Y (AND2X1)                                       0.03       1.56 f
-  u_matmul_4x4/pe01/u_mac/u_mult/pipe_2_reg[13]/D (DFFPOSX1)
+  u_matmul_4x4_systolic_0_3/pe13/u_mac/u_mult/pipe_1_reg[32]/Q (DFFPOSX1)
+                                                          0.17       0.17 r
+  U241214/Y (XNOR2X1)                                     0.15       0.33 r
+  U415361/Y (AND2X1)                                      0.04       0.37 r
+  U415362/Y (INVX1)                                       0.07       0.43 f
+  U217310/Y (OR2X1)                                       0.05       0.49 f
+  U290664/Y (AND2X1)                                      0.03       0.52 f
+  U290663/Y (INVX1)                                       0.02       0.54 r
+  U554640/YC (FAX1)                                       0.07       0.61 r
+  U554642/YS (FAX1)                                       0.09       0.70 f
+  U554648/YS (FAX1)                                       0.09       0.79 r
+  U554649/YS (FAX1)                                       0.08       0.87 r
+  U410070/Y (OR2X1)                                       0.04       0.91 r
+  U410071/Y (INVX1)                                       0.03       0.94 f
+  U304480/Y (OR2X1)                                       0.04       0.98 f
+  U304479/Y (INVX1)                                       0.01       0.99 r
+  U240671/Y (AND2X1)                                      0.04       1.03 r
+  U250658/Y (INVX1)                                       0.02       1.06 f
+  U554653/Y (OAI21X1)                                     0.08       1.13 r
+  U554688/Y (AOI21X1)                                     0.03       1.17 f
+  U260389/Y (INVX1)                                       0.00       1.17 r
+  U260390/Y (INVX1)                                       0.02       1.19 f
+  U554696/Y (XOR2X1)                                      0.06       1.25 r
+  U554739/Y (OAI21X1)                                     0.03       1.28 f
+  U240713/Y (AND2X1)                                      0.05       1.33 f
+  U404899/Y (INVX1)                                       0.02       1.35 r
+  U554743/Y (AOI22X1)                                     0.01       1.36 f
+  U336212/Y (BUFX2)                                       0.04       1.40 f
+  U554747/Y (AOI21X1)                                     0.04       1.44 r
+  U245751/Y (BUFX2)                                       0.04       1.48 r
+  U554750/YS (HAX1)                                       0.06       1.53 f
+  U554751/Y (AND2X1)                                      0.03       1.56 f
+  u_matmul_4x4_systolic_0_3/pe13/u_mac/u_mult/pipe_2_reg[13]/D (DFFPOSX1)
                                                           0.00       1.56 f
   data arrival time                                                  1.56
 
   clock CLK_0 (rise edge)                                 1.62       1.62
   clock network delay (ideal)                             0.00       1.62
-  u_matmul_4x4/pe01/u_mac/u_mult/pipe_2_reg[13]/CLK (DFFPOSX1)
+  u_matmul_4x4_systolic_0_3/pe13/u_mac/u_mult/pipe_2_reg[13]/CLK (DFFPOSX1)
                                                           0.00       1.62 r
   library setup time                                     -0.06       1.56
   data required time                                                 1.56
@@ -87,40 +83,40 @@ Wire Load Model Mode: top
  
 ****************************************
 Report : area
-Design : matrix_multiplication
+Design : matmul_16x16_systolic
 Version: O-2018.06-SP5
-Date   : Sat Dec 21 10:10:18 2019
+Date   : Sat Dec 21 13:05:33 2019
 ****************************************
 
 Library(s) Used:
 
     gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
 
-Number of ports:                          530
-Number of nets:                         41385
-Number of cells:                        40262
-Number of combinational cells:          33404
-Number of sequential cells:              6858
+Number of ports:                          828
+Number of nets:                        623827
+Number of cells:                       608928
+Number of combinational cells:         502680
+Number of sequential cells:            106248
 Number of macros/black boxes:               0
-Number of buf/inv:                      12045
-Number of references:                      20
+Number of buf/inv:                     152877
+Number of references:                      24
 
-Combinational area:              83476.266529
-Buf/Inv area:                    19643.489650
-Noncombinational area:           53677.594292
+Combinational area:            1278488.154353
+Buf/Inv area:                   243519.295335
+Noncombinational area:          831077.721283
 Macro/Black Box area:                0.000000
 Net Interconnect area:      undefined  (No wire load specified)
 
-Total cell area:                137153.860821
+Total cell area:               2109565.875636
 Total area:                 undefined
 1
  
 ****************************************
 Report : power
         -analysis_effort low
-Design : matrix_multiplication
+Design : matmul_16x16_systolic
 Version: O-2018.06-SP5
-Date   : Sat Dec 21 10:10:18 2019
+Date   : Sat Dec 21 13:05:35 2019
 ****************************************
 
 
@@ -142,12 +138,12 @@ Power-specific unit information :
     Leakage Power Units = 1nW
 
 
-  Cell Internal Power  =  63.5981 mW   (94%)
-  Net Switching Power  =   3.9925 mW    (6%)
+  Cell Internal Power  = 950.5991 mW   (95%)
+  Net Switching Power  =  46.9931 mW    (5%)
                          ---------
-Total Dynamic Power    =  67.5906 mW  (100%)
+Total Dynamic Power    = 997.5922 mW  (100%)
 
-Cell Leakage Power     = 764.7410 uW
+Cell Leakage Power     =  11.4538 mW
 
 
                  Internal         Switching           Leakage            Total
@@ -157,18 +153,18 @@ io_pad             0.0000            0.0000            0.0000            0.0000 
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
 clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
-register          59.2320            0.7629        3.5680e+05           60.3517  (  88.29%)
-sequential         0.1065        3.4819e-02        9.0172e+03            0.1504  (   0.22%)
-combinational      4.2596            3.1948        3.9892e+05            7.8533  (  11.49%)
+register         902.8357            8.7041        5.5175e+06          917.0665  (  90.89%)
+sequential         1.4323            0.4222        1.4428e+05            1.9988  (   0.20%)
+combinational     46.2735           37.8612        5.7920e+06           89.9239  (   8.91%)
 --------------------------------------------------------------------------------------------------
-Total             63.5981 mW         3.9925 mW     7.6474e+05 nW        68.3554 mW
+Total            950.5415 mW        46.9874 mW     1.1454e+07 nW     1.0090e+03 mW
 1
  
 ****************************************
 Report : design
-Design : matrix_multiplication
+Design : matmul_16x16_systolic
 Version: O-2018.06-SP5
-Date   : Sat Dec 21 10:10:18 2019
+Date   : Sat Dec 21 13:05:39 2019
 ****************************************
 
 Design allows ideal nets on clock nets.

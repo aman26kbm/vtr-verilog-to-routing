@@ -1,5 +1,5 @@
 Information: Updating design information... (UID-85)
-Warning: Design 'matmul_32x32_systolic' contains 4 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+Warning: Design 'matmul_32x32_systolic' contains 2 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
  
 ****************************************
 Report : timing
@@ -9,7 +9,7 @@ Report : timing
         -sort_by group
 Design : matmul_32x32_systolic
 Version: O-2018.06-SP5
-Date   : Thu Dec 19 00:58:14 2019
+Date   : Sat Dec 21 12:34:37 2019
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -17,9 +17,9 @@ Date   : Thu Dec 19 00:58:14 2019
 Operating Conditions: typical   Library: gscl45nm
 Wire Load Model Mode: top
 
-  Startpoint: u_matmul_4x4_systolic_0_0/pe00/u_mac/a_flopped_reg[3]
+  Startpoint: u_matmul_4x4_systolic_5_0/pe33/u_mac/mul_out_temp_reg_reg[13]
               (rising edge-triggered flip-flop clocked by CLK_0)
-  Endpoint: u_matmul_4x4_systolic_0_0/pe00/u_mac/mul_out_temp_reg_reg[13]
+  Endpoint: u_matmul_4x4_systolic_5_0/pe33/u_mac/out_reg[7]
             (rising edge-triggered flip-flop clocked by CLK_0)
   Path Group: CLK_0
   Path Type: max
@@ -28,70 +28,51 @@ Wire Load Model Mode: top
   --------------------------------------------------------------------------
   clock CLK_0 (rise edge)                                 0.00       0.00
   clock network delay (ideal)                             0.00       0.00
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/a_flopped_reg[3]/CLK (DFFPOSX1)
+  u_matmul_4x4_systolic_5_0/pe33/u_mac/mul_out_temp_reg_reg[13]/CLK (DFFPOSX1)
                                                           0.00 #     0.00 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/a_flopped_reg[3]/Q (DFFPOSX1)
-                                                          0.11       0.11 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/i_multiplicand[3] (qmult_0)
-                                                          0.00       0.11 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/A[3] (qmult_0_DW02_mult_0)
-                                                          0.00       0.11 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U498/Y (XOR2X1)
-                                                          0.14       0.25 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U492/Y (MUX2X1)
-                                                          0.07       0.32 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U198/Y (MUX2X1)
-                                                          0.09       0.41 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U584/YS (FAX1)
-                                                          0.12       0.53 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U583/Y (AOI22X1)
-                                                          0.05       0.57 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U376/Y (BUFX2)
-                                                          0.03       0.61 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U445/Y (INVX1)
-                                                          0.02       0.62 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U582/Y (AOI21X1)
-                                                          0.02       0.64 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U375/Y (BUFX2)
-                                                          0.04       0.68 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U407/Y (AND2X2)
-                                                          0.03       0.71 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U408/Y (INVX1)
-                                                          0.03       0.73 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U559/Y (AOI21X1)
-                                                          0.03       0.77 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U430/Y (INVX1)
-                                                          0.02       0.79 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U558/Y (OAI21X1)
-                                                          0.04       0.83 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U301/Y (INVX1)
-                                                          0.05       0.87 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U302/Y (AND2X1)
-                                                          0.04       0.92 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U531/Y (AOI21X1)
-                                                          0.04       0.95 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U358/Y (BUFX2)
-                                                          0.04       0.99 r
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/U530/Y (XOR2X1)
-                                                          0.03       1.02 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/u_mult/PRODUCT[13] (qmult_0_DW02_mult_0)
-                                                          0.00       1.02 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mult_u1/o_result[13] (qmult_0)
-                                                          0.00       1.02 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/U47/Y (AND2X1)     0.03       1.05 f
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mul_out_temp_reg_reg[13]/D (DFFPOSX1)
-                                                          0.00       1.05 f
-  data arrival time                                                  1.05
+  u_matmul_4x4_systolic_5_0/pe33/u_mac/mul_out_temp_reg_reg[13]/Q (DFFPOSX1)
+                                                          0.10       0.10 f
+  U393229/Y (OR2X1)                                       0.05       0.15 f
+  U393230/Y (NOR3X1)                                      0.02       0.18 r
+  U393231/Y (NAND2X1)                                     0.02       0.20 f
+  U393232/Y (NOR3X1)                                      0.04       0.24 r
+  U393233/Y (OR2X1)                                       0.08       0.31 r
+  U393234/Y (INVX1)                                       0.04       0.35 f
+  U393235/Y (AOI21X1)                                     0.02       0.37 r
+  U157302/Y (BUFX2)                                       0.04       0.41 r
+  U213772/Y (OR2X2)                                       0.04       0.45 r
+  U229708/Y (OR2X2)                                       0.04       0.49 r
+  U228566/Y (AND2X2)                                      0.03       0.52 r
+  U228567/Y (INVX1)                                       0.02       0.54 f
+  U145222/Y (AND2X2)                                      0.04       0.58 f
+  U145223/Y (INVX1)                                       0.00       0.58 r
+  U156706/Y (AND2X2)                                      0.03       0.61 r
+  U156707/Y (INVX1)                                       0.02       0.63 f
+  U145225/Y (AND2X2)                                      0.04       0.67 f
+  U145226/Y (INVX1)                                       0.00       0.67 r
+  U234730/Y (AND2X2)                                      0.03       0.70 r
+  U234731/Y (INVX1)                                       0.03       0.72 f
+  U393254/Y (NAND2X1)                                     0.02       0.74 r
+  U393255/Y (OAI21X1)                                     0.03       0.77 f
+  U393258/YC (FAX1)                                       0.08       0.85 f
+  U393261/YC (FAX1)                                       0.07       0.92 f
+  U393262/Y (MUX2X1)                                      0.04       0.96 f
+  U393263/Y (OAI21X1)                                     0.04       1.00 r
+  U393264/Y (AOI21X1)                                     0.02       1.02 f
+  U200613/Y (BUFX2)                                       0.03       1.06 f
+  u_matmul_4x4_systolic_5_0/pe33/u_mac/out_reg[7]/D (DFFPOSX1)
+                                                          0.00       1.06 f
+  data arrival time                                                  1.06
 
   clock CLK_0 (rise edge)                                 1.11       1.11
   clock network delay (ideal)                             0.00       1.11
-  u_matmul_4x4_systolic_0_0/pe00/u_mac/mul_out_temp_reg_reg[13]/CLK (DFFPOSX1)
+  u_matmul_4x4_systolic_5_0/pe33/u_mac/out_reg[7]/CLK (DFFPOSX1)
                                                           0.00       1.11 r
-  library setup time                                     -0.06       1.05
-  data required time                                                 1.05
+  library setup time                                     -0.05       1.06
+  data required time                                                 1.06
   --------------------------------------------------------------------------
-  data required time                                                 1.05
-  data arrival time                                                 -1.05
+  data required time                                                 1.06
+  data arrival time                                                 -1.06
   --------------------------------------------------------------------------
   slack (MET)                                                        0.00
 
@@ -102,42 +83,38 @@ Wire Load Model Mode: top
 Report : area
 Design : matmul_32x32_systolic
 Version: O-2018.06-SP5
-Date   : Thu Dec 19 00:58:15 2019
+Date   : Sat Dec 21 12:34:37 2019
 ****************************************
 
 Library(s) Used:
 
     gscl45nm (File: /usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db)
 
-Number of ports:                       215220
-Number of nets:                        880136
-Number of cells:                       675156
-Number of combinational cells:         589010
-Number of sequential cells:             73088
+Number of ports:                          884
+Number of nets:                        569486
+Number of cells:                       567779
+Number of combinational cells:         517298
+Number of sequential cells:             50480
 Number of macros/black boxes:               0
-Number of buf/inv:                     189830
-Number of references:                      64
+Number of buf/inv:                     176646
+Number of references:                      21
 
-Combinational area:            1589318.215439
-Buf/Inv area:                   305376.319133
-Noncombinational area:          583103.359863
+Combinational area:            1297377.487127
+Buf/Inv area:                   282142.684557
+Noncombinational area:          402734.479065
 Macro/Black Box area:                0.000000
 Net Interconnect area:      undefined  (No wire load specified)
 
-Total cell area:               2172421.575302
+Total cell area:               1700111.966192
 Total area:                 undefined
 1
-Loading db file '/usr/local/packages/cadence_2007/FreePDK45/osu_soc/lib/files/gscl45nm.db'
-Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
-Warning: Design has unannotated primary inputs. (PWR-414)
-Warning: Design has unannotated sequential cell outputs. (PWR-415)
  
 ****************************************
 Report : power
         -analysis_effort low
 Design : matmul_32x32_systolic
 Version: O-2018.06-SP5
-Date   : Thu Dec 19 00:59:13 2019
+Date   : Sat Dec 21 12:34:39 2019
 ****************************************
 
 
@@ -159,12 +136,12 @@ Power-specific unit information :
     Leakage Power Units = 1nW
 
 
-  Cell Internal Power  = 968.0021 mW   (96%)
-  Net Switching Power  =  38.2909 mW    (4%)
+  Cell Internal Power  = 673.3137 mW   (96%)
+  Net Switching Power  =  31.0917 mW    (4%)
                          ---------
-Total Dynamic Power    =   1.0063  W  (100%)
+Total Dynamic Power    = 704.4055 mW  (100%)
 
-Cell Leakage Power     =  11.8551 mW
+Cell Leakage Power     =   8.0086 mW
 
 
                  Internal         Switching           Leakage            Total
@@ -174,18 +151,18 @@ io_pad             0.0000            0.0000            0.0000            0.0000 
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
 clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
-register         937.1911            4.5069        4.0182e+06          945.7072  (  92.89%)
+register         647.0180            3.5457        2.7753e+06          653.3346  (  91.71%)
 sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
-combinational     30.8141           33.7842        7.8370e+06           72.4355  (   7.11%)
+combinational     26.2862           27.5449        5.2333e+06           59.0637  (   8.29%)
 --------------------------------------------------------------------------------------------------
-Total            968.0052 mW        38.2911 mW     1.1855e+07 nW     1.0181e+03 mW
+Total            673.3042 mW        31.0907 mW     8.0086e+06 nW       712.3983 mW
 1
  
 ****************************************
 Report : design
 Design : matmul_32x32_systolic
 Version: O-2018.06-SP5
-Date   : Thu Dec 19 00:59:18 2019
+Date   : Sat Dec 21 12:34:43 2019
 ****************************************
 
 Design allows ideal nets on clock nets.
@@ -240,7 +217,7 @@ Disabled Timing Arcs:
 
 Required Licenses:
 
-    None Required
+    DesignWare
 
 Design Parameters:
 
