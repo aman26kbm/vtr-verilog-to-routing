@@ -1070,21 +1070,12 @@
 
     <!-- Define matrix multiplier begin -->
 
-    <!-- Total area from SNPS = 2172421.57 um^2
-         Converting to MWTA at 60 L^2 / MWTA (1 MWTA = 60 * 40 * 40 nm2 = 96000nm2):
-          2172421.57um2 = 2172421.57 * 1000 * 1000 nm2
-                     = (2172421.57 * 1000 * 1000) / (96000) = 22,629,391 MWTAs
-
-         Now, this area is pre placement and pre routing. We need to add 15% place and route 
-         overhead as mentioned in "Chun Ho, ChiWai Yu, Philip Leong,Wayne Luk, and Steven Wilton. 2007. Domain-
-         Specific Hybrid FPGA: Architecture and Floating Point Applications. 196  201. https://doi.org/10.1109/FPL.2007.4380647"
-
-         So total area = 1.15 * 22,629,391 = 26,023,800
-
+    <!-- 
+         Area: 20365924.52
          Clock duration: 1.11 
     --> 
 	
-    <pb_type name="matmul_32x32" height="24" width="24" area="26023800">
+    <pb_type name="matmul_32x32" height="18" width="18" area="20365924">
 
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
       <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>

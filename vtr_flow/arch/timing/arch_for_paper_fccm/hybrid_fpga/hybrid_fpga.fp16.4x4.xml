@@ -829,40 +829,8 @@
        <!-- Define general purpose logic block (CLB) ends -->
 
     <!-- Define DSP begin -->
-    <!-- Total area from SNPS = 10973.17 um^2. 
-         This DSP slice contains 9 stage adder and 4 stage multiplier. 
-         Multiplier's critical path is 1.62 ns.
-         Adder's critical path is 0.823ns, which is almost half of the multiplier.
-         I am going to change the adder to half the number of stages and double the critical path. 
-         So, it will have almost the same critical path as the multiplier. 
-         This makes for a balanced pipeline.
-         
-         _____Mult_______
-         |    |    |    | 
-                        |  |  |  |  |  |  |  |  |
-                        __________Adder Orig_____
-                        |     |     |     |     |
-                        __________Adder Modif____
-
-         |    |    |    |     |     |     |     | 
-         _________________Overall_______________
-         
-        
-         The non-combinatorial area in the adder (area of flops) is 2589.12 um^2. We need to remove half of this area
-         because we removed half the flop stages. That is, we need to remove 1294.56 um^2 from the area of the DSP slice.
-
-         So, area of DSP slice is 10973.17 - 1294.56 = 9678.61 um^2.
-
-         Converting to MWTA at 60 L^2 / MWTA (1 MWTA = 60 * 40 * 40 nm2 = 96000nm2):
-           9678.61um2 = 9678.61 * 1000 * 1000 nm2
-                     = (9678.61 * 1000 * 1000) / (96000) = 100818.85 ~= 100800 MWTAs
-
-         Now, this area is pre placement and pre routing. We need to add 15% place and route 
-         overhead as mentioned in "Chun Ho, ChiWai Yu, Philip Leong,Wayne Luk, and Steven Wilton. 2007. Domain-
-         Specific Hybrid FPGA: Architecture and Floating Point Applications. 196  201. https://doi.org/10.1109/FPL.2007.4380647"
-
-         So total area = 1.15 * 100800 = 115920
-
+    <!-- 
+         Area: 115876.5156
          Clock duration:
          MAC mode  : 1.62 (Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) = 1.45)
          Mult mode : 1.62 (Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) = 1.45)
@@ -870,7 +838,7 @@
 
          The combinatorial adder and multipliers are still 8-bit fixed point. See the int8 arch for details on their critical paths.
     --> 
-    <pb_type name="dsp" height="2" width="1" area="115920">
+    <pb_type name="dsp" height="2" width="1" area="115876">
 	    <input  name="reset"  num_pins="1" is_non_clock_global="true"/> 
 <!--	    <input  name="reset"  num_pins="1"/> -->
       <input  name="a"      num_pins="16"/>
@@ -1098,23 +1066,9 @@
 
     <!-- Define matrix multiplier begin -->
 
-    <!-- Total area from SNPS = 137153.86 um^2
-         Removing adder area/2. See regular_fpga_DSP.fp16.xml for details. There are 16 adders here.
-         Overall area =  137153.86 - 1294*16 =~ 117153
- 
-         Converting to MWTA at 60 L^2 / MWTA (1 MWTA = 60 * 40 * 40 nm2 = 96000nm2):
-          117153um2 = 117153 * 1000 * 1000 nm2
-                     = (117153 * 1000 * 1000) / (96000) = 1,220,343 MWTAs
-
-         Now, this area is pre placement and pre routing. We need to add 15% place and route 
-         overhead as mentioned in "Chun Ho, ChiWai Yu, Philip Leong,Wayne Luk, and Steven Wilton. 2007. Domain-
-         Specific Hybrid FPGA: Architecture and Floating Point Applications. 196  201. https://doi.org/10.1109/FPL.2007.4380647"
-
-         So total area = 1.15 * 1,220,343 = 1403394 ~= 1403400
-
-         This area is 22.6 times the area of a tile (1 tile=1 CLB). So, we need a 5x5 size for the matmul block.
-
-         Clock duration: 1.62 (Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) = 1.45)
+    <!--  
+        Area: 1403400
+        Clock duration: 1.62 (Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) = 1.45)
     --> 
 	
     <pb_type name="matmul_4x4" height="5" width="5" area="1403400">

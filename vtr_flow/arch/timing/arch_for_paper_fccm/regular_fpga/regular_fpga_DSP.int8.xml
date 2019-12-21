@@ -806,23 +806,23 @@
        <!-- Define general purpose logic block (CLB) ends -->
 
     <!-- Define DSP begin -->
-    <!-- Total area from SNPS = 6462.26 um^2. 
+    <!-- Total area from SNPS = 2006.72 um^2. 
          Converting to MWTA at 60 L^2 / MWTA (1 MWTA = 60 * 40 * 40 nm2 = 96000nm2):
-           6462.26um2 = 6462.26 * 1000 * 1000 nm2
-                     = (6462.26 * 1000 * 1000) / (96000) = 67315.20 ~= 67500 MWTAs
+           2006.72 um2 = 2006.72 * 1000 * 1000 nm2
+                       = (2006.72 * 1000 * 1000) / (96000) = 20903.33 ~= 20900 MWTAs
 
          Now, this area is pre placement and pre routing. We need to add 15% place and route 
          overhead as mentioned in "Chun Ho, ChiWai Yu, Philip Leong,Wayne Luk, and Steven Wilton. 2007. Domain-
          Specific Hybrid FPGA: Architecture and Floating Point Applications. 196  201. https://doi.org/10.1109/FPL.2007.4380647"
 
-         So total area = 1.15 * 67500 = 77625
+         So total area = 1.15 * 20900 = 24038
 
          Clock duration:
          MAC mode  : 1.11 (Internal combo delay = Critical path delay (1.11) - Setup (0.06) - Clock-to-q (0.11) = 0.94)
          Mult mode : 1.11 (Internal combo delay = Critical path delay (1.11) - Setup (0.06) - Clock-to-q (0.11) = 0.94)
          Add mode  : 0.5  (Internal combo delay = Critical path delay (1.11) - Setup (0.06) - Clock-to-q (0.11) = 0.33)
     --> 
-    <pb_type name="dsp" height="2" width="1" area="77625">
+    <pb_type name="dsp" height="2" width="1" area="24038">
 	    <input  name="reset"  num_pins="1" is_non_clock_global="true"/> 
 <!--	    <input  name="reset"  num_pins="1"/> -->
       <input  name="a"      num_pins="8"/>

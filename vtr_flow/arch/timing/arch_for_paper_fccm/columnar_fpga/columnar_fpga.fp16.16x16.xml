@@ -784,12 +784,12 @@
     <!-- Define matrix multiplier begin -->
 
     <!-- 
-         Area = 4 * area of the 16x16 matmul block = 4 * 1403400 = 5,613,600
+         Area = 21284174.48 MWTAs
 
          Clock duration: 1.62 (Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) = 1.45)
     --> 
 	
-    <pb_type name="matmul_16x16" height="10" width="10" area="5613600">
+    <pb_type name="matmul_16x16" height="18" width="18" area="21284174">
 
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
       <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
