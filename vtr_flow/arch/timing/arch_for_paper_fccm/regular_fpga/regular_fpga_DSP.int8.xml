@@ -1021,14 +1021,17 @@
         </pb_type>
         <interconnect>
 				  <direct name="a2a" input="dsp.a" output="mac_8x8.a">
+		        <delay_constant max="0.1e-9" in_port="dsp.a" out_port="mac_8x8.a"/>
 				  </direct>
 				  <direct name="b2b" input="dsp.b" output="mac_8x8.b">
+		        <delay_constant max="0.1e-9" in_port="dsp.b" out_port="mac_8x8.b"/>
 				  </direct>
 				  <direct name="reset2reset" input="dsp.reset" output="mac_8x8.reset">
 				  </direct>
 				  <direct name="clk2clk" input="dsp.clk" output="mac_8x8.clk">
 				  </direct>
 				  <direct name="out2out" input="mac_8x8.out" output="dsp.out">
+		        <delay_constant max="0.1e-9" in_port="mac_8x8.out" out_port="dsp.out"/>
 				  </direct>
         </interconnect>
       </mode>
