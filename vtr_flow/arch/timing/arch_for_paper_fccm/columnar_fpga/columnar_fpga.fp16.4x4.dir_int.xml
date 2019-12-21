@@ -1510,9 +1510,9 @@
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
  <directlist>
-    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_4x4.a_data_out[63:0]" to_pin="matmul_4x4.a_data_in[63:0]" x_offset="6" y_offset="0" z_offset="0" switch_name="short_switch"/>
-    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_4x4.b_data_out[63:0]" to_pin="matmul_4x4.b_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
-    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_4x4.c_data_out[63:0]" to_pin="matmul_4x4.c_data_in[63:0]" x_offset="-6" y_offset="0" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_4x4.a_data_out[63:0]" to_pin="matmul_4x4.a_data_in[63:0]" x_offset="8" y_offset="0" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_4x4.b_data_out[63:0]" to_pin="matmul_4x4.b_data_in[63:0]" x_offset="0" y_offset="-5" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_4x4.c_data_out[63:0]" to_pin="matmul_4x4.c_data_in[63:0]" x_offset="-8" y_offset="0" z_offset="0" switch_name="short_switch"/>
     <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
  </directlist>
 </architecture>

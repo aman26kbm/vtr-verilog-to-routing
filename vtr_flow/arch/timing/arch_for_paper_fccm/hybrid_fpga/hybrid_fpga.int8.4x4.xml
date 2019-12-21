@@ -206,15 +206,15 @@
   <layout>
 
 <!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="227" height="227">
+    <fixed_layout name="mylayout" width="640" height="640">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
-        <col type="memory" startx="2" starty="1" repeatx="25" priority="50"/>
-        <col type="matmul_4x4" startx="4" starty="1" repeatx="25" priority="25"/>
-        <col type="dsp" startx="7" starty="1" repeatx="25" priority="50"/>
+		    <col type="dsp" startx="6" starty="1" repeatx="11" priority="30"/>
+	      <col type="memory" startx="7" starty="1" repeatx="11" priority="18"/>
+		    <col type="matmul" startx="9" starty="1" repeatx="11" priority="30"/>
 
     </fixed_layout> 
 <!--        </auto_layout> -->
