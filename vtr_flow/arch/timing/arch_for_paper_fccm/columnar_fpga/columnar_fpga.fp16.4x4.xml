@@ -158,14 +158,14 @@
   <layout>
 
 <!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="86" height="86">
+    <fixed_layout name="mylayout" width="162" height="162">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
-        <col type="clb" startx="1" starty="1" repeatx="6"  priority="20"/>
-        <col type="memory" startx="2" starty="1" repeatx="6" priority="50"/>
-        <col type="matmul_4x4" startx="4" starty="1" repeatx="6" priority="25"/>
+        <col type="clb" startx="1" starty="1" repeatx="8"  priority="20"/>
+        <col type="memory" startx="2" starty="1" repeatx="8" priority="50"/>
+        <col type="matmul_4x4" startx="4" starty="1" repeatx="8" priority="25"/>
 
     </fixed_layout> 
 <!--        </auto_layout> -->
@@ -797,10 +797,12 @@
 
          So total area = 1.15 * 1,220,343 = 1403394 ~= 1403400
 
+         This area is 22.6 times the area of a tile (1 tile=1 CLB). So, we need a 5x5 size for the matmul block.
+
          Clock duration: 1.62 (Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) = 1.45)
     --> 
 	
-    <pb_type name="matmul_4x4" height="3" width="3" area="1403400">
+    <pb_type name="matmul_4x4" height="5" width="5" area="1403400">
 
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
       <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>

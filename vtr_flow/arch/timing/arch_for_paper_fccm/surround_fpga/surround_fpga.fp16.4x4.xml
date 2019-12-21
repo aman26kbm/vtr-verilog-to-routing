@@ -127,7 +127,7 @@
       </output_ports>
     </model>
 
-    <model name="matmul_8x8_systolic">
+    <model name="matmul_4x4_systolic">
       <input_ports>
         <port name="clk" is_clock="1"/>  
         <port name="reset" clock="clk" combinational_sink_ports="done_mat_mul a_data_out b_data_out c_data_out a_addr b_addr" />
@@ -158,15 +158,19 @@
   <layout>
 
 <!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="86" height="86">
+    <fixed_layout name="mylayout" width="162" height="162">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
-        <col type="clb" startx="1" starty="1" repeatx="10"  priority="20"/>
-        <col type="memory" startx="2" starty="1" repeatx="10" priority="50"/>
-        <col type="matmul_8x8" startx="4" starty="1" repeatx="10" priority="25"/>
-
+        <col type="clb" startx="1" starty="1" repeatx="8"  priority="20"/>
+		    <region type="matmul_4x4" priority="50" startx="4" endx="6" repeatx="9" 
+		    										starty="4" endy="6" repeaty="9"/>
+		    <region type="memory" priority="40"  startx="2" endx="8" incrx="5" repeatx="9"
+		    									 starty="4" endy="6"           repeaty="9"/>
+		    <region type="memory1" priority="40" startx="4" endx="6" repeatx="9"
+		    									 starty="2" endy="8" repeaty="9" incry="5"/>
+	
     </fixed_layout> 
 <!--        </auto_layout> -->
 </layout>
@@ -229,10 +233,6 @@
         <cb type="pattern">1 1 1 1</cb>
 			</segment>
 		</segmentlist>
-
-    <directlist>
-      <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
-    </directlist>
 
 		<complexblocklist>
       
@@ -783,21 +783,26 @@
 
     <!-- Define matrix multiplier begin -->
 
-    <!-- Total area from SNPS = 137689.80 um^2
+    <!-- Total area from SNPS = 137153.86 um^2
+         Removing adder area/2. See regular_fpga_DSP.fp16.xml for details. There are 16 adders here.
+         Overall area =  137153.86 - 1294*16 =~ 117153
+ 
          Converting to MWTA at 60 L^2 / MWTA (1 MWTA = 60 * 40 * 40 nm2 = 96000nm2):
-          137689.80um2 = 137689.80 * 1000 * 1000 nm2
-                     = (137689.80 * 1000 * 1000) / (96000) = 1,434,268 MWTAs
+          117153um2 = 117153 * 1000 * 1000 nm2
+                     = (117153 * 1000 * 1000) / (96000) = 1,220,343 MWTAs
 
          Now, this area is pre placement and pre routing. We need to add 15% place and route 
          overhead as mentioned in "Chun Ho, ChiWai Yu, Philip Leong,Wayne Luk, and Steven Wilton. 2007. Domain-
          Specific Hybrid FPGA: Architecture and Floating Point Applications. 196  201. https://doi.org/10.1109/FPL.2007.4380647"
 
-         So total area = 1.15 * 1,434,268 = 1649408 ~= 1649500
+         So total area = 1.15 * 1,220,343 = 1403394 ~= 1403400
 
-         Clock duration: 1.11 
+         This area is 22.6 times the area of a tile (1 tile=1 CLB). So, we need a 5x5 size for the matmul block.
+
+         Clock duration: 1.62 (Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) = 1.45)
     --> 
 	
-    <pb_type name="matmul_8x8" height="6" width="6" area="1649500">
+    <pb_type name="matmul_4x4" height="5" width="5" area="1403400">
 
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
       <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
@@ -819,8 +824,8 @@
 
       <clock name="clk" num_pins="1"/>
 
-      <mode name="matmul_8x8_mode">
-        <pb_type name="matmul_8x8_pb" blif_model=".subckt matmul_8x8_systolic" num_pb="1">
+      <mode name="matmult_4x4_mode">
+        <pb_type name="matmul_4x4_pb" blif_model=".subckt matmul_4x4_systolic" num_pb="1">
 
           <input name="reset" num_pins="1"/>
           <input name="start_mat_mul" num_pins="1"/>
@@ -842,110 +847,110 @@
 
           <clock name="clk" num_pins="1"/>
 
-	        <T_setup value="66e-12" port="matmul_8x8_pb.reset" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.start_mat_mul" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.a_data" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.b_data" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.a_data_in" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.b_data_in" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.c_data_in" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.final_mat_mul_size" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.a_loc" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.b_loc" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.done_mat_mul" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.a_data_out" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.b_data_out" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.a_addr" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.b_addr" clock="clk"/>
-	        <T_setup value="66e-12" port="matmul_8x8_pb.c_data_out" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.reset" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.start_mat_mul" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.a_data" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.b_data" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.a_data_in" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.b_data_in" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.c_data_in" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.final_mat_mul_size" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.a_loc" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.b_loc" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.done_mat_mul" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.a_data_out" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.b_data_out" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.a_addr" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.b_addr" clock="clk"/>
+	        <T_setup value="66e-12" port="matmul_4x4_pb.c_data_out" clock="clk"/>
 
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.reset" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.start_mat_mul" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.a_data" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.b_data" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.a_data_in" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.b_data_in" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.c_data_in" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.final_mat_mul_size" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.a_loc" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.b_loc" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.done_mat_mul" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.a_data_out" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.b_data_out" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.a_addr" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.b_addr" clock="clk"/>
-	        <T_clock_to_Q max="124e-12" port="matmul_8x8_pb.c_data_out" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.reset" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.start_mat_mul" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.a_data" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.b_data" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.a_data_in" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.b_data_in" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.c_data_in" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.final_mat_mul_size" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.a_loc" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.b_loc" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.done_mat_mul" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.a_data_out" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.b_data_out" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.a_addr" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.b_addr" clock="clk"/>
+	        <T_clock_to_Q max="124e-12" port="matmul_4x4_pb.c_data_out" clock="clk"/>
 
-          <!-- Internal combo delay = Critical path delay (1.1) - Setup (0.06) - Clock-to-q (0.11) -->
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.c_data_out"/>
+          <!-- Internal combo delay = Critical path delay (1.62) - Setup (0.06) - Clock-to-q (0.11) -->
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_data_out"/>
 
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.done_mat_mul"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.a_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.b_data_out"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.a_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.b_addr"/>
-	        <delay_constant max="0.94e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.c_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_data_out"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_addr"/>
+	        <delay_constant max="1.45e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_data_out"/>
 
 <!-- 
           <power method="pin-toggle">
@@ -961,23 +966,23 @@
         </pb_type>
 
         <interconnect>
-          <direct name="reset" input="matmul_8x8.reset" output="matmul_8x8_pb.reset"></direct>
-          <direct name="start_mat_mul" input="matmul_8x8.start_mat_mul"    output="matmul_8x8_pb.start_mat_mul"></direct>
-          <direct name="a_data" input="matmul_8x8.a_data"    output="matmul_8x8_pb.a_data"></direct>
-          <direct name="b_data" input="matmul_8x8.b_data"    output="matmul_8x8_pb.b_data"></direct>
-          <direct name="a_data_in" input="matmul_8x8.a_data_in"    output="matmul_8x8_pb.a_data_in"></direct>
-          <direct name="b_data_in" input="matmul_8x8.b_data_in"    output="matmul_8x8_pb.b_data_in"></direct>
-          <direct name="c_data_in" input="matmul_8x8.c_data_in"    output="matmul_8x8_pb.c_data_in"></direct>
-          <direct name="final_mat_mul_size" input="matmul_8x8.final_mat_mul_size"    output="matmul_8x8_pb.final_mat_mul_size"></direct>
-          <direct name="a_loc" input="matmul_8x8.a_loc"    output="matmul_8x8_pb.a_loc"></direct>
-          <direct name="b_loc" input="matmul_8x8.b_loc"    output="matmul_8x8_pb.b_loc"></direct>
-          <direct name="done_mat_mul" input="matmul_8x8_pb.done_mat_mul" output="matmul_8x8.done_mat_mul"></direct>
-          <direct name="a_data_out" input="matmul_8x8_pb.a_data_out" output="matmul_8x8.a_data_out"></direct>
-          <direct name="b_data_out" input="matmul_8x8_pb.b_data_out" output="matmul_8x8.b_data_out"></direct>
-          <direct name="a_addr" input="matmul_8x8_pb.a_addr" output="matmul_8x8.a_addr"></direct>
-          <direct name="b_addr" input="matmul_8x8_pb.b_addr" output="matmul_8x8.b_addr"></direct>
-          <direct name="c_data_out" input="matmul_8x8_pb.c_data_out" output="matmul_8x8.c_data_out"></direct>
-          <direct name="clk" input="matmul_8x8.clk" output="matmul_8x8_pb.clk"></direct>
+          <direct name="reset" input="matmul_4x4.reset" output="matmul_4x4_pb.reset"></direct>
+          <direct name="start_mat_mul" input="matmul_4x4.start_mat_mul"    output="matmul_4x4_pb.start_mat_mul"></direct>
+          <direct name="a_data" input="matmul_4x4.a_data"    output="matmul_4x4_pb.a_data"></direct>
+          <direct name="b_data" input="matmul_4x4.b_data"    output="matmul_4x4_pb.b_data"></direct>
+          <direct name="a_data_in" input="matmul_4x4.a_data_in"    output="matmul_4x4_pb.a_data_in"></direct>
+          <direct name="b_data_in" input="matmul_4x4.b_data_in"    output="matmul_4x4_pb.b_data_in"></direct>
+          <direct name="c_data_in" input="matmul_4x4.c_data_in"    output="matmul_4x4_pb.c_data_in"></direct>
+          <direct name="final_mat_mul_size" input="matmul_4x4.final_mat_mul_size"    output="matmul_4x4_pb.final_mat_mul_size"></direct>
+          <direct name="a_loc" input="matmul_4x4.a_loc"    output="matmul_4x4_pb.a_loc"></direct>
+          <direct name="b_loc" input="matmul_4x4.b_loc"    output="matmul_4x4_pb.b_loc"></direct>
+          <direct name="done_mat_mul" input="matmul_4x4_pb.done_mat_mul" output="matmul_4x4.done_mat_mul"></direct>
+          <direct name="a_data_out" input="matmul_4x4_pb.a_data_out" output="matmul_4x4.a_data_out"></direct>
+          <direct name="b_data_out" input="matmul_4x4_pb.b_data_out" output="matmul_4x4.b_data_out"></direct>
+          <direct name="a_addr" input="matmul_4x4_pb.a_addr" output="matmul_4x4.a_addr"></direct>
+          <direct name="b_addr" input="matmul_4x4_pb.b_addr" output="matmul_4x4.b_addr"></direct>
+          <direct name="c_data_out" input="matmul_4x4_pb.c_data_out" output="matmul_4x4.c_data_out"></direct>
+          <direct name="clk" input="matmul_4x4.clk" output="matmul_4x4_pb.clk"></direct>
         </interconnect>
 
       </mode>
@@ -1481,6 +1486,446 @@
       <!-- Place this memory block every 8 columns from (and including) the second column -->
       <power method="sum-of-children"/>
     </pb_type>
+
+    <pb_type name="memory1" height="3" width="2" area="380260">
+      <input name="addr1" num_pins="11"/>
+      <input name="addr2" num_pins="11"/>
+      <input name="data" num_pins="40"/>
+      <input name="we1" num_pins="1"/>
+      <input name="we2" num_pins="1"/>
+      <output name="out" num_pins="40"/>
+      <clock name="clk" num_pins="1"/>
+      <!-- Specify single port mode first -->
+      <mode name="mem_512x40_sp">
+        <pb_type name="mem_512x40_sp" blif_model=".subckt single_port_ram" class="memory" num_pb="1">
+          <input name="addr" num_pins="9" port_class="address"/>
+          <input name="data" num_pins="40" port_class="data_in"/>
+          <input name="we" num_pins="1" port_class="write_en"/>
+          <output name="out" num_pins="40" port_class="data_out"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_512x40_sp.addr" clock="clk"/>
+          <T_setup value="472e-12" port="mem_512x40_sp.data" clock="clk"/>
+          <T_setup value="472e-12" port="mem_512x40_sp.we" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_512x40_sp.out" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="9.0e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[8:0]" output="mem_512x40_sp.addr">
+            <delay_constant max="132e-12" in_port="memory1.addr1[8:0]" out_port="mem_512x40_sp.addr"/>
+          </direct>
+          <direct name="data1" input="memory1.data" output="mem_512x40_sp.data">
+            <delay_constant max="132e-12" in_port="memory1.data" out_port="mem_512x40_sp.data"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_512x40_sp.we">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_512x40_sp.we"/>
+          </direct>
+          <direct name="dataout1" input="mem_512x40_sp.out" output="memory1.out">
+            <delay_constant max="40e-12" in_port="mem_512x40_sp.out" out_port="memory1.out"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_512x40_sp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_512x32_sp">
+        <pb_type name="mem_512x32_sp" blif_model=".subckt single_port_ram" class="memory" num_pb="1">
+          <input name="addr" num_pins="9" port_class="address"/>
+          <input name="data" num_pins="32" port_class="data_in"/>
+          <input name="we" num_pins="1" port_class="write_en"/>
+          <output name="out" num_pins="32" port_class="data_out"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_512x32_sp.addr" clock="clk"/>
+          <T_setup value="472e-12" port="mem_512x32_sp.data" clock="clk"/>
+          <T_setup value="472e-12" port="mem_512x32_sp.we" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_512x32_sp.out" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="9.0e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[8:0]" output="mem_512x32_sp.addr">
+            <delay_constant max="132e-12" in_port="memory1.addr1[8:0]" out_port="mem_512x32_sp.addr"/>
+          </direct>
+          <direct name="data1" input="memory1.data[31:0]" output="mem_512x32_sp.data">
+            <delay_constant max="132e-12" in_port="memory1.data[31:0]" out_port="mem_512x32_sp.data"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_512x32_sp.we">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_512x32_sp.we"/>
+          </direct>
+          <direct name="dataout1" input="mem_512x32_sp.out" output="memory1.out[31:0]">
+            <delay_constant max="40e-12" in_port="mem_512x32_sp.out" out_port="memory1.out[31:0]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_512x32_sp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_1024x20_sp">
+        <pb_type name="mem_1024x20_sp" blif_model=".subckt single_port_ram" class="memory" num_pb="1">
+          <input name="addr" num_pins="10" port_class="address"/>
+          <input name="data" num_pins="20" port_class="data_in"/>
+          <input name="we" num_pins="1" port_class="write_en"/>
+          <output name="out" num_pins="20" port_class="data_out"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_1024x20_sp.addr" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x20_sp.data" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x20_sp.we" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_1024x20_sp.out" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="9.0e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[9:0]" output="mem_1024x20_sp.addr">
+            <delay_constant max="132e-12" in_port="memory1.addr1[9:0]" out_port="mem_1024x20_sp.addr"/>
+          </direct>
+          <direct name="data1" input="memory1.data[19:0]" output="mem_1024x20_sp.data">
+            <delay_constant max="132e-12" in_port="memory1.data[19:0]" out_port="mem_1024x20_sp.data"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_1024x20_sp.we">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_1024x20_sp.we"/>
+          </direct>
+          <direct name="dataout1" input="mem_1024x20_sp.out" output="memory1.out[19:0]">
+            <delay_constant max="40e-12" in_port="mem_1024x20_sp.out" out_port="memory1.out[19:0]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_1024x20_sp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_1024x16_sp">
+        <pb_type name="mem_1024x16_sp" blif_model=".subckt single_port_ram" class="memory" num_pb="1">
+          <input name="addr" num_pins="10" port_class="address"/>
+          <input name="data" num_pins="16" port_class="data_in"/>
+          <input name="we" num_pins="1" port_class="write_en"/>
+          <output name="out" num_pins="16" port_class="data_out"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_1024x16_sp.addr" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x16_sp.data" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x16_sp.we" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_1024x16_sp.out" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="9.0e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[9:0]" output="mem_1024x16_sp.addr">
+            <delay_constant max="132e-12" in_port="memory1.addr1[9:0]" out_port="mem_1024x16_sp.addr"/>
+          </direct>
+          <direct name="data1" input="memory1.data[15:0]" output="mem_1024x16_sp.data">
+            <delay_constant max="132e-12" in_port="memory1.data[15:0]" out_port="mem_1024x16_sp.data"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_1024x16_sp.we">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_1024x16_sp.we"/>
+          </direct>
+          <direct name="dataout1" input="mem_1024x16_sp.out" output="memory1.out[15:0]">
+            <delay_constant max="40e-12" in_port="mem_1024x16_sp.out" out_port="memory1.out[15:0]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_1024x16_sp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_2048x10_sp">
+        <pb_type name="mem_2048x10_sp" blif_model=".subckt single_port_ram" class="memory" num_pb="1">
+          <input name="addr" num_pins="11" port_class="address"/>
+          <input name="data" num_pins="10" port_class="data_in"/>
+          <input name="we" num_pins="1" port_class="write_en"/>
+          <output name="out" num_pins="10" port_class="data_out"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_2048x10_sp.addr" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x10_sp.data" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x10_sp.we" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_2048x10_sp.out" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="9.0e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[10:0]" output="mem_2048x10_sp.addr">
+            <delay_constant max="132e-12" in_port="memory1.addr1[10:0]" out_port="mem_2048x10_sp.addr"/>
+          </direct>
+          <direct name="data1" input="memory1.data[9:0]" output="mem_2048x10_sp.data">
+            <delay_constant max="132e-12" in_port="memory1.data[9:0]" out_port="mem_2048x10_sp.data"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_2048x10_sp.we">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_2048x10_sp.we"/>
+          </direct>
+          <direct name="dataout1" input="mem_2048x10_sp.out" output="memory1.out[9:0]">
+            <delay_constant max="40e-12" in_port="mem_2048x10_sp.out" out_port="memory1.out[9:0]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_2048x10_sp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_2048x8_sp">
+        <pb_type name="mem_2048x8_sp" blif_model=".subckt single_port_ram" class="memory" num_pb="1">
+          <input name="addr" num_pins="11" port_class="address"/>
+          <input name="data" num_pins="8" port_class="data_in"/>
+          <input name="we" num_pins="1" port_class="write_en"/>
+          <output name="out" num_pins="8" port_class="data_out"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_2048x8_sp.addr" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x8_sp.data" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x8_sp.we" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_2048x8_sp.out" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="9.0e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[10:0]" output="mem_2048x8_sp.addr">
+            <delay_constant max="132e-12" in_port="memory1.addr1[10:0]" out_port="mem_2048x8_sp.addr"/>
+          </direct>
+          <direct name="data1" input="memory1.data[7:0]" output="mem_2048x8_sp.data">
+            <delay_constant max="132e-12" in_port="memory1.data[7:0]" out_port="mem_2048x8_sp.data"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_2048x8_sp.we">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_2048x8_sp.we"/>
+          </direct>
+          <direct name="dataout1" input="mem_2048x8_sp.out" output="memory1.out[7:0]">
+            <delay_constant max="40e-12" in_port="mem_2048x8_sp.out" out_port="memory1.out[7:0]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_2048x8_sp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <!-- Specify true dual port mode next -->
+      <mode name="mem_1024x20_dp">
+        <pb_type name="mem_1024x20_dp" blif_model=".subckt dual_port_ram" class="memory" num_pb="1">
+          <input name="addr1" num_pins="10" port_class="address1"/>
+          <input name="addr2" num_pins="10" port_class="address2"/>
+          <input name="data1" num_pins="20" port_class="data_in1"/>
+          <input name="data2" num_pins="20" port_class="data_in2"/>
+          <input name="we1" num_pins="1" port_class="write_en1"/>
+          <input name="we2" num_pins="1" port_class="write_en2"/>
+          <output name="out1" num_pins="20" port_class="data_out1"/>
+          <output name="out2" num_pins="20" port_class="data_out2"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_1024x20_dp.addr1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x20_dp.data1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x20_dp.we1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x20_dp.addr2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x20_dp.data2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x20_dp.we2" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_1024x20_dp.out1" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_1024x20_dp.out2" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="17.9e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[9:0]" output="mem_1024x20_dp.addr1">
+            <delay_constant max="132e-12" in_port="memory1.addr1[9:0]" out_port="mem_1024x20_dp.addr1"/>
+          </direct>
+          <direct name="address2" input="memory1.addr2[9:0]" output="mem_1024x20_dp.addr2">
+            <delay_constant max="132e-12" in_port="memory1.addr2[9:0]" out_port="mem_1024x20_dp.addr2"/>
+          </direct>
+          <direct name="data1" input="memory1.data[19:0]" output="mem_1024x20_dp.data1">
+            <delay_constant max="132e-12" in_port="memory1.data[19:0]" out_port="mem_1024x20_dp.data1"/>
+          </direct>
+          <direct name="data2" input="memory1.data[39:20]" output="mem_1024x20_dp.data2">
+            <delay_constant max="132e-12" in_port="memory1.data[39:20]" out_port="mem_1024x20_dp.data2"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_1024x20_dp.we1">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_1024x20_dp.we1"/>
+          </direct>
+          <direct name="writeen2" input="memory1.we2" output="mem_1024x20_dp.we2">
+            <delay_constant max="132e-12" in_port="memory1.we2" out_port="mem_1024x20_dp.we2"/>
+          </direct>
+          <direct name="dataout1" input="mem_1024x20_dp.out1" output="memory1.out[19:0]">
+            <delay_constant max="40e-12" in_port="mem_1024x20_dp.out1" out_port="memory1.out[19:0]"/>
+          </direct>
+          <direct name="dataout2" input="mem_1024x20_dp.out2" output="memory1.out[39:20]">
+            <delay_constant max="40e-12" in_port="mem_1024x20_dp.out2" out_port="memory1.out[39:20]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_1024x20_dp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_1024x16_dp">
+        <pb_type name="mem_1024x16_dp" blif_model=".subckt dual_port_ram" class="memory" num_pb="1">
+          <input name="addr1" num_pins="10" port_class="address1"/>
+          <input name="addr2" num_pins="10" port_class="address2"/>
+          <input name="data1" num_pins="16" port_class="data_in1"/>
+          <input name="data2" num_pins="16" port_class="data_in2"/>
+          <input name="we1" num_pins="1" port_class="write_en1"/>
+          <input name="we2" num_pins="1" port_class="write_en2"/>
+          <output name="out1" num_pins="16" port_class="data_out1"/>
+          <output name="out2" num_pins="16" port_class="data_out2"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_1024x16_dp.addr1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x16_dp.data1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x16_dp.we1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x16_dp.addr2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x16_dp.data2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_1024x16_dp.we2" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_1024x16_dp.out1" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_1024x16_dp.out2" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="17.9e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[9:0]" output="mem_1024x16_dp.addr1">
+            <delay_constant max="132e-12" in_port="memory1.addr1[9:0]" out_port="mem_1024x16_dp.addr1"/>
+          </direct>
+          <direct name="address2" input="memory1.addr2[9:0]" output="mem_1024x16_dp.addr2">
+            <delay_constant max="132e-12" in_port="memory1.addr2[9:0]" out_port="mem_1024x16_dp.addr2"/>
+          </direct>
+          <direct name="data1" input="memory1.data[15:0]" output="mem_1024x16_dp.data1">
+            <delay_constant max="132e-12" in_port="memory1.data[15:0]" out_port="mem_1024x16_dp.data1"/>
+          </direct>
+          <direct name="data2" input="memory1.data[31:16]" output="mem_1024x16_dp.data2">
+            <delay_constant max="132e-12" in_port="memory1.data[31:16]" out_port="mem_1024x16_dp.data2"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_1024x16_dp.we1">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_1024x16_dp.we1"/>
+          </direct>
+          <direct name="writeen2" input="memory1.we2" output="mem_1024x16_dp.we2">
+            <delay_constant max="132e-12" in_port="memory1.we2" out_port="mem_1024x16_dp.we2"/>
+          </direct>
+          <direct name="dataout1" input="mem_1024x16_dp.out1" output="memory1.out[15:0]">
+            <delay_constant max="40e-12" in_port="mem_1024x16_dp.out1" out_port="memory1.out[15:0]"/>
+          </direct>
+          <direct name="dataout2" input="mem_1024x16_dp.out2" output="memory1.out[31:16]">
+            <delay_constant max="40e-12" in_port="mem_1024x16_dp.out2" out_port="memory1.out[31:16]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_1024x16_dp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_2048x10_dp">
+        <pb_type name="mem_2048x10_dp" blif_model=".subckt dual_port_ram" class="memory" num_pb="1">
+          <input name="addr1" num_pins="11" port_class="address1"/>
+          <input name="addr2" num_pins="11" port_class="address2"/>
+          <input name="data1" num_pins="10" port_class="data_in1"/>
+          <input name="data2" num_pins="10" port_class="data_in2"/>
+          <input name="we1" num_pins="1" port_class="write_en1"/>
+          <input name="we2" num_pins="1" port_class="write_en2"/>
+          <output name="out1" num_pins="10" port_class="data_out1"/>
+          <output name="out2" num_pins="10" port_class="data_out2"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_2048x10_dp.addr1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x10_dp.data1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x10_dp.we1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x10_dp.addr2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x10_dp.data2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x10_dp.we2" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_2048x10_dp.out1" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_2048x10_dp.out2" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="17.9e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[10:0]" output="mem_2048x10_dp.addr1">
+            <delay_constant max="132e-12" in_port="memory1.addr1[10:0]" out_port="mem_2048x10_dp.addr1"/>
+          </direct>
+          <direct name="address2" input="memory1.addr2[10:0]" output="mem_2048x10_dp.addr2">
+            <delay_constant max="132e-12" in_port="memory1.addr2[10:0]" out_port="mem_2048x10_dp.addr2"/>
+          </direct>
+          <direct name="data1" input="memory1.data[9:0]" output="mem_2048x10_dp.data1">
+            <delay_constant max="132e-12" in_port="memory1.data[9:0]" out_port="mem_2048x10_dp.data1"/>
+          </direct>
+          <direct name="data2" input="memory1.data[19:10]" output="mem_2048x10_dp.data2">
+            <delay_constant max="132e-12" in_port="memory1.data[19:10]" out_port="mem_2048x10_dp.data2"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_2048x10_dp.we1">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_2048x10_dp.we1"/>
+          </direct>
+          <direct name="writeen2" input="memory1.we2" output="mem_2048x10_dp.we2">
+            <delay_constant max="132e-12" in_port="memory1.we2" out_port="mem_2048x10_dp.we2"/>
+          </direct>
+          <direct name="dataout1" input="mem_2048x10_dp.out1" output="memory1.out[9:0]">
+            <delay_constant max="40e-12" in_port="mem_2048x10_dp.out1" out_port="memory1.out[9:0]"/>
+          </direct>
+          <direct name="dataout2" input="mem_2048x10_dp.out2" output="memory1.out[19:10]">
+            <delay_constant max="40e-12" in_port="mem_2048x10_dp.out2" out_port="memory1.out[19:10]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_2048x10_dp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <mode name="mem_2048x8_dp">
+        <pb_type name="mem_2048x8_dp" blif_model=".subckt dual_port_ram" class="memory" num_pb="1">
+          <input name="addr1" num_pins="11" port_class="address1"/>
+          <input name="addr2" num_pins="11" port_class="address2"/>
+          <input name="data1" num_pins="8" port_class="data_in1"/>
+          <input name="data2" num_pins="8" port_class="data_in2"/>
+          <input name="we1" num_pins="1" port_class="write_en1"/>
+          <input name="we2" num_pins="1" port_class="write_en2"/>
+          <output name="out1" num_pins="8" port_class="data_out1"/>
+          <output name="out2" num_pins="8" port_class="data_out2"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="472e-12" port="mem_2048x8_dp.addr1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x8_dp.data1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x8_dp.we1" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x8_dp.addr2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x8_dp.data2" clock="clk"/>
+          <T_setup value="472e-12" port="mem_2048x8_dp.we2" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_2048x8_dp.out1" clock="clk"/>
+          <T_clock_to_Q max="1.156e-9" port="mem_2048x8_dp.out2" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="17.9e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory1.addr1[10:0]" output="mem_2048x8_dp.addr1">
+            <delay_constant max="132e-12" in_port="memory1.addr1[10:0]" out_port="mem_2048x8_dp.addr1"/>
+          </direct>
+          <direct name="address2" input="memory1.addr2[10:0]" output="mem_2048x8_dp.addr2">
+            <delay_constant max="132e-12" in_port="memory1.addr2[10:0]" out_port="mem_2048x8_dp.addr2"/>
+          </direct>
+          <direct name="data1" input="memory1.data[7:0]" output="mem_2048x8_dp.data1">
+            <delay_constant max="132e-12" in_port="memory1.data[7:0]" out_port="mem_2048x8_dp.data1"/>
+          </direct>
+          <direct name="data2" input="memory1.data[15:8]" output="mem_2048x8_dp.data2">
+            <delay_constant max="132e-12" in_port="memory1.data[15:8]" out_port="mem_2048x8_dp.data2"/>
+          </direct>
+          <direct name="writeen1" input="memory1.we1" output="mem_2048x8_dp.we1">
+            <delay_constant max="132e-12" in_port="memory1.we1" out_port="mem_2048x8_dp.we1"/>
+          </direct>
+          <direct name="writeen2" input="memory1.we2" output="mem_2048x8_dp.we2">
+            <delay_constant max="132e-12" in_port="memory1.we2" out_port="mem_2048x8_dp.we2"/>
+          </direct>
+          <direct name="dataout1" input="mem_2048x8_dp.out1" output="memory1.out[7:0]">
+            <delay_constant max="40e-12" in_port="mem_2048x8_dp.out1" out_port="memory1.out[7:0]"/>
+          </direct>
+          <direct name="dataout2" input="mem_2048x8_dp.out2" output="memory1.out[15:8]">
+            <delay_constant max="40e-12" in_port="mem_2048x8_dp.out2" out_port="memory1.out[15:8]"/>
+          </direct>
+          <direct name="clk" input="memory1.clk" output="mem_2048x8_dp.clk">
+             </direct>
+        </interconnect>
+      </mode>
+
+      <!-- Every input pin is driven by 15% of the tracks in a channel, every output pin is driven by 10% of the tracks in a channel -->
+      <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+        <fc_override fc_type="frac" fc_val="0" port_name="clk"/>
+      </fc>
+      <pinlocations pattern="spread"/>
+
+      <!-- Place this memory block every 8 columns from (and including) the second column -->
+      <power method="sum-of-children"/>
+    </pb_type>
     <!-- Define fracturable memory end -->
 
 
@@ -1494,4 +1939,7 @@
   <clocks>
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
+ <directlist>
+    <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
+ </directlist>
 </architecture>
