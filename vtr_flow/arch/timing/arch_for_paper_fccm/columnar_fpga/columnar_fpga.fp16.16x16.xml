@@ -158,14 +158,14 @@
   <layout>
 
 <!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="162" height="162">
+    <fixed_layout name="mylayout" width="380" height="380">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
-        <col type="clb" startx="1" starty="1" repeatx="13"  priority="20"/>
-        <col type="memory" startx="2" starty="1" repeatx="13" priority="50"/>
-        <col type="matmul_16x16" startx="4" starty="1" repeatx="13" priority="25"/>
+        <col type="clb" startx="1" starty="1" repeatx="21"  priority="20"/>
+        <col type="memory" startx="2" starty="1" repeatx="21" priority="50"/>
+        <col type="matmul_16x16" startx="4" starty="1" repeatx="21" priority="25"/>
 
     </fixed_layout> 
 <!--        </auto_layout> -->

@@ -182,17 +182,14 @@
   <layout>
 
     <!--<auto_layout aspect_ratio="1.0">-->
-    <fixed_layout name="mylayout" width="302" height="302">
+    <fixed_layout name="mylayout" width="546" height="546">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
-		    <col type="dsp" startx="2" starty="1" repeatx="10" priority="30"/>
-		    <col type="dsp" startx="4" starty="1" repeatx="10" priority="25"/>
-	      <col type="memory" startx="5" starty="1" repeatx="10" priority="18"/>
-        <col type="dsp" startx="7" starty="1" repeatx="10" priority="20"/>
-	      <col type="dsp" startx="9" starty="1" repeatx="10" priority="20"/>
+		    <col type="dsp" startx="6" starty="1" repeatx="8" priority="30"/>
+	      <col type="memory" startx="7" starty="1" repeatx="8" priority="18"/>
     </fixed_layout>
 <!--        </auto_layout> -->
 </layout>

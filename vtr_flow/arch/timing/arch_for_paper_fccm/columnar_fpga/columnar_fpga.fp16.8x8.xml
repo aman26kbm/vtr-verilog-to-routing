@@ -158,7 +158,7 @@
   <layout>
 
 <!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="162" height="162">
+    <fixed_layout name="mylayout" width="132" height="132">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
