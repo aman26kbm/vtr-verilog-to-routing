@@ -53,6 +53,7 @@ module dsp_slice(
   assign inp_b_mult = az_flopped;
   
   DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(inp_a_mult), .B(inp_b_mult), .TC(1'b1), .PRODUCT(out_mult_temp));
+  //assign out_mult_temp = inp_a_mult * inp_b_mult;
 
   reg [2*`DWIDTH-1:0] out_mult_temp_reg;
 
@@ -114,6 +115,7 @@ module dsp_slice(
   assign inp_b_adder = mux1_out;
 
   DW01_add #(`DWIDTH) u_add(.A(inp_a_adder), .B(inp_b_adder), .CI(carry_in), .SUM(out_adder), .CO(carry_out));
+  //assign out_adder = inp_a_adder * inp_b_adder;
 
   wire [`DWIDTH-1:0] mux3_out;
   assign mux3_out = multiply ? out_mult: out_adder;

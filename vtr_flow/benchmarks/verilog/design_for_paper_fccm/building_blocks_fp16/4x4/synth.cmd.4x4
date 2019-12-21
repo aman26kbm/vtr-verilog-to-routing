@@ -1,4 +1,4 @@
-analyze -format verilog {dsp_slice.stratix10.fp16.v 
+analyze -format verilog {4x4.v 
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FPMult/FPMult_ESExecuteModule.v  
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FPMult/FPMult_ExceptionModule.v  
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FPMult/FPMult_ExecuteModule.v    
@@ -18,17 +18,17 @@ analyze -format verilog {dsp_slice.stratix10.fp16.v
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FP_AddSub/FPAddSub_NormalizeShift2.v
 /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_fccm/fpmult_add/DSP48E1-FP/src/FP_AddSub/FPAddSub_RoundModule.v
 }
-elaborate dsp_slice -architecture verilog -library DEFAULT
+elaborate matrix_multiplication -architecture verilog -library DEFAULT
 link
-#set_implementation pparch u_add
-#set_implementation pparch u_mult
-set_dp_smartgen_options -all_options auto -hierarchy -smart_compare true -optimize_for speed -sop2pos_transformation false
+#set_implementation pparch */*/*/*/u_add
+#set_implementation pparch */*/*/*/u_mult
 create_clock -name "CLK_0" -period 1.62 -waveform { 0 0.81 }  { clk  }
+set_dp_smartgen_options -all_options auto -hierarchy -smart_compare true -optimize_for speed -sop2pos_transformation false
 set_operating_conditions -library gscl45nm typical
 remove_wire_load_model
 compile -exact_map
-uplevel #0 { report_timing -path full -delay max -nworst 1 -max_paths 1 -significant_digits 2 -sort_by group } >> Report.txt
-uplevel #0 { report_area } >> Report.txt
-uplevel #0 { report_power -analysis_effort low } >> Report.txt
-uplevel #0 { report_design -nosplit } >> Report.txt
+uplevel #0 { report_timing -path full -delay max -nworst 1 -max_paths 1 -significant_digits 2 -sort_by group } >> Report.4x4.txt
+uplevel #0 { report_area } >> Report.4x4.txt
+uplevel #0 { report_power -analysis_effort low } >> Report.4x4.txt
+uplevel #0 { report_design -nosplit } >> Report.4x4.txt
 exit
