@@ -163,14 +163,13 @@
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
-        <col type="clb" startx="1" starty="1" repeatx="8"  priority="20"/>
-		    <region type="matmul_4x4" priority="50" startx="4" endx="6" repeatx="9" 
-		    										starty="4" endy="6" repeaty="9"/>
-		    <region type="memory" priority="40"  startx="2" endx="8" incrx="5" repeatx="9"
-		    									 starty="4" endy="6"           repeaty="9"/>
-		    <region type="memory1" priority="40" startx="4" endx="6" repeatx="9"
-		    									 starty="2" endy="8" repeaty="9" incry="5"/>
-	
+	<fill type="clb" priority="10"/>
+        <region type="matmul_4x4" priority="50" startx="4" endx="8" repeatx="11" starty="4" endy="8" repeaty="11"/>
+        <region type="memory" priority="40"  startx="2" endx="10" incrx="7" repeatx="11" starty="5" endy="7" repeaty="11"/>
+        <region type="memory1" priority="40" startx="5" endx="7" repeatx="11" starty="2" endy="10" repeaty="11" incry="7"/>
+        <!--region type="matmul_4x4" priority="50" startx="4" endx="6" repeatx="9" starty="4" endy="6" repeaty="9"/>
+        <region type="memory" priority="40"  startx="2" endx="8" incrx="5" repeatx="9" starty="4" endy="6" repeaty="9"/>
+        <region type="memory1" priority="40" startx="4" endx="6" repeatx="9" starty="2" endy="8" repeaty="9" incry="5"/-->
     </fixed_layout> 
 <!--        </auto_layout> -->
 </layout>
