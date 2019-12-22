@@ -221,61 +221,6 @@ matmul_4x4_systolic u_matmul_4x4(
 
 endmodule  
 
-/*
-//Design without memories
-module matrix_multiplication(
- clk,
- reset,
- start_mat_mul,
- done_mat_mul,
- a_data,
- b_data,
- a_data_in, //Data values coming in from previous matmul - systolic connections
- b_data_in,
- c_data_in,
- c_data_out,
- a_data_out,
- b_data_out,
- a_addr,
- b_addr
-);
- input clk;
- input reset;
- input start_mat_mul;
- output done_mat_mul;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in;
- input [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in;
- output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
- output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] a_data_out;
- output [`BB_MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out;
- output [`AWIDTH-1:0] a_addr;
- output [`AWIDTH-1:0] b_addr;
-
-matmul_4x4_systolic u_matmul_4x4(
-  .clk(clk),
-  .reset(reset),
-  .start_mat_mul(start_mat_mul),
-  .done_mat_mul(done_mat_mul),
-  .a_data(a_data),
-  .b_data(b_data),
-  .a_data_in(a_data_in),
-  .b_data_in(b_data_in),
-  .c_data_in(c_data_in),
-  .c_data_out(c_data_out),
-  .a_data_out(a_data_out),
-  .b_data_out(b_data_out),
-  .a_addr(a_addr),
-  .b_addr(b_addr),
-  .final_mat_mul_size(8'd4),
-  .a_loc(8'd0),
-  .b_loc(8'd0)
-);
-
-endmodule
-*/
 
 module ram (addr0, d0, we0, q0,  clk);
 
