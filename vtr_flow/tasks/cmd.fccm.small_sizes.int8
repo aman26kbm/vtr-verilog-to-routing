@@ -1,0 +1,60 @@
+#-Please run the command under tasks directory
+#-Replace path/to/multi_clk.sdc with the actual path. Example:
+#%s?path/to/multi_clk.sdc?/mnt/c/Users/amana/DOCUME~1/WSL/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc?g
+####################
+#int8
+####################
+#columnar:
+../scripts/run_vtr_task.pl fccm_int8_4x4_from_4x4_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_24x24_from_4x4_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_40x40_from_4x4_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+#clustered:
+../scripts/run_vtr_task.pl fccm_int8_4x4_from_4x4_clustered/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_clustered/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_clustered/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_24x24_from_4x4_clustered/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_clustered/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_40x40_from_4x4_clustered/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+#surround
+../scripts/run_vtr_task.pl fccm_int8_4x4_from_4x4_surround/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_surround/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_surround/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_24x24_from_4x4_surround/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_surround/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_40x40_from_4x4_surround/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+#regular:
+../scripts/run_vtr_task.pl fccm_int8_4x4_from_4x4_regular_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_regular_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_regular_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_24x24_from_4x4_regular_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_regular_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_40x40_from_4x4_regular_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+#hybrid:
+../scripts/run_vtr_task.pl fccm_int8_4x4_from_4x4_hybrid_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_hybrid_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_hybrid_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_24x24_from_4x4_hybrid_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_hybrid_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_40x40_from_4x4_hybrid_fpga/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+#columnar_dir_int: 
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_columnar_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_columnar_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_columnar_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" 
+#surround_dir_int: 
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" 
+#BB 8x8 size:
+../scripts/run_vtr_task.pl fccm_int8_8x8_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_24x24_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_40x40_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+#BB 16x16 size:
+../scripts/run_vtr_task.pl fccm_int8_16x16_from_16x16_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_16x16_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
+#BB 32x32 size:
+../scripts/run_vtr_task.pl fccm_int8_32x32_from_32x32_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file /home/aman26kbm/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated"
