@@ -214,7 +214,7 @@
         <fill type="clb" priority="10"/>
 		    <col type="dsp" startx="6" starty="1" repeatx="11" priority="30"/>
 	      <col type="memory" startx="7" starty="1" repeatx="11" priority="18"/>
-		    <col type="matmul" startx="9" starty="1" repeatx="11" priority="30"/>
+		    <col type="matmul_4x4" startx="9" starty="1" repeatx="11" priority="30"/>
 
     </fixed_layout> 
 <!--        </auto_layout> -->
