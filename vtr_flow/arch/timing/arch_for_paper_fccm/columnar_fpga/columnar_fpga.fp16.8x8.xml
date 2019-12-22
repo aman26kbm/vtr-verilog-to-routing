@@ -811,7 +811,7 @@
 
       <clock name="clk" num_pins="1"/>
 
-      <mode name="matmult_8x8_mode">
+      <mode name="matmul_8x8_mode">
         <pb_type name="matmul_8x8_pb" blif_model=".subckt matmul_8x8_systolic" num_pb="1">
 
           <input name="reset" num_pins="1"/>

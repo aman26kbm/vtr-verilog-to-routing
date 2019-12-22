@@ -87,7 +87,6 @@
        that describe them.
   -->
   <models>
-    
     <model name="single_port_ram">
       <input_ports>
       <port name="we" clock="clk"/>     <!-- control -->
@@ -164,79 +163,41 @@
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
-        <!--col type="clb" startx="1" starty="1" repeatx="27"  priority="20"/>
-        <col type="clb" startx="2" starty="1" repeatx="27"  priority="20"/>
-        <col type="clb" startx="3" starty="1" repeatx="27"  priority="20"/-->
-		<!--col type="clb" startx="2" starty="1" priority="20"/-->
-		<fill type="clb" priority="1"/>
+		    <fill type="clb" priority="1"/>
 		
-        <!--Column of 'matmul_4x4' with 'EMPTY' blocks wherever a 'matmul_4x4' does not fit. Vertical offset by 1 for perimeter.-->
-		<!--<col type="matmul_4x4" startx="19" starty="1" priority="25"/>-->
-		<col type="matmul_4x4" startx="22" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="25" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="28" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="31" starty="1" priority="25"/>
+        <!--Column of 'matmul_4x4'-->
+		    <col type="matmul_4x4" startx="22" starty="1" priority="25"/>
+		    <col type="matmul_4x4" startx="25" starty="1" priority="25"/>
+		    <col type="matmul_4x4" startx="28" starty="1" priority="25"/>
+		    <col type="matmul_4x4" startx="31" starty="1" priority="25"/>
         <col type="matmul_4x4" startx="34" starty="1" priority="25"/>
         <col type="matmul_4x4" startx="37" starty="1" priority="25"/>
         <col type="matmul_4x4" startx="40" starty="1" priority="25"/>
         <col type="matmul_4x4" startx="43" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="46" starty="1" priority="25"/>
+		    <col type="matmul_4x4" startx="46" starty="1" priority="25"/>
         <col type="matmul_4x4" startx="49" starty="1" priority="25"/>
         <col type="matmul_4x4" startx="52" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="55" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="58" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="61" starty="1" priority="25"/>
-<!--        <col type="matmul_4x4" startx="55" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="58" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="61" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="64" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="67" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="70" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="73" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="76" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="79" starty="1" priority="25"/>
-		<col type="matmul_4x4" startx="82" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="85" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="88" starty="1" priority="25"/> -->
-		
+		    <col type="matmul_4x4" startx="55" starty="1" priority="25"/>
+		    <col type="matmul_4x4" startx="58" starty="1" priority="25"/>
+		    <col type="matmul_4x4" startx="61" starty="1" priority="25"/>
 
-        <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. Vertical offset by 1 for perimeter.-->
-<!--	<col type="memory" startx="29" starty="1" priority="20"/>
-		<col type="memory" startx="26" starty="1" priority="20"/>
-		<col type="memory" startx="23" starty="1" priority="20"/>
-		<col type="memory" startx="20" starty="1" priority="20"/> -->
-		<col type="memory" startx="20" starty="1" priority="20"/>
-		<col type="memory" startx="17" starty="1" priority="20"/>
-		<col type="memory" startx="14" starty="1" priority="20"/>
-		<col type="memory" startx="11" starty="1" priority="20"/>
-		<col type="memory" startx="8"  starty="1" priority="20"/>
-		<col type="memory" startx="5"  starty="1" priority="20"/>
-		<col type="memory" startx="2"  starty="1" priority="20"/>
-		
-		<!--<col type="memory" startx="55"  starty="1" priority="20"/>
-		<col type="memory" startx="58"  starty="1" priority="20"/>
-		<col type="memory" startx="61"  starty="1" priority="20"/>-->
-		<col type="memory" startx="64"  starty="1" priority="20"/>
-		<col type="memory" startx="67"  starty="1" priority="20"/>
-		<col type="memory" startx="70"  starty="1" priority="20"/>
-		<col type="memory" startx="73"  starty="1" priority="20"/>
-		<col type="memory" startx="76"  starty="1" priority="20"/>
-		<col type="memory" startx="79"  starty="1" priority="20"/>
-		<col type="memory" startx="82"  starty="1" priority="20"/>
-		
-		
-  <!--      <col type="memory" startx="91"  starty="1" priority="20"/>
-		<col type="memory" startx="94"  starty="1" priority="20"/>
-		<col type="memory" startx="97"  starty="1" priority="20"/>
-		<col type="memory" startx="100"  starty="1" priority="20"/>
-		<col type="memory" startx="103" starty="1" priority="20"/>
-		<col type="memory" startx="106" starty="1" priority="20"/>
-		<col type="memory" startx="109" starty="1" priority="20"/>
-		<col type="memory" startx="112" starty="1" priority="20"/>
-		<col type="memory" startx="115" starty="1" priority="20"/>
-		<col type="memory" startx="118" starty="1" priority="20"/> -->
+		    <col type="memory" startx="20" starty="1" priority="20"/>
+		    <col type="memory" startx="17" starty="1" priority="20"/>
+		    <col type="memory" startx="14" starty="1" priority="20"/>
+		    <col type="memory" startx="11" starty="1" priority="20"/>
+		    <col type="memory" startx="8"  starty="1" priority="20"/>
+		    <col type="memory" startx="5"  starty="1" priority="20"/>
+		    <col type="memory" startx="2"  starty="1" priority="20"/>
+		    
 
-
+		    <col type="memory" startx="64"  starty="1" priority="20"/>
+		    <col type="memory" startx="67"  starty="1" priority="20"/>
+		    <col type="memory" startx="70"  starty="1" priority="20"/>
+		    <col type="memory" startx="73"  starty="1" priority="20"/>
+		    <col type="memory" startx="76"  starty="1" priority="20"/>
+		    <col type="memory" startx="79"  starty="1" priority="20"/>
+		    <col type="memory" startx="82"  starty="1" priority="20"/>
+		
     </fixed_layout> 
 <!--        </auto_layout> -->
 </layout>
