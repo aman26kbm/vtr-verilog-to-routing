@@ -158,8 +158,7 @@
   <!-- Physical descriptions begin -->
   <layout>
 
-<!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="182" height="182">
+    <auto_layout aspect_ratio="1.0"> 
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
@@ -172,8 +171,7 @@
 		    <region type="memory1" priority="40" startx="4" endx="6" repeatx="9"
 		    									 starty="2" endy="8" repeaty="9" incry="5"/>
 	
-    </fixed_layout> 
-<!--        </auto_layout> -->
+    </auto_layout> 
 </layout>
 
   		<device>

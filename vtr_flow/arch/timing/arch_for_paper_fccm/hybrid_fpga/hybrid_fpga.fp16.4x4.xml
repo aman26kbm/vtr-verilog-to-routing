@@ -205,8 +205,7 @@
   <!-- Physical descriptions begin -->
   <layout>
 
-<!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="704" height="704">
+    <auto_layout aspect_ratio="1.0"> 
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
@@ -215,8 +214,7 @@
 		    <col type="dsp" startx="6" starty="1" repeatx="13" priority="30"/>
 	      <col type="memory" startx="7" starty="1" repeatx="13" priority="18"/>
         <col type="matmul_4x4" startx="9" starty="1" repeatx="13" priority="25"/>
-    </fixed_layout> 
-<!--        </auto_layout> -->
+    </auto_layout> 
 </layout>
 
   		<device>

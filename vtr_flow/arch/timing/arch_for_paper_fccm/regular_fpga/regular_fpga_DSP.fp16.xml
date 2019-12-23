@@ -181,17 +181,15 @@
   <!-- Physical descriptions begin -->
   <layout>
 
-    <!--<auto_layout aspect_ratio="1.0">-->
-    <fixed_layout name="mylayout" width="546" height="546">
+    <auto_layout aspect_ratio="1.0">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
         <!--Fill with 'clb'-->
         <fill type="clb" priority="10"/>
-		    <col type="dsp" startx="6" starty="1" repeatx="8" priority="30"/>
-	      <col type="memory" startx="7" starty="1" repeatx="8" priority="18"/>
-    </fixed_layout>
-<!--        </auto_layout> -->
+	<col type="dsp" startx="6" starty="1" repeatx="8" priority="30"/>
+	<col type="memory" startx="7" starty="1" repeatx="8" priority="18"/>
+    </auto_layout> 
 </layout>
 
   		<device>

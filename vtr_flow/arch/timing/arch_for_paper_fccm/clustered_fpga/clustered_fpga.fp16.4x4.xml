@@ -157,8 +157,7 @@
   <!-- Physical descriptions begin -->
   <layout>
 
-<!--    <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="162" height="162">
+    <auto_layout aspect_ratio="1.0">
         <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
         <perimeter type="io" priority="100"/>
         <corners type="EMPTY" priority="101"/>
@@ -170,13 +169,13 @@
 		    <col type="matmul_4x4" startx="36" starty="1" priority="25"/>
 		    <col type="matmul_4x4" startx="41" starty="1" priority="25"/>
 		    <col type="matmul_4x4" startx="46" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="51" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="56" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="61" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="66" starty="1" priority="25"/>
+                    <col type="matmul_4x4" startx="51" starty="1" priority="25"/>
+                    <col type="matmul_4x4" startx="56" starty="1" priority="25"/>
+                    <col type="matmul_4x4" startx="61" starty="1" priority="25"/>
+                    <col type="matmul_4x4" startx="66" starty="1" priority="25"/>
 		    <col type="matmul_4x4" startx="71" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="76" starty="1" priority="25"/>
-        <col type="matmul_4x4" startx="81" starty="1" priority="25"/>
+                    <col type="matmul_4x4" startx="76" starty="1" priority="25"/>
+                    <col type="matmul_4x4" startx="81" starty="1" priority="25"/>
 		    <col type="matmul_4x4" startx="86" starty="1" priority="25"/>
 		    <col type="matmul_4x4" startx="91" starty="1" priority="25"/>
 		    <col type="matmul_4x4" startx="96" starty="1" priority="25"/>
@@ -211,9 +210,7 @@
 		    <col type="memory" startx="152"  starty="1" priority="20"/>
 		    <col type="memory" startx="155"  starty="1" priority="20"/>
 		    <col type="memory" startx="158"  starty="1" priority="20"/>
-
-    </fixed_layout> 
-<!--        </auto_layout> -->
+        </auto_layout> 
 </layout>
 
 
