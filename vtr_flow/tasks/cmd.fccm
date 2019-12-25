@@ -57,6 +57,10 @@ nohup ../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_columnar_dir_int -s "-
 nohup ../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
 nohup ../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
 nohup ../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" & 
+#hybrid_dir_int: 
+nohup ../scripts/run_vtr_task.pl fccm_int8_8x8_from_4x4_hybrid_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
+nohup ../scripts/run_vtr_task.pl fccm_int8_16x16_from_4x4_hybrid_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
+nohup ../scripts/run_vtr_task.pl fccm_int8_32x32_from_4x4_hybrid_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" & 
 #BB 8x8 size:
 nohup ../scripts/run_vtr_task.pl fccm_int8_8x8_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
 nohup ../scripts/run_vtr_task.pl fccm_int8_16x16_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
@@ -129,6 +133,10 @@ nohup ../scripts/run_vtr_task.pl fccm_fp16_32x32_from_4x4_columnar_dir_int -s "-
 nohup ../scripts/run_vtr_task.pl fccm_fp16_8x8_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
 nohup ../scripts/run_vtr_task.pl fccm_fp16_16x16_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
 nohup ../scripts/run_vtr_task.pl fccm_fp16_32x32_from_4x4_surround_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" & 
+#hybrid_dir_int: 
+nohup ../scripts/run_vtr_task.pl fccm_fp16_8x8_from_4x4_hybrid_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
+nohup ../scripts/run_vtr_task.pl fccm_fp16_16x16_from_4x4_hybrid_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
+nohup ../scripts/run_vtr_task.pl fccm_fp16_32x32_from_4x4_hybrid_dir_int -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" & 
 #BB 8x8 size:
 nohup ../scripts/run_vtr_task.pl fccm_fp16_8x8_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
 nohup ../scripts/run_vtr_task.pl fccm_fp16_16x16_from_8x8_columnar/ -s "--const_gen_inference comb --seed 123 --sdc_file path/to/multi_clk.sdc --timing_report_npaths 1000 --timing_report_detail aggregated" &
