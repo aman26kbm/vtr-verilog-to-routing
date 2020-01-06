@@ -165,8 +165,9 @@ class GenResults():
             result_dict['max_segments_used_by_a_net'] = max_segments_used_by_a_net or "Not found"
           
         #calculated metrics
-        result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
-        result_dict['area_delay_product'] = float(result_dict['total_area']) * float(result_dict['critical_path'])
+        if 'logic_area' in result_dict and 'routing_area' in result_dict and 'critical_path' in result_dict:
+          result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
+          result_dict['area_delay_product'] = float(result_dict['total_area']) * float(result_dict['critical_path'])
 
       #append the current results to the main result list
       self.result_list.append(result_dict)
