@@ -1001,13 +1001,13 @@
 -->
       <pinlocations pattern="custom">
         <loc side="left" yoffset="1" xoffset="0">matmul_2x2.a_data_in[31:0]</loc>
-        <loc side="left" yoffset="2" xoffset="0">matmul_2x2.c_data_out[31:0]</loc>
+        <loc side="left" yoffset="2" xoffset="0">matmul_2x2.c_data_in[31:0]</loc>
         <loc side="left" yoffset="0" xoffset="0">matmul_2x2.a_addr[6:0]</loc>
         <loc side="top"  yoffset="2" xoffset="1">matmul_2x2.b_data_in[31:0]</loc>
         <loc side="top"  yoffset="2" xoffset="2">matmul_2x2.b_data[31:0]</loc>
         <loc side="top"  yoffset="2" xoffset="0">matmul_2x2.b_addr[6:0] matmul_2x2.start_mat_mul matmul_2x2.done_mat_mul matmul_2x2.clk</loc>
         <loc side="right" yoffset="1" xoffset="2">matmul_2x2.a_data_out[31:0]</loc>
-        <loc side="right" yoffset="2" xoffset="2">matmul_2x2.c_data_in[31:0]</loc>
+        <loc side="right" yoffset="2" xoffset="2">matmul_2x2.c_data_out[31:0]</loc>
         <loc side="right" yoffset="0" xoffset="2">matmul_2x2.b_loc[7:0] matmul_2x2.reset   matmul_2x2.a_loc[3:0]</loc>
         <loc side="bottom" yoffset="0" xoffset="1">matmul_2x2.b_data_out[31:0]</loc>
         <loc side="bottom" yoffset="0" xoffset="2">matmul_2x2.a_data[31:0]</loc>
@@ -1523,9 +1523,9 @@
     <clock buffer_size="auto" C_wire="2.5e-10"/>
   </clocks>
  <directlist>
-    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_2x2.a_data_out[31:0]" to_pin="matmul_2x2.a_data_in[31:0]" x_offset="8" y_offset="0" z_offset="0" switch_name="short_switch"/>
-    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_2x2.b_data_out[31:0]" to_pin="matmul_2x2.b_data_in[31:0]" x_offset="0" y_offset="-5" z_offset="0" switch_name="short_switch"/>
-    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_2x2.c_data_out[31:0]" to_pin="matmul_2x2.c_data_in[31:0]" x_offset="-8" y_offset="0" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_2x2.a_data_out[31:0]" to_pin="matmul_2x2.a_data_in[31:0]" x_offset="4" y_offset="0" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_2x2.b_data_out[31:0]" to_pin="matmul_2x2.b_data_in[31:0]" x_offset="0" y_offset="-1" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_2x2.c_data_out[31:0]" to_pin="matmul_2x2.c_data_in[31:0]" x_offset="4" y_offset="0" z_offset="0" switch_name="short_switch"/>
     <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
  </directlist>
 
