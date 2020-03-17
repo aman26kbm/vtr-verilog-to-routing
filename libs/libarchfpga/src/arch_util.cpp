@@ -12,7 +12,7 @@
 #include "read_xml_arch_file.h"
 #include "read_xml_util.h"
 
-static void free_all_pb_graph_nodes(t_type_descriptor* type_descriptors, int num_type_descriptors);
+static void free_all_pb_graph_nodes(std::vector<t_logical_block_type>& type_descriptors);
 static void free_pb_graph(t_pb_graph_node* pb_graph_node);
 static void free_pb_type(t_pb_type* pb_type);
 
@@ -33,7 +33,7 @@ InstPort::InstPort(std::string str) {
     }
 }
 
-InstPort::name_index InstPort::parse_name_index(std::string str) {
+InstPort::name_index InstPort::parse_name_index(const std::string& str) {
     auto open_bracket_pos = str.find("[");
     auto close_bracket_pos = str.find("]");
     auto colon_pos = str.find(":");
@@ -215,57 +215,71 @@ void free_arch(t_arch* arch) {
     }
 }
 
-void free_type_descriptors(t_type_descriptor* type_descriptors, int num_type_descriptors) {
-    free_all_pb_graph_nodes(type_descriptors, num_type_descriptors);
-
-    for (int i = 0; i < num_type_descriptors; ++i) {
-        vtr::free(type_descriptors[i].name);
-        if (i == EMPTY_TYPE_INDEX) {
+void free_type_descriptors(std::vector<t_physical_tile_type>& type_descriptors) {
+    for (auto& type : type_descriptors) {
+        vtr::free(type.name);
+        if (type.index == EMPTY_TYPE_INDEX) {
             continue;
         }
 
-        for (int width = 0; width < type_descriptors[i].width; ++width) {
-            for (int height = 0; height < type_descriptors[i].height; ++height) {
+        for (int width = 0; width < type.width; ++width) {
+            for (int height = 0; height < type.height; ++height) {
                 for (int side = 0; side < 4; ++side) {
-                    for (int pin = 0; pin < type_descriptors[i].num_pin_loc_assignments[width][height][side]; ++pin) {
-                        if (type_descriptors[i].pin_loc_assignments[width][height][side][pin])
-                            vtr::free(type_descriptors[i].pin_loc_assignments[width][height][side][pin]);
+                    for (int pin = 0; pin < type.num_pin_loc_assignments[width][height][side]; ++pin) {
+                        if (type.pin_loc_assignments[width][height][side][pin])
+                            vtr::free(type.pin_loc_assignments[width][height][side][pin]);
                     }
-                    vtr::free(type_descriptors[i].pinloc[width][height][side]);
-                    vtr::free(type_descriptors[i].pin_loc_assignments[width][height][side]);
+                    vtr::free(type.pinloc[width][height][side]);
+                    vtr::free(type.pin_loc_assignments[width][height][side]);
                 }
-                vtr::free(type_descriptors[i].pinloc[width][height]);
-                vtr::free(type_descriptors[i].pin_loc_assignments[width][height]);
-                vtr::free(type_descriptors[i].num_pin_loc_assignments[width][height]);
+                vtr::free(type.pinloc[width][height]);
+                vtr::free(type.pin_loc_assignments[width][height]);
+                vtr::free(type.num_pin_loc_assignments[width][height]);
             }
-            vtr::free(type_descriptors[i].pinloc[width]);
-            vtr::free(type_descriptors[i].pin_loc_assignments[width]);
-            vtr::free(type_descriptors[i].num_pin_loc_assignments[width]);
+            vtr::free(type.pinloc[width]);
+            vtr::free(type.pin_loc_assignments[width]);
+            vtr::free(type.num_pin_loc_assignments[width]);
         }
-        vtr::free(type_descriptors[i].pinloc);
-        vtr::free(type_descriptors[i].pin_loc_assignments);
-        vtr::free(type_descriptors[i].num_pin_loc_assignments);
+        vtr::free(type.pinloc);
+        vtr::free(type.pin_loc_assignments);
+        vtr::free(type.num_pin_loc_assignments);
 
-        for (int j = 0; j < type_descriptors[i].num_class; ++j) {
-            vtr::free(type_descriptors[i].class_inf[j].pinlist);
+        for (int j = 0; j < type.num_class; ++j) {
+            vtr::free(type.class_inf[j].pinlist);
         }
-        vtr::free(type_descriptors[i].class_inf);
-        vtr::free(type_descriptors[i].is_ignored_pin);
-        vtr::free(type_descriptors[i].is_pin_global);
-        vtr::free(type_descriptors[i].pin_class);
+        vtr::free(type.class_inf);
+        vtr::free(type.is_ignored_pin);
+        vtr::free(type.is_pin_global);
+        vtr::free(type.pin_class);
 
-        free_pb_type(type_descriptors[i].pb_type);
-        delete type_descriptors[i].pb_type;
+        for (auto port : type.ports) {
+            vtr::free(port.name);
+        }
     }
-    delete[] type_descriptors;
+    type_descriptors.clear();
 }
 
-static void free_all_pb_graph_nodes(t_type_descriptor* type_descriptors, int num_type_descriptors) {
-    for (int i = 0; i < num_type_descriptors; i++) {
-        if (type_descriptors[i].pb_type) {
-            if (type_descriptors[i].pb_graph_head) {
-                free_pb_graph(type_descriptors[i].pb_graph_head);
-                vtr::free(type_descriptors[i].pb_graph_head);
+void free_type_descriptors(std::vector<t_logical_block_type>& type_descriptors) {
+    free_all_pb_graph_nodes(type_descriptors);
+
+    for (auto& type : type_descriptors) {
+        vtr::free(type.name);
+        if (type.index == EMPTY_TYPE_INDEX) {
+            continue;
+        }
+
+        free_pb_type(type.pb_type);
+        delete type.pb_type;
+    }
+    type_descriptors.clear();
+}
+
+static void free_all_pb_graph_nodes(std::vector<t_logical_block_type>& type_descriptors) {
+    for (auto& type : type_descriptors) {
+        if (type.pb_type) {
+            if (type.pb_graph_head) {
+                free_pb_graph(type.pb_graph_head);
+                vtr::free(type.pb_graph_head);
             }
         }
     }
@@ -524,26 +538,35 @@ t_port* findPortByName(const char* name, t_pb_type* pb_type, int* high_index, in
     return port;
 }
 
-void SetupEmptyType(t_type_descriptor* cb_type_descriptors,
-                    t_type_ptr EMPTY_TYPE) {
-    t_type_descriptor* type;
-    type = &cb_type_descriptors[EMPTY_TYPE->index];
-    type->name = vtr::strdup("EMPTY");
-    type->num_pins = 0;
-    type->width = 1;
-    type->height = 1;
-    type->capacity = 0;
-    type->num_drivers = 0;
-    type->num_receivers = 0;
-    type->pinloc = nullptr;
-    type->num_class = 0;
-    type->class_inf = nullptr;
-    type->pin_class = nullptr;
-    type->is_ignored_pin = nullptr;
-    type->pb_type = nullptr;
-    type->area = UNDEFINED;
-    type->switchblock_locations = vtr::Matrix<e_sb_type>({{size_t(type->width), size_t(type->height)}}, e_sb_type::FULL);
-    type->switchblock_switch_overrides = vtr::Matrix<int>({{size_t(type->width), size_t(type->height)}}, DEFAULT_SWITCH);
+t_physical_tile_type SetupEmptyPhysicalType() {
+    t_physical_tile_type type;
+    type.name = vtr::strdup("EMPTY");
+    type.num_pins = 0;
+    type.width = 1;
+    type.height = 1;
+    type.capacity = 0;
+    type.num_drivers = 0;
+    type.num_receivers = 0;
+    type.pinloc = nullptr;
+    type.num_class = 0;
+    type.class_inf = nullptr;
+    type.pin_class = nullptr;
+    type.is_ignored_pin = nullptr;
+    type.area = UNDEFINED;
+    type.switchblock_locations = vtr::Matrix<e_sb_type>({{size_t(type.width), size_t(type.height)}}, e_sb_type::FULL);
+    type.switchblock_switch_overrides = vtr::Matrix<int>({{size_t(type.width), size_t(type.height)}}, DEFAULT_SWITCH);
+    type.is_input_type = false;
+    type.is_output_type = false;
+
+    return type;
+}
+
+t_logical_block_type SetupEmptyLogicalType() {
+    t_logical_block_type type;
+    type.name = vtr::strdup("EMPTY");
+    type.pb_type = nullptr;
+
+    return type;
 }
 
 void alloc_and_load_default_child_for_pb_type(t_pb_type* pb_type,
@@ -1079,12 +1102,10 @@ void CreateModelLibrary(t_arch* arch) {
 }
 
 void SyncModelsPbTypes(t_arch* arch,
-                       const t_type_descriptor* Types,
-                       const int NumTypes) {
-    int i;
-    for (i = 0; i < NumTypes; i++) {
-        if (Types[i].pb_type != nullptr) {
-            SyncModelsPbTypes_rec(arch, Types[i].pb_type);
+                       const std::vector<t_logical_block_type>& Types) {
+    for (auto& Type : Types) {
+        if (Type.pb_type != nullptr) {
+            SyncModelsPbTypes_rec(arch, Type.pb_type);
         }
     }
 }
@@ -1301,4 +1322,43 @@ bool is_library_model(const char* model_name) {
 
 bool is_library_model(const t_model* model) {
     return is_library_model(model->name);
+}
+
+//Returns true if the specified block type contains the specified blif model name
+//
+// TODO: Remove block_type_contains_blif_model / pb_type_contains_blif_model
+// as part of
+// https://github.com/verilog-to-routing/vtr-verilog-to-routing/issues/1193
+bool block_type_contains_blif_model(t_logical_block_type_ptr type, const std::string& blif_model_name) {
+    return pb_type_contains_blif_model(type->pb_type, blif_model_name);
+}
+
+//Returns true of a pb_type (or it's children) contain the specified blif model name
+bool pb_type_contains_blif_model(const t_pb_type* pb_type, const std::string& blif_model_name) {
+    if (!pb_type) {
+        return false;
+    }
+
+    if (pb_type->blif_model != nullptr) {
+        //Leaf pb_type
+        VTR_ASSERT(pb_type->num_modes == 0);
+        if (blif_model_name == pb_type->blif_model
+            || ".subckt " + blif_model_name == pb_type->blif_model) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        for (int imode = 0; imode < pb_type->num_modes; ++imode) {
+            const t_mode* mode = &pb_type->modes[imode];
+
+            for (int ichild = 0; ichild < mode->num_pb_type_children; ++ichild) {
+                const t_pb_type* pb_type_child = &mode->pb_type_children[ichild];
+                if (pb_type_contains_blif_model(pb_type_child, blif_model_name)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

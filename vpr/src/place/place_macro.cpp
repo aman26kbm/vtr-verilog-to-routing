@@ -3,7 +3,6 @@
 #include <cmath>
 #include <sstream>
 #include <map>
-using namespace std;
 
 #include "vtr_assert.h"
 #include "vtr_memory.h"
@@ -78,11 +77,16 @@ static void find_all_the_macro(int* num_of_macro, std::vector<ClusterBlockId>& p
 
     num_macro = 0;
     for (auto blk_id : cluster_ctx.clb_nlist.blocks()) {
-        num_blk_pins = cluster_ctx.clb_nlist.block_type(blk_id)->num_pins;
+        auto logical_block = cluster_ctx.clb_nlist.block_type(blk_id);
+        auto physical_tile = pick_best_physical_type(logical_block);
+
+        num_blk_pins = cluster_ctx.clb_nlist.block_type(blk_id)->pb_type->num_pins;
         for (to_iblk_pin = 0; to_iblk_pin < num_blk_pins; to_iblk_pin++) {
+            int to_physical_pin = get_physical_pin(physical_tile, logical_block, to_iblk_pin);
+
             to_net_id = cluster_ctx.clb_nlist.block_net(blk_id, to_iblk_pin);
-            to_idirect = f_idirect_from_blk_pin[cluster_ctx.clb_nlist.block_type(blk_id)->index][to_iblk_pin];
-            to_src_or_sink = f_direct_type_from_blk_pin[cluster_ctx.clb_nlist.block_type(blk_id)->index][to_iblk_pin];
+            to_idirect = f_idirect_from_blk_pin[physical_tile->index][to_physical_pin];
+            to_src_or_sink = f_direct_type_from_blk_pin[physical_tile->index][to_physical_pin];
 
             // Identify potential macro head blocks (i.e. start of a macro)
             //
@@ -98,9 +102,11 @@ static void find_all_the_macro(int* num_of_macro, std::vector<ClusterBlockId>& p
                     || (is_constant_clb_net(to_net_id)
                         && !net_is_driven_by_direct(to_net_id)))) {
                 for (from_iblk_pin = 0; from_iblk_pin < num_blk_pins; from_iblk_pin++) {
+                    int from_physical_pin = get_physical_pin(physical_tile, logical_block, from_iblk_pin);
+
                     from_net_id = cluster_ctx.clb_nlist.block_net(blk_id, from_iblk_pin);
-                    from_idirect = f_idirect_from_blk_pin[cluster_ctx.clb_nlist.block_type(blk_id)->index][from_iblk_pin];
-                    from_src_or_sink = f_direct_type_from_blk_pin[cluster_ctx.clb_nlist.block_type(blk_id)->index][from_iblk_pin];
+                    from_idirect = f_idirect_from_blk_pin[physical_tile->index][from_physical_pin];
+                    from_src_or_sink = f_direct_type_from_blk_pin[physical_tile->index][from_physical_pin];
 
                     // Confirm whether this is a head macro
                     //
@@ -130,8 +136,8 @@ static void find_all_the_macro(int* num_of_macro, std::vector<ClusterBlockId>& p
                             next_blk_id = cluster_ctx.clb_nlist.net_pin_block(curr_net_id, 1);
 
                             // Assume that the from_iblk_pin index is the same for the next block
-                            VTR_ASSERT(f_idirect_from_blk_pin[cluster_ctx.clb_nlist.block_type(next_blk_id)->index][from_iblk_pin] == from_idirect
-                                       && f_direct_type_from_blk_pin[cluster_ctx.clb_nlist.block_type(next_blk_id)->index][from_iblk_pin] == SOURCE);
+                            VTR_ASSERT(f_idirect_from_blk_pin[physical_tile->index][from_physical_pin] == from_idirect
+                                       && f_direct_type_from_blk_pin[physical_tile->index][from_physical_pin] == SOURCE);
                             next_net_id = cluster_ctx.clb_nlist.block_net(next_blk_id, from_iblk_pin);
 
                             // Mark down this block as a member of the macro
@@ -408,9 +414,9 @@ void free_placement_macros_structs() {
 
     // This frees up the two arrays and set the pointers to NULL
     auto& device_ctx = g_vpr_ctx.device();
-    int itype;
+    unsigned int itype;
     if (f_idirect_from_blk_pin != nullptr) {
-        for (itype = 1; itype < device_ctx.num_block_types; itype++) {
+        for (itype = 1; itype < device_ctx.physical_tile_types.size(); itype++) {
             free(f_idirect_from_blk_pin[itype]);
         }
         free(f_idirect_from_blk_pin);
@@ -418,7 +424,7 @@ void free_placement_macros_structs() {
     }
 
     if (f_direct_type_from_blk_pin != nullptr) {
-        for (itype = 1; itype < device_ctx.num_block_types; itype++) {
+        for (itype = 1; itype < device_ctx.physical_tile_types.size(); itype++) {
             free(f_direct_type_from_blk_pin[itype]);
         }
         free(f_direct_type_from_blk_pin);
@@ -455,16 +461,19 @@ static void write_place_macros(std::string filename, const std::vector<t_pl_macr
     fprintf(f, "type      type_pin  is_direct direct_type\n");
     fprintf(f, "------------------------------------------\n");
     auto& device_ctx = g_vpr_ctx.device();
-    for (int itype = 0; itype < device_ctx.num_block_types; ++itype) {
-        t_type_descriptor* type = &device_ctx.block_types[itype];
+    for (const auto& type : device_ctx.physical_tile_types) {
+        if (is_empty_type(&type)) {
+            continue;
+        }
 
-        for (int ipin = 0; ipin < type->num_pins; ++ipin) {
+        int itype = type.index;
+        for (int ipin = 0; ipin < type.num_pins; ++ipin) {
             if (f_idirect_from_blk_pin[itype][ipin] != OPEN) {
                 if (f_direct_type_from_blk_pin[itype][ipin] == SOURCE) {
-                    fprintf(f, "%-9s %-9d true      SOURCE    \n", type->name, ipin);
+                    fprintf(f, "%-9s %-9d true      SOURCE    \n", type.name, ipin);
                 } else {
                     VTR_ASSERT(f_direct_type_from_blk_pin[itype][ipin] == SINK);
-                    fprintf(f, "%-9s %-9d true      SINK      \n", type->name, ipin);
+                    fprintf(f, "%-9s %-9d true      SINK      \n", type.name, ipin);
                 }
             } else {
                 VTR_ASSERT(f_direct_type_from_blk_pin[itype][ipin] == OPEN);
@@ -486,7 +495,7 @@ static bool net_is_driven_by_direct(ClusterNetId clb_net) {
     auto& cluster_ctx = g_vpr_ctx.clustering();
 
     ClusterBlockId block_id = cluster_ctx.clb_nlist.net_driver_block(clb_net);
-    int pin_index = cluster_ctx.clb_nlist.net_pin_physical_index(clb_net, 0);
+    int pin_index = cluster_ctx.clb_nlist.net_pin_logical_index(clb_net, 0);
 
     auto direct = f_idirect_from_blk_pin[cluster_ctx.clb_nlist.block_type(block_id)->index][pin_index];
 

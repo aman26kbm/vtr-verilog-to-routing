@@ -10,8 +10,9 @@
  * The data structures that store the
  *
  * Key data types:
- * t_type_descriptor: describes a placeable complex logic block,
- * pb_type: describes the types of physical blocks within the t_type_descriptor in a hierarchy where the top block is the complex block and the leaf blocks implement one logical block
+ * t_physical_tile_type: represents the type of a tile in the device grid and describes its physical characteristics (pin locations, area, width, height, etc.)
+ * t_logical_block_type: represents and describes the type of a clustered block
+ * pb_type: describes the types of physical blocks within the t_logical_block_type in a hierarchy where the top block is the complex block and the leaf blocks implement one logical block
  * pb_graph_node: is a flattened version of pb_type so a pb_type with 10 instances will have 10 pb_graph_nodes representing each instance
  *
  * Additional notes:
@@ -37,6 +38,8 @@
 
 #include "vtr_ndmatrix.h"
 #include "vtr_hash.h"
+#include "vtr_bimap.h"
+#include "vtr_string_interning.h"
 
 #include "logic_types.h"
 #include "clock_types.h"
@@ -51,6 +54,14 @@ struct t_pb_type_power;
 struct t_mode_power;
 struct t_interconnect_power;
 struct t_port_power;
+struct t_physical_tile_port;
+struct t_equivalent_site;
+struct t_physical_tile_type;
+typedef const t_physical_tile_type* t_physical_tile_type_ptr;
+struct t_logical_block_type;
+typedef const t_logical_block_type* t_logical_block_type_ptr;
+struct t_logical_pin;
+struct t_physical_pin;
 struct t_pb_type;
 struct t_pb_graph_pin_power;
 struct t_mode;
@@ -80,31 +91,32 @@ enum class e_sb_type;
 // Metadata value storage.
 class t_metadata_value {
   public:
-    explicit t_metadata_value(std::string v)
+    explicit t_metadata_value(vtr::interned_string v)
         : value_(v) {}
-    explicit t_metadata_value(const t_metadata_value& o)
+    explicit t_metadata_value(const t_metadata_value& o) noexcept
         : value_(o.value_) {}
 
     // Return string value.
-    std::string as_string() const { return value_; }
+    vtr::interned_string as_string() const { return value_; }
 
   private:
-    std::string value_;
+    vtr::interned_string value_;
 };
 
 // Metadata storage dictionary.
-struct t_metadata_dict : std::unordered_map<
-                             std::string,
-                             std::vector<t_metadata_value>> {
+struct t_metadata_dict : vtr::flat_map<
+                             vtr::interned_string,
+                             std::vector<t_metadata_value>,
+                             vtr::interned_string_less> {
     // Is this key present in the map?
-    inline bool has(std::string key) const {
+    inline bool has(vtr::interned_string key) const {
         return this->count(key) >= 1;
     }
 
     // Get all metadata values matching key.
     //
     // Returns nullptr if key is not found.
-    inline const std::vector<t_metadata_value>* get(std::string key) const {
+    inline const std::vector<t_metadata_value>* get(vtr::interned_string key) const {
         auto iter = this->find(key);
         if (iter != this->end()) {
             return &iter->second;
@@ -116,7 +128,7 @@ struct t_metadata_dict : std::unordered_map<
     //
     // Returns nullptr if key is not found or if multiple values are prsent
     // per key.
-    inline const t_metadata_value* one(std::string key) const {
+    inline const t_metadata_value* one(vtr::interned_string key) const {
         auto values = get(key);
         if (values == nullptr) {
             return nullptr;
@@ -128,11 +140,10 @@ struct t_metadata_dict : std::unordered_map<
     }
 
     // Adds value to key.
-    void add(std::string key, std::string value) {
+    void add(vtr::interned_string key, vtr::interned_string value) {
         // Get the iterator to the key, which may already have elements if
         // add was called with this key in the past.
-        auto iter_inserted = this->emplace(key, std::vector<t_metadata_value>());
-        iter_inserted.first->second.push_back(t_metadata_value(value));
+        (*this)[key].emplace_back(t_metadata_value(value));
     }
 };
 
@@ -516,7 +527,7 @@ enum class e_sb_type {
 constexpr int NO_SWITCH = -1;
 constexpr int DEFAULT_SWITCH = -2;
 
-/* Describes the type for a physical logic block
+/* Describes the type for a physical tile
  * name: unique identifier for type
  * num_pins: Number of pins for the block
  * capacity: Number of blocks of this type that can occupy one grid tile (typically used by IOs).
@@ -552,20 +563,20 @@ constexpr int DEFAULT_SWITCH = -2;
  *                        Note that the SB is located to the top-right of the
  *                        grid tile location. [0..width-1][0..height-1]
  *
- *
- * pb_type: Internal subblocks and routing information for this physical block
- * pb_graph_head: Head of DAG of pb_types_nodes and their edges
- *
  * area: Describes how much area this logic block takes, if undefined, use default
  * type_timing_inf: timing information unique to this type
  * num_drivers: Total number of output drivers supplied
  * num_receivers: Total number of input receivers supplied
  * index: Keep track of type in array for easy access
+ * logical_tile_index: index of the corresponding logical block type
  */
-struct t_type_descriptor /* TODO rename this.  maybe physical type descriptor or complex logic block or physical logic block*/
-{
+struct t_physical_tile_type {
     char* name = nullptr;
     int num_pins = 0;
+    int num_input_pins = 0;
+    int num_output_pins = 0;
+    int num_clock_pins = 0;
+
     int capacity = 0;
 
     int width = 0;
@@ -580,6 +591,7 @@ struct t_type_descriptor /* TODO rename this.  maybe physical type descriptor or
     int num_class = 0;
     t_class* class_inf = nullptr; /* [0..num_class-1] */
 
+    std::vector<t_physical_tile_port> ports;
     std::vector<int> pin_width_offset;  //[0..num_pins-1]
     std::vector<int> pin_height_offset; //[0..num_pins-1]
     int* pin_class = nullptr;           /* [0..num_pins-1] */
@@ -591,10 +603,6 @@ struct t_type_descriptor /* TODO rename this.  maybe physical type descriptor or
     vtr::Matrix<e_sb_type> switchblock_locations;
     vtr::Matrix<int> switchblock_switch_overrides;
 
-    /* Clustering info */
-    t_pb_type* pb_type = nullptr;
-    t_pb_graph_node* pb_graph_head = nullptr;
-
     float area = 0;
 
     /* This info can be determined from class_inf and pin_class but stored for faster access */
@@ -603,10 +611,116 @@ struct t_type_descriptor /* TODO rename this.  maybe physical type descriptor or
 
     int index = -1; /* index of type descriptor in array (allows for index referencing) */
 
+    std::vector<t_logical_block_type_ptr> equivalent_sites;
+
+    /* Unordered map indexed by the logical block index.
+     * tile_block_pin_directs_map[logical block index][logical block pin] -> physical tile pin */
+    std::unordered_map<int, vtr::bimap<t_logical_pin, t_physical_pin>> tile_block_pin_directs_map;
+
     /* Returns the indices of pins that contain a clock for this physical logic block */
     std::vector<int> get_clock_pins_indices() const;
+
+    // TODO: Remove is_input_type / is_output_type as part of
+    // https://github.com/verilog-to-routing/vtr-verilog-to-routing/issues/1193
+
+    // Does this t_physical_tile_type contain an inpad?
+    bool is_input_type;
+
+    // Does this t_physical_tile_type contain an outpad?
+    bool is_output_type;
 };
-typedef const t_type_descriptor* t_type_ptr;
+
+/** A logical pin defines the pin index of a logical block type (i.e. a top level PB type)
+ *  This structure wraps the int value of the logical pin to allow its storage in the
+ *  vtr::bimap container.
+ */
+struct t_logical_pin {
+    int pin = -1;
+
+    t_logical_pin(int value) {
+        pin = value;
+    }
+
+    bool operator==(const t_logical_pin o) const {
+        return pin == o.pin;
+    }
+
+    bool operator<(const t_logical_pin o) const {
+        return pin < o.pin;
+    }
+};
+
+/** A physical pin defines the pin index of a physical tile type (i.e. a grid tile type)
+ *  This structure wraps the int value of the physical pin to allow its storage in the
+ *  vtr::bimap container.
+ */
+struct t_physical_pin {
+    int pin = -1;
+
+    t_physical_pin(int value) {
+        pin = value;
+    }
+
+    bool operator==(const t_physical_pin o) const {
+        return pin == o.pin;
+    }
+
+    bool operator<(const t_physical_pin o) const {
+        return pin < o.pin;
+    }
+};
+
+/** Describes I/O and clock ports of a physical tile type
+ *
+ *  It corresponds to <port/> tags in the FPGA architecture description
+ *
+ *  Data members:
+ *      name: name of the port
+ *      is_clock: whether or not this port is a clock
+ *      is_non_clock_global: Applies to top level pb_type, this pin is not a clock but
+ *                           is a global signal (useful for stuff like global reset signals,
+ *                           perhaps useful for VCC and GND)
+ *      num_pins: the number of pins this port has
+ *      tile_type: pointer to the associated tile type
+ *      port_class: port belongs to recognized set of ports in class library
+ *      index: port index by index in array of parent pb_type
+ *      absolute_first_pin_index: absolute index of the first pin in the physical tile.
+ *                                All the other pin indices can be calculated with num_pins
+ *      port_index_by_type index of port by type (index by input, output, or clock)
+ *      equivalence: Applies to logic block I/Os and to primitive inputs only
+ */
+struct t_physical_tile_port {
+    char* name;
+    enum PORTS type;
+    bool is_clock;
+    bool is_non_clock_global;
+    int num_pins;
+    PortEquivalence equivalent = PortEquivalence::NONE;
+
+    int index;
+    int absolute_first_pin_index;
+    int port_index_by_type;
+};
+
+/* Describes the type for a logical block
+ * name: unique identifier for type
+ * pb_type: Internal subblocks and routing information for this physical block
+ * pb_graph_head: Head of DAG of pb_types_nodes and their edges
+ *
+ * index: Keep track of type in array for easy access
+ * physical_tile_index: index of the corresponding physical tile type
+ */
+struct t_logical_block_type {
+    char* name = nullptr;
+
+    /* Clustering info */
+    t_pb_type* pb_type = nullptr;
+    t_pb_graph_node* pb_graph_head = nullptr;
+
+    int index = -1; /* index of type descriptor in array (allows for index referencing) */
+
+    std::vector<t_physical_tile_type_ptr> equivalent_tiles;
+};
 
 /*************************************************************************************************
  * PB Type Hierarchy                                                                             *
@@ -653,8 +767,9 @@ typedef const t_type_descriptor* t_type_ptr;
  *      modes: Different modes accepted
  *      ports: I/O and clock ports
  *      num_clock_pins: A count of the total number of clock pins
- *      int num_input_pins: A count of the total number of input pins
- *      int num_output_pins: A count of the total number of output pins
+ *      num_input_pins: A count of the total number of input pins
+ *      num_output_pins: A count of the total number of output pins
+ *      num_pins: A count of the total number of pins
  *      timing: Timing matrix of block [0..num_inputs-1][0..num_outputs-1]
  *      parent_mode: mode of the parent block
  *      t_mode_power: ???
@@ -675,6 +790,8 @@ struct t_pb_type {
     int num_clock_pins = 0;
     int num_input_pins = 0; /* inputs not including clock pins */
     int num_output_pins = 0;
+
+    int num_pins = 0;
 
     t_mode* parent_mode = nullptr;
     int depth = 0; /* depth of pb_type */
@@ -788,6 +905,7 @@ struct t_port {
 
     int index;
     int port_index_by_type;
+    int absolute_first_pin_index;
 
     t_port_power* port_power;
 };
@@ -1203,6 +1321,10 @@ struct t_segment_inf {
     //float Cmetal_per_m; /* Wire capacitance (per meter) */
 };
 
+inline bool operator==(const t_segment_inf& a, const t_segment_inf& b) {
+    return a.name == b.name && a.frequency == b.frequency && a.length == b.length && a.arch_wire_switch == b.arch_wire_switch && a.arch_opin_switch == b.arch_opin_switch && a.frac_cb == b.frac_cb && a.frac_sb == b.frac_sb && a.longline == b.longline && a.Rmetal == b.Rmetal && a.Cmetal == b.Cmetal && a.directionality == b.directionality && a.cb == b.cb && a.sb == b.sb;
+}
+
 enum class SwitchType {
     MUX = 0,   //A configurable (buffered) mux (single-driver)
     TRISTATE,  //A configurable tristate-able buffer (multi-driver)
@@ -1231,11 +1353,11 @@ enum class BufferSize {
  *            we would expect an additional "internal capacitance"           *
  *            to arise when the pass transistor is enabled and the signal    *
  *            must propogate to the buffer. See diagram of one stream below: *
- *                                                                           *   
+ *                                                                           *
  *                  Pass Transistor                                          *
  *                       |                                                   *
  *                     -----                                                 *
- *                     -----      Buffer                                     *   
+ *                     -----      Buffer                                     *
  *                    |     |       |\                                       *
  *              ------       -------| \--------                              *
  *                |             |   | /    |                                 *
@@ -1473,6 +1595,8 @@ struct t_clock_arch_spec {
 
 /*   Detailed routing architecture */
 struct t_arch {
+    mutable vtr::string_internment strings;
+
     char* architecture_id; //Secure hash digest of the architecture file to uniquely identify this architecture
 
     t_chan_width_dist Chans;

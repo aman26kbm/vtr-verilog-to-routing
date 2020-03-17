@@ -27,6 +27,12 @@ struct t_options {
     argparse::ArgValue<std::string> write_rr_graph_file;
     argparse::ArgValue<std::string> read_rr_graph_file;
 
+    argparse::ArgValue<std::string> write_placement_delay_lookup;
+    argparse::ArgValue<std::string> read_placement_delay_lookup;
+
+    argparse::ArgValue<std::string> write_router_lookahead;
+    argparse::ArgValue<std::string> read_router_lookahead;
+
     /* Stage Options */
     argparse::ArgValue<bool> do_packing;
     argparse::ArgValue<bool> do_placement;
@@ -50,6 +56,7 @@ struct t_options {
     argparse::ArgValue<float> target_device_utilization;
     argparse::ArgValue<e_constant_net_method> constant_net_method;
     argparse::ArgValue<e_clock_modeling> clock_modeling;
+    argparse::ArgValue<bool> two_stage_clock_routing;
     argparse::ArgValue<bool> exit_before_pack;
     argparse::ArgValue<bool> strict_checks;
     argparse::ArgValue<std::string> disable_errors;
@@ -109,8 +116,10 @@ struct t_options {
     argparse::ArgValue<std::string> post_place_timing_report_file;
     argparse::ArgValue<PlaceDelayModelType> place_delay_model;
     argparse::ArgValue<e_reducer> place_delay_model_reducer;
+    argparse::ArgValue<std::string> allowed_tiles_for_delay_model;
 
     /* Router Options */
+    argparse::ArgValue<bool> check_rr_graph;
     argparse::ArgValue<int> max_router_iterations;
     argparse::ArgValue<float> first_iter_pres_fac;
     argparse::ArgValue<float> initial_pres_fac;
@@ -125,6 +134,7 @@ struct t_options {
     argparse::ArgValue<bool> verify_binary_search;
     argparse::ArgValue<e_router_algorithm> RouterAlgorithm;
     argparse::ArgValue<int> min_incremental_reroute_fanout;
+    argparse::ArgValue<bool> read_rr_edge_metadata;
 
     /* Timing-driven router options only */
     argparse::ArgValue<float> astar_fac;
@@ -140,10 +150,13 @@ struct t_options {
     argparse::ArgValue<int> router_high_fanout_threshold;
     argparse::ArgValue<int> router_debug_net;
     argparse::ArgValue<int> router_debug_sink_rr;
+    argparse::ArgValue<int> router_debug_iteration;
     argparse::ArgValue<e_router_lookahead> router_lookahead_type;
     argparse::ArgValue<int> router_max_convergence_count;
     argparse::ArgValue<float> router_reconvergence_cpd_threshold;
+    argparse::ArgValue<bool> router_update_lower_bound_delays;
     argparse::ArgValue<std::string> router_first_iteration_timing_report_file;
+    argparse::ArgValue<e_router_initial_timing> router_initial_timing;
 
     /* Analysis options */
     argparse::ArgValue<bool> full_stats;
@@ -151,6 +164,7 @@ struct t_options {
     argparse::ArgValue<int> timing_report_npaths;
     argparse::ArgValue<e_timing_report_detail> timing_report_detail;
     argparse::ArgValue<bool> timing_report_skew;
+    argparse::ArgValue<std::string> echo_dot_timing_graph_node;
 };
 
 argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& args);

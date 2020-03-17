@@ -20,9 +20,28 @@ static void check_rr_edge(int from_node, int from_edge, int to_node);
 
 /************************ Subroutine definitions ****************************/
 
+class node_edge_sorter {
+  public:
+    bool operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) const {
+        return lhs.first < rhs.first;
+    }
+
+    bool operator()(const std::pair<int, int>& lhs, const int& rhs) const {
+        return lhs.first < rhs;
+    }
+
+    bool operator()(const int& lhs, const std::pair<int, int>& rhs) const {
+        return lhs < rhs.first;
+    }
+
+    bool operator()(const int& lhs, const int& rhs) const {
+        return lhs < rhs;
+    }
+};
+
 void check_rr_graph(const t_graph_type graph_type,
                     const DeviceGrid& grid,
-                    const t_type_ptr types) {
+                    const std::vector<t_physical_tile_type>& types) {
     e_route_type route_type = DETAILED;
     if (graph_type == GRAPH_GLOBAL) {
         route_type = GLOBAL;
@@ -34,6 +53,8 @@ void check_rr_graph(const t_graph_type graph_type,
     auto switch_types_from_current_to_node = std::vector<unsigned char>(device_ctx.rr_nodes.size());
     const int num_rr_switches = device_ctx.rr_switch_inf.size();
 
+    std::vector<std::pair<int, int>> edges;
+
     for (size_t inode = 0; inode < device_ctx.rr_nodes.size(); inode++) {
         device_ctx.rr_nodes[inode].validate();
 
@@ -44,14 +65,20 @@ void check_rr_graph(const t_graph_type graph_type,
             continue;
         }
 
+        // Virtual clock network sink is special, ignore.
+        if (device_ctx.virtual_clock_network_root_idx == int(inode)) {
+            continue;
+        }
+
         t_rr_type rr_type = device_ctx.rr_nodes[inode].type();
         int num_edges = device_ctx.rr_nodes[inode].num_edges();
 
         check_rr_node(inode, route_type, device_ctx);
 
         /* Check all the connectivity (edges, etc.) information.                    */
+        edges.resize(0);
+        edges.reserve(num_edges);
 
-        std::map<int, std::vector<int>> edges_from_current_to_node;
         for (int iedge = 0; iedge < num_edges; iedge++) {
             int to_node = device_ctx.rr_nodes[inode].edge_sink_node(iedge);
 
@@ -64,7 +91,7 @@ void check_rr_graph(const t_graph_type graph_type,
 
             check_rr_edge(inode, iedge, to_node);
 
-            edges_from_current_to_node[to_node].push_back(iedge);
+            edges.emplace_back(to_node, iedge);
             total_edges_to_node[to_node]++;
 
             auto switch_type = device_ctx.rr_nodes[inode].edge_switch(iedge);
@@ -77,13 +104,22 @@ void check_rr_graph(const t_graph_type graph_type,
             }
         } /* End for all edges of node. */
 
+        std::sort(edges.begin(), edges.end(), [](const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) {
+            return lhs.first < rhs.first;
+        });
+
         //Check that multiple edges between the same from/to nodes make sense
         for (int iedge = 0; iedge < num_edges; iedge++) {
             int to_node = device_ctx.rr_nodes[inode].edge_sink_node(iedge);
 
-            if (edges_from_current_to_node[to_node].size() == 1) continue; //Single edges are always OK
+            auto range = std::equal_range(edges.begin(), edges.end(),
+                                          to_node, node_edge_sorter());
 
-            VTR_ASSERT_MSG(edges_from_current_to_node[to_node].size() > 1, "Expect multiple edges");
+            size_t num_edges_to_node = std::distance(range.first, range.second);
+
+            if (num_edges_to_node == 1) continue; //Single edges are always OK
+
+            VTR_ASSERT_MSG(num_edges_to_node > 1, "Expect multiple edges");
 
             t_rr_type to_rr_type = device_ctx.rr_nodes[to_node].type();
 
@@ -92,7 +128,7 @@ void check_rr_graph(const t_graph_type graph_type,
                 || (rr_type != CHANX && rr_type != CHANY)) {
                 VPR_ERROR(VPR_ERROR_ROUTE,
                           "in check_rr_graph: node %d (%s) connects to node %d (%s) %zu times - multi-connections only expected for CHAN->CHAN.\n",
-                          inode, rr_node_typename[rr_type], to_node, rr_node_typename[to_rr_type], edges_from_current_to_node[to_node].size());
+                          inode, rr_node_typename[rr_type], to_node, rr_node_typename[to_rr_type], num_edges_to_node);
             }
 
             //Between two wire segments
@@ -104,7 +140,8 @@ void check_rr_graph(const t_graph_type graph_type,
             //
             //Identify any such edges with identical switches
             std::map<short, int> switch_counts;
-            for (auto edge : edges_from_current_to_node[to_node]) {
+            for (const auto& to_edge : vtr::Range<decltype(edges)::const_iterator>(range.first, range.second)) {
+                auto edge = to_edge.second;
                 auto edge_switch = device_ctx.rr_nodes[inode].edge_switch(edge);
 
                 switch_counts[edge_switch]++;
@@ -156,7 +193,7 @@ void check_rr_graph(const t_graph_type graph_type,
                  */
                 bool is_chain = false;
                 if (rr_type == IPIN) {
-                    t_type_ptr type = device_ctx.grid[device_ctx.rr_nodes[inode].xlow()][device_ctx.rr_nodes[inode].ylow()].type;
+                    t_physical_tile_type_ptr type = device_ctx.grid[device_ctx.rr_nodes[inode].xlow()][device_ctx.rr_nodes[inode].ylow()].type;
                     for (const t_fc_specification& fc_spec : types[type->index].fc_specs) {
                         if (fc_spec.fc_value == 0 && fc_spec.seg_index == 0) {
                             is_chain = true;
@@ -177,8 +214,9 @@ void check_rr_graph(const t_graph_type graph_type,
                     if (node.type() == IPIN || node.type() == OPIN) {
                         if (has_adjacent_channel(node, device_ctx.grid)) {
                             auto block_type = device_ctx.grid[node.xlow()][node.ylow()].type;
-                            VTR_LOG_ERROR("in check_rr_graph: node %d (%s) at (%d,%d) block=%s side=%s has no fanin.\n",
-                                          inode, node.type_string(), node.xlow(), node.ylow(), block_type->name, node.side_string());
+                            std::string pin_name = block_type_pin_index_to_name(block_type, node.pin_num());
+                            VTR_LOG_ERROR("in check_rr_graph: node %d (%s) at (%d,%d) block=%s side=%s pin=%s has no fanin.\n",
+                                          inode, node.type_string(), node.xlow(), node.ylow(), block_type->name, node.side_string(), pin_name.c_str());
                         }
                     } else {
                         VTR_LOG_ERROR("in check_rr_graph: node %d (%s) has no fanin.\n",
@@ -205,7 +243,7 @@ static bool rr_node_is_global_clb_ipin(int inode) {
     /* Returns true if inode refers to a global CLB input pin node.   */
 
     int ipin;
-    t_type_ptr type;
+    t_physical_tile_type_ptr type;
 
     auto& device_ctx = g_vpr_ctx.device();
 
@@ -226,7 +264,7 @@ void check_rr_node(int inode, enum e_route_type route_type, const DeviceContext&
 
     int xlow, ylow, xhigh, yhigh, ptc_num, capacity;
     t_rr_type rr_type;
-    t_type_ptr type;
+    t_physical_tile_type_ptr type;
     int nodes_per_chan, tracks_per_node, num_edges, cost_index;
     float C, R;
 
@@ -544,6 +582,7 @@ static void check_rr_edge(int from_node, int iedge, int to_node) {
 
                 VPR_FATAL_ERROR(VPR_ERROR_ROUTE, msg.c_str());
             }
+            break;
         case SwitchType::TRISTATE:  //Fallthrough
         case SwitchType::MUX:       //Fallthrough
         case SwitchType::PASS_GATE: //Fallthrough

@@ -60,7 +60,8 @@ constexpr int ERROR_EXIT_CODE = 1; //Something went wrong internally
 constexpr int INTERRUPTED_EXIT_CODE = 3; //VPR was interrupted by the user (e.g. SIGINT/ctr-C)
 
 static void do_one_route(int source_node, int sink_node,
-        const t_router_opts& router_opts) {
+        const t_router_opts& router_opts,
+        const std::vector<t_segment_inf>& segment_inf) {
     /* Returns true as long as found some way to hook up this net, even if that *
      * way resulted in overuse of resources (congestion).  If there is no way   *
      * to route this net, even ignoring congestion, it returns false.  In this  *
@@ -69,7 +70,6 @@ static void do_one_route(int source_node, int sink_node,
     auto& route_ctx = g_vpr_ctx.routing();
 
     t_rt_node* rt_root = init_route_tree_to_source_no_net(source_node);
-    enable_router_debug(router_opts, ClusterNetId(), sink_node);
 
     /* Update base costs according to fanout and criticality rules */
     update_rr_base_costs(1);
@@ -82,25 +82,37 @@ static void do_one_route(int source_node, int sink_node,
     bounding_box.ymax = device_ctx.grid.height() + 1;
 
     t_conn_cost_params cost_params;
-    cost_params.criticality = 1.;
+    cost_params.criticality = router_opts.max_criticality;
     cost_params.astar_fac = router_opts.astar_fac;
     cost_params.bend_cost = router_opts.bend_cost;
 
     route_budgets budgeting_inf;
 
-    init_heap(device_ctx.grid);
 
-    std::vector<int> modified_rr_node_inf;
     RouterStats router_stats;
-    auto router_lookahead = make_router_lookahead(router_opts.lookahead_type);
-    t_heap* cheapest = timing_driven_route_connection_from_route_tree(rt_root, sink_node, cost_params, bounding_box, *router_lookahead, modified_rr_node_inf, router_stats);
+    auto router_lookahead = make_router_lookahead(
+            router_opts.lookahead_type,
+            router_opts.write_router_lookahead,
+            router_opts.read_router_lookahead,
+            segment_inf
+            );
 
-    bool found_path = (cheapest != nullptr);
+    ConnectionRouter router(
+            device_ctx.grid,
+            *router_lookahead,
+            device_ctx.rr_nodes,
+            device_ctx.rr_rc_data,
+            device_ctx.rr_switch_inf,
+            g_vpr_ctx.mutable_routing().rr_node_route_inf);
+    enable_router_debug(router_opts, ClusterNetId(), sink_node, 1, &router);
+    bool found_path;
+    t_heap cheapest;
+    std::tie(found_path, cheapest) = router.timing_driven_route_connection_from_route_tree(rt_root, sink_node, cost_params, bounding_box, router_stats);
+
     if (found_path) {
-        VTR_ASSERT(cheapest->index == sink_node);
+        VTR_ASSERT(cheapest.index == sink_node);
 
-        t_rt_node* rt_node_of_sink = update_route_tree(cheapest, nullptr);
-        free_heap_data(cheapest);
+        t_rt_node* rt_node_of_sink = update_route_tree(&cheapest, nullptr);
 
         //find delay
         float net_delay = rt_node_of_sink->Tdel;
@@ -118,15 +130,23 @@ static void do_one_route(int source_node, int sink_node,
     }
 
     //Reset for the next router call
-    empty_heap();
-    reset_path_costs(modified_rr_node_inf);
+    router.reset_path_costs();
 }
 
 static void profile_source(int source_rr_node,
-        const t_router_opts& router_opts) {
+        const t_router_opts& router_opts,
+        const std::vector<t_segment_inf>& segment_inf) {
     vtr::ScopedStartFinishTimer timer("Profiling source");
     const auto& device_ctx = g_vpr_ctx.device();
     const auto& grid = device_ctx.grid;
+
+    auto router_lookahead = make_router_lookahead(
+            router_opts.lookahead_type,
+            router_opts.write_router_lookahead,
+            router_opts.read_router_lookahead,
+            segment_inf
+            );
+    RouterDelayProfiler profiler(router_lookahead.get());
 
     int start_x = 0;
     int end_x = grid.width() - 1;
@@ -139,7 +159,7 @@ static void profile_source(int source_rr_node,
 
     for (int sink_x = start_x; sink_x <= end_x; sink_x++) {
         for (int sink_y = start_y; sink_y <= end_y; sink_y++) {
-            if(device_ctx.grid[sink_x][sink_y].type == device_ctx.EMPTY_TYPE) {
+            if(device_ctx.grid[sink_x][sink_y].type == device_ctx.EMPTY_PHYSICAL_TILE_TYPE) {
                 continue;
             }
 
@@ -162,7 +182,7 @@ static void profile_source(int source_rr_node,
                     vtr::ScopedStartFinishTimer delay_timer(vtr::string_fmt(
                         "Routing Src: %d Sink: %d", source_rr_node,
                         sink_rr_node));
-                    successfully_routed = calculate_delay(source_rr_node, sink_rr_node,
+                    successfully_routed = profiler.calculate_delay(source_rr_node, sink_rr_node,
                                                         router_opts,
                                                         &delays[sink_x][sink_y]);
                 }
@@ -205,7 +225,7 @@ static t_chan_width setup_chan_width(t_router_opts router_opts,
     if (router_opts.fixed_channel_width == NO_FIXED_CHANNEL_WIDTH) {
         auto& device_ctx = g_vpr_ctx.device();
 
-        auto type = find_most_common_block_type(device_ctx.grid);
+        auto type = find_most_common_tile_type(device_ctx.grid);
 
         width_fac = 4 * type->num_pins;
         /*this is 2x the value that binary search starts */
@@ -284,12 +304,15 @@ int main(int argc, const char **argv) {
         if(route_options.profile_source) {
             profile_source(
                 route_options.source_rr_node,
-                vpr_setup.RouterOpts
+                vpr_setup.RouterOpts,
+                vpr_setup.Segments
                 );
         } else {
             do_one_route(
-                    route_options.source_rr_node, route_options.sink_rr_node,
-                    vpr_setup.RouterOpts);
+                    route_options.source_rr_node, 
+                    route_options.sink_rr_node,
+                    vpr_setup.RouterOpts,
+                    vpr_setup.Segments);
         }
         free_routing_structs();
 
