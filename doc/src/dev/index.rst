@@ -9,4 +9,6 @@ Developer Guide
     building
     contributing
     developing
-    tutorial
+    tutorials/index
+    support
+    license

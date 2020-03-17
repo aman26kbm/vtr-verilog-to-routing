@@ -38,6 +38,10 @@
 #include "vtr_vector.h"
 #include "vtr_util.h"
 #include "vtr_flat_map.h"
+#include "vtr_cache.h"
+#include "vtr_string_view.h"
+#include "vtr_dynamic_bitset.h"
+#include "rr_graph_fwd.h"
 
 /*******************************************************************************
  * Global data types and constants
@@ -109,6 +113,11 @@ enum class e_router_lookahead {
 enum class e_route_bb_update {
     STATIC, //Router net bounding boxes are not updated
     DYNAMIC //Rotuer net bounding boxes are updated
+};
+
+enum class e_router_initial_timing {
+    ALL_CRITICAL,
+    LOOKAHEAD
 };
 
 enum class e_const_gen_inference {
@@ -203,6 +212,33 @@ class t_pack_high_fanout_thresholds {
 
 /* Type used to express rr_node edge index. */
 typedef uint16_t t_edge_size;
+
+//An iterator that dereferences to an edge index
+//
+//Used inconjunction with vtr::Range to return ranges of edge indices
+class edge_idx_iterator : public std::iterator<std::bidirectional_iterator_tag, t_edge_size> {
+  public:
+    edge_idx_iterator(value_type init)
+        : value_(init) {}
+    iterator operator++() {
+        value_ += 1;
+        return *this;
+    }
+    iterator operator--() {
+        value_ -= 1;
+        return *this;
+    }
+    reference operator*() { return value_; }
+    pointer operator->() { return &value_; }
+
+    friend bool operator==(const edge_idx_iterator lhs, const edge_idx_iterator rhs) { return lhs.value_ == rhs.value_; }
+    friend bool operator!=(const edge_idx_iterator lhs, const edge_idx_iterator rhs) { return !(lhs == rhs); }
+
+  private:
+    value_type value_;
+};
+
+typedef vtr::Range<edge_idx_iterator> edge_idx_range;
 
 /* these are defined later, but need to declare here because it is used */
 class t_rr_node;
@@ -443,7 +479,7 @@ struct t_net_power {
  * width_offset: Number of grid tiles reserved based on width (right) of a block
  * height_offset: Number of grid tiles reserved based on height (top) of a block */
 struct t_grid_tile {
-    t_type_ptr type = nullptr;
+    t_physical_tile_type_ptr type = nullptr;
     int width_offset = 0;
     int height_offset = 0;
     const t_metadata_dict* meta = nullptr;
@@ -620,44 +656,15 @@ struct t_place_region {
     float cost;
 };
 
-/* Stores the information of the move for a block that is       *
- * moved during placement                                       *
- * block_num: the index of the moved block                      *
- * xold: the x_coord that the block is moved from               *
- * xnew: the x_coord that the block is moved to                 *
- * yold: the y_coord that the block is moved from               *
- * xnew: the x_coord that the block is moved to                 */
-struct t_pl_moved_block {
-    ClusterBlockId block_num;
-    t_pl_loc old_loc;
-    t_pl_loc new_loc;
-};
-
-/* Stores the list of blocks to be moved in a swap during       *
- * placement.                                                   *
- * num_moved_blocks: total number of blocks moved when          *
- *                   swapping two blocks.                       *
- * moved blocks: a list of moved blocks data structure with     *
- *               information on the move.                       *
- *               [0...num_moved_blocks-1]                       */
-struct t_pl_blocks_to_be_moved {
-    int num_moved_blocks;
-    std::vector<t_pl_moved_block> moved_blocks;
-    std::unordered_set<t_pl_loc> moved_from;
-    std::unordered_set<t_pl_loc> moved_to;
-};
-
 /* Represents the placement location of a clustered block
  * x: x-coordinate
  * y: y-coordinate
  * z: occupancy coordinate
- * is_fixed: true if this block's position is fixed by the user and shouldn't be moved during annealing
- * nets_and_pins_synced_to_z_coordinate: true if the associated clb's pins have been synced to the z location (i.e. after placement) */
+ * is_fixed: true if this block's position is fixed by the user and shouldn't be moved during annealing */
 struct t_block_loc {
     t_pl_loc loc;
 
     bool is_fixed = false;
-    bool nets_and_pins_synced_to_z_coordinate = false;
 };
 
 /* Stores the clustered blocks placed at a particular grid location */
@@ -831,6 +838,15 @@ struct t_placer_opts {
     std::string post_place_timing_report_file;
 
     bool strict_checks;
+
+    std::string write_placement_delay_lookup;
+    std::string read_placement_delay_lookup;
+
+    // Tile types that should be used during delay sampling.
+    //
+    // Useful for excluding tiles that have abnormal delay behavior, e.g.
+    // clock tree elements like PLL's, global/local clock buffers, etc.
+    std::string allowed_tiles_for_delay_model;
 };
 
 /* All the parameters controlling the router's operation are in this        *
@@ -884,17 +900,19 @@ enum e_route_type {
     GLOBAL,
     DETAILED
 };
+
 enum e_router_algorithm {
     BREADTH_FIRST,
     TIMING_DRIVEN,
-    NO_TIMING
 };
+
 enum e_base_cost_type {
     DELAY_NORMALIZED,
     DELAY_NORMALIZED_LENGTH,
     DELAY_NORMALIZED_FREQUENCY,
     DELAY_NORMALIZED_LENGTH_FREQUENCY,
-    DEMAND_ONLY
+    DEMAND_ONLY,
+    DEMAND_ONLY_NORMALIZED_LENGTH
 };
 enum e_routing_failure_predictor {
     OFF,
@@ -911,6 +929,7 @@ enum class e_timing_report_detail {
     NETLIST,          //Only show netlist elements
     AGGREGATED,       //Show aggregated intra-block and inter-block delays
     DETAILED_ROUTING, //Show inter-block routing resources used
+    DEBUG,            //Show additional internal debugging information
 };
 
 enum class e_incr_reroute_delay_ripup {
@@ -922,6 +941,8 @@ enum class e_incr_reroute_delay_ripup {
 constexpr int NO_FIXED_CHANNEL_WIDTH = -1;
 
 struct t_router_opts {
+    bool read_rr_edge_metadata = false;
+    bool do_check_rr_graph = true;
     float first_iter_pres_fac;
     float initial_pres_fac;
     float pres_fac_mult;
@@ -954,14 +975,22 @@ struct t_router_opts {
     float congested_routing_iteration_threshold_frac;
     e_route_bb_update route_bb_update;
     enum e_clock_modeling clock_modeling; //How clock pins and nets should be handled
+    bool two_stage_clock_routing;         //How clock nets on dedicated networks should be routed
     int high_fanout_threshold;
     int router_debug_net;
     int router_debug_sink_rr;
+    int router_debug_iteration;
     e_router_lookahead lookahead_type;
     int max_convergence_count;
     float reconvergence_cpd_threshold;
+    e_router_initial_timing initial_timing;
+    bool update_lower_bound_delays;
+
     std::string first_iteration_timing_report_file;
     bool strict_checks;
+
+    std::string write_router_lookahead;
+    std::string read_router_lookahead;
 };
 
 struct t_analysis_opts {
@@ -972,6 +1001,7 @@ struct t_analysis_opts {
     int timing_report_npaths;
     e_timing_report_detail timing_report_detail;
     bool timing_report_skew;
+    std::string echo_dot_timing_graph_node;
 };
 
 /* Defines the detailed routing architecture of the FPGA.  Only important   *
@@ -1111,7 +1141,11 @@ class t_chan_seg_details {
 
     int index() const { return seg_detail_->index; }
 
-    std::string type_name() const { return seg_detail_->type_name; }
+    const vtr::string_view type_name() const {
+        return vtr::string_view(
+            seg_detail_->type_name.data(),
+            seg_detail_->type_name.size());
+    }
 
   public: //Modifiers
     void set_length(int new_len) { length_ = new_len; }
@@ -1143,12 +1177,6 @@ struct t_linked_f_pointer {
     float* fptr;
 };
 
-typedef std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> t_rr_node_indices; //[0..num_rr_types-1][0..grid_width-1][0..grid_height-1][0..NUM_SIDES-1][0..max_ptc-1]
-
-/* Uncomment lines below to save some memory, at the cost of debugging ease. */
-/*enum e_rr_type {SOURCE, SINK, IPIN, OPIN, CHANX, CHANY}; */
-/* typedef short t_rr_type */
-
 /* Type of a routing resource node.  x-directed channel segment,   *
  * y-directed channel segment, input pin to a clb to pad, output   *
  * from a clb or pad (i.e. output pin of a net) and:               *
@@ -1163,12 +1191,14 @@ typedef enum e_rr_type : unsigned char {
     OPIN,
     CHANX,
     CHANY,
-    INTRA_CLUSTER_EDGE,
     NUM_RR_TYPES
 } t_rr_type;
 
-constexpr std::array<t_rr_type, NUM_RR_TYPES> RR_TYPES = {{SOURCE, SINK, IPIN, OPIN, CHANX, CHANY, INTRA_CLUSTER_EDGE}};
-constexpr std::array<const char*, NUM_RR_TYPES> rr_node_typename{{"SOURCE", "SINK", "IPIN", "OPIN", "CHANX", "CHANY", "INTRA_CLUSTER_EDGE"}};
+constexpr std::array<t_rr_type, NUM_RR_TYPES> RR_TYPES = {{SOURCE, SINK, IPIN, OPIN, CHANX, CHANY}};
+constexpr std::array<const char*, NUM_RR_TYPES> rr_node_typename{{"SOURCE", "SINK", "IPIN", "OPIN", "CHANX", "CHANY"}};
+
+//[0..num_rr_types-1][0..grid_width-1][0..grid_height-1][0..NUM_SIDES-1][0..max_ptc-1]
+typedef std::array<vtr::NdMatrix<std::vector<int>, 3>, NUM_RR_TYPES> t_rr_node_indices;
 
 /* Basic element used to store the traceback (routing) of each net.        *
  * index:   Array index (ID) of this routing resource node.                *
@@ -1204,7 +1234,7 @@ struct t_trace {
  * occ:        The current occupancy of the associated rr node              */
 struct t_rr_node_route_inf {
     int prev_node;
-    t_edge_size prev_edge;
+    RREdgeId prev_edge;
 
     float pres_cost;
     float acc_cost;
@@ -1224,9 +1254,39 @@ struct t_rr_node_route_inf {
 };
 
 //Information about the current status of a particular net as pertains to routing
-struct t_net_routing_status {
-    bool is_routed = false; //Whether the net has been legally routed
-    bool is_fixed = false;  //Whether the net is fixed (i.e. not to be re-routed)
+class t_net_routing_status {
+  public:
+    void clear() {
+        is_routed_.clear();
+        is_fixed_.clear();
+    }
+
+    void resize(size_t number_nets) {
+        is_routed_.resize(number_nets);
+        is_routed_.fill(false);
+        is_fixed_.resize(number_nets);
+        is_fixed_.fill(false);
+    }
+    void set_is_routed(ClusterNetId net, bool is_routed) {
+        is_routed_.set(index(net), is_routed);
+    }
+    bool is_routed(ClusterNetId net) const {
+        return is_routed_.get(index(net));
+    }
+    void set_is_fixed(ClusterNetId net, bool is_fixed) {
+        is_fixed_.set(index(net), is_fixed);
+    }
+    bool is_fixed(ClusterNetId net) const {
+        return is_fixed_.get(index(net));
+    }
+
+  private:
+    ClusterNetId index(ClusterNetId net) const {
+        VTR_ASSERT_SAFE(net != ClusterNetId::INVALID());
+        return net;
+    }
+    vtr::dynamic_bitset<ClusterNetId> is_routed_; //Whether the net has been legally routed
+    vtr::dynamic_bitset<ClusterNetId> is_fixed_;  //Whether the net is fixed (i.e. not to be re-routed)
 };
 
 struct t_node_edge {
@@ -1309,6 +1369,7 @@ struct t_vpr_setup {
     std::string device_layout;
     e_constant_net_method constant_net_method; //How constant nets should be handled
     e_clock_modeling clock_modeling;           //How clocks should be handled
+    bool two_stage_clock_routing;              //How clocks should be routed in the presence of a dedicated clock network
     bool exit_before_pack;                     //Exits early before starting packing (useful for collecting statistics without running/loading any stages)
 };
 
@@ -1332,5 +1393,7 @@ class RouteStatus {
 };
 
 typedef vtr::vector<ClusterBlockId, std::vector<std::vector<int>>> t_clb_opins_used; //[0..num_blocks-1][0..class-1][0..used_pins-1]
+
+typedef std::vector<std::map<int, int>> t_arch_switch_fanin;
 
 #endif

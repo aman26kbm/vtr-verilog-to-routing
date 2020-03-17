@@ -11,8 +11,13 @@ At a minimum VPR requires two command-line arguments::
 
 where:
 
-  * ``architecture`` is an :ref:`FPGA architecture description file <fpga_architecture_description>`
-  * ``circuit`` is the technology mapped netlist in :ref:`BLIF format <vpr_blif_file>` to be implemented
+.. option:: architecture
+
+    is an :ref:`FPGA architecture description file <fpga_architecture_description>`
+
+.. option:: circuit
+
+    is the technology mapped netlist in :ref:`BLIF format <vpr_blif_file>` to be implemented
 
 VPR will then pack, place, and route the circuit onto the specified architecture.
 
@@ -33,6 +38,7 @@ In the following text, values in angle brackets e.g. ``<int>`` ``<float>`` ``<st
 Values in curly braces separated by vertical bars, e.g. ``{on | off}``, indicate all the permissible choices for an option.
 
 .. _stage_options:
+
 Stage Options
 ^^^^^^^^^^^^^
 VPR runs all stages of (pack, place, route, and analysis) if none of :option:`--pack`, :option:`--place`, :option:`--route` or :option:`--analysis` are specified.
@@ -63,6 +69,7 @@ VPR runs all stages of (pack, place, route, and analysis) if none of :option:`--
     **Default:** ``off``
 
 .. _graphics_options:
+
 Graphics Options
 ^^^^^^^^^^^^^^^^
 
@@ -80,8 +87,15 @@ Graphics Options
     The higher the number, the more infrequently the program will pause.
 
     **Default:** ``1``
+    
+.. option:: --save_graphics {on | off}
+
+    If set to on, this option will save an image of the final placement and the final routing created by vpr to pdf files on disk, with no need for any user interaction. The files are named vpr_placement.pdf and vpr_routing.pdf.
+
+    **Default:** ``off``
 
 .. _general_options:
+
 General Options
 ^^^^^^^^^^^^^^^
 .. option:: -h, --help
@@ -186,6 +200,7 @@ General Options
     **Default:** ``on``
 
 .. _filename_options:
+
 Filename Options
 ^^^^^^^^^^^^^^^^
 VPR by default appends .blif, .net, .place, and .route to the circuit name provided by the user, and looks for an SDC file in the working directory with the same name as the circuit.
@@ -193,9 +208,9 @@ Use the options below to override this default naming behaviour.
 
 .. option:: --circuit_file <file>
 
-    Path to technology mapped user circuit in blif format.
+    Path to technology mapped user circuit in :ref:`BLIF format <vpr_blif_file>`.
 
-    .. note:: If specified the ``circuit`` positional argument is treated as the circuit name.
+    .. note:: If specified the :option:`circuit` positional argument is treated as the circuit name.
 
     .. seealso:: :option:`--circuit_format`
 
@@ -211,29 +226,39 @@ Use the options below to override this default naming behaviour.
 
 .. option:: --net_file <file>
 
-    Path to packed user circuit in net format
+    Path to packed user circuit in :ref:`net format <vpr_net_file>`.
+
+    **Default:** :option:`circuit <circuit>`.net
 
 .. option:: --place_file <file>
 
-    Path to final placement file
+    Path to final :ref:`placement file <vpr_place_file>`.
+
+    **Default:** :option:`circuit <circuit>`.place
 
 .. option:: --route_file <file>
 
-    Path to final routing file
+    Path to final :ref:`routing file <vpr_route_file>`.
+
+    **Default:** :option:`circuit <circuit>`.route
 
 .. option:: --sdc_file <file>
 
-    Path to SDC timing constraints file
+    Path to SDC timing constraints file.
+
+    If no SDC file is found :ref:`default timing constraints <default_timing_constraints>` will be used.
+
+    **Default:** :option:`circuit <circuit>`.sdc
 
 .. option:: --write_rr_graph <file>
 
-    Writes out the routing resource graph generated at the last stage of VPR into XML format
+    Writes out the routing resource graph generated at the last stage of VPR into :ref:`RR Graph XML format <vpr_route_resource_file>`
 
     <file> describes the filename for the generated routing resource graph. The output can be read into VPR using :option:`--read_rr_graph`
 
 .. option:: --read_rr_graph <file>
 
-    Reads in the routing resource graph named <file> in the VTR root directory and loads it into the placement and routing stage of VPR.
+    Reads in the routing resource graph named <file> loads it for use during the placement and routing stages.
 
     The routing resource graph overthrows all the architecture definitions regarding switches, nodes, and edges. Other information such as grid information, block types, and segment information are matched with the architecture file to ensure accuracy.
 
@@ -244,8 +269,6 @@ Use the options below to override this default naming behaviour.
 .. option:: --outfile_prefix <string>
 
     Prefix for output files
-
-.. _general_options:
 
 .. _netlist_options:
 
@@ -395,6 +418,7 @@ For people not working on CAD, you can probably leave all the options to their d
 .. option:: --balance_block_type_utilization {on, off, auto}
 
     Controls how the packer selects the block type to which a primitive will be mapped if it can potentially map to multiple block types.
+
      * ``on``  : Try to balance block type utilization by picking the block type with the (currenty) lowest utilization.
      * ``off`` : Do not try to balance block type utilization
      * ``auto``: Dynamically enabled/disabled (based on density)
@@ -463,7 +487,7 @@ For people not working on CAD, you can probably leave all the options to their d
     **Default:** ``auto``
 
 
-.. option:: --pack_prioritize_transitive_connectivity {on, off}
+.. option:: --pack_prioritize_transitive_connectivity {on | off}
 
     Controls whether transitive connectivity is prioritized over high-fanout connectivity during packing.
 
@@ -829,7 +853,14 @@ VPR uses a negotiated congestion algorithm (based on Pathfinder) to perform rout
 
     Selects which router algorithm to use.
 
-    The ``breadth_first`` router focuses solely on routing a design successfully, while the ``timing_driven`` router focuses both on achieving a successful route and achieving good circuit speed.
+    .. warning::
+
+        The ``breadth_first`` router **should NOT be used to compare the run-time/quality** of alternate routing algorithms.
+
+        It is inferrior to the ``timing_driven`` router from a circuit speed (2x - 10x slower) and run-time perspective (takes 10-100x longer on the large benchmarks).
+        The ``breadth_first`` router is deprecated and may be removed in a future release.
+
+    The ``breadth_first`` router :cite:`betz_arch_cad` focuses solely on routing a design successfully, while the ``timing_driven`` router :cite:`betz_arch_cad,murray_air` focuses both on achieving a successful route and achieving good circuit speed.
 
     The breadth-first router is capable of routing a design using slightly fewer tracks than the timing-driving router (typically 5% if the timing-driven router uses its default parameters.
     This can be reduced to about 2% if the router parameters are set so the timing-driven router pays more attention to routability and less to area).
@@ -884,7 +915,8 @@ The following options are only valid when the router is in timing-driven mode (t
     If the first routing iteration uses more than this fraction of available wirelength routing is aborted.
     
     **Default:** ``0.85``
-.. option:: --incremental_reroute_delay_ripup {on, off, auto}
+
+.. option:: --incremental_reroute_delay_ripup {on | off | auto}
 
     Controls whether incremental net routing will rip-up (and re-route) a critical connection for delay, even if the routing is legal.
     ``auto`` enables delay-based rip-up unless routability becomes a concern.
@@ -920,7 +952,7 @@ The following options are only valid when the router is in timing-driven mode (t
 
     **Default:** ``disable``
 
-.. option:: --save_routing_per_iteration {on, off}
+.. option:: --save_routing_per_iteration {on | off}
 
     Controls whether VPR saves the current routing to a file after each routing iteration.
     May be helpful for debugging.
@@ -1258,27 +1290,38 @@ Analysis Options
                There is no logical contradiction, but for clarification, it is best to see an explanation of the VPR coordinate system.
                The path can also be visualized by VPR graphics, as an illustration of this point:
 
-.. _fig_path_2:
+            .. _fig_path_2:
 
-.. figure:: path_2.*
- 
- Illustration of Path #2 with insight into the coordinate system.
+            .. figure:: path_2.*
+             
+             Illustration of Path #2 with insight into the coordinate system.
 
-:numref:`fig_path_2` shows the routing resources used in Path #2 and their locations on the FPGA.
+            :numref:`fig_path_2` shows the routing resources used in Path #2 and their locations on the FPGA.
 
-1. The signal emerges from near the top-right corner of the block to_FFC (OPIN:1479)  and joins the topmost horizontal segment of length 1 (CHANX:2073). 
+            1. The signal emerges from near the top-right corner of the block to_FFC (OPIN:1479)  and joins the topmost horizontal segment of length 1 (CHANX:2073). 
 
-2. The signal proceeds to the left, then connects to the outermost, blue vertical segment of length 0 (CHANY:2139). 
+            2. The signal proceeds to the left, then connects to the outermost, blue vertical segment of length 0 (CHANY:2139). 
 
-3. The signal continues downward and attaches to the horizontal segment of length 1 (CHANX:2040). 
+            3. The signal continues downward and attaches to the horizontal segment of length 1 (CHANX:2040). 
 
-4. Of the aforementioned horizontal segment, after travelling one linear unit to the right, the signal jumps on a vertical segment of length 0 (CHANY:2166).
+            4. Of the aforementioned horizontal segment, after travelling one linear unit to the right, the signal jumps on a vertical segment of length 0 (CHANY:2166).
 
-5. The signal travels upward and promptly connects to a horizontal segment of length 0 (CHANX:2076).
+            5. The signal travels upward and promptly connects to a horizontal segment of length 0 (CHANX:2076).
 
-6. This segment connects to the green destination io (3,4).
+            6. This segment connects to the green destination io (3,4).
+
+        * ``debug``: Like ``detailed``, but includes additional VPR internal debug information such as timing graph node IDs (``tnode``) and routing SOURCE/SINK nodes.
 
     **Default:** ``netlist``
+
+.. option:: --echo_dot_timing_graph_node { string | int }
+
+    Controls what subset of the timing graph is echoed to a GraphViz DOT file when :option:`vpr --echo_file` is enabled.
+
+    Value can be a string (corresponding to a VPR atom netlist pin name), or an integer representing a timing graph node ID.
+    Negative values mean the entire timing graph is dumped to the DOT file.
+
+    **Default:** ``-1``
 
 .. option:: --timing_report_skew { on | off }
 

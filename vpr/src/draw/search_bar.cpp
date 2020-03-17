@@ -2,7 +2,6 @@
 
 #    include <cstdio>
 #    include <sstream>
-using namespace std;
 
 #    include "vtr_assert.h"
 #    include "vtr_ndoffsetmatrix.h"
@@ -189,7 +188,7 @@ void auto_zoom_rr_node(int rr_node_id) {
         case OPIN: {
             int i = device_ctx.rr_nodes[rr_node_id].xlow();
             int j = device_ctx.rr_nodes[rr_node_id].ylow();
-            t_type_ptr type = device_ctx.grid[i][j].type;
+            t_physical_tile_type_ptr type = device_ctx.grid[i][j].type;
             int width_offset = device_ctx.grid[i][j].width_offset;
             int height_offset = device_ctx.grid[i][j].height_offset;
             int ipin = device_ctx.rr_nodes[rr_node_id].ptc_num();

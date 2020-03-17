@@ -20,7 +20,7 @@ import shlex
 import recommonmark
 
 sys.path.append(".")
-from markdown_code_symlinks import MarkdownCodeSymlinks
+from markdown_code_symlinks import LinkParser, MarkdownSymlinksDomain
 
 # Cool looking ReadTheDocs theme
 import sphinx_rtd_theme
@@ -55,6 +55,7 @@ from vtr_version import get_vtr_version, get_vtr_release
 extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
+    'notfound.extension',
     'sphinx_markdown_tables',
     'sdcdomain',
     'archdomain',
@@ -71,7 +72,7 @@ templates_path = []
 
 # Support rendering Markdown docs
 source_parsers = {
-   '.md': 'recommonmark.parser.CommonMarkParser',
+   '.md': 'markdown_code_symlinks.LinkParser',
 }
 
 # The suffix(es) of source filenames.
@@ -168,12 +169,12 @@ numfig = True
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = '_static/vtr_logo.svg'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+html_favicon = '_static/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -240,6 +241,10 @@ html_static_path = ['_static']
 # implements a search results scorer. If empty, the default will be used.
 #html_search_scorer = 'scorer.js'
 
+#If true, images itself links to the original image if it doesn’t have ‘target’
+#option or scale related options: ‘scale’, ‘width’, ‘height’.
+html_scaled_image_link = True
+
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Verilog-to-Routingdoc'
 
@@ -269,7 +274,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = '_static/vtr_logo.pdf'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -324,13 +329,34 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
+# -- Options for 404 page -------------------------------------------
+
+# sphinx-notfound-page
+# https://github.com/readthedocs/sphinx-notfound-page
+notfound_context = {
+    'title': 'Page Not Found',
+    'body': '''
+<h1>Page Not Found</h1>
+<p>Sorry, we couldn't find that page.</p>
+<p>Try using the search box or go to the homepage.</p>
+''',
+}
+
 def setup(app):
-    MarkdownCodeSymlinks.find_links()
+    github_code_repo = 'https://github.com/verilog-to-routing/vtr-verilog-to-routing/'
+    github_code_branch = 'blob/master/'
+
+    docs_root_dir = os.path.realpath(os.path.dirname(__file__))
+    code_root_dir = os.path.realpath(os.path.join(docs_root_dir, "..", ".."))
+
+    MarkdownSymlinksDomain.init_domain(github_code_repo, github_code_branch,
+        docs_root_dir, code_root_dir)
+    MarkdownSymlinksDomain.find_links()
+    app.add_domain(MarkdownSymlinksDomain)
     app.add_config_value(
         'recommonmark_config', {
-            'github_code_repo': 'https://github.com/verilog-to-routing/vtr-verilog-to-routing',
+            'github_code_repo': github_code_repo,
             'enable_math': True,
             'enable_inline_math': True,
         }, True)
-    app.add_transform(MarkdownCodeSymlinks)
     app.add_stylesheet('css/vtr.css')

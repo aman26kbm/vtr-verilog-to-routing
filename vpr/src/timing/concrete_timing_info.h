@@ -34,11 +34,17 @@ class ConcreteSetupTimingInfo : public SetupTimingInfo {
   public:
     //Accessors
     tatum::TimingPathInfo least_slack_critical_path() const override {
-        return find_least_slack_critical_path_delay(*timing_constraints_, *setup_analyzer_);
+        if (least_slack_critical_path_.type() == tatum::TimingType::UNKOWN) {
+            least_slack_critical_path_ = find_least_slack_critical_path_delay(*timing_constraints_, *setup_analyzer_);
+        }
+        return least_slack_critical_path_;
     }
 
     tatum::TimingPathInfo longest_critical_path() const override {
-        return find_longest_critical_path_delay(*timing_constraints_, *setup_analyzer_);
+        if (longest_critical_path_.type() == tatum::TimingType::UNKOWN) {
+            longest_critical_path_ = find_longest_critical_path_delay(*timing_constraints_, *setup_analyzer_);
+        }
+        return longest_critical_path_;
     }
 
     std::vector<tatum::TimingPathInfo> critical_paths() const override {
@@ -46,11 +52,17 @@ class ConcreteSetupTimingInfo : public SetupTimingInfo {
     }
 
     float setup_total_negative_slack() const override {
-        return find_setup_total_negative_slack(*setup_analyzer_);
+        if (std::isnan(sTNS_)) {
+            sTNS_ = find_setup_total_negative_slack(*setup_analyzer_);
+        }
+        return sTNS_;
     }
 
     float setup_worst_negative_slack() const override {
-        return find_setup_worst_negative_slack(*setup_analyzer_);
+        if (std::isnan(sWNS_)) {
+            sWNS_ = find_setup_worst_negative_slack(*setup_analyzer_);
+        }
+        return sWNS_;
     }
 
     float setup_pin_slack(AtomPinId pin) const override {
@@ -61,21 +73,15 @@ class ConcreteSetupTimingInfo : public SetupTimingInfo {
         return slack_crit_.setup_pin_criticality(pin);
     }
 
-    std::shared_ptr<const tatum::TimingAnalyzer> analyzer() const override {
-        return setup_analyzer();
-    }
+    std::shared_ptr<const tatum::TimingAnalyzer> analyzer() const override { return setup_analyzer(); }
 
-    std::shared_ptr<const tatum::TimingGraph> timing_graph() const override {
-        return timing_graph_;
-    }
+    std::shared_ptr<const tatum::SetupTimingAnalyzer> setup_analyzer() const override { return setup_analyzer_; }
 
-    std::shared_ptr<const tatum::TimingConstraints> timing_constraints() const override {
-        return timing_constraints_;
-    }
+    std::shared_ptr<const tatum::TimingGraph> timing_graph() const override { return timing_graph_; }
 
-    std::shared_ptr<const tatum::SetupTimingAnalyzer> setup_analyzer() const override {
-        return setup_analyzer_;
-    }
+    std::shared_ptr<const tatum::DelayCalculator> delay_calculator() const override { return delay_calc_; }
+
+    std::shared_ptr<const tatum::TimingConstraints> timing_constraints() const override { return timing_constraints_; }
 
   public:
     //Mutators
@@ -112,15 +118,17 @@ class ConcreteSetupTimingInfo : public SetupTimingInfo {
         timing_ctx.stats.sta_wallclock_time += sta_wallclock_time;
         timing_ctx.stats.slack_wallclock_time += slack_wallclock_time;
         timing_ctx.stats.num_full_setup_updates += 1;
+
+        clear_cache();
     }
 
     void update_setup_slacks() {
+        clear_cache();
         slack_crit_.update_slacks_and_criticalities(*timing_graph_, *setup_analyzer_);
     }
 
     void set_warn_unconstrained(bool val) override { warn_unconstrained_ = val; }
 
-  private:
   private:
     //Data
     std::shared_ptr<const tatum::TimingGraph> timing_graph_;
@@ -130,10 +138,24 @@ class ConcreteSetupTimingInfo : public SetupTimingInfo {
 
     SetupSlackCrit slack_crit_;
 
+    //Cached values
+    mutable float sTNS_ = std::numeric_limits<float>::quiet_NaN();
+    mutable float sWNS_ = std::numeric_limits<float>::quiet_NaN();
+    mutable tatum::TimingPathInfo least_slack_critical_path_;
+    mutable tatum::TimingPathInfo longest_critical_path_;
+
     bool warn_unconstrained_ = true;
 
     typedef std::chrono::duration<double> dsec;
     typedef std::chrono::high_resolution_clock Clock;
+
+    //Reset cached values to invalid (calculated lazily in accessors)
+    void clear_cache() {
+        sTNS_ = std::numeric_limits<float>::quiet_NaN();
+        sWNS_ = std::numeric_limits<float>::quiet_NaN();
+        least_slack_critical_path_ = tatum::TimingPathInfo();
+        longest_critical_path_ = tatum::TimingPathInfo();
+    }
 };
 
 template<class DelayCalc>
@@ -173,6 +195,7 @@ class ConcreteHoldTimingInfo : public HoldTimingInfo {
     std::shared_ptr<const tatum::TimingAnalyzer> analyzer() const override { return hold_analyzer(); }
     std::shared_ptr<const tatum::HoldTimingAnalyzer> hold_analyzer() const override { return hold_analyzer_; }
     std::shared_ptr<const tatum::TimingGraph> timing_graph() const override { return timing_graph_; }
+    std::shared_ptr<const tatum::DelayCalculator> delay_calculator() const override { return delay_calc_; }
     std::shared_ptr<const tatum::TimingConstraints> timing_constraints() const override { return timing_constraints_; }
 
   public:
@@ -276,10 +299,8 @@ class ConcreteSetupHoldTimingInfo : public SetupHoldTimingInfo {
 
     //TimingInfo related
     std::shared_ptr<const tatum::TimingAnalyzer> analyzer() const override { return setup_hold_analyzer(); }
-    std::shared_ptr<const tatum::TimingGraph> timing_graph() const override {
-        return setup_timing_.timing_graph();
-        ;
-    }
+    std::shared_ptr<const tatum::TimingGraph> timing_graph() const override { return setup_timing_.timing_graph(); }
+    std::shared_ptr<const tatum::DelayCalculator> delay_calculator() const override { return setup_timing_.delay_calculator(); }
     std::shared_ptr<const tatum::TimingConstraints> timing_constraints() const override { return setup_timing_.timing_constraints(); }
 
   public:
@@ -382,10 +403,8 @@ class ConstantTimingInfo : public SetupHoldTimingInfo {
 
     //TimingInfo related
     std::shared_ptr<const tatum::TimingAnalyzer> analyzer() const override { return nullptr; }
-    std::shared_ptr<const tatum::TimingGraph> timing_graph() const override {
-        return nullptr;
-        ;
-    }
+    std::shared_ptr<const tatum::TimingGraph> timing_graph() const override { return nullptr; }
+    std::shared_ptr<const tatum::DelayCalculator> delay_calculator() const override { return nullptr; }
     std::shared_ptr<const tatum::TimingConstraints> timing_constraints() const override { return nullptr; }
 
     void set_warn_unconstrained(bool /*val*/) override {}

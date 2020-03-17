@@ -59,35 +59,35 @@ void ShowSetup(const t_vpr_setup& vpr_setup) {
 }
 
 void printClusteredNetlistStats() {
-    int i, j, L_num_p_inputs, L_num_p_outputs;
-    int* num_blocks_type;
-
     auto& device_ctx = g_vpr_ctx.device();
     auto& cluster_ctx = g_vpr_ctx.clustering();
 
-    num_blocks_type = (int*)vtr::calloc(device_ctx.num_block_types, sizeof(int));
+    int j, L_num_p_inputs, L_num_p_outputs;
+    std::vector<int> num_blocks_type(device_ctx.logical_block_types.size(), 0);
 
     VTR_LOG("\n");
     VTR_LOG("Netlist num_nets: %d\n", (int)cluster_ctx.clb_nlist.nets().size());
     VTR_LOG("Netlist num_blocks: %d\n", (int)cluster_ctx.clb_nlist.blocks().size());
 
-    for (i = 0; i < device_ctx.num_block_types; i++) {
-        num_blocks_type[i] = 0;
-    }
     /* Count I/O input and output pads */
     L_num_p_inputs = 0;
     L_num_p_outputs = 0;
 
     for (auto blk_id : cluster_ctx.clb_nlist.blocks()) {
-        num_blocks_type[cluster_ctx.clb_nlist.block_type(blk_id)->index]++;
-        auto type = cluster_ctx.clb_nlist.block_type(blk_id);
-        if (is_io_type(type)) {
-            for (j = 0; j < type->num_pins; j++) {
+        auto logical_block = cluster_ctx.clb_nlist.block_type(blk_id);
+        auto physical_tile = pick_best_physical_type(logical_block);
+        num_blocks_type[logical_block->index]++;
+        if (is_io_type(physical_tile)) {
+            for (j = 0; j < logical_block->pb_type->num_pins; j++) {
+                int physical_pin = get_physical_pin(physical_tile, logical_block, j);
+                auto pin_class = physical_tile->pin_class[physical_pin];
+                auto class_inf = physical_tile->class_inf[pin_class];
+
                 if (cluster_ctx.clb_nlist.block_net(blk_id, j) != ClusterNetId::INVALID()) {
-                    if (type->class_inf[type->pin_class[j]].type == DRIVER) {
+                    if (class_inf.type == DRIVER) {
                         L_num_p_inputs++;
                     } else {
-                        VTR_ASSERT(type->class_inf[type->pin_class[j]].type == RECEIVER);
+                        VTR_ASSERT(class_inf.type == RECEIVER);
                         L_num_p_outputs++;
                     }
                 }
@@ -95,15 +95,15 @@ void printClusteredNetlistStats() {
         }
     }
 
-    for (i = 0; i < device_ctx.num_block_types; i++) {
-        VTR_LOG("Netlist %s blocks: %d.\n", device_ctx.block_types[i].name, num_blocks_type[i]);
+    for (const auto& type : device_ctx.logical_block_types) {
+        VTR_LOG("Netlist %s blocks: %d.\n", type.name, num_blocks_type[type.index]);
     }
 
     /* Print out each block separately instead */
     VTR_LOG("Netlist inputs pins: %d\n", L_num_p_inputs);
     VTR_LOG("Netlist output pins: %d\n", L_num_p_outputs);
     VTR_LOG("\n");
-    free(num_blocks_type);
+    num_blocks_type.clear();
 }
 
 static void ShowRoutingArch(const t_det_routing_arch& RoutingArch) {
@@ -190,9 +190,6 @@ static void ShowRouterOpts(const t_router_opts& RouterOpts) {
             case TIMING_DRIVEN:
                 VTR_LOG("TIMING_DRIVEN\n");
                 break;
-            case NO_TIMING:
-                VTR_LOG("NO_TIMING\n");
-                break;
             default:
                 VPR_FATAL_ERROR(VPR_ERROR_UNKNOWN, "<Unknown>\n");
         }
@@ -213,6 +210,9 @@ static void ShowRouterOpts(const t_router_opts& RouterOpts) {
                 break;
             case DEMAND_ONLY:
                 VTR_LOG("DEMAND_ONLY\n");
+                break;
+            case DEMAND_ONLY_NORMALIZED_LENGTH:
+                VTR_LOG("DEMAND_ONLY_NORMALIZED_LENGTH\n");
                 break;
             default:
                 VPR_FATAL_ERROR(VPR_ERROR_UNKNOWN, "Unknown base_cost_type\n");
@@ -266,9 +266,6 @@ static void ShowRouterOpts(const t_router_opts& RouterOpts) {
                 break;
             case TIMING_DRIVEN:
                 VTR_LOG("TIMING_DRIVEN\n");
-                break;
-            case NO_TIMING:
-                VTR_LOG("NO_TIMING\n");
                 break;
             default:
                 VTR_LOG_ERROR("Unknown router algorithm\n");

@@ -13,7 +13,6 @@
 #include <chrono>
 #include <cmath>
 #include <sstream>
-using namespace std;
 
 #include "vtr_assert.h"
 #include "vtr_math.h"
@@ -217,6 +216,7 @@ void vpr_init_with_options(const t_options* options, t_vpr_setup* vpr_setup, t_a
     vpr_setup->device_layout = options->device_layout;
     vpr_setup->constant_net_method = options->constant_net_method;
     vpr_setup->clock_modeling = options->clock_modeling;
+    vpr_setup->two_stage_clock_routing = options->two_stage_clock_routing;
     vpr_setup->exit_before_pack = options->exit_before_pack;
 
     VTR_LOG("\n");
@@ -401,7 +401,7 @@ void vpr_create_device_grid(const t_vpr_setup& vpr_setup, const t_arch& Arch) {
      */
 
     //Record the resource requirement
-    std::map<t_type_ptr, size_t> num_type_instances;
+    std::map<t_logical_block_type_ptr, size_t> num_type_instances;
     for (auto blk_id : cluster_ctx.clb_nlist.blocks()) {
         num_type_instances[cluster_ctx.clb_nlist.block_type(blk_id)]++;
     }
@@ -418,24 +418,35 @@ void vpr_create_device_grid(const t_vpr_setup& vpr_setup, const t_arch& Arch) {
 
     VTR_LOG("\n");
     VTR_LOG("Resource usage...\n");
-    for (int i = 0; i < device_ctx.num_block_types; ++i) {
-        auto type = &device_ctx.block_types[i];
-        VTR_LOG("\tNetlist      %d\tblocks of type: %s\n",
-                num_type_instances[type], type->name);
-        VTR_LOG("\tArchitecture %d\tblocks of type: %s\n",
-                device_ctx.grid.num_instances(type), type->name);
+    for (const auto& type : device_ctx.logical_block_types) {
+        if (is_empty_type(&type)) continue;
+
+        VTR_LOG("\tNetlist\n\t\t%d\tblocks of type: %s\n",
+                num_type_instances[&type], type.name);
+
+        VTR_LOG("\tArchitecture\n");
+        for (const auto equivalent_tile : type.equivalent_tiles) {
+            VTR_LOG("\t\t%d\tblocks of type: %s\n",
+                    device_ctx.grid.num_instances(equivalent_tile), equivalent_tile->name);
+        }
     }
     VTR_LOG("\n");
 
     float device_utilization = calculate_device_utilization(device_ctx.grid, num_type_instances);
     VTR_LOG("Device Utilization: %.2f (target %.2f)\n", device_utilization, target_device_utilization);
-    for (int i = 0; i < device_ctx.num_block_types; ++i) {
-        auto type = &device_ctx.block_types[i];
-        float util = 0.;
-        if (device_ctx.grid.num_instances(type) != 0) {
-            util = float(num_type_instances[type]) / device_ctx.grid.num_instances(type);
+    for (const auto& type : device_ctx.physical_tile_types) {
+        if (is_empty_type(&type)) {
+            continue;
         }
-        VTR_LOG("\tBlock Utilization: %.2f Type: %s\n", util, type->name);
+
+        if (device_ctx.grid.num_instances(&type) != 0) {
+            float util = 0.;
+            VTR_LOG("\tPhysical Tile %s:\n", type.name);
+            for (auto logical_block : type.equivalent_sites) {
+                util = float(num_type_instances[logical_block]) / device_ctx.grid.num_instances(&type);
+                VTR_LOG("\tBlock Utilization: %.2f Logical Block: %s\n", util, logical_block->name);
+            }
+        }
     }
     VTR_LOG("\n");
 
@@ -591,6 +602,16 @@ bool vpr_place_flow(t_vpr_setup& vpr_setup, const t_arch& arch) {
 }
 
 void vpr_place(t_vpr_setup& vpr_setup, const t_arch& arch) {
+    if (placer_needs_lookahead(vpr_setup)) {
+        // Prime lookahead cache to avoid adding lookahead computation cost to
+        // the placer timer.
+        get_cached_router_lookahead(
+            vpr_setup.RouterOpts.lookahead_type,
+            vpr_setup.RouterOpts.write_router_lookahead,
+            vpr_setup.RouterOpts.read_router_lookahead,
+            vpr_setup.Segments);
+    }
+
     vtr::ScopedStartFinishTimer timer("Placement");
 
     try_place(vpr_setup.PlacerOpts,
@@ -720,6 +741,16 @@ RouteStatus vpr_route_fixed_W(t_vpr_setup& vpr_setup,
                               std::shared_ptr<SetupHoldTimingInfo> timing_info,
                               std::shared_ptr<RoutingDelayCalculator> delay_calc,
                               vtr::vector<ClusterNetId, float*>& net_delay) {
+    if (router_needs_lookahead(vpr_setup.RouterOpts.router_algorithm)) {
+        // Prime lookahead cache to avoid adding lookahead computation cost to
+        // the routing timer.
+        get_cached_router_lookahead(
+            vpr_setup.RouterOpts.lookahead_type,
+            vpr_setup.RouterOpts.write_router_lookahead,
+            vpr_setup.RouterOpts.read_router_lookahead,
+            vpr_setup.Segments);
+    }
+
     vtr::ScopedStartFinishTimer timer("Routing");
 
     if (NO_FIXED_CHANNEL_WIDTH == fixed_channel_width || fixed_channel_width <= 0) {
@@ -746,6 +777,9 @@ RouteStatus vpr_route_min_W(t_vpr_setup& vpr_setup,
                             std::shared_ptr<SetupHoldTimingInfo> timing_info,
                             std::shared_ptr<RoutingDelayCalculator> delay_calc,
                             vtr::vector<ClusterNetId, float*>& net_delay) {
+    // Note that lookahead cache is not primed here because
+    // binary_search_place_and_route will change the channel width, and result
+    // in the lookahead cache being recomputed.
     vtr::ScopedStartFinishTimer timer("Routing");
 
     auto& router_opts = vpr_setup.RouterOpts;
@@ -814,8 +848,7 @@ void vpr_create_rr_graph(t_vpr_setup& vpr_setup, const t_arch& arch, int chan_wi
 
     //Create the RR graph
     create_rr_graph(graph_type,
-                    device_ctx.num_block_types,
-                    device_ctx.block_types,
+                    device_ctx.physical_tile_types,
                     device_ctx.grid,
                     chan_width,
                     device_ctx.num_arch_switches,
@@ -825,9 +858,10 @@ void vpr_create_rr_graph(t_vpr_setup& vpr_setup, const t_arch& arch, int chan_wi
                     router_opts.trim_empty_channels,
                     router_opts.trim_obs_channels,
                     router_opts.clock_modeling,
-                    router_opts.lookahead_type,
                     arch.Directs, arch.num_directs,
-                    &warnings);
+                    &warnings,
+                    router_opts.read_rr_edge_metadata,
+                    router_opts.do_check_rr_graph);
     //Initialize drawing, now that we have an RR graph
     init_draw_coords(chan_width_fac);
 }
@@ -871,7 +905,7 @@ static void get_intercluster_switch_fanin_estimates(const t_vpr_setup& vpr_setup
     //Build a dummy 10x10 device to determine the 'best' block type to use
     auto grid = create_device_grid(vpr_setup.device_layout, arch.grid_layouts, 10, 10);
 
-    auto type = find_most_common_block_type(grid);
+    auto type = find_most_common_tile_type(grid);
     /* get Fc_in/out for most common block (e.g. logic blocks) */
     VTR_ASSERT(type->fc_specs.size() > 0);
 
@@ -961,7 +995,8 @@ void free_device(const t_det_routing_arch& routing_arch) {
 static void free_complex_block_types() {
     auto& device_ctx = g_vpr_ctx.mutable_device();
 
-    free_type_descriptors(device_ctx.block_types, device_ctx.num_block_types);
+    free_type_descriptors(device_ctx.logical_block_types);
+    free_type_descriptors(device_ctx.physical_tile_types);
     free_pb_graph_edges();
 }
 
@@ -1045,7 +1080,7 @@ void vpr_setup_vpr(t_options* Options,
                    t_router_opts* RouterOpts,
                    t_analysis_opts* AnalysisOpts,
                    t_det_routing_arch* RoutingArch,
-                   vector<t_lb_type_rr_node>** PackerRRGraph,
+                   std::vector<t_lb_type_rr_node>** PackerRRGraph,
                    std::vector<t_segment_inf>& Segments,
                    t_timing_inf* Timing,
                    bool* ShowGraphics,
@@ -1129,14 +1164,6 @@ void vpr_analysis(t_vpr_setup& vpr_setup, const t_arch& Arch, const RouteStatus&
         VPR_FATAL_ERROR(VPR_ERROR_ANALYSIS, "No routing loaded -- can not perform post-routing analysis");
     }
 
-    vtr::vector<ClusterNetId, float*> net_delay;
-    vtr::t_chunk net_delay_ch;
-    if (vpr_setup.TimingEnabled) {
-        //Load the net delays
-        net_delay = alloc_net_delay(&net_delay_ch);
-        load_net_delay_from_routing(net_delay);
-    }
-
     routing_stats(vpr_setup.RouterOpts.full_stats, vpr_setup.RouterOpts.route_type,
                   vpr_setup.Segments,
                   vpr_setup.RoutingArch.R_minW_nmos,
@@ -1146,6 +1173,13 @@ void vpr_analysis(t_vpr_setup& vpr_setup, const t_arch& Arch, const RouteStatus&
                   vpr_setup.RoutingArch.wire_to_rr_ipin_switch);
 
     if (vpr_setup.TimingEnabled) {
+        vtr::vector<ClusterNetId, float*> net_delay;
+        vtr::t_chunk net_delay_ch;
+
+        //Load the net delays
+        net_delay = alloc_net_delay(&net_delay_ch);
+        load_net_delay_from_routing(net_delay);
+
         //Do final timing analysis
         auto analysis_delay_calc = std::make_shared<AnalysisDelayCalculator>(atom_ctx.nlist, atom_ctx.lookup, net_delay);
         auto timing_info = make_setup_hold_timing_info(analysis_delay_calc);
@@ -1180,9 +1214,9 @@ void vpr_analysis(t_vpr_setup& vpr_setup, const t_arch& Arch, const RouteStatus&
 }
 
 /* This function performs power estimation. It relies on the
- * placement/routing results, as well as the critical path. 
+ * placement/routing results, as well as the critical path.
  * Power estimation can be performed as part of a full or
- * partial flow. More information on the power estimation functions of 
+ * partial flow. More information on the power estimation functions of
  * VPR can be found here:
  *   http://docs.verilogtorouting.org/en/latest/vtr/power_estimation/
  */

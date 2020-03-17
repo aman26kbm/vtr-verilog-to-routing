@@ -395,7 +395,7 @@
  * Currently, the AtomNetlist and ClusteredNetlist are both derived from Netlist. The AtomNetlist has primitive
  * specific details (t_model, TruthTable), and handles all operations with the atoms. The ClusteredNetlist
  * contains information on the CLB (Clustered Logic Block) level, which includes the physical description of the
- * blocks (t_type_descriptor), as well as the internal hierarchy and wiring (t_pb/t_pb_route).
+ * blocks (t_logical_block_type), as well as the internal hierarchy and wiring (t_pb/t_pb_route).
  *
  * The calling-conventions of the functions in the AtomNetlist and ClusteredNetlist is as follows:
  *
@@ -696,6 +696,11 @@ class Netlist {
     //  port_id : The ID of the associated port
     //  port_bit: The bit index of the pin in the port
     PinId find_pin(const PortId port_id, BitIndex port_bit) const;
+
+    //Returns the PinId of the specified pin or PinId::INVALID() if not found
+    //NOTE: this method is SLOW, O(num_pins) -- avoid if possible
+    //  name : The name of the pin
+    PinId find_pin(const std::string name) const;
 
   public: //Public Mutators
     //Add the specified pin to the specified net as pin_type. Automatically removes

@@ -48,7 +48,7 @@ using connect_g_objects_fn = void (*)(application *app);
 /**
  * The signature of a setup callback function
  */
-using setup_callback_fn = void (*)(application *app);
+using setup_callback_fn = void (*)(application *app, bool new_window);
 
 /**
  * The signature of a button callback function
@@ -96,6 +96,15 @@ public:
     std::string canvas_identifier;
 
     /**
+     * A user-defined name of the GTK application
+     *
+     * Application identifiers should follow the following format:
+     * https://developer.gnome.org/gio/stable/GApplication.html#g-application-id-is-valid
+     * Use g_application_id_is_valid () to check its validity
+     */
+    std::string application_identifier;
+
+    /**
      * Specify the function that will connect GUI objects to user-defined callbacks.
      *
      * GUI objects (i.e., a GObject) can be retrieved from this application object. These objects can then be connected
@@ -112,15 +121,18 @@ public:
      * Create the settings structure with default values
      */
     settings()
-    : main_ui_resource("/ezgl/main.ui"), window_identifier("MainWindow"), canvas_identifier("MainCanvas"), setup_callbacks(nullptr)
+    : main_ui_resource("/ezgl/main.ui"), window_identifier("MainWindow"), canvas_identifier("MainCanvas"), application_identifier("ezgl.app"),
+      setup_callbacks(nullptr)
     {
     }
 
     /**
      * Create the settings structure with user-defined values
      */
-    settings(std::string m_resource, std::string w_identifier, std::string c_identifier, connect_g_objects_fn s_callbacks = nullptr)
-    : main_ui_resource(m_resource), window_identifier(w_identifier), canvas_identifier(c_identifier), setup_callbacks(s_callbacks)
+    settings(std::string m_resource, std::string w_identifier, std::string c_identifier, std::string a_identifier = "ezgl.app",
+        connect_g_objects_fn s_callbacks = nullptr)
+    : main_ui_resource(m_resource), window_identifier(w_identifier), canvas_identifier(c_identifier), application_identifier(a_identifier),
+      setup_callbacks(s_callbacks)
     {
     }
   };
@@ -225,16 +237,14 @@ public:
   void refresh_drawing();
 
   /**
-   * Get a temporary renderer that can be used to draw on top of the main canvas
-   *
-   * The returned renderer should be used only in the same callback in which this function is called
+   * Get a renderer that can be used to draw on top of the main canvas
    */
-  renderer get_renderer();
+  renderer *get_renderer();
 
   /**
    * Flush the drawings done by the renderer, returned from get_renderer(), to the on-screen buffer
    *
-   * The flushing is done after returning to the GTK event loop
+   * The flushing is done immediately
    */
   void flush_drawing();
 
@@ -342,6 +352,9 @@ private:
   // The ID of the main canvas
   std::string m_canvas_id;
 
+  // The ID of the GTK application
+  std::string m_application_id;
+
   // The GTK application.
   GtkApplication *m_application;
 
@@ -356,6 +369,9 @@ private:
 
   // A flag that indicates if the run() was called before or not to allow multiple reruns
   bool first_run;
+
+  // A flag that indicates if we are resuming an older run to allow proper quitting
+  bool resume_run;
 
 private:
   // Called when our GtkApplication is initialized for the first time.

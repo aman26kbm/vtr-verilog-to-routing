@@ -22,19 +22,19 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
-#include <stdio.h>
-#include <string.h>
 #include "odin_error.h"
 #include "odin_types.h"
 #include "odin_util.h"
 #include "odin_globals.h"
 #include "verilog_bison.h"
 #include "vtr_util.h"
+#include "scope_util.h"
+
+#include <stdio.h>
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "string.h"
+#include <string.h>
 
 #define RECURSIVE_LIMIT 256
 
@@ -107,16 +107,18 @@ vDEC [Dd][_]*[[:digit:]][[:digit:]_]*
 vHEX [Hh][_]*[ZzXx[:xdigit:]][ZzXx[:xdigit:]_]*
 vINT [[:digit:]][[:digit:]_]*
 vWORD [[:alpha:]_][[:alnum:]_$]*
+defineWORD [[:alnum:]_$]+
 vSTRING ["][^"]*["]  
 vPUNCT 	[\?\:\|\^\&\<\>\-\*\/\%\(\)\{\}\[\]\~\!\;\#\,\.\@\=\+]
 
-%%	
+%%
+
 	/* preproc helpers */
 <VAR_PARSE>{vWORD}					{ MP(); add_args_to_define(yytext); }
 <VAR_PARSE>[\,]						{  }
 <VAR_PARSE>[\)]						{ CHANGE_STATE(DEFINE_BODY); }
-<PARSE_DEFINE>{vWORD}[\(]			{ MP(); new_define_t(yytext); CHANGE_STATE(VAR_PARSE);}
-<PARSE_DEFINE>{vWORD}				{ MP(); new_define_t(yytext); CHANGE_STATE(DEFINE_BODY);}
+<PARSE_DEFINE>{defineWORD}[\(]		{ MP(); new_define_t(yytext); CHANGE_STATE(VAR_PARSE);}
+<PARSE_DEFINE>{defineWORD}			{ MP(); new_define_t(yytext); CHANGE_STATE(DEFINE_BODY);}
 <INITIAL>"`define"					{ MP(); PUSH_STATE(PARSE_DEFINE); }
 
 <DEFINE_REMOVAL>{vWORD}				{ MP(); defines_map.erase(yytext); POP_STATE();}
@@ -165,21 +167,32 @@ vPUNCT 	[\?\:\|\^\&\<\>\-\*\/\%\(\)\{\}\[\]\~\!\;\#\,\.\@\=\+]
 <INITIAL>[\`]{vWORD}[\(]			{ MP(); load_define(yytext); PUSH_STATE(DEFINE_ARGS); }
 <INITIAL>[\`]{vWORD}				{ MP(); lex_string(get_simple_define(yytext).c_str());}
 
+
+	/* Begin Scoped items */
+<INITIAL>"begin"					{ MP(); push_scope(); return vBEGIN;}
+<INITIAL>"function"					{ MP(); push_scope(); return vFUNCTION;}
+<INITIAL>"module"					{ MP(); push_scope(); return vMODULE;}
+<INITIAL>"macromodule"				{ MP(); push_scope(); return vMODULE;}
+<INITIAL>"task"						{ MP(); push_scope(); return vTASK;}
+
+	/* End Scoped items */
+<INITIAL>"end"						{ MP(); return vEND;}
+<INITIAL>"endfunction"				{ MP(); return vENDFUNCTION;}
+<INITIAL>"endmodule"				{ MP(); return vENDMODULE;}
+<INITIAL>"endtask"					{ MP(); return vENDTASK;}
+
 	/*	Keywords	*/
 <INITIAL>"always"					{ MP(); return vALWAYS;}
 <INITIAL>"and"						{ MP(); return vAND;}
 <INITIAL>"assign"					{ MP(); return vASSIGN;}
-<INITIAL>"begin"					{ MP(); return vBEGIN;}
+<INITIAL>"automatic"				{ MP(); return vAUTOMATIC;}
 <INITIAL>"case"						{ MP(); return vCASE;}
 <INITIAL>"default"					{ MP(); return vDEFAULT;}
 <INITIAL>"defparam"					{ MP(); return vDEFPARAM;}
 <INITIAL>"else"						{ MP(); return vELSE;}
-<INITIAL>"end"						{ MP(); return vEND;}
 <INITIAL>"endcase"					{ MP(); return vENDCASE;}
-<INITIAL>"endfunction"				{ MP(); return vENDFUNCTION;}
-<INITIAL>"endgenerate"				{ MP(); return vENDGENERATE;}
-<INITIAL>"endmodule"				{ MP(); return vENDMODULE;}
 <INITIAL>"endspecify"				{ MP(); return vENDSPECIFY;}
+<INITIAL>"endgenerate"				{ MP(); return vENDGENERATE;}
 <INITIAL>"for"						{ MP(); return vFOR;}
 <INITIAL>"if"						{ MP(); return vIF;}
 <INITIAL>"initial"					{ MP(); return vINITIAL;}
@@ -188,8 +201,6 @@ vPUNCT 	[\?\:\|\^\&\<\>\-\*\/\%\(\)\{\}\[\]\~\!\;\#\,\.\@\=\+]
 <INITIAL>"integer"					{ MP(); return vINTEGER;}
 <INITIAL>"generate"					{ MP(); return vGENERATE;}
 <INITIAL>"genvar"					{ MP(); return vGENVAR;}
-<INITIAL>"module"					{ MP(); return vMODULE;}
-<INITIAL>"function"					{ MP(); return vFUNCTION;}
 <INITIAL>"nand"						{ MP(); return vNAND;}
 <INITIAL>"negedge"					{ MP(); return vNEGEDGE;}
 <INITIAL>"nor"						{ MP(); return vNOR;}
@@ -204,8 +215,8 @@ vPUNCT 	[\?\:\|\^\&\<\>\-\*\/\%\(\)\{\}\[\]\~\!\;\#\,\.\@\=\+]
 <INITIAL>"while"					{ MP(); return vWHILE;}
 <INITIAL>"xnor"						{ MP(); return vXNOR;}
 <INITIAL>"xor"						{ MP(); return vXOR;}
-<INITIAL>"macromodule"				{ MP(); return vMODULE;}
 <INITIAL>"specparam"				{ MP(); return vSPECPARAM;}
+<INITIAL>"buf"				        { MP(); return vBUF;}
 
 	/* Net types */
 <INITIAL>"wire"						{ MP(); return netWIRE;}
@@ -222,13 +233,11 @@ vPUNCT 	[\?\:\|\^\&\<\>\-\*\/\%\(\)\{\}\[\]\~\!\;\#\,\.\@\=\+]
 <INITIAL>"reg"						{ MP(); return netREG;}
 
 	/*	unsupported Keywords		*/
-<INITIAL>"automatic"				{ UNSUPPORTED_TOKEN;}
 <INITIAL>"buf"						{ UNSUPPORTED_TOKEN;}
 <INITIAL>"casex"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"casez"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"disable"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"edge"						{ UNSUPPORTED_TOKEN;}
-<INITIAL>"endtask"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"scalared"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"bufif0"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"bufif1"					{ UNSUPPORTED_TOKEN;}
@@ -268,7 +277,6 @@ vPUNCT 	[\?\:\|\^\&\<\>\-\*\/\%\(\)\{\}\[\]\~\!\;\#\,\.\@\=\+]
 <INITIAL>"supply0"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"supply1"					{ UNSUPPORTED_TOKEN;}
 <INITIAL>"table"					{ UNSUPPORTED_TOKEN;}
-<INITIAL>"task"						{ UNSUPPORTED_TOKEN;}
 <INITIAL>"time"						{ UNSUPPORTED_TOKEN;}
 <INITIAL>"tran"						{ UNSUPPORTED_TOKEN;}
 <INITIAL>"tranif0"					{ UNSUPPORTED_TOKEN;}
@@ -327,7 +335,7 @@ vPUNCT 	[\?\:\|\^\&\<\>\-\*\/\%\(\)\{\}\[\]\~\!\;\#\,\.\@\=\+]
 <INITIAL>[[:digit:]]*'[sS]?{vDEC}	{ MP(); yylval.num_value = vtr::strdup(yytext); return vNUMBER; }
 
 	/*	operands	*/
-<INITIAL>{vWORD}					{ MP(); yylval.id_name = vtr::strdup(yytext); return vSYMBOL_ID; }
+<INITIAL>{vWORD}(\.{vWORD})*		{ MP(); yylval.id_name = vtr::strdup(yytext); return vSYMBOL_ID; }
 
 	/* return operators */
 <INITIAL>{vPUNCT}					{ MP(); return yytext[0]; }
@@ -602,7 +610,7 @@ bool pop_include()
 		current_parse_file = -1;
 	}
 
-	if(has_current_parse_file())
+	if(has_current_parse_file() && current_parse_file >= 0)
 	{
 		my_yylineno = include_file_names[current_parse_file].second;
 
@@ -641,7 +649,8 @@ void new_define_t(const char* id)
 	
 	if(defines_map.find(tmp) != defines_map.end())
 	{
-		warning_message(PARSE_ERROR, my_yylineno, current_parse_file, "%s defined more than once", id);
+		warning_message(PARSE_ERROR, my_yylineno, current_parse_file, "%s is redefined, overwritting its value", id);
+		delete defines_map[tmp];	
 	}
 
 	defines_map[tmp] = new_define;
@@ -664,32 +673,35 @@ std::string get_simple_define(const char *str)
 
 std::string get_complex_define()
 {
-	if( current_args.size() != current_define->args.size())
+	if(current_define)
 	{
-		error_message(PARSE_ERROR, my_yylineno, current_parse_file, 
-			"define is being used with wrong number of arguments, Expected %d, got %d", 
-			current_args.size(), 
-			current_define->args.size());
-	}
-
-	for(int i=0; i<current_define->args.size(); i++)
-	{
-		std::string original_arg = current_define->args[i];
-		std::string replacement_arg = current_args[i];
-
-		size_t pos = current_define_body.find( original_arg, 0 );
-		while ( pos != std::string::npos )
+		if( current_args.size() != current_define->args.size())
 		{
-			current_define_body.erase(pos, original_arg.size());
-			current_define_body.insert( pos, replacement_arg );
-			pos += replacement_arg.size();
-			pos = current_define_body.find( replacement_arg, pos );
+			error_message(PARSE_ERROR, my_yylineno, current_parse_file, 
+				"define is being used with wrong number of arguments, Expected %ld, got %ld", 
+				current_args.size(), 
+				current_define->args.size());
 		}
-	}
 
-	if(configuration.print_parse_tokens )
-	{
-		printf("DEFINE = %s\n",  current_define_body.c_str());
+		for(int i=0; i<current_define->args.size(); i++)
+		{
+			std::string original_arg = current_define->args[i];
+			std::string replacement_arg = current_args[i];
+
+			size_t pos = current_define_body.find( original_arg, 0 );
+			while ( pos != std::string::npos )
+			{
+				current_define_body.erase(pos, original_arg.size());
+				current_define_body.insert( pos, replacement_arg );
+				pos += replacement_arg.size();
+				pos = current_define_body.find( replacement_arg, pos );
+			}
+		}
+
+		if(configuration.print_parse_tokens )
+		{
+			printf("DEFINE = %s\n",  current_define_body.c_str());
+		}
 	}
 	return current_define_body;
 }
@@ -712,25 +724,45 @@ void define_arg_push_back(char c)
 void load_define(const char *str)
 {
 	std::string tmp(str);
-	if(tmp[0] == '`')
-	{
-		tmp.erase(0,1);
-	}
 
-	if(tmp.back() == '(')
-	{
-		tmp.pop_back();
-	}
-
-	auto itter = defines_map.find(tmp);
-	if(itter == defines_map.end())
-	{
-		error_message(PARSE_ERROR, my_yylineno, current_parse_file, "%s define cannot be found", tmp.c_str());
-	}
-
-	current_define = itter->second;
-	current_define_body = current_define->body;
+	current_define = NULL;
+	current_define_body = "";
 	current_args = std::vector<std::string>();
+
+	// compiler specific macros
+	if(tmp == "`__LINE__") 
+	{
+		current_define_body = std::to_string(my_yylineno);
+	}
+	else if (tmp == "`__FILE__")
+	{
+		current_define_body = std::string(configuration.list_of_file_names[current_parse_file]);
+	}
+	else
+	{
+		if(tmp[0] == '`')
+		{
+			tmp.erase(0,1);
+		}
+
+		if(tmp.back() == '(')
+		{
+			tmp.pop_back();
+		}
+
+		auto itter = defines_map.find(tmp);
+		if(itter == defines_map.end())
+		{
+			warning_message(PARSE_ERROR, my_yylineno, current_parse_file, 
+				"%s define cannot be found, replacing with empty string and continuing synthesis", 
+				tmp.c_str());
+		}
+		else
+		{
+			current_define = itter->second;
+			current_define_body = current_define->body;
+		}
+	}
 }
 
 void append_to_define_body(char c)
