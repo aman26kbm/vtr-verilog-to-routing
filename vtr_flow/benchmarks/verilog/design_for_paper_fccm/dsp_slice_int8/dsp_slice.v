@@ -1,4 +1,4 @@
-`define DWIDTH 16
+`define DWIDTH 8
 module dsp_slice(
         clk,
         reset,
