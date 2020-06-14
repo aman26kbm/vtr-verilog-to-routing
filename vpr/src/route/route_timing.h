@@ -10,7 +10,7 @@
 #include "router_stats.h"
 #include "router_lookahead.h"
 #include "spatial_route_tree_lookup.h"
-#include "connection_router.h"
+#include "connection_router_interface.h"
 #include "heap_type.h"
 
 int get_max_pins_per_net();
@@ -18,12 +18,13 @@ int get_max_pins_per_net();
 bool try_timing_driven_route(const t_router_opts& router_opts,
                              const t_analysis_opts& analysis_opts,
                              const std::vector<t_segment_inf>& segment_inf,
-                             vtr::vector<ClusterNetId, float*>& net_delay,
+                             ClbNetPinsMatrix<float>& net_delay,
                              const ClusteredPinAtomPinsLookup& netlist_pin_lookup,
                              std::shared_ptr<SetupHoldTimingInfo> timing_info,
                              std::shared_ptr<RoutingDelayCalculator> delay_calc,
                              ScreenUpdatePriority first_iteration_priority);
 
+template<typename ConnectionRouter>
 bool try_timing_driven_route_net(ConnectionRouter& router,
                                  ClusterNetId net_id,
                                  int itry,
@@ -33,12 +34,14 @@ bool try_timing_driven_route_net(ConnectionRouter& router,
                                  RouterStats& connections_routed,
                                  float* pin_criticality,
                                  t_rt_node** rt_node_of_sink,
-                                 vtr::vector<ClusterNetId, float*>& net_delay,
+                                 ClbNetPinsMatrix<float>& net_delay,
                                  const ClusteredPinAtomPinsLookup& netlist_pin_lookup,
                                  std::shared_ptr<SetupTimingInfo> timing_info,
+                                 ClusteredPinTimingInvalidator* pin_timing_invalidator,
                                  route_budgets& budgeting_inf,
                                  bool& was_rerouted);
 
+template<typename ConnectionRouter>
 bool timing_driven_route_net(ConnectionRouter& router,
                              ClusterNetId net_id,
                              int itry,
@@ -50,7 +53,8 @@ bool timing_driven_route_net(ConnectionRouter& router,
                              t_rt_node** rt_node_of_sink,
                              float* net_delay,
                              const ClusteredPinAtomPinsLookup& netlist_pin_lookup,
-                             std::shared_ptr<const SetupTimingInfo> timing_info,
+                             std::shared_ptr<SetupTimingInfo> timing_info,
+                             ClusteredPinTimingInvalidator* pin_timing_invalidator,
                              route_budgets& budgeting_inf);
 
 void alloc_timing_driven_route_structs(float** pin_criticality_ptr,
@@ -58,7 +62,7 @@ void alloc_timing_driven_route_structs(float** pin_criticality_ptr,
                                        t_rt_node*** rt_node_of_sink_ptr);
 void free_timing_driven_route_structs(float* pin_criticality, int* sink_order, t_rt_node** rt_node_of_sink);
 
-void enable_router_debug(const t_router_opts& router_opts, ClusterNetId net, int sink_rr, int router_iteration, ConnectionRouter* router);
+void enable_router_debug(const t_router_opts& router_opts, ClusterNetId net, int sink_rr, int router_iteration, ConnectionRouterInterface* router);
 
 std::vector<t_heap> timing_driven_find_all_shortest_paths_from_route_tree(t_rt_node* rt_root,
                                                                           const t_conn_cost_params cost_params,

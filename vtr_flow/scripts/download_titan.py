@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import os
 import argparse
-import urlparse
-import urllib
-import urllib2
+import urllib.parse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import hashlib
 import math
 import textwrap
@@ -48,8 +48,7 @@ def parse_args():
                         required=True,
                         help="The 'vtr_flow' directory under the VTR tree. "
                              "If specified this will extract the titan release, "
-                             "placing benchmarks under vtr_flow/benchmarks/titan, "
-                             "and architectures under vtr_flow/arch/titan ")
+                             "placing benchmarks under vtr_flow/benchmarks/titan ")
     parser.add_argument("--force",
                         default=False,
                         action="store_true",
@@ -74,39 +73,40 @@ def main():
         tar_gz_filename = "titan_release_" + args.titan_version + '.tar.gz'
         md5_filename = "titan_release_" + args.titan_version + '.md5'
         
-        tar_gz_url = urlparse.urljoin(TITAN_URL_MIRRORS[args.mirror], tar_gz_filename)
-        md5_url = urlparse.urljoin(TITAN_URL_MIRRORS[args.mirror], md5_filename)
+        tar_gz_url = urllib.parse.urljoin(TITAN_URL_MIRRORS[args.mirror], tar_gz_filename)
+        md5_url = urllib.parse.urljoin(TITAN_URL_MIRRORS[args.mirror], md5_filename)
 
-        external_md5 = load_md5_from_url(md5_url)
+        # Requires a .decode() here to convert from bytes to a string
+        external_md5 = load_md5_from_url(md5_url).decode()
 
         file_matches = False
         if os.path.isfile(tar_gz_filename):
             file_matches = md5_matches(tar_gz_filename, external_md5)
 
         if not args.force and file_matches:
-            print "Found existing {} with matching checksum (skipping download and extraction)".format(tar_gz_filename)
+            print("Found existing {} with matching checksum (skipping download and extraction)".format(tar_gz_filename))
         else:
             if os.path.isfile(tar_gz_filename) and not file_matches:
-                print "Local file MD5 does not match remote MD5"
+                print("Local file MD5 does not match remote MD5")
 
-            print "Downloading {}".format(tar_gz_url)
+            print("Downloading {}".format(tar_gz_url))
             download_url(tar_gz_filename, tar_gz_url)
 
-            print "Verifying {}".format(tar_gz_url)
+            print("Verifying {}".format(tar_gz_url))
             if not md5_matches(tar_gz_filename, external_md5):
-                raise CheckSumError(tar_gz_filename)
+                raise ChecksumError(tar_gz_filename)
 
-            print "Extracting {}".format(tar_gz_filename)
+            print("Extracting {}".format(tar_gz_filename))
             extract_to_vtr_flow_dir(args, tar_gz_filename)
 
     except DownloadError as e:
-        print "Failed to download:", e
+        print("Failed to download:", e)
         sys.exit(1)
     except ChecksumError as e:
-        print "File corrupt:", e
+        print("File corrupt:", e)
         sys.exit(2)
     except ExtractionError as e:
-        print "Failed to extract titan release:", e
+        print("Failed to extract titan release:", e)
         sys.exit(3)
 
     sys.exit(0)
@@ -116,7 +116,7 @@ def download_url(filename, url):
     """
     Downloads the titan release
     """
-    urllib.urlretrieve(url, filename, reporthook=download_progress_callback)
+    urllib.request.urlretrieve(url, filename, reporthook=download_progress_callback)
 
 def verify_titan(tar_gz_filename, md5_url):
     """
@@ -127,7 +127,7 @@ def verify_titan(tar_gz_filename, md5_url):
     if(filename != tar_gz_filename):
         raise VerificationError("External MD5 appears to be for a different file. Was {} expected {}".format(filename, tar_gz_filename))
 
-    print "Verifying checksum"
+    print("Verifying checksum")
     local_md5 = hashlib.md5()
     with open(filename, "rb") as f:
         #Read in chunks to avoid reading the whole file into memory
@@ -136,7 +136,7 @@ def verify_titan(tar_gz_filename, md5_url):
 
     if local_md5.hexdigest() != external_md5:
         raise ChecksumError("Checksum mismatch! Local {} expected {}".format(local_md5.hexdigest(), external_md5))
-    print "OK"
+    print("OK")
 
 def md5_matches(filename_to_check, reference_md5):
 
@@ -152,7 +152,7 @@ def md5_matches(filename_to_check, reference_md5):
     return True
 
 def load_md5_from_url(md5_url):
-    md5_data = urllib2.urlopen(md5_url)
+    md5_data = urllib.request.urlopen(md5_url)
     external_md5, filename = md5_data.read().split()
 
     return external_md5
@@ -168,13 +168,17 @@ def download_progress_callback(block_num, block_size, expected_size):
         sys.stdout.write(".")
         sys.stdout.flush()
     if block_num*block_size >= expected_size:
-        print ""
+        print("")
 
 def extract_to_vtr_flow_dir(args, tar_gz_filename):
     """
-    Extracts the 'arch' and 'benchmarks' directories of the titan release
-    into their corresponding vtr directories
+    Extracts the 'benchmarks' directory of the titan release
+    into its corresponding vtr directory
     """
+
+    #Note that in previous VTR releases, arch files also need to be extracted from the titan release
+    #into its corresponding VTR directory. This is no longer needed as VTR is now packed with the
+    #newest Titan arch files.
 
     #Reference directories
     arch_dir = os.path.join(args.vtr_flow_dir, "arch")
@@ -227,14 +231,6 @@ def extract_to_vtr_flow_dir(args, tar_gz_filename):
                     dst_file_path = os.path.join(titan_benchmarks_extract_dir, filename)
                 elif fnmatch.fnmatch(src_file_path, "*/titan_release*/benchmarks/other_benchmarks/*/*/*.blif"):
                     dst_file_path = os.path.join(titan_other_benchmarks_extract_dir, filename)
-                elif filename.endswith(".xml"):
-
-                    if args.upgrade_archs:
-                        #Apply the Architecture XML upgrade script
-                        print "Upgrading architecture file:"
-                        os.system("{} {}".format(arch_upgrade_script, src_file_path))
-                    
-                    dst_file_path = os.path.join(titan_arch_extract_dir, filename)
 
                 if dst_file_path:
                     shutil.move(src_file_path, dst_file_path)
@@ -243,7 +239,7 @@ def extract_to_vtr_flow_dir(args, tar_gz_filename):
         #Clean-up
         shutil.rmtree(tmpdir)
 
-    print "Done"
+    print("Done")
 
 def determine_sdc_name(dirpath):
     """
@@ -265,19 +261,19 @@ def determine_sdc_name(dirpath):
 def extract_callback(members):
     for tarinfo in members:
         if fnmatch.fnmatch(tarinfo.name, "titan_release*/benchmarks/titan23/*/*/*.blif"):
-            print tarinfo.name
+            print(tarinfo.name)
             yield tarinfo
         elif fnmatch.fnmatch(tarinfo.name, "titan_release*/benchmarks/titan23/*/sdc/vpr.sdc"):
-            print tarinfo.name
+            print(tarinfo.name)
             yield tarinfo
         if fnmatch.fnmatch(tarinfo.name, "titan_release*/benchmarks/other_benchmarks/*/*/*.blif"):
-            print tarinfo.name
+            print(tarinfo.name)
             yield tarinfo
         elif fnmatch.fnmatch(tarinfo.name, "titan_release*/benchmarks/other_benchmarks/*/sdc/vpr.sdc"):
-            print tarinfo.name
+            print(tarinfo.name)
             yield tarinfo
         elif fnmatch.fnmatch(tarinfo.name, "titan_release*/arch/stratixiv*.xml"):
-            print tarinfo.name
+            print(tarinfo.name)
             yield tarinfo 
 
 

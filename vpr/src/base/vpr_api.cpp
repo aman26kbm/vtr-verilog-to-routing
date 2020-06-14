@@ -62,6 +62,7 @@
 #include "check_route.h"
 #include "constant_nets.h"
 #include "atom_netlist_utils.h"
+#include "cluster.h"
 
 #include "pack_report.h"
 
@@ -277,6 +278,7 @@ void vpr_init_with_options(const t_options* options, t_vpr_setup* vpr_setup, t_a
              &vpr_setup->ShowGraphics,
              &vpr_setup->GraphPause,
              &vpr_setup->SaveGraphics,
+             &vpr_setup->GraphicsCommands,
              &vpr_setup->PowerOpts);
 
     /* Check inputs are reasonable */
@@ -440,10 +442,16 @@ void vpr_create_device_grid(const t_vpr_setup& vpr_setup, const t_arch& Arch) {
         }
 
         if (device_ctx.grid.num_instances(&type) != 0) {
-            float util = 0.;
             VTR_LOG("\tPhysical Tile %s:\n", type.name);
-            for (auto logical_block : type.equivalent_sites) {
-                util = float(num_type_instances[logical_block]) / device_ctx.grid.num_instances(&type);
+
+            auto equivalent_sites = get_equivalent_sites_set(&type);
+
+            for (auto logical_block : equivalent_sites) {
+                float util = 0.;
+                size_t num_inst = device_ctx.grid.num_instances(&type);
+                if (num_inst != 0) {
+                    util = float(num_type_instances[logical_block]) / num_inst;
+                }
                 VTR_LOG("\tBlock Utilization: %.2f Logical Block: %s\n", util, logical_block->name);
             }
         }
@@ -495,6 +503,10 @@ bool vpr_pack_flow(t_vpr_setup& vpr_setup, const t_arch& arch) {
 
         /* Output the netlist stats to console. */
         printClusteredNetlistStats();
+
+        // print the total number of used physical blocks for each
+        // physical block type after finishing the packing stage
+        print_pb_type_count(g_vpr_ctx.clustering().clb_nlist);
     }
 
     return status;
@@ -660,10 +672,11 @@ RouteStatus vpr_route_flow(t_vpr_setup& vpr_setup, const t_arch& arch) {
     } else { //Do or load
         int chan_width = router_opts.fixed_channel_width;
 
-        //Initialize the delay calculator
-        vtr::t_chunk net_delay_ch;
-        vtr::vector<ClusterNetId, float*> net_delay = alloc_net_delay(&net_delay_ch);
+        auto& cluster_ctx = g_vpr_ctx.clustering();
 
+        ClbNetPinsMatrix<float> net_delay = make_net_pins_matrix<float>(cluster_ctx.clb_nlist);
+
+        //Initialize the delay calculator
         std::shared_ptr<SetupHoldTimingInfo> timing_info = nullptr;
         std::shared_ptr<RoutingDelayCalculator> routing_delay_calc = nullptr;
         if (vpr_setup.Timing.timing_analysis_enabled) {
@@ -671,7 +684,7 @@ RouteStatus vpr_route_flow(t_vpr_setup& vpr_setup, const t_arch& arch) {
 
             routing_delay_calc = std::make_shared<RoutingDelayCalculator>(atom_ctx.nlist, atom_ctx.lookup, net_delay);
 
-            timing_info = make_setup_hold_timing_info(routing_delay_calc);
+            timing_info = make_setup_hold_timing_info(routing_delay_calc, router_opts.timing_update_type);
         }
 
         if (router_opts.doRouting == STAGE_DO) {
@@ -698,7 +711,7 @@ RouteStatus vpr_route_flow(t_vpr_setup& vpr_setup, const t_arch& arch) {
         std::string graphics_msg;
         if (route_status.success()) {
             //Sanity check the routing
-            check_route(router_opts.route_type);
+            check_route(router_opts.route_type, router_opts.check_route);
             get_serial_num();
 
             //Update status
@@ -729,7 +742,6 @@ RouteStatus vpr_route_flow(t_vpr_setup& vpr_setup, const t_arch& arch) {
 
         //Update interactive graphics
         update_screen(ScreenUpdatePriority::MAJOR, graphics_msg.c_str(), ROUTING, timing_info);
-        free_net_delay(net_delay, &net_delay_ch);
     }
 
     return route_status;
@@ -740,7 +752,7 @@ RouteStatus vpr_route_fixed_W(t_vpr_setup& vpr_setup,
                               int fixed_channel_width,
                               std::shared_ptr<SetupHoldTimingInfo> timing_info,
                               std::shared_ptr<RoutingDelayCalculator> delay_calc,
-                              vtr::vector<ClusterNetId, float*>& net_delay) {
+                              ClbNetPinsMatrix<float>& net_delay) {
     if (router_needs_lookahead(vpr_setup.RouterOpts.router_algorithm)) {
         // Prime lookahead cache to avoid adding lookahead computation cost to
         // the routing timer.
@@ -776,7 +788,7 @@ RouteStatus vpr_route_min_W(t_vpr_setup& vpr_setup,
                             const t_arch& arch,
                             std::shared_ptr<SetupHoldTimingInfo> timing_info,
                             std::shared_ptr<RoutingDelayCalculator> delay_calc,
-                            vtr::vector<ClusterNetId, float*>& net_delay) {
+                            ClbNetPinsMatrix<float>& net_delay) {
     // Note that lookahead cache is not primed here because
     // binary_search_place_and_route will change the channel width, and result
     // in the lookahead cache being recomputed.
@@ -805,7 +817,7 @@ RouteStatus vpr_load_routing(t_vpr_setup& vpr_setup,
                              const t_arch& /*arch*/,
                              int fixed_channel_width,
                              std::shared_ptr<SetupHoldTimingInfo> timing_info,
-                             vtr::vector<ClusterNetId, float*>& net_delay) {
+                             ClbNetPinsMatrix<float>& net_delay) {
     vtr::ScopedStartFinishTimer timer("Load Routing");
     if (NO_FIXED_CHANNEL_WIDTH == fixed_channel_width) {
         VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Fixed channel width must be specified when loading routing (was %d)", fixed_channel_width);
@@ -869,8 +881,9 @@ void vpr_create_rr_graph(t_vpr_setup& vpr_setup, const t_arch& arch, int chan_wi
 void vpr_init_graphics(const t_vpr_setup& vpr_setup, const t_arch& arch) {
     /* Startup X graphics */
     init_graphics_state(vpr_setup.ShowGraphics, vpr_setup.GraphPause,
-                        vpr_setup.RouterOpts.route_type, vpr_setup.SaveGraphics);
-    if (vpr_setup.ShowGraphics || vpr_setup.SaveGraphics)
+                        vpr_setup.RouterOpts.route_type, vpr_setup.SaveGraphics,
+                        vpr_setup.GraphicsCommands);
+    if (vpr_setup.ShowGraphics || vpr_setup.SaveGraphics || !vpr_setup.GraphicsCommands.empty())
         alloc_draw_structs(&arch);
 }
 
@@ -981,7 +994,7 @@ void free_device(const t_det_routing_arch& routing_arch) {
     device_ctx.chan_width.max = device_ctx.chan_width.x_max = device_ctx.chan_width.y_max = device_ctx.chan_width.x_min = device_ctx.chan_width.y_min = 0;
 
     for (int iswitch : {routing_arch.delayless_switch, routing_arch.global_route_switch}) {
-        if (device_ctx.arch_switch_inf[iswitch].name) {
+        if (device_ctx.arch_switch_inf != nullptr && device_ctx.arch_switch_inf[iswitch].name) {
             vtr::free(device_ctx.arch_switch_inf[iswitch].name);
             device_ctx.arch_switch_inf[iswitch].name = nullptr;
         }
@@ -1086,6 +1099,7 @@ void vpr_setup_vpr(t_options* Options,
                    bool* ShowGraphics,
                    int* GraphPause,
                    bool* SaveGraphics,
+                   std::string* GraphicsCommands,
                    t_power_opts* PowerOpts) {
     SetupVPR(Options,
              TimingEnabled,
@@ -1107,6 +1121,7 @@ void vpr_setup_vpr(t_options* Options,
              ShowGraphics,
              GraphPause,
              SaveGraphics,
+             GraphicsCommands,
              PowerOpts);
 }
 
@@ -1173,16 +1188,15 @@ void vpr_analysis(t_vpr_setup& vpr_setup, const t_arch& Arch, const RouteStatus&
                   vpr_setup.RoutingArch.wire_to_rr_ipin_switch);
 
     if (vpr_setup.TimingEnabled) {
-        vtr::vector<ClusterNetId, float*> net_delay;
-        vtr::t_chunk net_delay_ch;
-
         //Load the net delays
-        net_delay = alloc_net_delay(&net_delay_ch);
+        auto& cluster_ctx = g_vpr_ctx.clustering();
+
+        ClbNetPinsMatrix<float> net_delay = make_net_pins_matrix<float>(cluster_ctx.clb_nlist);
         load_net_delay_from_routing(net_delay);
 
         //Do final timing analysis
         auto analysis_delay_calc = std::make_shared<AnalysisDelayCalculator>(atom_ctx.nlist, atom_ctx.lookup, net_delay);
-        auto timing_info = make_setup_hold_timing_info(analysis_delay_calc);
+        auto timing_info = make_setup_hold_timing_info(analysis_delay_calc, vpr_setup.AnalysisOpts.timing_update_type);
         timing_info->update();
 
         if (isEchoFileEnabled(E_ECHO_ANALYSIS_TIMING_GRAPH)) {
@@ -1207,9 +1221,6 @@ void vpr_analysis(t_vpr_setup& vpr_setup, const t_arch& Arch, const RouteStatus&
         if (vpr_setup.PowerOpts.do_power) {
             vpr_power_estimation(vpr_setup, Arch, *timing_info, route_status);
         }
-
-        //Clean-up the net delays
-        free_net_delay(net_delay, &net_delay_ch);
     }
 }
 
@@ -1285,59 +1296,59 @@ void vpr_power_estimation(const t_vpr_setup& vpr_setup,
 
 void vpr_print_error(const VprError& vpr_error) {
     /* Determine the type of VPR error, To-do: can use some enum-to-string mechanism */
-    char* error_type = nullptr;
+    const char* error_type = nullptr;
     try {
         switch (vpr_error.type()) {
             case VPR_ERROR_UNKNOWN:
-                error_type = vtr::strdup("Unknown");
+                error_type = "Unknown";
                 break;
             case VPR_ERROR_ARCH:
-                error_type = vtr::strdup("Architecture file");
+                error_type = "Architecture file";
                 break;
             case VPR_ERROR_PACK:
-                error_type = vtr::strdup("Packing");
+                error_type = "Packing";
                 break;
             case VPR_ERROR_PLACE:
-                error_type = vtr::strdup("Placement");
+                error_type = "Placement";
                 break;
             case VPR_ERROR_ROUTE:
-                error_type = vtr::strdup("Routing");
+                error_type = "Routing";
                 break;
             case VPR_ERROR_TIMING:
-                error_type = vtr::strdup("Timing");
+                error_type = "Timing";
                 break;
             case VPR_ERROR_SDC:
-                error_type = vtr::strdup("SDC file");
+                error_type = "SDC file";
                 break;
             case VPR_ERROR_NET_F:
-                error_type = vtr::strdup("Netlist file");
+                error_type = "Netlist file";
                 break;
             case VPR_ERROR_BLIF_F:
-                error_type = vtr::strdup("Blif file");
+                error_type = "Blif file";
                 break;
             case VPR_ERROR_PLACE_F:
-                error_type = vtr::strdup("Placement file");
+                error_type = "Placement file";
                 break;
             case VPR_ERROR_IMPL_NETLIST_WRITER:
-                error_type = vtr::strdup("Implementation Netlist Writer");
+                error_type = "Implementation Netlist Writer";
                 break;
             case VPR_ERROR_ATOM_NETLIST:
-                error_type = vtr::strdup("Atom Netlist");
+                error_type = "Atom Netlist";
                 break;
             case VPR_ERROR_POWER:
-                error_type = vtr::strdup("Power");
+                error_type = "Power";
                 break;
             case VPR_ERROR_ANALYSIS:
-                error_type = vtr::strdup("Analysis");
+                error_type = "Analysis";
                 break;
             case VPR_ERROR_OTHER:
-                error_type = vtr::strdup("Other");
+                error_type = "Other";
                 break;
             case VPR_ERROR_INTERRUPTED:
-                error_type = vtr::strdup("Interrupted");
+                error_type = "Interrupted";
                 break;
             default:
-                error_type = vtr::strdup("Unrecognized Error");
+                error_type = "Unrecognized Error";
                 break;
         }
     } catch (const vtr::VtrError& e) {

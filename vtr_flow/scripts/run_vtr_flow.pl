@@ -110,7 +110,7 @@ my @memory_tracker_args     = ("time", "-v");
 my $limit_memory_usage      = -1;
 my $timeout                 = 14 * 24 * 60 * 60;         # 14 day execution timeout
 my $valgrind 		        = 0;
-my @valgrind_args	        = ("--leak-check=full", "--suppressions=$vtr_flow_path/../vpr/valgrind.supp", "--error-exitcode=1", "--errors-for-leak-kinds=none", "--track-origins=yes", "--log-file=valgrind.log","--error-limit=no");
+my @valgrind_args	        = ("--leak-check=full", "--suppressions=$vtr_flow_path/../vpr/valgrind.supp", "--error-exitcode=22", "--track-origins=yes", "--error-limit=no");
 my $abc_quote_addition      = 0;
 my @forwarded_vpr_args;   # VPR arguments that pass through the script
 my $verify_rr_graph         = 0;
@@ -125,7 +125,12 @@ my $odin_adder_config_path = "default";
 my $odin_adder_cin_global = "";
 my $use_odin_xml_config = 1;
 my $relax_W_factor = 1.3;
-my $crit_path_router_iterations = undef;
+my $crit_path_router_iterations = 150; #We set a higher routing iterations (vs 50 default)
+                                       #to avoid spurious routing failures at relaxed W 
+                                       #caused by small perturbations in pattern or 
+                                       #placement. Usually these failures show up on small 
+                                       #circuits (with low W). Setting a higher value here 
+                                       #will help avoids them.
 my $show_failures = 0;
 
 
@@ -1299,9 +1304,7 @@ sub system_with_timeout {
 
 
 		open( STDOUT, "> $_[1]" );
-		if (!$valgrind) {
-			open( STDERR, ">&STDOUT" );
-		}
+        open( STDERR, ">&STDOUT" );
 
 		# Copy the args and cut out first four
 		my @VPRARGS = @_;
@@ -1637,6 +1640,13 @@ sub run_vpr {
     if (defined $args->{extra_vpr_args} && scalar(@extra_vpr_args) > 0) {
         push(@vpr_args, @extra_vpr_args);
     }
+
+    #Extra options to fine-tune LeakSanitizer (LSAN) behaviour.
+    #Note that if VPR was compiled without LSAN these have no effect
+    # 'suppressions=...' Add the LeakSanitizer (LSAN) suppression file
+    # 'exitcode=12' Use a consistent exitcode (on some systems LSAN don't use the default exit code of 23)
+    # 'fast_unwind_on_malloc=0' Provide more accurate leak stack traces
+    local $ENV{"LSAN_OPTIONS"} = "suppressions=$vtr_flow_path/../vpr/lsan.supp exitcode=23 fast_unwind_on_malloc=0";
 
     #Run the command
     $q = &system_with_timeout(

@@ -13,6 +13,7 @@ ast_node_t* create_node_w_type_no_count(ids id, int line_number, int file_number
 ast_node_t* create_node_w_type(ids id, int line_number, int file_number);
 ast_node_t* create_tree_node_id(char* string, int line_number, int file_number);
 
+ast_node_t* create_tree_node_string(char* input_number, int line_number, int file_number);
 ast_node_t* create_tree_node_number(char* input_number, int line_number, int file_number);
 ast_node_t* create_tree_node_number(VNumber& input_number, int line_number, int file_number);
 ast_node_t* create_tree_node_number(long input_number, int line_number, int file_number);
@@ -39,6 +40,8 @@ void make_concat_into_list_of_strings(ast_node_t* concat_top, char* instance_nam
 void change_to_number_node(ast_node_t* node, long number);
 void change_to_number_node(ast_node_t* node, VNumber number);
 
+char* get_identifier(ast_node_t* node);
+
 char* get_name_of_pin_at_bit(ast_node_t* var_node, int bit, char* instance_name_prefix, sc_hierarchy* local_ref);
 char* get_name_of_var_declare_at_bit(ast_node_t* var_declare, int bit);
 char_list_t* get_name_of_pins(ast_node_t* var_node, char* instance_name_prefix, sc_hierarchy* local_ref);
@@ -50,6 +53,8 @@ ast_node_t* fold_binary(ast_node_t** node);
 ast_node_t* fold_unary(ast_node_t** node);
 
 long clog2(long value_in, int length);
+void c_display(ast_node_t* node);
+void c_finish(ast_node_t* node);
 long resolve_concat_sizes(ast_node_t* node_top, sc_hierarchy* local_ref);
 
 #endif

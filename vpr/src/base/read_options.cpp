@@ -245,6 +245,8 @@ struct ParseBaseCost {
             conv_value.set_value(DEMAND_ONLY_NORMALIZED_LENGTH);
         else if (str == "demand_only")
             conv_value.set_value(DEMAND_ONLY);
+        else if (str == "delay_normalized_length_bounded")
+            conv_value.set_value(DELAY_NORMALIZED_LENGTH_BOUNDED);
         else {
             std::stringstream msg;
             msg << "Invalid conversion from '" << str << "' to e_router_algorithm (expected one of: " << argparse::join(default_choices(), ", ") << ")";
@@ -265,6 +267,8 @@ struct ParseBaseCost {
             conv_value.set_value("delay_normalized_length_frequency");
         else if (val == DEMAND_ONLY_NORMALIZED_LENGTH)
             conv_value.set_value("demand_only_normalized_length");
+        else if (val == DELAY_NORMALIZED_LENGTH_BOUNDED)
+            conv_value.set_value("delay_normalized_length_bounded");
         else {
             VTR_ASSERT(val == DEMAND_ONLY);
             conv_value.set_value("demand_only");
@@ -273,7 +277,38 @@ struct ParseBaseCost {
     }
 
     std::vector<std::string> default_choices() {
-        return {"demand_only", "demand_only_normalized_length", "delay_normalized", "delay_normalized_length", "delay_normalized_frequency", "delay_normalized_length_frequency"};
+        return {"demand_only", "demand_only_normalized_length", "delay_normalized", "delay_normalized_length", "delay_normalized_length_bounded", "delay_normalized_frequency", "delay_normalized_length_frequency"};
+    }
+};
+
+struct ParsePlaceDeltaDelayAlgorithm {
+    ConvertedValue<e_place_delta_delay_algorithm> from_str(std::string str) {
+        ConvertedValue<e_place_delta_delay_algorithm> conv_value;
+        if (str == "astar")
+            conv_value.set_value(e_place_delta_delay_algorithm::ASTAR_ROUTE);
+        else if (str == "dijkstra")
+            conv_value.set_value(e_place_delta_delay_algorithm::DIJKSTRA_EXPANSION);
+        else {
+            std::stringstream msg;
+            msg << "Invalid conversion from '" << str << "' to e_place_delta_delay_algorithm (expected one of: " << argparse::join(default_choices(), ", ") << ")";
+            conv_value.set_error(msg.str());
+        }
+        return conv_value;
+    }
+
+    ConvertedValue<std::string> to_str(e_place_delta_delay_algorithm val) {
+        ConvertedValue<std::string> conv_value;
+        if (val == e_place_delta_delay_algorithm::ASTAR_ROUTE)
+            conv_value.set_value("astar");
+        else {
+            VTR_ASSERT(val == e_place_delta_delay_algorithm::DIJKSTRA_EXPANSION);
+            conv_value.set_value("dijkstra");
+        }
+        return conv_value;
+    }
+
+    std::vector<std::string> default_choices() {
+        return {"astar", "dijkstra"};
     }
 };
 
@@ -792,6 +827,138 @@ struct ParseRouterFirstIterTiming {
     }
 };
 
+struct ParseRouterHeap {
+    ConvertedValue<e_heap_type> from_str(std::string str) {
+        ConvertedValue<e_heap_type> conv_value;
+        if (str == "binary")
+            conv_value.set_value(e_heap_type::BINARY_HEAP);
+        else if (str == "bucket")
+            conv_value.set_value(e_heap_type::BUCKET_HEAP_APPROXIMATION);
+        else {
+            std::stringstream msg;
+            msg << "Invalid conversion from '" << str << "' to e_heap_type (expected one of: " << argparse::join(default_choices(), ", ") << ")";
+            conv_value.set_error(msg.str());
+        }
+        return conv_value;
+    }
+
+    ConvertedValue<std::string> to_str(e_heap_type val) {
+        ConvertedValue<std::string> conv_value;
+        if (val == e_heap_type::BINARY_HEAP)
+            conv_value.set_value("binary");
+        else {
+            VTR_ASSERT(val == e_heap_type::BUCKET_HEAP_APPROXIMATION);
+            conv_value.set_value("bucket");
+        }
+        return conv_value;
+    }
+
+    std::vector<std::string> default_choices() {
+        return {"binary", "bucket"};
+    }
+};
+
+struct ParseCheckRoute {
+    ConvertedValue<e_check_route_option> from_str(std::string str) {
+        ConvertedValue<e_check_route_option> conv_value;
+        if (str == "off")
+            conv_value.set_value(e_check_route_option::OFF);
+        else if (str == "quick")
+            conv_value.set_value(e_check_route_option::QUICK);
+        else if (str == "full")
+            conv_value.set_value(e_check_route_option::FULL);
+        else {
+            std::stringstream msg;
+            msg << "Invalid conversion from '" << str << "' to e_check_route_option (expected one of: " << argparse::join(default_choices(), ", ") << ")";
+            conv_value.set_error(msg.str());
+        }
+        return conv_value;
+    }
+
+    ConvertedValue<std::string> to_str(e_check_route_option val) {
+        ConvertedValue<std::string> conv_value;
+        if (val == e_check_route_option::OFF)
+            conv_value.set_value("off");
+        else if (val == e_check_route_option::QUICK)
+            conv_value.set_value("quick");
+        else {
+            VTR_ASSERT(val == e_check_route_option::FULL);
+            conv_value.set_value("full");
+        }
+        return conv_value;
+    }
+
+    std::vector<std::string> default_choices() {
+        return {"off", "quick", "full"};
+    }
+};
+
+struct ParsePlaceEfforScaling {
+    ConvertedValue<e_place_effort_scaling> from_str(std::string str) {
+        ConvertedValue<e_place_effort_scaling> conv_value;
+        if (str == "circuit")
+            conv_value.set_value(e_place_effort_scaling::CIRCUIT);
+        else if (str == "device_circuit")
+            conv_value.set_value(e_place_effort_scaling::DEVICE_CIRCUIT);
+        else {
+            std::stringstream msg;
+            msg << "Invalid conversion from '" << str << "' to e_place_effort_scaling (expected one of: " << argparse::join(default_choices(), ", ") << ")";
+            conv_value.set_error(msg.str());
+        }
+        return conv_value;
+    }
+
+    ConvertedValue<std::string> to_str(e_place_effort_scaling val) {
+        ConvertedValue<std::string> conv_value;
+        if (val == e_place_effort_scaling::CIRCUIT)
+            conv_value.set_value("circuit");
+        else {
+            VTR_ASSERT(val == e_place_effort_scaling::DEVICE_CIRCUIT);
+            conv_value.set_value("device_circuit");
+        }
+        return conv_value;
+    }
+
+    std::vector<std::string> default_choices() {
+        return {"circuit", "device_circuit"};
+    }
+};
+
+struct ParseTimingUpdateType {
+    ConvertedValue<e_timing_update_type> from_str(std::string str) {
+        ConvertedValue<e_timing_update_type> conv_value;
+        if (str == "auto")
+            conv_value.set_value(e_timing_update_type::AUTO);
+        else if (str == "full")
+            conv_value.set_value(e_timing_update_type::FULL);
+        else if (str == "incremental")
+            conv_value.set_value(e_timing_update_type::INCREMENTAL);
+        else {
+            std::stringstream msg;
+            msg << "Invalid conversion from '" << str << "' to e_timing_update_type (expected one of: " << argparse::join(default_choices(), ", ") << ")";
+            conv_value.set_error(msg.str());
+        }
+        return conv_value;
+    }
+
+    ConvertedValue<std::string> to_str(e_timing_update_type val) {
+        ConvertedValue<std::string> conv_value;
+        if (val == e_timing_update_type::AUTO)
+            conv_value.set_value("auto");
+        if (val == e_timing_update_type::FULL)
+            conv_value.set_value("full");
+        else {
+            VTR_ASSERT(val == e_timing_update_type::INCREMENTAL);
+            conv_value.set_value("incremental");
+        }
+        return conv_value;
+    }
+
+    std::vector<std::string> default_choices() {
+        return {"auto", "full", "incremental"};
+    }
+};
+
 argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& args) {
     std::string description =
         "Implements the specified circuit onto the target FPGA architecture"
@@ -883,6 +1050,65 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
         .help("Save all graphical contents to PDF files")
         .default_value("off");
 
+    gfx_grp.add_argument(args.graphics_commands, "--graphics_commands")
+        .help(
+            "A set of semi-colon seperated graphics commands.\n"
+            "   Commands:\n"
+            "      * save_graphics <file>\n"
+            "           Saves graphics to the specified file (.png/.pdf/\n"
+            "           .svg). If <file> contains '{i}', it will be\n"
+            "           replaced with an integer which increments\n"
+            "           each time graphics is invoked.\n"
+            "      * set_macros <int>\n"
+            "           Sets the placement macro drawing state\n"
+            "      * set_nets <int>\n"
+            "           Sets the net drawing state\n"
+            "      * set_cpd <int>\n"
+            "           Sets the criticla path delay drawing state\n"
+            "      * set_routing_util <int>\n"
+            "           Sets the routing utilization drawing state\n"
+            "      * set_clip_routing_util <int>\n"
+            "           Sets whether routing utilization values are\n"
+            "           clipped to [0., 1.]. Useful when a consistent\n"
+            "           scale is needed across images\n"
+            "      * set_draw_block_outlines <int>\n"
+            "           Sets whether blocks have an outline drawn around\n"
+            "           them\n"
+            "      * set_draw_block_text <int>\n"
+            "           Sets whether blocks have label text drawn on them\n"
+            "      * set_draw_block_internals <int>\n"
+            "           Sets the level to which block internals are drawn\n"
+            "      * set_draw_net_max_fanout <int>\n"
+            "           Sets the maximum fanout for nets to be drawn (if\n"
+            "           fanout is beyond this value the net will not be\n"
+            "           drawn)\n"
+            "      * set_congestion <int>\n"
+            "           Sets the routing congestion drawing state\n"
+            "      * exit <int>\n"
+            "           Exits VPR with specified exit code\n"
+            "\n"
+            "   Example:\n"
+            "     'save_graphics place.png; \\\n"
+            "      set_nets 1; save_graphics nets1.png;\\\n"
+            "      set_nets 2; save_graphics nets2.png; set_nets 0;\\\n"
+            "      set_cpd 1; save_graphics cpd1.png; \\\n"
+            "      set_cpd 3; save_graphics cpd3.png; set_cpd 0; \\\n"
+            "      set_routing_util 5; save_graphics routing_util5.png; \\\n"
+            "      set_routing_util 0; \\\n"
+            "      set_congestion 1; save_graphics congestion1.png;'\n"
+            "\n"
+            "   The above toggles various graphics settings (e.g. drawing\n"
+            "   nets, drawing critical path) and then saves the results to\n"
+            "   .png files.\n"
+            "\n"
+            "   Note that drawing state is reset to its previous state after\n"
+            "   these commands are invoked.\n"
+            "\n"
+            "   Like the interactive graphics --disp option, the --auto\n"
+            "   option controls how often the commands specified with\n"
+            "   this option are invoked.\n")
+        .default_value("");
+
     auto& gen_grp = parser.add_argument_group("general options");
 
     gen_grp.add_argument(args.show_help, "--help", "-h")
@@ -915,6 +1141,17 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
     gen_grp.add_argument<bool, ParseOnOff>(args.timing_analysis, "--timing_analysis")
         .help("Controls whether timing analysis (and timing driven optimizations) are enabled.")
         .default_value("on");
+
+    gen_grp.add_argument<e_timing_update_type, ParseTimingUpdateType>(args.timing_update_type, "--timing_update_type")
+        .help(
+            "Controls how timing analysis updates are performed:\n"
+            " * auto: VPR decides\n"
+            " * full: Full timing updates are performed (may be faster \n"
+            "         if circuit timing has changed significantly)\n"
+            " * incr: Incremental timing updates are performed (may be \n"
+            "         faster in the face of smaller circuit timing changes)\n")
+        .default_value("auto")
+        .show_in(argparse::ShowIn::HELP_ONLY);
 
     gen_grp.add_argument<bool, ParseOnOff>(args.CreateEchoFile, "--echo_file")
         .help(
@@ -1284,13 +1521,32 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
         .default_value("1")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
-    place_grp.add_argument<bool, ParseOnOff>(args.ShowPlaceTiming, "--enable_timing_computations")
-        .help("Displays delay statistics even if placement is not timing driven")
+    place_grp.add_argument<e_place_delta_delay_algorithm, ParsePlaceDeltaDelayAlgorithm>(
+                 args.place_delta_delay_matrix_calculation_method,
+                 "--place_delta_delay_matrix_calculation_method")
+        .help(
+            "What algorithm should be used to compute the place delta matrix.\n"
+            "\n"
+            " * astar : Find delta delays between OPIN's and IPIN's using\n"
+            "           the router with the current --astar_fac.\n"
+            " * dijkstra : Use Dijkstra's algorithm to find all shortest paths \n"
+            "              from sampled OPIN's to all IPIN's.\n")
+        .default_value("astar")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
     place_grp.add_argument(args.PlaceInnerNum, "--inner_num")
         .help("Controls number of moves per temperature: inner_num * num_blocks ^ (4/3)")
         .default_value("1.0")
+        .show_in(argparse::ShowIn::HELP_ONLY);
+
+    place_grp.add_argument<e_place_effort_scaling, ParsePlaceEfforScaling>(args.place_effort_scaling, "--place_effort_scaling")
+        .help(
+            "Controls how the number of placer moves level scales with circuit\n"
+            " and device size:\n"
+            "  * circuit: proportional to circuit size (num_blocks ^ 4/3)\n"
+            "  * device_circuit: proportional to device and circuit size\n"
+            "                    (grid_size ^ 2/3 * num_blocks ^ 2/3)\n")
+        .default_value("circuit")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
     place_grp.add_argument(args.PlaceInitT, "--init_t")
@@ -1346,6 +1602,13 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
         .default_value("")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
+    place_grp.add_argument(args.placement_saves_per_temperature, "--save_placement_per_temperature")
+        .help(
+            "Controls how often VPR saves the current placement to a file per temperature (may be helpful for debugging)."
+            " The value specifies how many times the placement should be saved (values less than 1 disable this feature).")
+        .default_value("0")
+        .show_in(argparse::ShowIn::HELP_ONLY);
+
     auto& place_timing_grp = parser.add_argument_group("timing-driven placement options");
 
     place_timing_grp.add_argument(args.PlaceTimingTradeoff, "--timing_tradeoff")
@@ -1362,6 +1625,13 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
 
     place_timing_grp.add_argument(args.inner_loop_recompute_divider, "--inner_loop_recompute_divider")
         .help("Controls how many timing analysies are perform per temperature during placement")
+        .default_value("0")
+        .show_in(argparse::ShowIn::HELP_ONLY);
+
+    place_timing_grp.add_argument(args.quench_recompute_divider, "--quench_recompute_divider")
+        .help(
+            "Controls how many timing analysies are perform during the final placement quench (t=0)."
+            " If unspecified, uses the value from --inner_loop_recompute_divider")
         .default_value("0")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
@@ -1487,9 +1757,13 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
             "      to magnitude of typical routing resource delay\n"
             " * delay_normalized_length: like delay_normalized but\n"
             "      scaled by routing resource length\n"
-            " * delay_normalized_freqeuncy: like delay_normalized\n"
+            " * delay_normalized_length_bounded: like delay_normalized but\n"
+            "      scaled by routing resource length.  Scaling is normalized\n"
+            "      between 1 to 4, with min lengths getting scaled at 1,\n"
+            "      and max lengths getting scaled at 4.\n"
+            " * delay_normalized_frequency: like delay_normalized\n"
             "      but scaled inversely by segment type frequency\n"
-            " * delay_normalized_length_freqeuncy: like delay_normalized\n"
+            " * delay_normalized_length_frequency: like delay_normalized\n"
             "      but scaled by routing resource length, and inversely\n"
             "      by segment type frequency\n"
             "(Default: demand_only for breadth-first router,\n"
@@ -1529,7 +1803,7 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
     route_grp.add_argument<e_router_algorithm, ParseRouterAlgorithm>(args.RouterAlgorithm, "--router_algorithm")
         .help(
             "Specifies the router algorithm to use.\n"
-            " * breadth_first: focuses solely on routability\n"
+            " * breadth_first: focuses solely on routability [DEPRECATED, inferior quality & run-time]\n"
             " * timing_driven: focuses on routability and circuit speed\n")
         .default_value("timing_driven")
         .choices({"breadth_first", "timing_driven"})
@@ -1538,6 +1812,11 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
     route_grp.add_argument(args.min_incremental_reroute_fanout, "--min_incremental_reroute_fanout")
         .help("The net fanout threshold above which nets will be re-routed incrementally.")
         .default_value("16")
+        .show_in(argparse::ShowIn::HELP_ONLY);
+
+    route_grp.add_argument<bool, ParseOnOff>(args.exit_after_first_routing_iteration, "--exit_after_first_routing_iteration")
+        .help("Causes VPR to exit after the first routing iteration (useful for saving graphics)")
+        .default_value("off")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
     auto& route_timing_grp = parser.add_argument_group("timing-driven routing options");
@@ -1591,8 +1870,8 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
     route_timing_grp.add_argument<e_routing_budgets_algorithm, RouteBudgetsAlgorithm>(args.routing_budgets_algorithm, "--routing_budgets_algorithm")
         .help(
             "Controls how the routing budgets are created.\n"
-            " * slack: Sets the budgets depending on the amount slack between connections and the current delay values.\n"
-            " * criticality: Sets the minimum budgets to 0 and the maximum budgets as a function of delay and criticality (net delay/ pin criticality)\n"
+            " * slack: Sets the budgets depending on the amount slack between connections and the current delay values. [EXPERIMENTAL]\n"
+            " * criticality: Sets the minimum budgets to 0 and the maximum budgets as a function of delay and criticality (net delay/ pin criticality) [EXPERIMENTAL]\n"
             " * disable: Removes the routing budgets, use the default VPR and ignore hold time constraints\n")
         .default_value("disable")
         .choices({"minimax", "scale_delay", "disable"})
@@ -1630,9 +1909,10 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
     route_timing_grp.add_argument<e_router_lookahead, ParseRouterLookahead>(args.router_lookahead_type, "--router_lookahead")
         .help(
             "Controls what lookahead the router uses to calculate cost of completing a connection.\n"
-            " * classic: The classic VPR lookahead\n"
+            " * classic: The classic VPR lookahead (may perform better on un-buffered routing\n"
+            "            architectures)\n"
             " * map: A more advanced lookahead which accounts for diverse wire type\n")
-        .default_value("classic")
+        .default_value("map")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
     route_timing_grp.add_argument(args.router_max_convergence_count, "--router_max_convergence_count")
@@ -1659,13 +1939,26 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
             " * lookahead   : Connection criticalities are determined\n"
             "                 from timing analysis assuming best-case\n"
             "                 connection delays as estimated by the\n"
-            "                 router's lookahead.\n")
-        .default_value("all_critical")
+            "                 router's lookahead.\n"
+            "(Default: 'lookahead' if a non-classic router lookahead is\n"
+            "           used, otherwise 'all_critical')\n")
+        .default_value("lookahead")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
     route_timing_grp.add_argument<bool, ParseOnOff>(args.router_update_lower_bound_delays, "--router_update_lower_bound_delays")
         .help("Controls whether the router updates lower bound connection delays after the 1st routing iteration.")
-        .default_value("off")
+        .default_value("on")
+        .show_in(argparse::ShowIn::HELP_ONLY);
+
+    route_timing_grp.add_argument<e_heap_type, ParseRouterHeap>(args.router_heap, "--router_heap")
+        .help(
+            "Controls what type of heap to use for timing driven router.\n"
+            " * binary: A binary heap is used.\n"
+            " * bucket: A bucket heap approximation is used. The bucket heap\n"
+            " *         is faster because it is only a heap approximation.\n"
+            " *         Testing has shown the approximation results in\n"
+            " *         similiar QoR with less CPU work.\n")
+        .default_value("binary")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
     route_timing_grp.add_argument(args.router_first_iteration_timing_report_file, "--router_first_iter_timing_report")
@@ -1676,6 +1969,15 @@ argparse::ArgumentParser create_arg_parser(std::string prog_name, t_options& arg
     route_timing_grp.add_argument<bool, ParseOnOff>(args.read_rr_edge_metadata, "--read_rr_edge_metadata")
         .help("Read RR edge metadata from --read_rr_graph.  RR edge metadata is not used in core VPR algorithms, and is typically not read to save runtime and memory. (Default: off).")
         .default_value("off")
+        .show_in(argparse::ShowIn::HELP_ONLY);
+
+    route_timing_grp.add_argument<e_check_route_option, ParseCheckRoute>(args.check_route, "--check_route")
+        .help(
+            "Options to run check route in three different modes.\n"
+            " * off    : check route is completely disabled.\n"
+            " * quick  : runs check route with slow checks disabled.\n"
+            " * full   : runs the full check route step.\n")
+        .default_value("full")
         .show_in(argparse::ShowIn::HELP_ONLY);
 
     route_timing_grp.add_argument(args.router_debug_net, "--router_debug_net")
@@ -1885,6 +2187,11 @@ void set_conditional_defaults(t_options& args) {
         args.ShowPlaceTiming.set(args.timing_analysis, Provenance::INFERRED);
     }
 
+    //Slave quench recompute divider of inner loop recompute divider unless specified
+    if (args.quench_recompute_divider.provenance() != Provenance::SPECIFIED) {
+        args.quench_recompute_divider.set(args.inner_loop_recompute_divider, Provenance::INFERRED);
+    }
+
     //Are we using the automatic, or user-specified annealing schedule?
     if (args.PlaceInitT.provenance() == Provenance::SPECIFIED
         || args.PlaceExitT.provenance() == Provenance::SPECIFIED
@@ -1941,6 +2248,15 @@ void set_conditional_defaults(t_options& args) {
             args.bend_cost.set(0., Provenance::INFERRED);
         }
     }
+
+    //Initial timing estimate
+    if (args.router_initial_timing.provenance() != Provenance::SPECIFIED) {
+        if (args.router_lookahead_type != e_router_lookahead::CLASSIC) {
+            args.router_initial_timing.set(e_router_initial_timing::LOOKAHEAD, Provenance::INFERRED);
+        } else {
+            args.router_initial_timing.set(e_router_initial_timing::ALL_CRITICAL, Provenance::INFERRED);
+        }
+    }
 }
 
 bool verify_args(const t_options& args) {
@@ -1959,6 +2275,13 @@ bool verify_args(const t_options& args) {
                         "%s option must be enabled for %s to have any effect\n",
                         args.enable_clustering_pin_feasibility_filter.argument_name().c_str(),
                         args.target_external_pin_util.argument_name().c_str());
+    }
+
+    if (args.router_initial_timing == e_router_initial_timing::LOOKAHEAD && args.router_lookahead_type == e_router_lookahead::CLASSIC) {
+        VPR_FATAL_ERROR(VPR_ERROR_OTHER,
+                        "%s option value 'lookahead' is not compatible with %s 'classic'\n",
+                        args.router_initial_timing.argument_name().c_str(),
+                        args.router_lookahead_type.argument_name().c_str());
     }
 
     return true;

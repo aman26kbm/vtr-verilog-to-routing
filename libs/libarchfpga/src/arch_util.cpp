@@ -140,36 +140,8 @@ void free_arch(t_arch* arch) {
     }
     delete[] arch->Switches;
     arch->Switches = nullptr;
-    t_model* model = arch->models;
-    while (model) {
-        t_model_ports* input_port = model->inputs;
-        while (input_port) {
-            t_model_ports* prev_port = input_port;
-            input_port = input_port->next;
-            vtr::free(prev_port->name);
-            delete prev_port;
-        }
-        t_model_ports* output_port = model->outputs;
-        while (output_port) {
-            t_model_ports* prev_port = output_port;
-            output_port = output_port->next;
-            vtr::free(prev_port->name);
-            delete prev_port;
-        }
-        vtr::t_linked_vptr* vptr = model->pb_types;
-        while (vptr) {
-            vtr::t_linked_vptr* vptr_prev = vptr;
-            vptr = vptr->next;
-            vtr::free(vptr_prev);
-        }
-        t_model* prev_model = model;
 
-        model = model->next;
-        if (prev_model->instances)
-            vtr::free(prev_model->instances);
-        vtr::free(prev_model->name);
-        delete prev_model;
-    }
+    free_arch_models(arch->models);
 
     for (int i = 0; i < arch->num_directs; ++i) {
         vtr::free(arch->Directs[i].name);
@@ -215,6 +187,58 @@ void free_arch(t_arch* arch) {
     }
 }
 
+//Frees all models in the linked list
+void free_arch_models(t_model* models) {
+    t_model* model = models;
+    while (model) {
+        model = free_arch_model(model);
+    }
+}
+
+//Frees the specified model, and returns the next model (if any) in the linked list
+t_model* free_arch_model(t_model* model) {
+    if (!model) return nullptr;
+
+    t_model* next_model = model->next;
+
+    free_arch_model_ports(model->inputs);
+    free_arch_model_ports(model->outputs);
+
+    vtr::t_linked_vptr* vptr = model->pb_types;
+    while (vptr) {
+        vtr::t_linked_vptr* vptr_prev = vptr;
+        vptr = vptr->next;
+        vtr::free(vptr_prev);
+    }
+
+    if (model->instances)
+        vtr::free(model->instances);
+    vtr::free(model->name);
+    delete model;
+
+    return next_model;
+}
+
+//Frees all the model portss in a linked list
+void free_arch_model_ports(t_model_ports* model_ports) {
+    t_model_ports* model_port = model_ports;
+    while (model_port) {
+        model_port = free_arch_model_port(model_port);
+    }
+}
+
+//Frees the specified model_port, and returns the next model_port (if any) in the linked list
+t_model_ports* free_arch_model_port(t_model_ports* model_port) {
+    if (!model_port) return nullptr;
+
+    t_model_ports* next_port = model_port->next;
+
+    vtr::free(model_port->name);
+    delete model_port;
+
+    return next_port;
+}
+
 void free_type_descriptors(std::vector<t_physical_tile_type>& type_descriptors) {
     for (auto& type : type_descriptors) {
         vtr::free(type.name);
@@ -222,38 +246,12 @@ void free_type_descriptors(std::vector<t_physical_tile_type>& type_descriptors) 
             continue;
         }
 
-        for (int width = 0; width < type.width; ++width) {
-            for (int height = 0; height < type.height; ++height) {
-                for (int side = 0; side < 4; ++side) {
-                    for (int pin = 0; pin < type.num_pin_loc_assignments[width][height][side]; ++pin) {
-                        if (type.pin_loc_assignments[width][height][side][pin])
-                            vtr::free(type.pin_loc_assignments[width][height][side][pin]);
-                    }
-                    vtr::free(type.pinloc[width][height][side]);
-                    vtr::free(type.pin_loc_assignments[width][height][side]);
-                }
-                vtr::free(type.pinloc[width][height]);
-                vtr::free(type.pin_loc_assignments[width][height]);
-                vtr::free(type.num_pin_loc_assignments[width][height]);
+        for (auto& sub_tile : type.sub_tiles) {
+            vtr::free(sub_tile.name);
+
+            for (auto port : sub_tile.ports) {
+                vtr::free(port.name);
             }
-            vtr::free(type.pinloc[width]);
-            vtr::free(type.pin_loc_assignments[width]);
-            vtr::free(type.num_pin_loc_assignments[width]);
-        }
-        vtr::free(type.pinloc);
-        vtr::free(type.pin_loc_assignments);
-        vtr::free(type.num_pin_loc_assignments);
-
-        for (int j = 0; j < type.num_class; ++j) {
-            vtr::free(type.class_inf[j].pinlist);
-        }
-        vtr::free(type.class_inf);
-        vtr::free(type.is_ignored_pin);
-        vtr::free(type.is_pin_global);
-        vtr::free(type.pin_class);
-
-        for (auto port : type.ports) {
-            vtr::free(port.name);
         }
     }
     type_descriptors.clear();
@@ -547,11 +545,6 @@ t_physical_tile_type SetupEmptyPhysicalType() {
     type.capacity = 0;
     type.num_drivers = 0;
     type.num_receivers = 0;
-    type.pinloc = nullptr;
-    type.num_class = 0;
-    type.class_inf = nullptr;
-    type.pin_class = nullptr;
-    type.is_ignored_pin = nullptr;
     type.area = UNDEFINED;
     type.switchblock_locations = vtr::Matrix<e_sb_type>({{size_t(type.width), size_t(type.height)}}, e_sb_type::FULL);
     type.switchblock_switch_overrides = vtr::Matrix<int>({{size_t(type.width), size_t(type.height)}}, DEFAULT_SWITCH);
@@ -567,6 +560,18 @@ t_logical_block_type SetupEmptyLogicalType() {
     type.pb_type = nullptr;
 
     return type;
+}
+
+std::unordered_set<t_logical_block_type_ptr> get_equivalent_sites_set(t_physical_tile_type_ptr type) {
+    std::unordered_set<t_logical_block_type_ptr> equivalent_sites;
+
+    for (auto& sub_tile : type->sub_tiles) {
+        for (auto& logical_block : sub_tile.equivalent_sites) {
+            equivalent_sites.insert(logical_block);
+        }
+    }
+
+    return equivalent_sites;
 }
 
 void alloc_and_load_default_child_for_pb_type(t_pb_type* pb_type,

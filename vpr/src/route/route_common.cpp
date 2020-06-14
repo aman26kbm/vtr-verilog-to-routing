@@ -37,6 +37,7 @@
 #include "timing_info.h"
 #include "tatum/echo_writer.hpp"
 #include "binary_heap.h"
+#include "bucket.h"
 
 /**************** Types local to route_common.c ******************/
 struct t_trace_branch {
@@ -52,7 +53,6 @@ static t_trace* trace_free_head = nullptr;
 static vtr::t_chunk trace_ch;
 
 static int num_trace_allocated = 0; /* To watch for memory leaks. */
-static int num_heap_allocated = 0;
 static int num_linked_f_pointer_allocated = 0;
 
 /*  The numbering relation between the channels and clbs is:				*
@@ -242,7 +242,7 @@ bool try_route(int width_fac,
                const t_analysis_opts& analysis_opts,
                t_det_routing_arch* det_routing_arch,
                std::vector<t_segment_inf>& segment_inf,
-               vtr::vector<ClusterNetId, float*>& net_delay,
+               ClbNetPinsMatrix<float>& net_delay,
                std::shared_ptr<SetupHoldTimingInfo> timing_info,
                std::shared_ptr<RoutingDelayCalculator> delay_calc,
                t_chan_width_dist chan_width_dist,
@@ -307,18 +307,20 @@ bool try_route(int width_fac,
         success = try_breadth_first_route(router_opts);
     } else { /* TIMING_DRIVEN route */
         VTR_LOG("Confirming router algorithm: TIMING_DRIVEN.\n");
+        auto& atom_ctx = g_vpr_ctx.atom();
 
         IntraLbPbPinLookup intra_lb_pb_pin_lookup(device_ctx.logical_block_types);
-        ClusteredPinAtomPinsLookup netlist_pin_lookup(cluster_ctx.clb_nlist, intra_lb_pb_pin_lookup);
+        ClusteredPinAtomPinsLookup netlist_pin_lookup(cluster_ctx.clb_nlist, atom_ctx.nlist, intra_lb_pb_pin_lookup);
 
-        success = try_timing_driven_route(router_opts,
-                                          analysis_opts,
-                                          segment_inf,
-                                          net_delay,
-                                          netlist_pin_lookup,
-                                          timing_info,
-                                          delay_calc,
-                                          first_iteration_priority);
+        success = try_timing_driven_route(
+            router_opts,
+            analysis_opts,
+            segment_inf,
+            net_delay,
+            netlist_pin_lookup,
+            timing_info,
+            delay_calc,
+            first_iteration_priority);
 
         profiling::time_on_fanout_analysis();
     }
@@ -698,17 +700,21 @@ void reset_path_costs(const std::vector<int>& visited_rr_nodes) {
 /* Returns the *congestion* cost of using this rr_node. */
 float get_rr_cong_cost(int inode) {
     auto& device_ctx = g_vpr_ctx.device();
+    auto& route_ctx = g_vpr_ctx.routing();
 
     float cost = get_single_rr_cong_cost(inode);
 
-    auto itr = device_ctx.rr_node_to_non_config_node_set.find(inode);
-    if (itr != device_ctx.rr_node_to_non_config_node_set.end()) {
-        for (int node : device_ctx.rr_non_config_node_sets[itr->second]) {
-            if (node == inode) {
-                continue; //Already included above
-            }
+    if (route_ctx.non_configurable_bitset.get(inode)) {
+        // Access unordered_map only when the node is part of a non-configurable set
+        auto itr = device_ctx.rr_node_to_non_config_node_set.find(inode);
+        if (itr != device_ctx.rr_node_to_non_config_node_set.end()) {
+            for (int node : device_ctx.rr_non_config_node_sets[itr->second]) {
+                if (node == inode) {
+                    continue; //Already included above
+                }
 
-            cost += get_single_rr_cong_cost(node);
+                cost += get_single_rr_cong_cost(node);
+            }
         }
     }
     return (cost);
@@ -833,7 +839,7 @@ static t_clb_opins_used alloc_and_load_clb_opins_used_locally() {
      * specifies that this is necessary).                                       */
 
     t_clb_opins_used clb_opins_used_locally;
-    int clb_pin, iclass, class_low, class_high;
+    int clb_pin, iclass;
 
     auto& cluster_ctx = g_vpr_ctx.clustering();
 
@@ -841,9 +847,11 @@ static t_clb_opins_used alloc_and_load_clb_opins_used_locally() {
 
     for (auto blk_id : cluster_ctx.clb_nlist.blocks()) {
         auto type = physical_tile_type(blk_id);
+        auto sub_tile = type->sub_tiles[get_sub_tile_index(blk_id)];
 
-        get_class_range_for_block(blk_id, &class_low, &class_high);
-        clb_opins_used_locally[blk_id].resize(type->num_class);
+        auto class_range = get_class_range_for_block(blk_id);
+
+        clb_opins_used_locally[blk_id].resize((int)type->class_inf.size());
 
         if (is_io_type(type)) continue;
 
@@ -865,7 +873,7 @@ static t_clb_opins_used alloc_and_load_clb_opins_used_locally() {
                     VTR_ASSERT(type->class_inf[iclass].type == DRIVER);
 
                     /* Check to make sure class is in same range as that assigned to block */
-                    VTR_ASSERT(iclass >= class_low && iclass <= class_high);
+                    VTR_ASSERT(iclass >= class_range.low && iclass <= class_range.high);
 
                     //We push back OPEN to reserve space to store the exact pin which
                     //will be reserved (determined later)
@@ -931,7 +939,14 @@ void alloc_and_load_rr_node_route_structs() {
     auto& device_ctx = g_vpr_ctx.device();
 
     route_ctx.rr_node_route_inf.resize(device_ctx.rr_nodes.size());
+    route_ctx.non_configurable_bitset.resize(device_ctx.rr_nodes.size());
+    route_ctx.non_configurable_bitset.fill(false);
+
     reset_rr_node_route_structs();
+
+    for (auto i : device_ctx.rr_node_to_non_config_node_set) {
+        route_ctx.non_configurable_bitset.set(i.first, true);
+    }
 }
 
 void reset_rr_node_route_structs() {
@@ -1004,7 +1019,6 @@ static vtr::vector<ClusterBlockId, std::vector<int>> load_rr_clb_sources(const t
     vtr::vector<ClusterBlockId, std::vector<int>> rr_blk_source;
 
     int i, j, iclass, inode;
-    int class_low, class_high;
     t_rr_type rr_type;
 
     auto& cluster_ctx = g_vpr_ctx.clustering();
@@ -1014,10 +1028,13 @@ static vtr::vector<ClusterBlockId, std::vector<int>> load_rr_clb_sources(const t
 
     for (auto blk_id : cluster_ctx.clb_nlist.blocks()) {
         auto type = physical_tile_type(blk_id);
-        get_class_range_for_block(blk_id, &class_low, &class_high);
-        rr_blk_source[blk_id].resize(type->num_class);
-        for (iclass = 0; iclass < type->num_class; iclass++) {
-            if (iclass >= class_low && iclass <= class_high) {
+        auto sub_tile = type->sub_tiles[get_sub_tile_index(blk_id)];
+
+        auto class_range = get_class_range_for_block(blk_id);
+
+        rr_blk_source[blk_id].resize((int)type->class_inf.size());
+        for (iclass = 0; iclass < (int)type->class_inf.size(); iclass++) {
+            if (iclass >= class_range.low && iclass <= class_range.high) {
                 i = place_ctx.block_locs[blk_id].loc.x;
                 j = place_ctx.block_locs[blk_id].loc.y;
 
@@ -1260,11 +1277,14 @@ void print_route(FILE* fp, const vtr::vector<ClusterNetId, t_traceback>& traceba
 
                     fprintf(fp, "%d  ", device_ctx.rr_nodes[inode].ptc_num());
 
-                    if (!is_io_type(device_ctx.grid[ilow][jlow].type) && (rr_type == IPIN || rr_type == OPIN)) {
+                    auto physical_tile = device_ctx.grid[ilow][jlow].type;
+                    if (!is_io_type(physical_tile) && (rr_type == IPIN || rr_type == OPIN)) {
                         int pin_num = device_ctx.rr_nodes[inode].ptc_num();
                         int xoffset = device_ctx.grid[ilow][jlow].width_offset;
                         int yoffset = device_ctx.grid[ilow][jlow].height_offset;
-                        ClusterBlockId iblock = place_ctx.grid_blocks[ilow - xoffset][jlow - yoffset].blocks[0];
+                        int sub_tile_offset = physical_tile->get_sub_tile_loc_from_pin(pin_num);
+
+                        ClusterBlockId iblock = place_ctx.grid_blocks[ilow - xoffset][jlow - yoffset].blocks[sub_tile_offset];
                         VTR_ASSERT(iblock);
                         t_pb_graph_pin* pb_pin = get_pb_graph_node_pin_from_block_pin(iblock, pin_num);
                         t_pb_type* pb_type = pb_pin->parent_node->pb_type;
@@ -1320,8 +1340,8 @@ void print_route(const char* placement_file, const char* route_file) {
 
     if (getEchoEnabled() && isEchoFileEnabled(E_ECHO_MEM)) {
         fp = vtr::fopen(getEchoFileName(E_ECHO_MEM), "w");
-        fprintf(fp, "\nNum_heap_allocated: %d   Num_trace_allocated: %d\n",
-                num_heap_allocated, num_trace_allocated);
+        fprintf(fp, "\nNum_trace_allocated: %d\n",
+                num_trace_allocated);
         fprintf(fp, "Num_linked_f_pointer_allocated: %d\n",
                 num_linked_f_pointer_allocated);
         fclose(fp);
@@ -1331,14 +1351,14 @@ void print_route(const char* placement_file, const char* route_file) {
     route_ctx.routing_id = vtr::secure_digest_file(route_file);
 }
 
-//To ensure the router can only swaps pin which are actually logically equivalent some block output pins must be
+//To ensure the router can only swap pins which are actually logically equivalent, some block output pins must be
 //reserved in certain cases.
 //
 // In the RR graph, output pin equivalence is modelled by a single SRC node connected to (multiple) OPINs, modelling
 // that each of the OPINs is logcially equivalent (i.e. it doesn't matter through which the router routes a signal,
 // so long as it is from the appropriate SRC).
 //
-// This correctly models 'full' equivalence (e.g. if there is a full crossbar between the outputs), but is to
+// This correctly models 'full' equivalence (e.g. if there is a full crossbar between the outputs), but is too
 // optimistic for 'instance' equivalence (which typcially models the pin equivalence possible by swapping sub-block
 // instances like BLEs). In particular, for the 'instance' equivalence case, some of the 'equivalent' block outputs
 // may be used by internal signals which are routed entirely *within* the block (i.e. the signals which never leave
@@ -1360,7 +1380,7 @@ void reserve_locally_used_opins(HeapInterface* heap, float pres_fac, float acc_f
     if (rip_up_local_opins) {
         for (auto blk_id : cluster_ctx.clb_nlist.blocks()) {
             type = physical_tile_type(blk_id);
-            for (iclass = 0; iclass < type->num_class; iclass++) {
+            for (iclass = 0; iclass < (int)type->class_inf.size(); iclass++) {
                 num_local_opin = route_ctx.clb_opins_used_locally[blk_id][iclass].size();
 
                 if (num_local_opin == 0) continue;
@@ -1381,7 +1401,7 @@ void reserve_locally_used_opins(HeapInterface* heap, float pres_fac, float acc_f
 
     for (auto blk_id : cluster_ctx.clb_nlist.blocks()) {
         type = physical_tile_type(blk_id);
-        for (iclass = 0; iclass < type->num_class; iclass++) {
+        for (iclass = 0; iclass < (int)type->class_inf.size(); iclass++) {
             num_local_opin = route_ctx.clb_opins_used_locally[blk_id][iclass].size();
 
             if (num_local_opin == 0) continue;
@@ -1389,7 +1409,7 @@ void reserve_locally_used_opins(HeapInterface* heap, float pres_fac, float acc_f
             VTR_ASSERT(type->class_inf[iclass].equivalence == PortEquivalence::INSTANCE);
 
             //From the SRC node we walk through it's out going edges to collect the
-            //OPIN nodes. We then push them onto a heap so the the OPINs with lower
+            //OPIN nodes. We then push them onto a heap so the OPINs with lower
             //congestion cost are popped-off/reserved first. (Intuitively, we want
             //the reserved OPINs to move out of the way of congestion, by preferring
             //to reserve OPINs with lower congestion costs).

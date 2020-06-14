@@ -30,10 +30,27 @@ bool is_empty_type(t_logical_block_type_ptr type);
 //Returns the corresponding physical type given the logical type as parameter
 t_physical_tile_type_ptr physical_tile_type(ClusterBlockId blk);
 
+//Returns the corresponding physical pin based on the input parameters:
+// - physical_tile
+// - relative_pin: this is the pin relative to a specific sub tile
+// - capacity location: absolute sub tile location
+int get_physical_pin_from_capacity_location(t_physical_tile_type_ptr physical_tile, int relative_pin, int capacity_location);
+
+//Returns a pair consisting of the absolute capacity location relative to the pin parameter
+//and the relative pin within the sub tile
+std::pair<int, int> get_capacity_location_from_physical_pin(t_physical_tile_type_ptr physical_tile, int pin);
+
+//Returns the sub tile corresponding to the logical block location within a physical type
+int get_sub_tile_index(ClusterBlockId blk);
+
 int get_unique_pb_graph_node_id(const t_pb_graph_node* pb_graph_node);
 
-void get_class_range_for_block(const ClusterBlockId blk_id, int* class_low, int* class_high);
+//Returns the physical class range relative to a block id. This must be called after placement
+//as the block id is used to retrieve the information of the used physical tile.
+t_class_range get_class_range_for_block(const ClusterBlockId blk_id);
 
+//Returns the physical pin range relative to a block id. This must be called after placement
+//as the block id is used to retrieve the information of the used physical tile.
 void get_pin_range_for_block(const ClusterBlockId blk_id,
                              int* pin_low,
                              int* pin_high);
@@ -125,9 +142,6 @@ void free_pin_id_to_pb_mapping(vtr::vector<ClusterBlockId, t_pb**>& pin_id_to_pb
 float compute_primitive_base_cost(const t_pb_graph_node* primitive);
 int num_ext_inputs_atom_block(AtomBlockId blk_id);
 
-void get_blk_pin_from_port_pin(int blk_type_index, int port, int port_pin, int* blk_pin);
-void free_blk_pin_from_port_pin();
-
 void alloc_and_load_idirect_from_blk_pin(t_direct_inf* directs, int num_directs, int*** idirect_from_blk_pin, int*** direct_type_from_blk_pin);
 
 void parse_direct_pin_name(char* src_string, int line, int* start_pin_index, int* end_pin_index, char* pb_type_name, char* port_name);
@@ -144,7 +158,11 @@ AtomBlockId find_memory_sibling(const t_pb* pb);
 void place_sync_external_block_connections(ClusterBlockId iblk);
 int get_max_num_pins(t_logical_block_type_ptr logical_block);
 
+//Verifies whether a given logical block is compatible with a given physical tile
 bool is_tile_compatible(t_physical_tile_type_ptr physical_tile, t_logical_block_type_ptr logical_block);
+
+//Verifies whether a logical block and a relative placement location is compatible with a given physical tile
+bool is_sub_tile_compatible(t_physical_tile_type_ptr physical_tile, t_logical_block_type_ptr logical_block, int sub_tile_loc);
 
 //Returns the physical tile type which 'best' matches logical_block
 t_physical_tile_type_ptr pick_best_physical_type(t_logical_block_type_ptr logical_block);
@@ -156,12 +174,22 @@ t_logical_block_type_ptr pick_best_logical_type(t_physical_tile_type_ptr physica
 //the best expected physical tile the block should use (if no valid placement).
 t_physical_tile_type_ptr get_physical_tile_type(const ClusterBlockId blk);
 
-int get_logical_pin(t_physical_tile_type_ptr physical_tile,
-                    t_logical_block_type_ptr logical_block,
-                    int pin);
+//Returns the physical pin index (within 'physical_tile') corresponding to the
+//logical index ('pin' of the first instance of 'logical_block' within the physcial tile.
+//
+//Throws an exception if the corresponding physical pin can't be found.
 int get_physical_pin(t_physical_tile_type_ptr physical_tile,
                      t_logical_block_type_ptr logical_block,
                      int pin);
+
+//Returns the physical pin index (within 'physical_tile') corresponding to the
+//logical index ('pin') of the 'logical_block' at sub-tile location 'sub_tile_index'.
+//
+//Throws an exception if the corresponding physical pin can't be found.
+int get_sub_tile_physical_pin(int sub_tile_index,
+                              t_physical_tile_type_ptr physical_tile,
+                              t_logical_block_type_ptr logical_block,
+                              int pin);
 
 //Returns the physical pin of the tile, related to the given ClusterNedId, and the net pin index
 int net_pin_to_tile_pin_index(const ClusterNetId net_id, int net_pin_index);
@@ -169,10 +197,19 @@ int net_pin_to_tile_pin_index(const ClusterNetId net_id, int net_pin_index);
 //Returns the physical pin of the tile, related to the given ClusterPinId
 int tile_pin_index(const ClusterPinId pin);
 
+// Returns one of the physical ports of a tile corresponding to the port_name.
+// Given that each sub_tile's port that has exactly the same name has to be equivalent
+// one to the other, it is indifferent which port is returned.
+t_physical_tile_port find_tile_port_by_name(t_physical_tile_type_ptr type, const char* port_name);
+
 int max_pins_per_grid_tile();
 
 void pretty_print_uint(const char* prefix, size_t value, int num_digits, int scientific_precision);
 void pretty_print_float(const char* prefix, double value, int num_digits, int scientific_precision);
+
+void print_timing_stats(std::string name,
+                        const t_timing_analysis_profile_info& current,
+                        const t_timing_analysis_profile_info& past = t_timing_analysis_profile_info());
 
 // Make room in a vector, with amortized O(1) time by using a pow2 growth pattern.
 //
@@ -195,5 +232,4 @@ void make_room_in_vector(T* vec, size_t elem_position) {
 
     vec->resize(elem_position + 1);
 }
-
 #endif

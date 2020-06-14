@@ -1,51 +1,159 @@
 # Commit Procedures
 
-## For external developers
-See [Submitting Code to VTR](CONTRIBUTING.md#submitting-code-to-vtr).
+For general guidance on contributing to VTR see [Submitting Code to VTR](CONTRIBUTING.md#submitting-code-to-vtr).
 
-## For developers with commit rights
-The guiding principle in internal development is to submit your work into the repository without breaking other people's work.
-When you commit, make sure that the repository compiles, that the flow runs, and that you did not clobber someone else's work.
-In the event that you are responsible for "breaking the build", fix the build at top priority.
+The actual machanics of submitting code are outlined below.
 
-We have some guidelines in place to help catch most of these problems:
+However they differ slightly depending on whether you are:
+ * an **internal developer** (i.e. you have commit access to the main VTR repository at `github.com/verilog-to-routing/vtr-verilog-to-routing`) or, 
+ * an (**external developer**) (i.e. no commit access).
 
-1.  Before you push code to the central repository, your code MUST pass the check-in regression test.
-    The check-in regression test is a quick way to test if any part of the VTR flow is broken.
+The overall approach is similar, but we call out the differences below.
 
-    At a minimum you must run:
-    ```shell
-    #From the VTR root directory
-    $ ./run_reg_test.pl vtr_reg_basic
+1. Setup a local repository on your development machine.
+
+    a. **External Developers**
+
+    * Create a 'fork' of the VTR repository.
+
+        Usually this is done on GitHub, giving you a copy of the VTR repository (i.e. `github.com/<username>/vtr-verilog-to-routing`, where `<username>` is your GitHub username) to which you have commit rights.
+        See [About forks](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-forks) in the GitHub documentation.
+
+    * Clone your 'fork' onto your local machine.
+    
+        For example, `git clone git@github.com:<username>/vtr-verilog-to-routing.git`, where `<username>` is your GitHub username.
+
+    b. **Internal Developers**
+
+    * Clone the main VTR repository onto your local machine.
+    
+        For example, `git clone git@github.com:verilog-to-routing/vtr-verilog-to-routing.git`.
+
+2. Move into the cloned repository.
+
+    For example, `cd vtr-verilog-to-routing`.
+
+3. Create a *branch*, based off of `master` to work on.
+
+    For example, `git checkout -b my_awesome_branch master`, where `my_awesome_branch` is some helpful (and descriptive) name you give you're branch.
+    *Please try to pick descriptive branch names!*
+
+4. Make your changes to the VTR code base.
+
+5. Test your changes to ensure they work as intended and have not broken other features.
+
+    At the bare minimum it is recommended to run:
     ```
-    You may push if all the tests return `All tests passed`.
-
-    However you are strongly encouraged to run both the *basic* and *strong* regression tests:
-    ```shell
-    #From the VTR root directory
-    $ ./run_reg_test.pl vtr_reg_basic vtr_reg_strong
+    make                                                #Rebuild the code
+    ./run_reg_test.pl vtr_reg_basic vtr_reg_strong      #Run tests
     ```
-    since it performs much more thorough testing.
 
-    It is typically a good idea to run tests regularly as you make changes.
-    If you have failures see [how to debugging failed tests](#debugging-failed-tests).
+    See [Running Tests](#running-tests) for more details.
 
-2.  The automated [BuildBot](http://builds.verilogtorouting.org:8080/waterfall) will perform more extensive regressions tests and mark which revisions are stable.
+    Also note that additional [code formatting](#code-formatting) checks, and tests will be run when you open a Pull Request.
 
-3.  Everyone who is doing development must write regression tests for major feature they create.
-    This ensures regression testing will detect if a feature is broken by someone (or yourself).
-    See [Adding Tests](#adding-tests) for details.
+6. Commit your changes (i.e. `git add` followed by `git commit`).
 
-4.  In the event a regression test is broken, the one responsible for having the test pass is in charge of determining:
-    * If there is a bug in the source code, in which case the source code needs to be updated to fix the bug, or
-    * If there is a problem with the test (perhaps the quality of the tool did in fact get better or perhaps there is a bug with the test itself), in which case the test needs to be updated to reflect the new changes.
+    *Please try to use good commit messages!*
 
-    If the golden results need to be updated and you are sure that the new golden results are better, use the command `../scripts/parse_vtr_task.pl -create_golden your_regression_test_name_here`
+    See [Commit Messages and Structure](#commit-messages-and-structure) for details.
 
-5.  Keep in sync with the master branch as regularly as you can (i.e. `git pull` or `git pull --rebase`).
-    The longer code deviates from the trunk, the more painful it is to integrate back into the trunk.
+7. Push the changes to GitHub.
 
-Whatever system that we come up with will not be foolproof so be conscientious about how your changes will affect other developers.
+    For example, `git push origin my_awesome_branch`.
+
+    a. **External Developers**
+
+    Your code changes will now exist in your branch (e.g. `my_awesome_branch`) within your fork (e.g. `github.com/<username>/vtr-verilog-to-routing/tree/my_awesome_branch`, where `<username>` is your GitHub username)
+
+    b. **Internal Developers**
+
+    Your code changes will now exist in your branch (e.g. `my_awesome_branch`) within the main VTR repository (i.e. `github.com/verilog-to-routing/vtr-verilog-to-routing/tree/my_awesome_branch`)
+
+8. Create a Pull Request (PR) to request your changes be merged into VTR.
+
+    * Navitage to your branch on GitHub
+
+        a. **External Developers**
+
+        Navigate to your branch within your fork on GitHub (e.g. `https://github.com/<username/vtr-verilog-to-routing/tree/my_awesome_branch`, where `<username>` is your GitHub username, and `my_awesome_branch` is your branch name).
+
+        b. **Internal Developers**
+
+        Navigate to your branch on GitHub (e.g. `https://github.com/verilog-to-routing/vtr-verilog-to-routing/tree/my_awesome_branch`, where `my_awesome_branch` is your branch name).
+
+    * Select the `New pull request` button.
+
+        a. **External Developers**
+
+        If prompted, select `verilog-to-routing/vtr-verilog-to-routing` as the base repository.
+
+# Commit Messages and Structure
+
+## Commit Messages
+
+Commit messagaes are an important part of understanding the code base and it's history.
+It is therefore *extremely* important to provide the following information in the commit message:
+
+* What is being changed?
+* Why is this change occurring?
+
+The diff of changes included with the commit provides the details of what is actually changed, so only a high-level description of what is being done is needed.
+However a code diff provides *no* insight into **why** the change is being made, so this extremely helpful context can only be encoded in the commit message.
+
+The preferred convention in VTR is to structure commit messages as follows:
+```
+Header line: explain the commit in one line (use the imperative)
+
+More detailed explanatory text. Explain the problem that this commit
+is solving. Focus on why you are making this change as opposed to how
+(the code explains that). Are there side effects or other unintuitive
+consequences of this change? Here's the place to explain them.
+
+If necessary. Wrap lines at some reasonable point (e.g. 74 characters,
+or so) In some contexts, the header line is treated as the subject
+of the commit and the rest of the text as the body. The blank line
+separating the summary from the body is critical (unless you omit
+the body entirely); various tools like `log`, `shortlog` and `rebase`
+can get confused if you run the two together.
+
+Further paragraphs come after blank lines.
+
+ - Bullet points are okay, too
+
+ - Typically a hyphen or asterisk is used for the bullet, preceded
+   by a single space, with blank lines in between, but conventions
+   vary here
+
+You can also put issue tracker references at the bottom like this:
+
+Fixes: #123
+See also: #456, #789
+```
+(based off of [here](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html), and [here](https://github.com/torvalds/subsurface-for-dirk/blob/master/README.md#contributing)).
+
+Commit messages do not always need to be long, so use your judgement.
+More complex or involved changes with wider ranging implications likely deserve longer commit messages than fixing a simple typo.
+
+It is often helpful to phrase the first line of a commit as an imperative/command written as if to tell the repository what to do (e.g. `Update netlist data structure comments`, `Add tests for feature XYZ`, `Fix bug which ...`).
+
+To provide quick context, some VTR developers also tag the first line with the main part of the code base effected, some common ones include:
+* `vpr:` for the VPR place and route tool (`vpr/`)
+* `flow:` VTR flow architectures, scripts, tests, ... (`vtr_flow/`)
+* `archfpga:` for FPGA architecture library (`libs/libarchfpga`)
+* `vtrutil:` for common VTR utilities (`libs/libvtrutil`)
+* `doc:` Documentation (`doc/`, `*.md`, ...)
+* `infra:` Infrastructure (CI, `.github/`, ...)
+
+
+## Commit Structure
+Generally, you should strive to keep commits atomic (i.e. they do one logical change to the code).
+This often means keeping commits small and focused in what they change.
+Of course, a large number of miniscule commits is also unhelpful (overwhelming and difficult to see the structure), and sometimes things can only be done in large changes -- so use your judgement.
+A reasonable rule of thumb is to try and ensure VTR will still compile after each commit.
+
+For those familiar with history re-writing features in git (e.g. rebase) you can sometimes use these to clean-up your commit history after the fact.
+However these should only be done on private branches, and never directly on `master`.
 
 # Code Formatting
 
@@ -186,9 +294,9 @@ VTR also has a limited set of unit tests, which can be run with:
 $ make && make test
 ```
 
-### Running tests on presubmits via Kokoro
+## Running tests on Pull Requests (PRs) via Kokoro
 
-Because of the long runtime for nightly and weekly tests, a kokoro job can be
+Because of the long runtime for nightly and weekly tests, a Kokoro job can be
 used to run these tests once a Pull Request (PR) has been made at
 https://github.com/verilog-to-routing/vtr-verilog-to-routing.
 
@@ -199,45 +307,50 @@ Non-contributors can request a contributor on the project add a label
 and then and issue jobs for that PR.  If the tag remains after being added,
 there may not be an available Kokoro runner, so wait.
 
-#### Re-running tests on Kokoro
+### Re-running tests on Kokoro
 
 If a job fails due to an intermittent failure or a re-run is desired, a
 contributor can add the label "kokoro:force-run" to re-issue jobs for that PR.
 
-#### Checking results from Kokoro tests
+### Checking results from Kokoro tests
 
 Currently there is not a way for an in-flight job to be monitored.
 
-Once a job has been completed, the stdout and the output files (e.g.
-parse\_results.txt) are available by following the "Details" link that appears
-on the PR.
+Once a job has been completed, you can follow the "Details" link that appears on the PR status. 
+The Kokoro page will show the job's stdout in the 'Target Log' tab (once the job has completed).
+The full log can be downloading by clicking the 'Download Full Log' button, or from the 'Artifacts' tab.
 
-The stdout from run is available on the "Invocation Log" tab.  The log should
-be displayed, and can be downloaded via the "Download Full Log" button on the
-same tab.
+### Downloading logs from Google Cloud Storage (GCS)
 
-Output files (e.g. parse\_results.txt) can be found by following the "GCS"
-link on the "Invocation Details" tab.  Individual files can be downloaded by
-using the GCS browser.  If many files are desired, use "gsutil" to download
-the logs from GCS.
+After a Kokoro run is complete a number of useful log files (e.g. for each VPR invocation) are stored to Google Cloud Storage (GCS).
 
-#### Example of downloading logs from GCS
+The top level directory containing all VTR Kokoro runs is:
 
-An GCS example link from the "Invocation Details" tab:
+    https://console.cloud.google.com/storage/browser/vtr-verilog-to-routing/artifacts/prod/foss-fpga-tools/verilog-to-routing/upstream/
+
+PR jobs are under the `presubmit` directory, and continuous jobs (which run on the master branch) are under the `continuous` directory.
+
+Each Kokoro run has a unique build number, which can be found in the log file (available via the Kokoro run webpage).
+For example, if the log file contains:
+```
+export KOKORO_BUILD_NUMBER="450"
+```
+then the Kokoro build number is `450`.
+
+If build 450 corresponded to a PR (`presubmit`) build of the `nightly` regression tests, the resulting output files would be available at:
+
+    https://console.cloud.google.com/storage/browser/vtr-verilog-to-routing/artifacts/prod/foss-fpga-tools/verilog-to-routing/upstream/presubmit/nightly/450/
+
+where `presubmit/nightly/450/` (the type, test name and build number) have been appended to the base URL.
+Navigating to that URL will allow you to browse and download the collected log files.
+
+To download all the files from that Kokoro run, replace `https://console.cloud.google.com/storage/browser/` in the URL with `gs://` and invoke the [gsutil](https://cloud.google.com/storage/docs/gsutil) command (and it's `cp -R` sub-command), like so:
 
 ```
-https://console.cloud.google.com/storage/browser/vtr-verilog-to-routing/artifacts/prod/foss-fpga-tools/verilog-to-routing/upstream/presubmit/nightly/75/20200129-124904
+gsutil -m cp -R gs://vtr-verilog-to-routing/artifacts/prod/foss-fpga-tools/verilog-to-routing/upstream/presubmit/nightly/450 .
 ```
 
-To download all the files from that run, remove
-`https://console.cloud.google.com/storage/browser/` from the beginning of the
-URL, and invoke gsutil with the remainder, like so:
-
-```
-gsutil -m cp -R gs://vtr-verilog-to-routing/artifacts/prod/foss-fpga-tools/verilog-to-routing/upstream/presubmit/nightly/52/20200123-165906 .
-```
-
-This will download all of the logs to the current working directory.
+This will download all of the logs to the current directory for inspection.
 
 #### Kokoro runner details
 
@@ -246,18 +359,18 @@ Kokoro runners are a standard
 VM with a 4 TB `pd-standard` disk used to perform the build of VPR and run the
 tests.
 
-#### What to do if kokoro jobs are not starting?
+#### What to do if Kokoro jobs are not starting?
 
-There are several reasons kokoro jobs might not be starting.
+There are several reasons Kokoro jobs might not be starting.
 Try adding the "kokoro:force-run" label if it is not already added, or remove
 and add it if it already was added.
 
 If adding the label has no affect, check GCS status, as a GCS disruption will
-also disrupt kokoro.
+also disrupt Kokoro.
 
 Another reason jobs may not start is if there is a large backlog of jobs
 running, there may be no runners left to start.  In this case, someone with
-kokoro management rights may need to terminate stale jobs, or wait for job
+Kokoro management rights may need to terminate stale jobs, or wait for job
 timeouts.
 
 # Debugging Failed Tests
@@ -746,6 +859,140 @@ $ make
 ```
 this turns on more extensive assertion checking and re-builds VTR.
 
+## GDB Pretty Printers
+To make it easier to debug some of VTR's data structures with [GDB](www.gnu.org/gdb).
+
+### STL Pretty Printers
+
+It is helpful to enable [STL pretty printers](https://sourceware.org/gdb/wiki/STLSupport), which make it much easier to debug data structures using STL.
+
+For example printing a `std::vector<int>` by default prints:
+
+    (gdb) p/r x_locs
+    $2 = {<std::_Vector_base<int, std::allocator<int> >> = {
+        _M_impl = {<std::allocator<int>> = {<__gnu_cxx::new_allocator<int>> = {<No data fields>}, <No data fields>}, _M_start = 0x555556f063b0, 
+          _M_finish = 0x555556f063dc, _M_end_of_storage = 0x555556f064b0}}, <No data fields>}
+
+which is not very helpful.
+
+But with STL pretty printers it prints:
+
+    (gdb) p x_locs
+    $2 = std::vector of length 11, capacity 64 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+which is much more helpful for debugging!
+
+If STL pretty printers aren't already enabled on your system, add the following to your [.gdbinit file](https://sourceware.org/gdb/current/onlinedocs/gdb/gdbinit-man.html):
+
+    python
+    import sys
+    sys.path.insert(0, '$STL_PRINTER_ROOT')
+    from libstdcxx.v6.printers import register_libstdcxx_printers
+    register_libstdcxx_printers(None)
+
+    end
+
+where `$STL_PRINTER_ROOT` should be replaced with the appropriate path to the STL pretty printers.
+For example recent versions of GCC include these under `/usr/share/gcc-*/python` (e.g. `/usr/share/gcc-9/python`)
+
+
+### VTR Pretty Printers
+
+VTR includes some pretty printers for some VPR/VTR specific types.
+
+For example, without the pretty printers you would see the following when printing a VPR `AtomBlockId`:
+
+    (gdb) p blk_id
+    $1 = {
+      id_ = 71
+    }
+
+But with the VTR pretty printers enabled you would see:
+
+    (gdb) p blk_id
+    $1 = AtomBlockId(71)
+
+To enable the VTR pretty printers in GDB add the following to your [.gdbinit file](https://sourceware.org/gdb/current/onlinedocs/gdb/gdbinit-man.html):
+
+    python
+    import sys
+
+    sys.path.insert(0, "$VTR_ROOT/dev")
+    import vtr_gdb_pretty_printers
+    gdb.pretty_printers.append(vtr_gdb_pretty_printers.vtr_type_lookup)
+
+    end
+
+where ``$VTR_ROOT`` should be replaced with the root of the VTR source tree on your system.
+
+## RR (Record Replay) Debugger
+
+[RR](https://rr-project.org/) extends GDB with the ability to to record a run of a tool and then re-run it to reproduce any observed issues.
+RR also enables efficient reverse execution (!) which can be *extremely helpful* when tracking down the source of a bug.
+
+# Speeding up the edit-compile-test cycle
+Rapid iteration through the edit-compile-test/debug cycle is very helpful when making code changes to VTR.
+
+The following is some guidance on techniques to reduce the time required.
+
+# Speeding Compilation
+
+1. Parallel compilation
+
+    For instance when [building VTR](BUILDING.md) using make, you can specify the `-j N` option to compile the code base with N parallel jobs:
+    ```
+    $ make -j N
+    ```
+
+    A reasonable value for `N` is equal to the number of threads you system can run. For instance, if your system has 4 cores with HyperThreading (i.e. 2-way SMT) you could run:
+    ```
+    $ make -j8
+    ```
+
+2. Building only a subset of VTR
+
+    If you know your changes only effect a specific tool in VTR, you can request that only that tool is rebuilt.
+    For instance, if you only wanted to re-compile VPR you could run:
+    ```
+    $ make vpr
+    ```
+    which would avoid re-building other tools (e.g. ODIN, ABC).
+
+3. Use ccache
+
+    [ccache](https://ccache.dev/) is a program which caches previous compilation results.
+    This can save significant time, for instance, when switching back and forth between release and debug builds.
+
+    VTR's cmake configuration should automatically detect and make use of ccache once it is installed.
+
+    For instance on Ubuntu/Debian systems you can install ccache with:
+    ```
+    $ sudo apt install ccache
+    ```
+    This only needs to be done once on your development system.
+
+4. Disable Interprocedural Optimizatiaons (IPO)
+
+    IPO re-optimizes an entire executable at link time, and is automatically enabled by VTR if a supporting compiler is found.
+    This can notably improve performance (e.g. ~10-20% faster), but can significantly increase compilation time (e.g. >2x in some cases).
+    When frequently re-compiling and debugging the extra execution speed may not be worth the longer compilation times.
+    In such cases you can manually disable IPO by setting the cmake parameter `VTR_IPO_BUILD=off`.
+
+    For instance using the wrapper Makefile:
+    ```
+    $ make CMAKE_PARAMS="-DVTR_IPO_BUILD=off"
+    ```
+    Note that this option is sticky, so subsequent calls to make don't need to keep specifying VTR_IPO_BUILD, until you want to re-enable it.
+
+    This setting can also be changed with the ccmake tool (i.e. `ccmake build`).
+
+All of these option can be used in combination.
+For example, the following will re-build only VPR using 8 parallel jobs with IPO disabled:
+```
+make CMAKE_PARAMS="-DVTR_IPO_BUILD=off" -j8 vpr
+```
+
+
 # External Subtrees
 VTR includes some code which is developed in external repositories, and is integrated into the VTR source tree using [git subtrees](https://www.atlassian.com/blog/git/alternatives-to-git-submodule-git-subtree).
 
@@ -898,10 +1145,14 @@ In preparation for a release it may make sense to produce 'release candidates' w
 The following outlines the procedure to following when making an official VTR release:
 
  * Check the code compiles on the list of supported compilers
- * Check that all regression tests pass
+ * Check that all regression tests pass functionality
  * Update regression test golden results to match the released version
- * Increment the version number (set in root CMakeLists.txt)
+ * Check that all regression tests pass QoR
  * Create a new entry in the CHANGELOG.md for the release, summarizing at a high-level user-facing changes
+ * Increment the version number (set in root CMakeLists.txt)
  * Create a git annotated tag (e.g. `v8.0.0`) and push it to github
-
+ * GitHub will automatically create a release based on the tag
+ * Add the new change log entry to the [GitHub release description](https://github.com/verilog-to-routing/vtr-verilog-to-routing/releases)
+ * Update the [ReadTheDocs configuration](https://readthedocs.org/projects/vtr/versions/) to build and serve documentation for the relevant tag (e.g. `v8.0.0`)
+ * Send a release announcement email to the [vtr-announce](vtr-announce@googlegroups.com) mailing list (make sure to thank all contributors!)
 

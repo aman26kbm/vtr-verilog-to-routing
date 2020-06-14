@@ -40,6 +40,7 @@
 #include "echo_files.h"
 #include "route_common.h"
 #include "read_route.h"
+#include "binary_heap.h"
 
 /*************Functions local to this module*************/
 static void process_route(std::ifstream& fp, const char* filename, int& lineno);
@@ -49,6 +50,7 @@ static void process_global_blocks(std::ifstream& fp, ClusterNetId inet, const ch
 static void format_coordinates(int& x, int& y, std::string coord, ClusterNetId net, const char* filename, const int lineno);
 static void format_pin_info(std::string& pb_name, std::string& port_name, int& pb_pin_num, std::string input);
 static std::string format_name(std::string name);
+static bool check_rr_graph_connectivity(RRNodeId prev_node, RRNodeId node);
 
 /*************Global Functions****************************/
 bool read_route(const char* route_file, const t_router_opts& router_opts, bool verify_file_digests) {
@@ -206,9 +208,11 @@ static void process_nodes(std::ifstream& fp, ClusterNetId inet, const char* file
     /*remember the position of the last line in order to go back*/
     std::streampos oldpos = fp.tellg();
     int inode, x, y, x2, y2, ptc, switch_id, offset;
+    std::string prev_type;
     int node_count = 0;
     std::string input;
     std::vector<std::string> tokens;
+    RRNodeId prev_node(-1);
 
     /*Walk through every line that begins with Node:*/
     while (std::getline(fp, input)) {
@@ -258,12 +262,26 @@ static void process_nodes(std::ifstream& fp, ClusterNetId inet, const char* file
                               "The coordinates of node %d does not match the rr graph", inode);
                 }
                 offset = 2;
+
+                /* Check for connectivity, this throws an exception when a dangling net is encountered in the routing file */
+                bool legal_node = check_rr_graph_connectivity(prev_node, node.id());
+                if (!legal_node) {
+                    vpr_throw(VPR_ERROR_ROUTE, filename, lineno, "Dangling branch at net %lu, nodes %d -> %d: %s", inet, prev_node, inode, input.c_str());
+                }
+                prev_node = node.id();
             } else {
                 if (node.xlow() != x || node.xhigh() != x || node.yhigh() != y || node.ylow() != y) {
                     vpr_throw(VPR_ERROR_ROUTE, filename, lineno,
                               "The coordinates of node %d does not match the rr graph", inode);
                 }
                 offset = 0;
+
+                bool legal_node = check_rr_graph_connectivity(prev_node, node.id());
+                prev_node = node.id();
+                if (!legal_node) {
+                    vpr_throw(VPR_ERROR_ROUTE, filename, lineno, "Dangling branch at net %lu, nodes %d -> %d: %s", inet, prev_node, inode, input.c_str());
+                }
+                prev_node = node.id();
             }
 
             /* Verify types and ptc*/
@@ -290,9 +308,17 @@ static void process_nodes(std::ifstream& fp, ClusterNetId inet, const char* file
                 /*This is an opin or ipin, process its pin nums*/
                 if (!is_io_type(device_ctx.grid[x][y].type) && (tokens[2] == "IPIN" || tokens[2] == "OPIN")) {
                     int pin_num = device_ctx.rr_nodes[inode].ptc_num();
+
+                    auto type = device_ctx.grid[x][y].type;
                     int height_offset = device_ctx.grid[x][y].height_offset;
-                    ClusterBlockId iblock = place_ctx.grid_blocks[x][y - height_offset].blocks[0];
-                    t_pb_graph_pin* pb_pin = get_pb_graph_node_pin_from_block_pin(iblock, pin_num);
+
+                    int capacity, relative_pin;
+                    std::tie(capacity, relative_pin) = get_capacity_location_from_physical_pin(type, pin_num);
+
+                    ClusterBlockId iblock = place_ctx.grid_blocks[x][y - height_offset].blocks[capacity];
+                    t_pb_graph_pin* pb_pin;
+
+                    pb_pin = get_pb_graph_node_pin_from_block_pin(iblock, pin_num);
                     t_pb_type* pb_type = pb_pin->parent_node->pb_type;
 
                     std::string pb_name, port_name;
@@ -435,4 +461,40 @@ static std::string format_name(std::string name) {
                         name.c_str());
         return nullptr;
     }
+}
+
+/* Check for a discontinuity in the trace looking at the rr_graph
+ * This is a check to ensure illegal dangling branches are caught before the program moves further
+ * @returns false if there is a discontinuity */
+static bool check_rr_graph_connectivity(RRNodeId prev_node, RRNodeId node) {
+    // Check if its the first node of the series
+    if (prev_node == RRNodeId(-1)) return true;
+
+    // Check if the nodes are the same, which is illegal
+    if (prev_node == node) return false;
+
+    auto& device_ctx = g_vpr_ctx.device();
+    const auto& rr_graph = device_ctx.rr_nodes;
+    const auto& switch_info = device_ctx.rr_switch_inf;
+
+    // If it's starting a new sub branch this is ok
+    if (rr_graph.node_type(prev_node) == SINK) return true;
+
+    for (RREdgeId edge : rr_graph.edge_range(prev_node)) {
+        //If the sink node is reachable by previous node return true
+        if (rr_graph.edge_sink_node(edge) == node) {
+            return true;
+        }
+
+        // If there are any non-configurable branches return true
+        short edge_switch = rr_graph.edge_switch(edge);
+        if (!(switch_info[edge_switch].configurable())) return true;
+    }
+
+    // If it's part of a non configurable node list, return true
+    if (rr_graph.num_non_configurable_edges(node) != 0) {
+        return true;
+    }
+
+    return false;
 }

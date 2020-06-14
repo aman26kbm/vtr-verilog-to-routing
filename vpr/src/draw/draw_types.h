@@ -52,8 +52,9 @@ enum e_draw_nets {
 enum e_draw_rr_toggle {
     DRAW_NO_RR = 0,
     DRAW_NODES_RR,
-    DRAW_NODES_AND_SBOX_RR,
-    DRAW_ALL_BUT_BUFFERS_RR,
+    DRAW_NODES_SBOX_RR,
+    DRAW_NODES_SBOX_CBOX_RR,
+    DRAW_NODES_SBOX_CBOX_INTERNAL_RR,
     DRAW_ALL_RR,
 };
 
@@ -171,6 +172,10 @@ struct t_draw_state {
     int show_routing_bb = OPEN;
     e_draw_routing_util show_routing_util = DRAW_NO_ROUTING_UTIL;
     e_draw_rr_toggle draw_rr_toggle = DRAW_NO_RR;
+    bool clip_routing_util = false;
+    bool draw_block_outlines = true;
+    bool draw_block_text = true;
+    int draw_net_max_fanout = std::numeric_limits<int>::max();
     int max_sub_blk_lvl = 0;
     int show_blk_internal = 0;
     bool show_graphics = false;
@@ -182,13 +187,18 @@ struct t_draw_state {
     t_draw_rr_node* draw_rr_node = nullptr;
     std::shared_ptr<const SetupTimingInfo> setup_timing_info;
     const t_arch* arch_info = nullptr;
-    std::unique_ptr<const vtr::ColorMap> color_map = nullptr;
+    std::shared_ptr<const vtr::ColorMap> color_map = nullptr;
     bool save_graphics = false;
+    std::string graphics_commands;
     bool forced_pause = false;
+    int sequence_number = 0;
+    float net_alpha = 0.1;
 
     std::string save_graphics_file_base = "vpr";
 
     t_draw_state() = default;
+    t_draw_state(const t_draw_state&) = default;
+    t_draw_state& operator=(const t_draw_state&) = default;
 
     void reset_nets_congestion_and_rr();
 

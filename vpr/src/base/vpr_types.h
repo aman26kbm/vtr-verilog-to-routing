@@ -32,6 +32,7 @@
 #include "clustered_netlist_fwd.h"
 #include "constant_nets.h"
 #include "clock_modeling.h"
+#include "heap_type.h"
 
 #include "vtr_assert.h"
 #include "vtr_ndmatrix.h"
@@ -136,6 +137,12 @@ enum class e_balance_block_type_util {
     OFF,
     ON,
     AUTO
+};
+
+enum class e_check_route_option {
+    OFF,
+    QUICK,
+    FULL
 };
 
 /* Selection algorithm for selecting next seed  */
@@ -431,6 +438,12 @@ struct t_timing_inf {
     std::string SDCFile;
 };
 
+enum class e_timing_update_type {
+    FULL,
+    INCREMENTAL,
+    AUTO
+};
+
 /***************************************************************************
  * Placement and routing data types
  ****************************************************************************/
@@ -474,17 +487,6 @@ struct t_net_power {
     float density;
 };
 
-/* s_grid_tile is the minimum tile of the fpga
- * type:  Pointer to type descriptor, NULL for illegal
- * width_offset: Number of grid tiles reserved based on width (right) of a block
- * height_offset: Number of grid tiles reserved based on height (top) of a block */
-struct t_grid_tile {
-    t_physical_tile_type_ptr type = nullptr;
-    int width_offset = 0;
-    int height_offset = 0;
-    const t_metadata_dict* meta = nullptr;
-};
-
 /* Stores the bounding box of a net in terms of the minimum and   *
  * maximum coordinates of the blocks forming the net, clipped to  *
  * the region:                                                    *
@@ -503,26 +505,26 @@ struct t_bb {
 // z: z-offset
 struct t_pl_offset {
     t_pl_offset() = default;
-    t_pl_offset(int xoffset, int yoffset, int zoffset)
+    t_pl_offset(int xoffset, int yoffset, int sub_tile_offset)
         : x(xoffset)
         , y(yoffset)
-        , z(zoffset) {}
+        , sub_tile(sub_tile_offset) {}
 
     int x = 0;
     int y = 0;
-    int z = 0;
+    int sub_tile = 0;
 
     t_pl_offset& operator+=(const t_pl_offset& rhs) {
         x += rhs.x;
         y += rhs.y;
-        z += rhs.z;
+        sub_tile += rhs.sub_tile;
         return *this;
     }
 
     t_pl_offset& operator-=(const t_pl_offset& rhs) {
         x -= rhs.x;
         y -= rhs.y;
-        z -= rhs.z;
+        sub_tile -= rhs.sub_tile;
         return *this;
     }
 
@@ -537,18 +539,18 @@ struct t_pl_offset {
     }
 
     friend t_pl_offset operator-(const t_pl_offset& other) {
-        return t_pl_offset(-other.x, -other.y, -other.z);
+        return t_pl_offset(-other.x, -other.y, -other.sub_tile);
     }
     friend t_pl_offset operator+(const t_pl_offset& other) {
-        return t_pl_offset(+other.x, +other.y, +other.z);
+        return t_pl_offset(+other.x, +other.y, +other.sub_tile);
     }
 
     friend bool operator<(const t_pl_offset& lhs, const t_pl_offset& rhs) {
-        return std::tie(lhs.x, lhs.y, lhs.z) < std::tie(rhs.x, rhs.y, rhs.z);
+        return std::tie(lhs.x, lhs.y, lhs.sub_tile) < std::tie(rhs.x, rhs.y, rhs.sub_tile);
     }
 
     friend bool operator==(const t_pl_offset& lhs, const t_pl_offset& rhs) {
-        return std::tie(lhs.x, lhs.y, lhs.z) == std::tie(rhs.x, rhs.y, rhs.z);
+        return std::tie(lhs.x, lhs.y, lhs.sub_tile) == std::tie(rhs.x, rhs.y, rhs.sub_tile);
     }
 
     friend bool operator!=(const t_pl_offset& lhs, const t_pl_offset& rhs) {
@@ -562,7 +564,7 @@ struct hash<t_pl_offset> {
     std::size_t operator()(const t_pl_offset& v) const noexcept {
         std::size_t seed = std::hash<int>{}(v.x);
         vtr::hash_combine(seed, v.y);
-        vtr::hash_combine(seed, v.z);
+        vtr::hash_combine(seed, v.sub_tile);
         return seed;
     }
 };
@@ -578,26 +580,26 @@ struct hash<t_pl_offset> {
 //offset between t_pl_loc.
 struct t_pl_loc {
     t_pl_loc() = default;
-    t_pl_loc(int xloc, int yloc, int zloc)
+    t_pl_loc(int xloc, int yloc, int sub_tile_loc)
         : x(xloc)
         , y(yloc)
-        , z(zloc) {}
+        , sub_tile(sub_tile_loc) {}
 
     int x = OPEN;
     int y = OPEN;
-    int z = OPEN;
+    int sub_tile = OPEN;
 
     t_pl_loc& operator+=(const t_pl_offset& rhs) {
         x += rhs.x;
         y += rhs.y;
-        z += rhs.z;
+        sub_tile += rhs.sub_tile;
         return *this;
     }
 
     t_pl_loc& operator-=(const t_pl_offset& rhs) {
         x -= rhs.x;
         y -= rhs.y;
-        z -= rhs.z;
+        sub_tile -= rhs.sub_tile;
         return *this;
     }
 
@@ -618,15 +620,15 @@ struct t_pl_loc {
     }
 
     friend t_pl_offset operator-(const t_pl_loc& lhs, const t_pl_loc& rhs) {
-        return t_pl_offset(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+        return t_pl_offset(lhs.x - rhs.x, lhs.y - rhs.y, lhs.sub_tile - rhs.sub_tile);
     }
 
     friend bool operator<(const t_pl_loc& lhs, const t_pl_loc& rhs) {
-        return std::tie(lhs.x, lhs.y, lhs.z) < std::tie(rhs.x, rhs.y, rhs.z);
+        return std::tie(lhs.x, lhs.y, lhs.sub_tile) < std::tie(rhs.x, rhs.y, rhs.sub_tile);
     }
 
     friend bool operator==(const t_pl_loc& lhs, const t_pl_loc& rhs) {
-        return std::tie(lhs.x, lhs.y, lhs.z) == std::tie(rhs.x, rhs.y, rhs.z);
+        return std::tie(lhs.x, lhs.y, lhs.sub_tile) == std::tie(rhs.x, rhs.y, rhs.sub_tile);
     }
 
     friend bool operator!=(const t_pl_loc& lhs, const t_pl_loc& rhs) {
@@ -640,7 +642,7 @@ struct hash<t_pl_loc> {
     std::size_t operator()(const t_pl_loc& v) const noexcept {
         std::size_t seed = std::hash<int>{}(v.x);
         vtr::hash_combine(seed, v.y);
-        vtr::hash_combine(seed, v.z);
+        vtr::hash_combine(seed, v.sub_tile);
         return seed;
     }
 };
@@ -744,6 +746,7 @@ struct t_packer_opts {
     e_stage_action doPacking;
     enum e_packer_algorithm packer_algorithm;
     std::string device_layout;
+    e_timing_update_type timing_update_type;
 };
 
 /* Annealing schedule information for the placer.  The schedule type      *
@@ -773,9 +776,6 @@ struct t_annealing_sched {
  *              channel width in the binary search.                          *
  * recompute_crit_iter: how many temperature stages pass before we recompute *
  *               criticalities based on average point to point delay         *
- * enable_timing_computations: in bounding_box mode, normally, timing        *
- *               information is not produced, this causes the information    *
- *               to be computed. in *_TIMING_DRIVEN modes, this has no effect*
  * inner_loop_crit_divider: (move_lim/inner_loop_crit_divider) determines how*
  *               many inner_loop iterations pass before a recompute of       *
  *               criticalities is done.                                      *
@@ -786,6 +786,11 @@ struct t_annealing_sched {
 enum e_place_algorithm {
     BOUNDING_BOX_PLACE,
     PATH_TIMING_DRIVEN_PLACE
+};
+
+enum e_place_effort_scaling {
+    CIRCUIT,       //Effort scales based on circuit size only
+    DEVICE_CIRCUIT //Effort scales based on both circuit and device size
 };
 
 enum class PlaceDelayModelType {
@@ -808,6 +813,11 @@ enum class e_file_type {
     NONE
 };
 
+enum class e_place_delta_delay_algorithm {
+    ASTAR_ROUTE,
+    DIJKSTRA_EXPANSION,
+};
+
 struct t_placer_opts {
     enum e_place_algorithm place_algorithm;
     float timing_tradeoff;
@@ -817,14 +827,17 @@ struct t_placer_opts {
     std::string pad_loc_file;
     enum pfreq place_freq;
     int recompute_crit_iter;
-    bool enable_timing_computations;
     int inner_loop_recompute_divider;
+    int quench_recompute_divider;
     float td_place_exp_first;
     int seed;
     float td_place_exp_last;
     e_stage_action doPlacement;
     float rlim_escape_fraction;
     std::string move_stats_file;
+    int placement_saves_per_temperature;
+    e_place_effort_scaling effort_scaling;
+    e_timing_update_type timing_update_type;
 
     PlaceDelayModelType delay_model_type;
     e_reducer delay_model_reducer;
@@ -847,6 +860,8 @@ struct t_placer_opts {
     // Useful for excluding tiles that have abnormal delay behavior, e.g.
     // clock tree elements like PLL's, global/local clock buffers, etc.
     std::string allowed_tiles_for_delay_model;
+
+    e_place_delta_delay_algorithm place_delta_delay_matrix_calculation_method;
 };
 
 /* All the parameters controlling the router's operation are in this        *
@@ -911,6 +926,7 @@ enum e_base_cost_type {
     DELAY_NORMALIZED_LENGTH,
     DELAY_NORMALIZED_FREQUENCY,
     DELAY_NORMALIZED_LENGTH_FREQUENCY,
+    DELAY_NORMALIZED_LENGTH_BOUNDED,
     DEMAND_ONLY,
     DEMAND_ONLY_NORMALIZED_LENGTH
 };
@@ -930,6 +946,22 @@ enum class e_timing_report_detail {
     AGGREGATED,       //Show aggregated intra-block and inter-block delays
     DETAILED_ROUTING, //Show inter-block routing resources used
     DEBUG,            //Show additional internal debugging information
+};
+
+struct t_timing_analysis_profile_info {
+    double timing_analysis_wallclock_time() const {
+        return sta_wallclock_time + slack_wallclock_time;
+    }
+
+    size_t num_full_updates() const {
+        return num_full_setup_updates + num_full_hold_updates + num_full_setup_hold_updates;
+    }
+
+    double sta_wallclock_time = 0.;
+    double slack_wallclock_time = 0.;
+    size_t num_full_setup_updates = 0;
+    size_t num_full_hold_updates = 0;
+    size_t num_full_setup_hold_updates = 0;
 };
 
 enum class e_incr_reroute_delay_ripup {
@@ -991,6 +1023,12 @@ struct t_router_opts {
 
     std::string write_router_lookahead;
     std::string read_router_lookahead;
+
+    e_heap_type router_heap;
+    bool exit_after_first_routing_iteration;
+
+    e_check_route_option check_route;
+    e_timing_update_type timing_update_type;
 };
 
 struct t_analysis_opts {
@@ -1002,6 +1040,8 @@ struct t_analysis_opts {
     e_timing_report_detail timing_report_detail;
     bool timing_report_skew;
     std::string echo_dot_timing_graph_node;
+
+    e_timing_update_type timing_update_type;
 };
 
 /* Defines the detailed routing architecture of the FPGA.  Only important   *
@@ -1197,6 +1237,10 @@ typedef enum e_rr_type : unsigned char {
 constexpr std::array<t_rr_type, NUM_RR_TYPES> RR_TYPES = {{SOURCE, SINK, IPIN, OPIN, CHANX, CHANY}};
 constexpr std::array<const char*, NUM_RR_TYPES> rr_node_typename{{"SOURCE", "SINK", "IPIN", "OPIN", "CHANX", "CHANY"}};
 
+constexpr bool is_pin(e_rr_type type) { return (type == IPIN || type == OPIN); }
+constexpr bool is_chan(e_rr_type type) { return (type == CHANX || type == CHANY); }
+constexpr bool is_src_sink(e_rr_type type) { return (type == SOURCE || type == SINK); }
+
 //[0..num_rr_types-1][0..grid_width-1][0..grid_height-1][0..NUM_SIDES-1][0..max_ptc-1]
 typedef std::array<vtr::NdMatrix<std::vector<int>, 3>, NUM_RR_TYPES> t_rr_node_indices;
 
@@ -1365,6 +1409,7 @@ struct t_vpr_setup {
     bool ShowGraphics;                   /* option to show graphics */
     int GraphPause;                      /* user interactiveness graphics option */
     bool SaveGraphics;                   /* option to save graphical contents to pdf, png, or svg */
+    std::string GraphicsCommands;        /* commands to control graphics settings */
     t_power_opts PowerOpts;
     std::string device_layout;
     e_constant_net_method constant_net_method; //How constant nets should be handled

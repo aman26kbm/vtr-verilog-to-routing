@@ -44,12 +44,14 @@ struct t_options {
     argparse::ArgValue<bool> show_graphics; //Enable argparse::ArgValue<int>eractive graphics?
     argparse::ArgValue<int> GraphPause;
     argparse::ArgValue<bool> save_graphics;
+    argparse::ArgValue<std::string> graphics_commands;
 
     /* General options */
     argparse::ArgValue<bool> show_help;
     argparse::ArgValue<bool> show_version;
     argparse::ArgValue<size_t> num_workers;
     argparse::ArgValue<bool> timing_analysis;
+    argparse::ArgValue<e_timing_update_type> timing_update_type;
     argparse::ArgValue<bool> CreateEchoFile;
     argparse::ArgValue<bool> verify_file_digests;
     argparse::ArgValue<std::string> device_layout;
@@ -101,11 +103,15 @@ struct t_options {
     argparse::ArgValue<int> PlaceChanWidth;
     argparse::ArgValue<float> place_rlim_escape_fraction;
     argparse::ArgValue<std::string> place_move_stats_file;
+    argparse::ArgValue<int> placement_saves_per_temperature;
+    argparse::ArgValue<e_place_effort_scaling> place_effort_scaling;
+    argparse::ArgValue<e_place_delta_delay_algorithm> place_delta_delay_matrix_calculation_method;
 
     /* Timing-driven placement options only */
     argparse::ArgValue<float> PlaceTimingTradeoff;
     argparse::ArgValue<int> RecomputeCritIter;
     argparse::ArgValue<int> inner_loop_recompute_divider;
+    argparse::ArgValue<int> quench_recompute_divider;
     argparse::ArgValue<float> place_exp_first;
     argparse::ArgValue<float> place_exp_last;
     argparse::ArgValue<float> place_delay_offset;
@@ -135,6 +141,8 @@ struct t_options {
     argparse::ArgValue<e_router_algorithm> RouterAlgorithm;
     argparse::ArgValue<int> min_incremental_reroute_fanout;
     argparse::ArgValue<bool> read_rr_edge_metadata;
+    argparse::ArgValue<bool> exit_after_first_routing_iteration;
+    argparse::ArgValue<e_check_route_option> check_route;
 
     /* Timing-driven router options only */
     argparse::ArgValue<float> astar_fac;
@@ -157,6 +165,7 @@ struct t_options {
     argparse::ArgValue<bool> router_update_lower_bound_delays;
     argparse::ArgValue<std::string> router_first_iteration_timing_report_file;
     argparse::ArgValue<e_router_initial_timing> router_initial_timing;
+    argparse::ArgValue<e_heap_type> router_heap;
 
     /* Analysis options */
     argparse::ArgValue<bool> full_stats;

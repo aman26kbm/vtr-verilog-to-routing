@@ -200,6 +200,18 @@ class edge_sort_iterator {
         return lhs.swapper_.idx_ < rhs.swapper_.idx_;
     }
 
+    friend bool operator>(const edge_sort_iterator& lhs, const edge_sort_iterator& rhs) {
+        return lhs.swapper_.idx_ > rhs.swapper_.idx_;
+    }
+
+    friend bool operator>=(const edge_sort_iterator& lhs, const edge_sort_iterator& rhs) {
+        return lhs.swapper_.idx_ >= rhs.swapper_.idx_;
+    }
+
+    friend bool operator<=(const edge_sort_iterator& lhs, const edge_sort_iterator& rhs) {
+        return lhs.swapper_.idx_ <= rhs.swapper_.idx_;
+    }
+
     RREdgeId edge() const {
         return RREdgeId(swapper_.idx_);
     }
@@ -533,6 +545,9 @@ bool t_rr_graph_storage::validate() const {
 const char* t_rr_graph_storage::node_type_string(RRNodeId id) const {
     return rr_node_typename[node_type(id)];
 }
+const char* t_rr_graph_view::node_type_string(RRNodeId id) const {
+    return rr_node_typename[node_type(id)];
+}
 
 void t_rr_graph_storage::set_node_ptc_num(RRNodeId id, short new_ptc_num) {
     node_ptc_[id].ptc_.pin_num = new_ptc_num; //TODO: eventually remove
@@ -561,23 +576,57 @@ void t_rr_graph_storage::set_node_class_num(RRNodeId id, short new_class_num) {
 short t_rr_graph_storage::node_ptc_num(RRNodeId id) const {
     return node_ptc_[id].ptc_.pin_num;
 }
-short t_rr_graph_storage::node_pin_num(RRNodeId id) const {
-    if (node_type(id) != IPIN && node_type(id) != OPIN) {
-        VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Attempted to access RR node 'pin_num' for non-IPIN/OPIN type '%s'", node_type_string(id));
+
+static short get_node_pin_num(
+    vtr::array_view_id<RRNodeId, const t_rr_node_data> node_storage,
+    vtr::array_view_id<RRNodeId, const t_rr_node_ptc_data> node_ptc,
+    RRNodeId id) {
+    auto node_type = node_storage[id].type_;
+    if (node_type != IPIN && node_type != OPIN) {
+        VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Attempted to access RR node 'pin_num' for non-IPIN/OPIN type '%s'", rr_node_typename[node_type]);
     }
-    return node_ptc_[id].ptc_.pin_num;
+    return node_ptc[id].ptc_.pin_num;
+}
+
+static short get_node_track_num(
+    vtr::array_view_id<RRNodeId, const t_rr_node_data> node_storage,
+    vtr::array_view_id<RRNodeId, const t_rr_node_ptc_data> node_ptc,
+    RRNodeId id) {
+    auto node_type = node_storage[id].type_;
+    if (node_type != CHANX && node_type != CHANY) {
+        VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Attempted to access RR node 'track_num' for non-CHANX/CHANY type '%s'", rr_node_typename[node_type]);
+    }
+    return node_ptc[id].ptc_.track_num;
+}
+
+static short get_node_class_num(
+    vtr::array_view_id<RRNodeId, const t_rr_node_data> node_storage,
+    vtr::array_view_id<RRNodeId, const t_rr_node_ptc_data> node_ptc,
+    RRNodeId id) {
+    auto node_type = node_storage[id].type_;
+    if (node_type != SOURCE && node_type != SINK) {
+        VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Attempted to access RR node 'class_num' for non-SOURCE/SINK type '%s'", rr_node_typename[node_type]);
+    }
+    return node_ptc[id].ptc_.class_num;
+}
+
+short t_rr_graph_storage::node_pin_num(RRNodeId id) const {
+    return get_node_pin_num(
+        vtr::make_const_array_view_id(node_storage_),
+        vtr::make_const_array_view_id(node_ptc_),
+        id);
 }
 short t_rr_graph_storage::node_track_num(RRNodeId id) const {
-    if (node_type(id) != CHANX && node_type(id) != CHANY) {
-        VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Attempted to access RR node 'track_num' for non-CHANX/CHANY type '%s'", node_type_string(id));
-    }
-    return node_ptc_[id].ptc_.track_num;
+    return get_node_track_num(
+        vtr::make_const_array_view_id(node_storage_),
+        vtr::make_const_array_view_id(node_ptc_),
+        id);
 }
 short t_rr_graph_storage::node_class_num(RRNodeId id) const {
-    if (node_type(id) != SOURCE && node_type(id) != SINK) {
-        VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Attempted to access RR node 'class_num' for non-SOURCE/SINK type '%s'", node_type_string(id));
-    }
-    return node_ptc_[id].ptc_.class_num;
+    return get_node_class_num(
+        vtr::make_const_array_view_id(node_storage_),
+        vtr::make_const_array_view_id(node_ptc_),
+        id);
 }
 
 void t_rr_graph_storage::set_node_type(RRNodeId id, t_rr_type new_type) {
@@ -633,4 +682,30 @@ void t_rr_graph_storage::set_node_side(RRNodeId id, e_side new_side) {
         VPR_FATAL_ERROR(VPR_ERROR_ROUTE, "Attempted to set RR node 'side' for non-channel type '%s'", node_type_string(id));
     }
     node_storage_[id].dir_side_.side = new_side;
+}
+
+short t_rr_graph_view::node_ptc_num(RRNodeId id) const {
+    return node_ptc_[id].ptc_.pin_num;
+}
+short t_rr_graph_view::node_pin_num(RRNodeId id) const {
+    return get_node_pin_num(node_storage_, node_ptc_, id);
+}
+short t_rr_graph_view::node_track_num(RRNodeId id) const {
+    return get_node_track_num(node_storage_, node_ptc_, id);
+}
+short t_rr_graph_view::node_class_num(RRNodeId id) const {
+    return get_node_class_num(node_storage_, node_ptc_, id);
+}
+
+t_rr_graph_view t_rr_graph_storage::view() const {
+    VTR_ASSERT(partitioned_);
+    VTR_ASSERT(node_storage_.size() == node_fan_in_.size());
+    return t_rr_graph_view(
+        vtr::make_const_array_view_id(node_storage_),
+        vtr::make_const_array_view_id(node_ptc_),
+        vtr::make_const_array_view_id(node_first_edge_),
+        vtr::make_const_array_view_id(node_fan_in_),
+        vtr::make_const_array_view_id(edge_src_node_),
+        vtr::make_const_array_view_id(edge_dest_node_),
+        vtr::make_const_array_view_id(edge_switch_));
 }

@@ -1396,10 +1396,10 @@ static void build_rr_sinks_sources(const int i,
         return;
 
     auto type = grid[i][j].type;
-    int num_class = type->num_class;
-    t_class* class_inf = type->class_inf;
+    int num_class = (int)type->class_inf.size();
+    const std::vector<t_class>& class_inf = type->class_inf;
     int num_pins = type->num_pins;
-    int* pin_class = type->pin_class;
+    const std::vector<int>& pin_class = type->pin_class;
 
     /* SINK and SOURCE-to-OPIN edges */
     for (int iclass = 0; iclass < num_class; ++iclass) {
@@ -1432,6 +1432,8 @@ static void build_rr_sinks_sources(const int i,
         } else { /* SINK */
             VTR_ASSERT(class_inf[iclass].type == RECEIVER);
             inode = get_rr_node_index(L_rr_node_indices, i, j, SINK, iclass);
+
+            VTR_ASSERT(inode >= 0);
 
             /* NOTE:  To allow route throughs through clbs, change the lines below to  *
              * make an edge from the input SINK to the output SOURCE.  Do for just the *
@@ -1483,7 +1485,7 @@ static void build_rr_sinks_sources(const int i,
                             inode = get_rr_node_index(L_rr_node_indices, i + width_offset, j + height_offset, OPIN, ipin, side);
 
                             //Initially left unconnected
-
+                            VTR_ASSERT(inode >= 0);
                             L_rr_node[inode].set_cost_index(OPIN_COST_INDEX);
                             L_rr_node[inode].set_type(OPIN);
                         }
@@ -2612,18 +2614,7 @@ static t_clb_to_clb_directs* alloc_and_load_clb_to_clb_directs(const t_direct_in
 
         clb_to_clb_directs[i].from_clb_type = physical_tile;
 
-        bool port_found = false;
-        for (const auto& port : physical_tile->ports) {
-            if (0 == strcmp(port.name, port_name)) {
-                tile_port = port;
-                port_found = true;
-                break;
-            }
-        }
-
-        if (!port_found) {
-            VPR_THROW(VPR_ERROR_ARCH, "Unable to find port %s (on block %s).\n", port_name, tile_name);
-        }
+        tile_port = find_tile_port_by_name(physical_tile, port_name);
 
         if (start_pin_index == OPEN) {
             VTR_ASSERT(start_pin_index == end_pin_index);
@@ -2654,18 +2645,7 @@ static t_clb_to_clb_directs* alloc_and_load_clb_to_clb_directs(const t_direct_in
 
         clb_to_clb_directs[i].to_clb_type = physical_tile;
 
-        port_found = false;
-        for (const auto& port : physical_tile->ports) {
-            if (0 == strcmp(port.name, port_name)) {
-                tile_port = port;
-                port_found = true;
-                break;
-            }
-        }
-
-        if (!port_found) {
-            VPR_THROW(VPR_ERROR_ARCH, "Unable to find port %s (on block %s).\n", port_name, tile_name);
-        }
+        tile_port = find_tile_port_by_name(physical_tile, port_name);
 
         if (start_pin_index == OPEN) {
             VTR_ASSERT(start_pin_index == end_pin_index);
@@ -2693,15 +2673,8 @@ static t_clb_to_clb_directs* alloc_and_load_clb_to_clb_directs(const t_direct_in
         }
         free(tile_name);
         free(port_name);
-
-        //We must be careful to clean-up anything that we may have incidentally allocated.
-        //Specifically, we can be called while generating the dummy architecture
-        //for placer delay estimation.  Since the delay estimation occurs on a
-        //'different' architecture it is almost certain that the f_blk_pin_from_port_pin allocated
-        //by calling get_blk_pin_from_port_pin() will later be invalid.
-        //We therefore must free it now.
-        free_blk_pin_from_port_pin();
     }
+
     return clb_to_clb_directs;
 }
 
@@ -2734,7 +2707,8 @@ static int get_opin_direct_connecions(int x,
     }
 
     //Capacity location determined by pin number relative to pins per capacity instance
-    int z = opin / (curr_type->num_pins / curr_type->capacity);
+    int z, relative_opin;
+    std::tie(z, relative_opin) = get_capacity_location_from_physical_pin(curr_type, opin);
     VTR_ASSERT(z >= 0 && z < curr_type->capacity);
 
     /* Iterate through all direct connections */
@@ -2752,8 +2726,8 @@ static int get_opin_direct_connecions(int x,
                 //Only add connections if the target clb type matches the type in the direct specification
                 t_physical_tile_type_ptr target_type = device_ctx.grid[x + directs[i].x_offset][y + directs[i].y_offset].type;
                 if (clb_to_clb_directs[i].to_clb_type == target_type
-                    && z + directs[i].z_offset < int(target_type->capacity)
-                    && z + directs[i].z_offset >= 0) {
+                    && z + directs[i].sub_tile_offset < int(target_type->capacity)
+                    && z + directs[i].sub_tile_offset >= 0) {
                     /* Compute index of opin with regards to given pins */
                     int max_index = OPEN, min_index = OPEN;
                     bool swap = false;
@@ -2766,31 +2740,28 @@ static int get_opin_direct_connecions(int x,
                         min_index = clb_to_clb_directs[i].from_clb_pin_start_index;
                         max_index = clb_to_clb_directs[i].from_clb_pin_end_index;
                     }
-                    int logical_opin = opin % (curr_type->num_pins / curr_type->capacity);
 
-                    if (max_index >= logical_opin && min_index <= logical_opin) {
-                        int offset = logical_opin - min_index;
+                    if (max_index >= relative_opin && min_index <= relative_opin) {
+                        int offset = relative_opin - min_index;
                         /* This opin is specified to connect directly to an ipin, now compute which ipin to connect to */
-                        int logical_ipin = OPEN;
+                        int relative_ipin = OPEN;
                         if (clb_to_clb_directs[i].to_clb_pin_start_index > clb_to_clb_directs[i].to_clb_pin_end_index) {
                             if (swap) {
-                                logical_ipin = clb_to_clb_directs[i].to_clb_pin_end_index + offset;
+                                relative_ipin = clb_to_clb_directs[i].to_clb_pin_end_index + offset;
                             } else {
-                                logical_ipin = clb_to_clb_directs[i].to_clb_pin_start_index - offset;
+                                relative_ipin = clb_to_clb_directs[i].to_clb_pin_start_index - offset;
                             }
                         } else {
                             if (swap) {
-                                logical_ipin = clb_to_clb_directs[i].to_clb_pin_end_index - offset;
+                                relative_ipin = clb_to_clb_directs[i].to_clb_pin_end_index - offset;
                             } else {
-                                logical_ipin = clb_to_clb_directs[i].to_clb_pin_start_index + offset;
+                                relative_ipin = clb_to_clb_directs[i].to_clb_pin_start_index + offset;
                             }
                         }
 
-                        VTR_ASSERT(logical_ipin < (target_type->num_pins / target_type->capacity));
-
                         //If this block has capacity > 1 then the pins of z position > 0 are offset
                         //by the number of pins per capacity instance
-                        int ipin = logical_ipin + (target_type->num_pins / target_type->capacity) * (z + directs[i].z_offset);
+                        int ipin = get_physical_pin_from_capacity_location(target_type, relative_ipin, z + directs[i].sub_tile_offset);
 
                         //if (ipin > target_type->num_pins) continue; //Invalid z-offset
 

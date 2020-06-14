@@ -306,8 +306,8 @@ void check_rr_node(int inode, enum e_route_type route_type, const DeviceContext&
         case SOURCE:
         case SINK:
             if (type == nullptr) {
-                VPR_ERROR(VPR_ERROR_ROUTE,
-                          "in check_rr_node: node %d (type %d) is at an illegal clb location (%d, %d).\n", inode, rr_type, xlow, ylow);
+                VPR_FATAL_ERROR(VPR_ERROR_ROUTE,
+                                "in check_rr_node: node %d (type %d) is at an illegal clb location (%d, %d).\n", inode, rr_type, xlow, ylow);
             }
             if (xlow != (xhigh - type->width + 1) || ylow != (yhigh - type->height + 1)) {
                 VPR_FATAL_ERROR(VPR_ERROR_ROUTE,
@@ -317,8 +317,8 @@ void check_rr_node(int inode, enum e_route_type route_type, const DeviceContext&
         case IPIN:
         case OPIN:
             if (type == nullptr) {
-                VPR_ERROR(VPR_ERROR_ROUTE,
-                          "in check_rr_node: node %d (type %d) is at an illegal clb location (%d, %d).\n", inode, rr_type, xlow, ylow);
+                VPR_FATAL_ERROR(VPR_ERROR_ROUTE,
+                                "in check_rr_node: node %d (type %d) is at an illegal clb location (%d, %d).\n", inode, rr_type, xlow, ylow);
             }
             if (xlow != xhigh || ylow != yhigh) {
                 VPR_FATAL_ERROR(VPR_ERROR_ROUTE,
@@ -357,7 +357,7 @@ void check_rr_node(int inode, enum e_route_type route_type, const DeviceContext&
 
     switch (rr_type) {
         case SOURCE:
-            if (ptc_num >= type->num_class
+            if (ptc_num >= (int)type->class_inf.size()
                 || type->class_inf[ptc_num].type != DRIVER) {
                 VPR_ERROR(VPR_ERROR_ROUTE,
                           "in check_rr_node: inode %d (type %d) had a ptc_num of %d.\n", inode, rr_type, ptc_num);
@@ -369,7 +369,7 @@ void check_rr_node(int inode, enum e_route_type route_type, const DeviceContext&
             break;
 
         case SINK:
-            if (ptc_num >= type->num_class
+            if (ptc_num >= (int)type->class_inf.size()
                 || type->class_inf[ptc_num].type != RECEIVER) {
                 VPR_ERROR(VPR_ERROR_ROUTE,
                           "in check_rr_node: inode %d (type %d) had a ptc_num of %d.\n", inode, rr_type, ptc_num);

@@ -2,6 +2,28 @@ Command-line Options
 ====================
 .. program:: vpr
 
+.. |des90_place| image:: https://www.verilogtorouting.org/img/des90_placement_macros.gif
+    :width: 200px
+    :alt: Placement 
+
+.. |des90_cpd| image:: https://www.verilogtorouting.org/img/des90_cpd.gif
+    :width: 200px 
+    :alt: Critical Path 
+
+.. |des90_nets| image:: https://www.verilogtorouting.org/img/des90_nets.gif
+    :width: 200px
+    :alt: Wiring
+
+.. |des90_routing| image:: https://www.verilogtorouting.org/img/des90_routing_util.gif
+    :width: 200px 
+    :alt: Routing Usage
+
++---------------------------------------+---------------------------------------+---------------------------------------+---------------------------------------+
+| |des90_place|                         + |des90_cpd|                           | |des90_nets|                          + |des90_routing|                       +
+|                                       +                                       |                                       +                                       +
+| Placement                             + Critical Path                         | Logical Connections                   + Routing Utilization                   +
++---------------------------------------+---------------------------------------+---------------------------------------+---------------------------------------+
+
 Basic Usage
 -----------
 
@@ -94,6 +116,57 @@ Graphics Options
 
     **Default:** ``off``
 
+.. option:: --graphics_commands <string>
+
+    A set of semi-colon seperated graphics commands.
+
+    * save_graphics <file>
+         Saves graphics to the specified file (.png/.pdf/
+         .svg). If <file> contains ``{i}``, it will be
+         replaced with an integer which increments
+         each time graphics is invoked.
+    * set_macros <int>
+         Sets the placement macro drawing state
+    * set_nets <int>
+         Sets the net drawing state
+    * set_cpd <int>
+         Sets the criticla path delay drawing state
+    * set_routing_util <int>
+         Sets the routing utilization drawing state
+    * set_clip_routing_util <int>
+         Sets whether routing utilization values are clipped to [0., 1.]. Useful when a consistent scale is needed across images
+    * set_draw_block_outlines <int>
+         Sets whether blocks have an outline drawn around them
+    * set_draw_block_text <int>
+         Sets whether blocks have label text drawn on them
+    * set_draw_block_internals <int>
+         Sets the level to which block internals are drawn
+    * set_draw_net_max_fanout <int>
+         Sets the maximum fanout for nets to be drawn (if fanout is beyond this value the net will not be drawn)
+    * set_congestion <int>
+         Sets the routing congestion drawing state
+    * exit <int>
+         Exits VPR with specified exit code
+    
+    Example:
+
+    .. code-block:: none
+
+        save_graphics place.png; \
+        set_nets 1; save_graphics nets1.png;\
+        set_nets 2; save_graphics nets2.png; set_nets 0;\
+        set_cpd 1; save_graphics cpd1.png; \
+        set_cpd 3; save_graphics cpd3.png; set_cpd 0; \
+        set_routing_util 5; save_graphics routing_util5.png; \
+        set_routing_util 0; \
+        set_congestion 1; save_graphics congestion1.png;
+
+    The above toggles various graphics settings (e.g. drawing nets, drawing critical path) and then saves the results to .png files.
+    
+    Note that drawing state is reset to its previous state after these commands are invoked.
+
+    Like the interactive graphics :option`<--disp>` option, the :option:`--auto` option controls how often the commands specified with this option are invoked.
+
 .. _general_options:
 
 General Options
@@ -181,6 +254,17 @@ General Options
      * ``dedicated_network``: Use the architectures dedicated clock network (experimental)
 
      **Default:** ``ideal``
+
+.. option:: --two_stage_clock_routing {on | off}
+
+    Routes clock nets in two stages using a dedicated clock network.
+
+     * First stage: From the net source (e.g. an I/O pin) to a dedicated clock network root (e.g. center of chip)
+     * Second stage: From the clock network root to net sinks.
+
+    Note this option only works when specifying a clock architecture, see :ref:`Clock Architecture Format <clock_architecture_format>`; it does not work when reading a routing resource graph (i.e. :option:`--read_rr_graph`).
+
+     **Default:** ``off``
 
 .. option:: --exit_before_pack {on | off}
 
@@ -1006,6 +1090,21 @@ The following options are only valid when the router is in timing-driven mode (t
     
      **Default:** ``0.99``
 
+.. option:: --router_initial_timing {all_critical | lookahead}
+
+    Controls how criticality is determined at the start of the first routing iteration.
+
+     * ``all_critical``: All connections are considered timing critical.
+     * ``lookahead``: Connection criticalities are determined from timing analysis assuming (best-case) connection delays as estimated by the router's lookahead.
+
+     **Default:** ``all_critical`` for the classic :option:`--router_lookahead`, otherwise ``lookahead``
+
+.. option:: --router_update_lower_bound_delays {on | off}
+
+    Controls whether the router updates lower bound connection delays after the 1st routing iteration.
+
+    **Default:** ``on``
+
 .. option:: --router_first_iter_timing_report <file>
 
     Name of the timing report file to generate after the first routing iteration completes (not generated if unspecfied).
@@ -1359,3 +1458,15 @@ The following options are used to enable power estimation in VPR.
 
     Instructions on generating this file are provided in :ref:`power_estimation`.
 
+Command-line Auto Completion
+----------------------------
+
+To simplify using VPR on the command-line you can use the ``dev/vpr_bash_completion.sh`` script, which will enable TAB completion for VPR commandline arguments (based on the output of `vpr -h`).
+
+Simply add:
+
+.. code-block:: bash
+
+    source $VTR_ROOT/dev/vpr_bash_completion.sh
+
+to your ``.bashrc``. ``$VTR_ROOT`` refers to the root of the VTR source tree on your system.

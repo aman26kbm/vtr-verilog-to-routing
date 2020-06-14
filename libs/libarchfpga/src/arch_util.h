@@ -2,6 +2,7 @@
 #define ARCH_UTIL_H
 
 #include <regex>
+#include <unordered_set>
 #include "physical_types.h"
 
 class InstPort {
@@ -39,6 +40,10 @@ class InstPort {
 };
 
 void free_arch(t_arch* arch);
+void free_arch_models(t_model* models);
+t_model* free_arch_model(t_model* model);
+void free_arch_model_ports(t_model_ports* model_ports);
+t_model_ports* free_arch_model_port(t_model_ports* model_port);
 
 void free_type_descriptors(std::vector<t_logical_block_type>& type_descriptors);
 void free_type_descriptors(std::vector<t_physical_tile_type>& type_descriptors);
@@ -47,6 +52,8 @@ t_port* findPortByName(const char* name, t_pb_type* pb_type, int* high_index, in
 
 t_physical_tile_type SetupEmptyPhysicalType();
 t_logical_block_type SetupEmptyLogicalType();
+
+std::unordered_set<t_logical_block_type_ptr> get_equivalent_sites_set(t_physical_tile_type_ptr type);
 
 void alloc_and_load_default_child_for_pb_type(t_pb_type* pb_type,
                                               char* new_name,

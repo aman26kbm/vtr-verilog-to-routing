@@ -19,6 +19,7 @@ Multiple examples of how this language can be used to describe different types o
    :maxdepth: 1
 
    classic_soft_logic
+   multi_mode_ble
    configurable_memory_bus
    fracturable_multiplier_bus
 
@@ -31,6 +32,7 @@ Multiple examples of how this language can be used to describe different types o
    configurable_memory
    xilinx_virtex_6_like
    equivalent_sites
+   heterogeneous_tiles
 
 **Modeling Guides:**
 

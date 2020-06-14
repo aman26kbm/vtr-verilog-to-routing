@@ -25,7 +25,9 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <string>
 #include <unordered_map>
+#include <string>
 
 class Hashtable {
   private:

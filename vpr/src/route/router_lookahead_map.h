@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <limits>
 #include "vtr_ndmatrix.h"
 #include "router_lookahead.h"
 
@@ -19,10 +20,11 @@ class Cost_Entry {
     float delay;
     float congestion;
 
-    Cost_Entry() {
-        delay = -1.0;
-        congestion = -1.0;
+    Cost_Entry()
+        : Cost_Entry(std::numeric_limits<float>::quiet_NaN(),
+                     std::numeric_limits<float>::quiet_NaN()) {
     }
+
     Cost_Entry(float set_delay, float set_congestion) {
         delay = set_delay;
         congestion = set_congestion;
@@ -39,8 +41,8 @@ void write_router_lookahead(const std::string& file);
 
 /* Computes the lookahead map to be used by the router. If a map was computed prior to this, a new one will not be computed again.
  * The rr graph must have been built before calling this function. */
-void compute_router_lookahead(int num_segments);
+void compute_router_lookahead(const std::vector<t_segment_inf>& segment_inf);
 
 /* queries the lookahead_map (should have been computed prior to routing) to get the expected cost
  * from the specified source to the specified target */
-float get_lookahead_map_cost(int from_node_ind, int to_node_ind, float criticality_fac);
+float get_lookahead_map_cost(RRNodeId from_node, RRNodeId to_node, float criticality_fac);

@@ -65,6 +65,7 @@ void SetupVPR(const t_options* Options,
               bool* ShowGraphics,
               int* GraphPause,
               bool* SaveGraphics,
+              std::string* GraphicsCommands,
               t_power_opts* PowerOpts) {
     using argparse::Provenance;
 
@@ -234,6 +235,7 @@ void SetupVPR(const t_options* Options,
     *ShowGraphics = Options->show_graphics;
 
     *SaveGraphics = Options->save_graphics;
+    *GraphicsCommands = Options->graphics_commands;
 
     if (getEchoEnabled() && isEchoFileEnabled(E_ECHO_ARCH)) {
         EchoArch(getEchoFileName(E_ECHO_ARCH), device_ctx.physical_tile_types, device_ctx.logical_block_types, Arch);
@@ -275,7 +277,7 @@ static void SetupSwitches(const t_arch& Arch,
 
     /* Delayless switch for connecting sinks and sources with their pins. */
     device_ctx.arch_switch_inf[RoutingArch->delayless_switch].set_type(SwitchType::MUX);
-    device_ctx.arch_switch_inf[RoutingArch->delayless_switch].name = vtr::strdup("__vpr_delayless_switch__");
+    device_ctx.arch_switch_inf[RoutingArch->delayless_switch].name = vtr::strdup(VPR_DELAYLESS_SWITCH_NAME);
     device_ctx.arch_switch_inf[RoutingArch->delayless_switch].R = 0.;
     device_ctx.arch_switch_inf[RoutingArch->delayless_switch].Cin = 0.;
     device_ctx.arch_switch_inf[RoutingArch->delayless_switch].Cout = 0.;
@@ -371,11 +373,16 @@ static void SetupRouterOpts(const t_options& Options, t_router_opts* RouterOpts)
     RouterOpts->initial_timing = Options.router_initial_timing;
     RouterOpts->update_lower_bound_delays = Options.router_update_lower_bound_delays;
     RouterOpts->first_iteration_timing_report_file = Options.router_first_iteration_timing_report_file;
-
     RouterOpts->strict_checks = Options.strict_checks;
 
     RouterOpts->write_router_lookahead = Options.write_router_lookahead;
     RouterOpts->read_router_lookahead = Options.read_router_lookahead;
+
+    RouterOpts->router_heap = Options.router_heap;
+    RouterOpts->exit_after_first_routing_iteration = Options.exit_after_first_routing_iteration;
+
+    RouterOpts->check_route = Options.check_route;
+    RouterOpts->timing_update_type = Options.timing_update_type;
 }
 
 static void SetupAnnealSched(const t_options& Options,
@@ -446,6 +453,8 @@ void SetupPackerOpts(const t_options& Options,
     PackerOpts->packer_algorithm = PACK_GREEDY; /* DEFAULT */
 
     PackerOpts->device_layout = Options.device_layout;
+
+    PackerOpts->timing_update_type = Options.timing_update_type;
 }
 
 static void SetupNetlistOpts(const t_options& Options, t_netlist_opts& NetlistOpts) {
@@ -466,6 +475,7 @@ static void SetupPlacerOpts(const t_options& Options, t_placer_opts* PlacerOpts)
     }
 
     PlacerOpts->inner_loop_recompute_divider = Options.inner_loop_recompute_divider;
+    PlacerOpts->quench_recompute_divider = Options.quench_recompute_divider;
 
     //TODO: document?
     PlacerOpts->place_cost_exp = 1;
@@ -486,8 +496,6 @@ static void SetupPlacerOpts(const t_options& Options, t_placer_opts* PlacerOpts)
     PlacerOpts->timing_tradeoff = Options.PlaceTimingTradeoff;
 
     /* Depends on PlacerOpts->place_algorithm */
-    PlacerOpts->enable_timing_computations = Options.ShowPlaceTiming;
-
     PlacerOpts->delay_offset = Options.place_delay_offset;
     PlacerOpts->delay_ramp_delta_threshold = Options.place_delay_ramp_delta_threshold;
     PlacerOpts->delay_ramp_slope = Options.place_delay_ramp_slope;
@@ -503,6 +511,8 @@ static void SetupPlacerOpts(const t_options& Options, t_placer_opts* PlacerOpts)
 
     PlacerOpts->rlim_escape_fraction = Options.place_rlim_escape_fraction;
     PlacerOpts->move_stats_file = Options.place_move_stats_file;
+    PlacerOpts->placement_saves_per_temperature = Options.placement_saves_per_temperature;
+    PlacerOpts->place_delta_delay_matrix_calculation_method = Options.place_delta_delay_matrix_calculation_method;
 
     PlacerOpts->strict_checks = Options.strict_checks;
 
@@ -510,6 +520,9 @@ static void SetupPlacerOpts(const t_options& Options, t_placer_opts* PlacerOpts)
     PlacerOpts->read_placement_delay_lookup = Options.read_placement_delay_lookup;
 
     PlacerOpts->allowed_tiles_for_delay_model = Options.allowed_tiles_for_delay_model;
+
+    PlacerOpts->effort_scaling = Options.place_effort_scaling;
+    PlacerOpts->timing_update_type = Options.timing_update_type;
 }
 
 static void SetupAnalysisOpts(const t_options& Options, t_analysis_opts& analysis_opts) {
@@ -523,6 +536,8 @@ static void SetupAnalysisOpts(const t_options& Options, t_analysis_opts& analysi
     analysis_opts.timing_report_detail = Options.timing_report_detail;
     analysis_opts.timing_report_skew = Options.timing_report_skew;
     analysis_opts.echo_dot_timing_graph_node = Options.echo_dot_timing_graph_node;
+
+    analysis_opts.timing_update_type = Options.timing_update_type;
 }
 
 static void SetupPowerOpts(const t_options& Options, t_power_opts* power_opts, t_arch* Arch) {

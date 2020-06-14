@@ -1,15 +1,20 @@
+version: ~> 1.0
 language: cpp
 
 dist: trusty
 addons:
   apt:
     sources:
-    - george-edison55-precise-backports # For cmake
-    - llvm-toolchain-precise-3.6
-    - llvm-toolchain-trusty-6.0
-    - llvm-toolchain-trusty-7 # For clang-format-7
-    - llvm-toolchain-trusty-8
-    - ubuntu-toolchain-r-test
+    - sourceline: 'ppa:george-edison55/precise-backports' # For cmake
+    - sourceline: 'deb http://apt.llvm.org/precise llvm-toolchain-precise-3.6 main'
+      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+    - sourceline: 'deb http://apt.llvm.org/trusty llvm-toolchain-trusty-6.0 main'
+      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+    - sourceline: 'deb http://apt.llvm.org/trusty llvm-toolchain-trusty-7 main' # For clang-format-7
+      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+    - sourceline: 'deb http://apt.llvm.org/trusty llvm-toolchain-trusty-8 main'
+      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+    - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
     - autoconf
     - automake
@@ -47,8 +52,6 @@ addons:
     - qt5-default
     - clang-format-7
     # All the compilers!
-    - g++-4.9
-    - gcc-4.9
     - g++-5
     - gcc-5
     - g++-6
@@ -112,7 +115,7 @@ jobs:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
       script:
         - ./.github/travis/build.sh
-        - ./run_reg_test.pl vtr_reg_basic -show_failures -j2
+        - travis_wait 30 ./run_reg_test.pl vtr_reg_basic -show_failures -j2
     - stage: Test
       name: "Strong Regression Tests"
       env:
@@ -128,7 +131,8 @@ jobs:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
       script:
         - ./.github/travis/build.sh
-        - ./run_reg_test.pl vtr_reg_valgrind_small -show_failures -j2
+        - travis_wait 30 ./run_reg_test.pl vtr_reg_valgrind_small -show_failures -j2
+    - stage: Test
       name: "Sanitized Basic Regression Tests"
       env:
         - CMAKE_PARAMS="-DVTR_ASSERT_LEVEL=3 -DVTR_ENABLE_SANITIZE=on -DVTR_IPO_BUILD=off -DWITH_BLIFEXPLORER=on"
@@ -138,7 +142,7 @@ jobs:
       script:
         - ./.github/travis/build.sh
         #We skip QoR since we are only checking for errors in sanitizer runs
-        - ./run_reg_test.pl vtr_reg_basic -show_failures -skip_qor -j2
+        - travis_wait 50 ./run_reg_test.pl vtr_reg_basic -show_failures -skip_qor -j2
     #Currently strong regression with sanitizers is disabled as it exceeds the maximum travis job run-time
     #- stage: Test
       #name: "Sanitized Strong Regression Tests"

@@ -72,30 +72,7 @@ struct TimingContext : public Context {
     //These specify how timing analysis is performed (e.g. target clock periods)
     std::shared_ptr<tatum::TimingConstraints> constraints;
 
-    struct timing_analysis_profile_info {
-        double timing_analysis_wallclock_time() const {
-            return sta_wallclock_time + slack_wallclock_time;
-        }
-
-        double old_timing_analysis_wallclock_time() const {
-            return old_sta_wallclock_time + old_delay_annotation_wallclock_time;
-        }
-
-        size_t num_full_updates() const {
-            return num_full_setup_updates + num_full_hold_updates + num_full_setup_hold_updates;
-        }
-
-        double sta_wallclock_time = 0.;
-        double slack_wallclock_time = 0.;
-        size_t num_full_setup_updates = 0;
-        size_t num_full_hold_updates = 0;
-        size_t num_full_setup_hold_updates = 0;
-
-        double old_sta_wallclock_time = 0.;
-        double old_delay_annotation_wallclock_time = 0.;
-        size_t num_old_sta_full_updates = 0;
-    };
-    timing_analysis_profile_info stats;
+    t_timing_analysis_profile_info stats;
 };
 
 namespace std {
@@ -287,6 +264,14 @@ struct RoutingContext : public Context {
     vtr::vector<ClusterBlockId, std::vector<int>> rr_blk_source; /* [0..num_blocks-1][0..num_class-1] */
 
     std::vector<t_rr_node_route_inf> rr_node_route_inf; /* [0..device_ctx.num_rr_nodes-1] */
+
+    //Information about whether a node is part of a non-configurable set
+    //(i.e. connected to others with non-configurable edges like metal shorts that can't be disabled)
+    //Stored in a single bit per rr_node for efficiency
+    //  bit value 0: node is not part of a non-configurable set
+    //  bit value 1: node is part of a non-configurable set
+    //Initialized once when RoutingContext is initialized, static throughout invocation of router
+    vtr::dynamic_bitset<> non_configurable_bitset; /*[0...device_ctx.num_rr_nodes] */
 
     //Information about current routing status of each net
     t_net_routing_status net_status;
