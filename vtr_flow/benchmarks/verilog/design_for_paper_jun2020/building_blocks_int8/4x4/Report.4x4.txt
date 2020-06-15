@@ -1,0 +1,1250 @@
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Error: Current design is not defined. (UID-4)
+0
+Information: Building the design 'matmul_4x4_systolic'. (HDL-193)
+Error:  ./4x4.v:262: Type query about dimensions or access by indexing requires an array reference as the first argument. (ELAB-400)
+*** Presto compilation terminated with 1 errors. ***
+Warning: Unable to resolve reference 'matmul_4x4_systolic' in 'matrix_multiplication'. (LINK-5)
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:24:36 2020
+****************************************
+
+Operating Conditions: typical   Library: ceid_vlsiLab_umc65ll_stdCells
+Wire Load Model Mode: enclosed
+
+  Startpoint: u_matmul_4x4/done_mat_mul (internal pin)
+  Endpoint: done_mat_mul
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  matrix_multiplication
+                     M5K                   ceid_vlsiLab_umc65ll_stdCells
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_matmul_4x4/done_mat_mul (matmul_4x4_systolic)         0.00       0.00 r
+  done_mat_mul (out)                                      0.00       0.00 r
+  data arrival time                                                  0.00
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : area
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:24:36 2020
+****************************************
+
+Library(s) Used:
+
+    No libraries used.
+
+Number of ports:                          353
+Number of nets:                           355
+Number of cells:                            3
+Number of combinational cells:              0
+Number of sequential cells:                 3
+Number of macros/black boxes:               0
+Number of buf/inv:                          0
+Number of references:                       1
+
+Combinational area:                  0.000000
+Buf/Inv area:                        0.000000
+Noncombinational area:               0.000000
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:                     0.000000
+Total area:                 undefined
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:24:36 2020
+****************************************
+
+
+Library(s) Used:
+
+    No libraries used.
+
+
+Operating Conditions: typical   Library: ceid_vlsiLab_umc65ll_stdCells
+Wire Load Model Mode: enclosed
+
+Design        Wire Load Model            Library
+------------------------------------------------
+matrix_multiplication  M5K               ceid_vlsiLab_umc65ll_stdCells
+
+
+Global Operating Voltage = 1    
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =   0.0000 mW    (0%)
+  Net Switching Power  =  11.3084 uW  (100%)
+                         ---------
+Total Dynamic Power    =  11.3084 uW  (100%)
+
+Cell Leakage Power     =   0.0000 nW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000        1.1308e-02            0.0000        1.1308e-02  ( 100.00%)
+register           0.0000            0.0000            0.0000            0.0000  (   0.00%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+--------------------------------------------------------------------------------------------------
+Total              0.0000 mW     1.1308e-02 mW         0.0000 nW     1.1308e-02 mW
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : design
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:24:36 2020
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    No libraries used.
+
+Local Link Library:
+
+    {/home/projects/ljohn/aarora1/ceid/ceid_umc65ll/synopsys/ceid_vlsiLab_umc65ll_stdCells.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : ceid_vlsiLab_umc65ll_stdCells
+    Process :   1.00
+    Temperature :  25.00
+    Voltage :   1.00
+
+Wire Loading Model:
+
+    Selected automatically from the total cell area.
+
+Name           :   M5K
+Location       :   ceid_vlsiLab_umc65ll_stdCells
+Resistance     :   0
+Capacitance    :   0.0001426
+Area           :   0
+Slope          :   0.5
+Fanout   Length   Points Average Cap Std Deviation
+--------------------------------------------------------------
+     1     7.00
+     2    14.00
+     3    25.20
+     4    40.32
+     5    56.45
+    10    90.32
+    16   162.57
+    50   292.63
+    90   585.25
+
+
+
+Wire Loading Model Mode: enclosed.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+Information: Building the design 'matmul_4x4_systolic'. (HDL-193)
+Error:  ./4x4.v:268: Type query about dimensions or access by indexing requires an array reference as the first argument. (ELAB-400)
+*** Presto compilation terminated with 1 errors. ***
+Warning: Unable to resolve reference 'matmul_4x4_systolic' in 'matrix_multiplication'. (LINK-5)
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:30:58 2020
+****************************************
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4/done_mat_mul (internal pin)
+  Endpoint: done_mat_mul
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_matmul_4x4/done_mat_mul (matmul_4x4_systolic)         0.00       0.00 r
+  done_mat_mul (out)                                      0.00       0.00 r
+  data arrival time                                                  0.00
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : area
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:30:58 2020
+****************************************
+
+Library(s) Used:
+
+    No libraries used.
+
+Number of ports:                          365
+Number of nets:                           355
+Number of cells:                            3
+Number of combinational cells:              0
+Number of sequential cells:                 3
+Number of macros/black boxes:               0
+Number of buf/inv:                          0
+Number of references:                       1
+
+Combinational area:                  0.000000
+Buf/Inv area:                        0.000000
+Noncombinational area:               0.000000
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                     0.000000
+Total area:                 undefined
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:30:58 2020
+****************************************
+
+
+Library(s) Used:
+
+    No libraries used.
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =   0.0000 mW        
+  Net Switching Power  =   0.0000 mW        
+                         ---------
+Total Dynamic Power    =   0.0000 mW        
+
+Cell Leakage Power     =   0.0000 nW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (     N/A)
+memory             0.0000            0.0000            0.0000            0.0000  (     N/A)
+black_box          0.0000            0.0000            0.0000            0.0000  (     N/A)
+clock_network      0.0000            0.0000            0.0000            0.0000  (     N/A)
+register           0.0000            0.0000            0.0000            0.0000  (     N/A)
+sequential         0.0000            0.0000            0.0000            0.0000  (     N/A)
+combinational      0.0000            0.0000            0.0000            0.0000  (     N/A)
+--------------------------------------------------------------------------------------------------
+Total              0.0000 mW         0.0000 mW         0.0000 nW         0.0000 mW
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : design
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:30:58 2020
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    No libraries used.
+
+Local Link Library:
+
+    {/home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+Information: Building the design 'matmul_4x4_systolic'. (HDL-193)
+Error:  ./4x4.v:268: Type query about dimensions or access by indexing requires an array reference as the first argument. (ELAB-400)
+*** Presto compilation terminated with 1 errors. ***
+Warning: Unable to resolve reference 'matmul_4x4_systolic' in 'matrix_multiplication'. (LINK-5)
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:31:19 2020
+****************************************
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4/done_mat_mul (internal pin)
+  Endpoint: done_mat_mul
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_matmul_4x4/done_mat_mul (matmul_4x4_systolic)         0.00       0.00 r
+  done_mat_mul (out)                                      0.00       0.00 r
+  data arrival time                                                  0.00
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : area
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:31:19 2020
+****************************************
+
+Library(s) Used:
+
+    No libraries used.
+
+Number of ports:                          365
+Number of nets:                           355
+Number of cells:                            3
+Number of combinational cells:              0
+Number of sequential cells:                 3
+Number of macros/black boxes:               0
+Number of buf/inv:                          0
+Number of references:                       1
+
+Combinational area:                  0.000000
+Buf/Inv area:                        0.000000
+Noncombinational area:               0.000000
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                     0.000000
+Total area:                 undefined
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:31:19 2020
+****************************************
+
+
+Library(s) Used:
+
+    No libraries used.
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =   0.0000 mW        
+  Net Switching Power  =   0.0000 mW        
+                         ---------
+Total Dynamic Power    =   0.0000 mW        
+
+Cell Leakage Power     =   0.0000 nW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (     N/A)
+memory             0.0000            0.0000            0.0000            0.0000  (     N/A)
+black_box          0.0000            0.0000            0.0000            0.0000  (     N/A)
+clock_network      0.0000            0.0000            0.0000            0.0000  (     N/A)
+register           0.0000            0.0000            0.0000            0.0000  (     N/A)
+sequential         0.0000            0.0000            0.0000            0.0000  (     N/A)
+combinational      0.0000            0.0000            0.0000            0.0000  (     N/A)
+--------------------------------------------------------------------------------------------------
+Total              0.0000 mW         0.0000 mW         0.0000 nW         0.0000 mW
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : design
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:31:19 2020
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    No libraries used.
+
+Local Link Library:
+
+    {/home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+Information: Building the design 'matmul_4x4_systolic'. (HDL-193)
+Warning:  File /home/projects/ljohn/aarora1/vtr_aman/vtr-verilog-to-routing/vtr_flow/benchmarks/verilog/design_for_paper_jun2020/building_blocks_int8/4x4/matmul_4x4_systolic-verilog.pvl not found, or does not contain a usable description of matmul_4x4_systolic. (ELAB-320)
+Error:  Module 'matmul_4x4_systolic' cannot be found for elaboration. (ELAB-357)
+*** Presto compilation terminated with 1 errors. ***
+Warning: Unable to resolve reference 'matmul_4x4_systolic' in 'matrix_multiplication'. (LINK-5)
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:32:10 2020
+****************************************
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4/done_mat_mul (internal pin)
+  Endpoint: done_mat_mul
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_matmul_4x4/done_mat_mul (matmul_4x4_systolic)         0.00       0.00 r
+  done_mat_mul (out)                                      0.00       0.00 r
+  data arrival time                                                  0.00
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : area
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:32:10 2020
+****************************************
+
+Library(s) Used:
+
+    No libraries used.
+
+Number of ports:                          365
+Number of nets:                           355
+Number of cells:                            3
+Number of combinational cells:              0
+Number of sequential cells:                 3
+Number of macros/black boxes:               0
+Number of buf/inv:                          0
+Number of references:                       1
+
+Combinational area:                  0.000000
+Buf/Inv area:                        0.000000
+Noncombinational area:               0.000000
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                     0.000000
+Total area:                 undefined
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:32:10 2020
+****************************************
+
+
+Library(s) Used:
+
+    No libraries used.
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =   0.0000 mW        
+  Net Switching Power  =   0.0000 mW        
+                         ---------
+Total Dynamic Power    =   0.0000 mW        
+
+Cell Leakage Power     =   0.0000 nW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (     N/A)
+memory             0.0000            0.0000            0.0000            0.0000  (     N/A)
+black_box          0.0000            0.0000            0.0000            0.0000  (     N/A)
+clock_network      0.0000            0.0000            0.0000            0.0000  (     N/A)
+register           0.0000            0.0000            0.0000            0.0000  (     N/A)
+sequential         0.0000            0.0000            0.0000            0.0000  (     N/A)
+combinational      0.0000            0.0000            0.0000            0.0000  (     N/A)
+--------------------------------------------------------------------------------------------------
+Total              0.0000 mW         0.0000 mW         0.0000 nW         0.0000 mW
+1
+Warning: Design 'matrix_multiplication' has '1' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : design
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:32:10 2020
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    No libraries used.
+
+Local Link Library:
+
+    {/home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    None Required
+
+Design Parameters:
+
+    None specified.
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:36:29 2020
+****************************************
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4/pe20/u_mac/b_flopped_reg[7]
+              (rising edge-triggered flip-flop clocked by CLK_0)
+  Endpoint: u_matmul_4x4/pe20/u_mac/mul_out_temp_reg_reg[13]
+            (rising edge-triggered flip-flop clocked by CLK_0)
+  Path Group: CLK_0
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock CLK_0 (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  u_matmul_4x4/pe20/u_mac/b_flopped_reg[7]/CLK (DFFPOSX1)
+                                                          0.00       0.00 r
+  u_matmul_4x4/pe20/u_mac/b_flopped_reg[7]/Q (DFFPOSX1)
+                                                          0.10       0.10 r
+  U2666/Y (AND2X2)                                        0.07       0.17 r
+  U822/Y (INVX1)                                          0.03       0.20 f
+  U1727/Y (OAI21X1)                                       0.04       0.24 r
+  U1728/Y (INVX1)                                         0.03       0.27 f
+  U1286/Y (NAND2X1)                                       0.03       0.30 r
+  U1285/Y (AND2X2)                                        0.03       0.33 r
+  U3173/Y (INVX1)                                         0.02       0.35 f
+  U1271/Y (OAI21X1)                                       0.06       0.42 r
+  U12963/YS (FAX1)                                        0.09       0.50 f
+  U369/Y (OR2X1)                                          0.04       0.55 f
+  U1278/Y (AND2X2)                                        0.04       0.58 f
+  U1878/Y (XNOR2X1)                                       0.03       0.61 f
+  U309/Y (OR2X1)                                          0.05       0.66 f
+  U288/Y (AND2X1)                                         0.05       0.71 f
+  U2690/Y (INVX1)                                         0.00       0.71 r
+  U2125/Y (OR2X2)                                         0.03       0.74 r
+  U2126/Y (INVX1)                                         0.02       0.76 f
+  U1481/Y (AOI21X1)                                       0.04       0.80 r
+  U4623/Y (INVX1)                                         0.02       0.83 f
+  U2197/Y (BUFX2)                                         0.03       0.86 f
+  U4827/Y (OAI21X1)                                       0.05       0.90 r
+  U13468/Y (XNOR2X1)                                      0.04       0.95 r
+  U5093/Y (OR2X1)                                         0.05       0.99 r
+  U5094/Y (INVX1)                                         0.06       1.06 f
+  u_matmul_4x4/pe20/u_mac/mul_out_temp_reg_reg[13]/D (DFFPOSX1)
+                                                          0.00       1.06 f
+  data arrival time                                                  1.06
+
+  clock CLK_0 (rise edge)                                 1.11       1.11
+  clock network delay (ideal)                             0.00       1.11
+  u_matmul_4x4/pe20/u_mac/mul_out_temp_reg_reg[13]/CLK (DFFPOSX1)
+                                                          0.00       1.11 r
+  library setup time                                     -0.05       1.06
+  data required time                                                 1.06
+  --------------------------------------------------------------------------
+  data required time                                                 1.06
+  data arrival time                                                 -1.06
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+ 
+****************************************
+Report : area
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:36:29 2020
+****************************************
+
+Library(s) Used:
+
+    gscl45nm (File: /home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Number of ports:                          365
+Number of nets:                         15675
+Number of cells:                        15466
+Number of combinational cells:          14476
+Number of sequential cells:               990
+Number of macros/black boxes:               0
+Number of buf/inv:                       6117
+Number of references:                      23
+
+Combinational area:              33845.915237
+Buf/Inv area:                     9454.048305
+Noncombinational area:            7898.318825
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                 41744.234062
+Total area:                 undefined
+1
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:36:29 2020
+****************************************
+
+
+Library(s) Used:
+
+    gscl45nm (File: /home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =  13.1080 mW   (97%)
+  Net Switching Power  = 412.5302 uW    (3%)
+                         ---------
+Total Dynamic Power    =  13.5205 mW  (100%)
+
+Cell Leakage Power     = 215.8459 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register          12.6982        3.7013e-02        5.4428e+04           12.7896  (  93.11%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      0.4098            0.3755        1.6142e+05            0.9468  (   6.89%)
+--------------------------------------------------------------------------------------------------
+Total             13.1080 mW         0.4125 mW     2.1585e+05 nW        13.7364 mW
+1
+ 
+****************************************
+Report : design
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:36:29 2020
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    gscl45nm (File: /home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Local Link Library:
+
+    {/home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    DesignWare
+
+Design Parameters:
+
+    None specified.
+1
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:39:05 2020
+****************************************
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+  Startpoint: u_matmul_4x4/pe33/u_mac/a_flopped_reg[6]
+              (rising edge-triggered flip-flop clocked by CLK_0)
+  Endpoint: u_matmul_4x4/pe33/u_mac/mul_out_temp_reg_reg[13]
+            (rising edge-triggered flip-flop clocked by CLK_0)
+  Path Group: CLK_0
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock CLK_0 (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  u_matmul_4x4/pe33/u_mac/a_flopped_reg[6]/CLK (DFFPOSX1)
+                                                          0.00       0.00 r
+  u_matmul_4x4/pe33/u_mac/a_flopped_reg[6]/Q (DFFPOSX1)
+                                                          0.12       0.12 f
+  U470/Y (AND2X1)                                         0.06       0.18 f
+  U5733/Y (INVX1)                                         0.01       0.19 r
+  U433/Y (OR2X1)                                          0.05       0.24 r
+  U8209/Y (INVX1)                                         0.03       0.27 f
+  U696/Y (NOR2X1)                                         0.05       0.31 r
+  U3845/Y (XNOR2X1)                                       0.05       0.36 r
+  U1952/Y (OR2X1)                                         0.04       0.40 r
+  U1583/Y (AND2X1)                                        0.05       0.45 r
+  U3840/Y (XNOR2X1)                                       0.07       0.52 r
+  U3150/Y (OR2X1)                                         0.04       0.56 r
+  U3578/Y (INVX1)                                         0.02       0.57 f
+  U10442/Y (OAI21X1)                                      0.05       0.62 r
+  U10443/Y (INVX1)                                        0.03       0.65 f
+  U170/Y (AND2X1)                                         0.05       0.70 f
+  U695/Y (NOR2X1)                                         0.03       0.73 r
+  U694/Y (INVX1)                                          0.02       0.75 f
+  U1200/Y (INVX1)                                         0.00       0.75 r
+  U2370/Y (AOI21X1)                                       0.02       0.78 f
+  U2374/Y (AND2X2)                                        0.04       0.82 f
+  U693/Y (OR2X2)                                          0.04       0.85 f
+  U692/Y (NAND2X1)                                        0.01       0.86 r
+  U691/Y (NAND2X1)                                        0.04       0.90 f
+  U3362/Y (OAI21X1)                                       0.06       0.96 r
+  U3361/Y (XNOR2X1)                                       0.03       0.99 f
+  U10493/Y (AND2X1)                                       0.04       1.04 f
+  u_matmul_4x4/pe33/u_mac/mul_out_temp_reg_reg[13]/D (DFFPOSX1)
+                                                          0.00       1.04 f
+  data arrival time                                                  1.04
+
+  clock CLK_0 (rise edge)                                 1.11       1.11
+  clock network delay (ideal)                             0.00       1.11
+  u_matmul_4x4/pe33/u_mac/mul_out_temp_reg_reg[13]/CLK (DFFPOSX1)
+                                                          0.00       1.11 r
+  library setup time                                     -0.07       1.04
+  data required time                                                 1.04
+  --------------------------------------------------------------------------
+  data required time                                                 1.04
+  data arrival time                                                 -1.04
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+ 
+****************************************
+Report : area
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:39:05 2020
+****************************************
+
+Library(s) Used:
+
+    gscl45nm (File: /home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Number of ports:                          365
+Number of nets:                         14485
+Number of cells:                        14155
+Number of combinational cells:          13165
+Number of sequential cells:               990
+Number of macros/black boxes:               0
+Number of buf/inv:                       5439
+Number of references:                      22
+
+Combinational area:              31519.595247
+Buf/Inv area:                     8442.237523
+Noncombinational area:            7898.318825
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                 39417.914072
+Total area:                 undefined
+1
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:39:05 2020
+****************************************
+
+
+Library(s) Used:
+
+    gscl45nm (File: /home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+
+Operating Conditions: typical   Library: gscl45nm
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.1  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  =  13.1146 mW   (97%)
+  Net Switching Power  = 434.0904 uW    (3%)
+                         ---------
+Total Dynamic Power    =  13.5487 mW  (100%)
+
+Cell Leakage Power     = 201.9922 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register          12.7023        4.0433e-02        5.4428e+04           12.7972  (  93.07%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      0.4123            0.3937        1.4756e+05            0.9535  (   6.93%)
+--------------------------------------------------------------------------------------------------
+Total             13.1146 mW         0.4341 mW     2.0199e+05 nW        13.7507 mW
+1
+ 
+****************************************
+Report : design
+Design : matrix_multiplication
+Version: K-2015.06-SP4
+Date   : Sun Jun 14 21:39:05 2020
+****************************************
+
+Design allows ideal nets on clock nets.
+
+Library(s) Used:
+
+    gscl45nm (File: /home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db)
+
+Local Link Library:
+
+    {/home/projects/ljohn/aarora1/FreePDK45/FreePDK45/osu_soc/lib/files/gscl45nm.db}
+
+Flip-Flop Types:
+
+    No flip-flop types specified.
+
+Latch Types:
+
+    No latch types specified.
+
+Operating Conditions:
+
+
+    Operating Condition Name : typical
+    Library : gscl45nm
+    Process :   1.00
+    Temperature :  27.00
+    Voltage :   1.10
+
+Wire Loading Model:
+
+    No wire loading specified.
+
+
+Wire Loading Model Mode: top.
+
+Timing Ranges:
+
+    No timing ranges specified.
+
+Pin Input Delays:
+
+    None specified.
+
+Pin Output Delays:
+
+    None specified.
+
+Disabled Timing Arcs:
+
+    No arcs disabled.
+
+Required Licenses:
+
+    DesignWare
+
+Design Parameters:
+
+    None specified.
+1
