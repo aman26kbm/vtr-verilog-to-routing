@@ -268,7 +268,7 @@
   <!-- Physical descriptions begin -->
   <layout>
     <!-- <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="210" height="210">
+    <fixed_layout name="mylayout" width="350" height="350">
 
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
       <perimeter type="io" priority="100"/>
