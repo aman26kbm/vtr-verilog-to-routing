@@ -3,7 +3,7 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog/design_for_paper_fccm/regular_fpga_int8
+circuits_dir=benchmarks/verilog/design_for_paper_jun2020/regular_fpga_int8
 
 # Path to directory of architectures to use
 archs_dir=arch/timing/arch_for_paper_jun2020/regular_fpga
