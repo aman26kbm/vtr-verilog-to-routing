@@ -206,21 +206,24 @@ reg done_mat_mul;
 //of the matmul and P is the number of pipleine stages in the MAC block.
 reg [6:0] clk_cnt;
 
+reg [7:0] final_mat_mul_size_mul_4;
+assign final_mat_mul_size_mul_4 = final_mat_mul_size<<2;
+
 //Finding out number of cycles to assert matmul done.
 //When we have to save the outputs to accumulators, then we don't need to
 //shift out data. So, we can assert done_mat_mul early.
 //In the normal case, we have to include the time to shift out the results. 
 //Note: the count expression used to contain "4*final_mat_mul_size", but 
-//to avoid multiplication, we now use "final_mat_mul_size<<2"
+//to avoid multiplication, we now use "final_mat_mul_size_mul_4"
 wire [6:0] clk_cnt_for_done;
 assign clk_cnt_for_done = 
                           (save_output_to_accum && add_accum_to_output) ?
-                          ((final_mat_mul_size<<2) - 3 + `NUM_CYCLES_IN_MAC - final_mat_mul_size) : (
+                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC - final_mat_mul_size) : (
                           (save_output_to_accum) ?
-                          ((final_mat_mul_size<<2) - 3 + `NUM_CYCLES_IN_MAC - final_mat_mul_size) : (
+                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC - final_mat_mul_size) : (
                           (add_accum_to_output) ? 
-                          ((final_mat_mul_size<<2) - 3 + `NUM_CYCLES_IN_MAC) :  
-                          ((final_mat_mul_size<<2) - 3 + `NUM_CYCLES_IN_MAC) ));  
+                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC) :  
+                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC) ));  
 
 always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
