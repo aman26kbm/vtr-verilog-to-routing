@@ -456,7 +456,6 @@ always @(posedge clk) begin
 
       b_addr <= b_addr + address_stride_b;
   
-    end
     b_mem_access <= 1;
   end
 end 
