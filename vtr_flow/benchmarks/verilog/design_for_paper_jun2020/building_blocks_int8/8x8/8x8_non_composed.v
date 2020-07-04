@@ -1,3 +1,18 @@
+`define DWIDTH 8
+`define AWIDTH 11
+`define MEM_SIZE 2048
+
+`define MAT_MUL_SIZE 8
+`define MASK_WIDTH 8
+`define LOG2_MAT_MUL_SIZE 3
+
+`define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
+`define NUM_CYCLES_IN_MAC 3
+`define MEM_ACCESS_LATENCY 1
+`define REG_DATAWIDTH 32
+`define REG_ADDRWIDTH 8
+`define ADDR_STRIDE_WIDTH 8
+`define MAX_BITS_POOL 3
 
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +35,100 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module matmul(
+module matrix_multiplication(
+ clk,
+ reset,
+ start_mat_mul,
+ done_mat_mul,
+ address_mat_a,
+ address_mat_b,
+ address_mat_c,
+ address_stride_a,
+ address_stride_b,
+ address_stride_c,
+ a_data,
+ b_data,
+ a_data_in, //Data values coming in from previous matmul - systolic connections
+ b_data_in,
+ c_data_in, //Data values coming in from previous matmul - systolic shifting
+ c_data_out, //Data values going out to next matmul - systolic shifting
+ a_data_out,
+ b_data_out,
+ a_addr,
+ b_addr,
+ c_addr,
+ c_data_available,
+ save_output_to_accum,
+ add_accum_to_output,
+ validity_mask_a_rows,
+ validity_mask_a_cols_b_rows,
+ validity_mask_b_cols
+);
+
+ input clk;
+ input reset;
+ input start_mat_mul;
+ output done_mat_mul;
+ input [`AWIDTH-1:0] address_mat_a;
+ input [`AWIDTH-1:0] address_mat_b;
+ input [`AWIDTH-1:0] address_mat_c;
+ input [`ADDR_STRIDE_WIDTH-1:0] address_stride_a;
+ input [`ADDR_STRIDE_WIDTH-1:0] address_stride_b;
+ input [`ADDR_STRIDE_WIDTH-1:0] address_stride_c;
+ input [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data;
+ input [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data;
+ input [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in;
+ input [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in;
+ input [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in;
+ output [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
+ output [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_out;
+ output [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out;
+ output [`AWIDTH-1:0] a_addr;
+ output [`AWIDTH-1:0] b_addr;
+ output [`AWIDTH-1:0] c_addr;
+ output c_data_available;
+ input save_output_to_accum;
+ input add_accum_to_output;
+ input [`MASK_WIDTH-1:0] validity_mask_a_rows;
+ input [`MASK_WIDTH-1:0] validity_mask_a_cols_b_rows;
+ input [`MASK_WIDTH-1:0] validity_mask_b_cols;
+
+matmul_8x8_systolic u_matmul_4x4(
+  .clk(clk),
+  .reset(reset),
+  .start_mat_mul(start_mat_mul),
+  .done_mat_mul(done_mat_mul),
+  .address_mat_a(address_mat_a),
+  .address_mat_b(address_mat_b),
+  .address_mat_c(address_mat_c),
+  .address_stride_a(address_stride_a),
+  .address_stride_b(address_stride_b),
+  .address_stride_c(address_stride_c),
+  .a_data(a_data),
+  .b_data(b_data),
+  .a_data_in(a_data_in),
+  .b_data_in(b_data_in),
+  .c_data_in(c_data_in),
+  .c_data_out(c_data_out),
+  .a_data_out(a_data_out),
+  .b_data_out(b_data_out),
+  .a_addr(a_addr),
+  .b_addr(b_addr),
+  .c_addr(c_addr),
+  .c_data_available(c_data_available),
+  .save_output_to_accum(save_output_to_accum),
+  .add_accum_to_output(add_accum_to_output),
+  .validity_mask_a_rows(validity_mask_a_rows),
+  .validity_mask_a_cols_b_rows(validity_mask_a_cols_b_rows),
+  .validity_mask_b_cols(validity_mask_b_cols),
+  .final_mat_mul_size(8'd8),
+  .a_loc(8'd0),
+  .b_loc(8'd0)
+);
+
+endmodule
+
+module matmul_8x8_systolic(
  clk,
  reset,
  start_mat_mul,
