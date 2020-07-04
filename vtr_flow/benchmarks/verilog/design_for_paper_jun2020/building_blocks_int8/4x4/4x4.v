@@ -200,14 +200,23 @@ module matmul_4x4_systolic(
 //////////////////////////////////////////////////////////////////////////
 
 reg done_mat_mul;
-//This is 7 bits because the expectation is that clock count will be pretty
+//This is 8 bits because the expectation is that clock count will be pretty
 //small. For large matmuls, this will need to increased to have more bits.
 //In general, a systolic multiplier takes 4*N-2+P cycles, where N is the size 
 //of the matmul and P is the number of pipleine stages in the MAC block.
-reg [6:0] clk_cnt;
+reg [7:0] clk_cnt;
 
 reg [7:0] final_mat_mul_size_mul_4;
 assign final_mat_mul_size_mul_4 = final_mat_mul_size<<2;
+
+reg [7:0] final_mat_mul_size_mul_3;
+assign final_mat_mul_size_mul_3 = final_mat_mul_size_mul_4 - final_mat_mul_size;
+
+reg [7:0] final_mat_mul_size_mul_3_minus_3_plus_mac_cycles;
+assign final_mat_mul_size_mul_3_minus_3_plus_mac_cycles = final_mat_mul_size_mul_3 - 3 + `NUM_CYCLES_IN_MAC;
+
+reg [7:0] final_mat_mul_size_mul_4_minus_3_plus_mac_cycles;
+assign final_mat_mul_size_mul_4_minus_3_plus_mac_cycles = final_mat_mul_size_mul_4 - 3 + `NUM_CYCLES_IN_MAC;
 
 //Finding out number of cycles to assert matmul done.
 //When we have to save the outputs to accumulators, then we don't need to
@@ -215,15 +224,18 @@ assign final_mat_mul_size_mul_4 = final_mat_mul_size<<2;
 //In the normal case, we have to include the time to shift out the results. 
 //Note: the count expression used to contain "4*final_mat_mul_size", but 
 //to avoid multiplication, we now use "final_mat_mul_size_mul_4"
-wire [6:0] clk_cnt_for_done;
+wire [7:0] clk_cnt_for_done;
 assign clk_cnt_for_done = 
                           (save_output_to_accum && add_accum_to_output) ?
-                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC - final_mat_mul_size) : (
-                          (save_output_to_accum) ?
-                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC - final_mat_mul_size) : (
-                          (add_accum_to_output) ? 
-                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC) :  
-                          ((final_mat_mul_size_mul_4) - 3 + `NUM_CYCLES_IN_MAC) ));  
+                          final_mat_mul_size_mul_3_minus_3_plus_mac_cycles : (
+                          save_output_to_accum ?
+                          final_mat_mul_size_mul_3_minus_3_plus_mac_cycles : (
+                          add_accum_to_output ? 
+                          final_mat_mul_size_mul_4_minus_3_plus_mac_cycles :
+                          final_mat_mul_size_mul_4_minus_3_plus_mac_cycles));
+
+reg [7:0] clk_cnt_inc;
+assign clk_cnt_inc = clk_cnt + 1;
 
 always @(posedge clk) begin
   if (reset || ~start_mat_mul) begin
@@ -232,14 +244,13 @@ always @(posedge clk) begin
   end
   else if (clk_cnt == clk_cnt_for_done) begin
     done_mat_mul <= 1;
-    clk_cnt <= clk_cnt + 1;
   end
   else if (done_mat_mul == 0) begin
-    clk_cnt <= clk_cnt + 1;
+    clk_cnt <= clk_cnt_inc;
   end    
   else begin
     done_mat_mul <= 0;
-    clk_cnt <= clk_cnt + 1;
+    clk_cnt <= clk_cnt_inc;
   end
 end
 
@@ -302,7 +313,7 @@ wire [`DWIDTH-1:0] a1_data;
 wire [`DWIDTH-1:0] a2_data;
 wire [`DWIDTH-1:0] a3_data;
 assign a0_data = a_data[`DWIDTH-1:0] & {`DWIDTH{a_data_valid}} & {`DWIDTH{validity_mask_a_rows[0:0]}};
-assign a1_data = a_data[2*`DWIDTH-1:`DWIDTH] & {`DWIDTH{a_data_valid}} & {`DWIDTH{validity_mask_a_rows[1:1]}};;
+assign a1_data = a_data[2*`DWIDTH-1:`DWIDTH] & {`DWIDTH{a_data_valid}} & {`DWIDTH{validity_mask_a_rows[1:1]}};
 assign a2_data = a_data[3*`DWIDTH-1:2*`DWIDTH] & {`DWIDTH{a_data_valid}} & {`DWIDTH{validity_mask_a_rows[2:2]}};
 assign a3_data = a_data[4*`DWIDTH-1:3*`DWIDTH] & {`DWIDTH{a_data_valid}} & {`DWIDTH{validity_mask_a_rows[3:3]}};
 
@@ -641,6 +652,7 @@ assign cin_row3 = c_data_in[4*`DWIDTH-1:3*`DWIDTH];
 //assign row_latch_en = (clk_cnt==(`MAT_MUL_SIZE + ((a_loc+b_loc) << `LOG2_MAT_MUL_SIZE) + 10 +  `NUM_CYCLES_IN_MAC - 1));
 //Fixing bug. The line above is inaccurate. Using the line below. 
 //TODO: This line needs to be fixed to include a_loc and b_loc ie. when final_mat_mul_size is different from `MAT_MUL_SIZE
+
 assign row_latch_en =  (save_output_to_accum) ?
                        ((clk_cnt == ((`MAT_MUL_SIZE<<2) - `MAT_MUL_SIZE -1 +`NUM_CYCLES_IN_MAC))) :
                        ((clk_cnt == ((`MAT_MUL_SIZE<<2) - `MAT_MUL_SIZE -2 +`NUM_CYCLES_IN_MAC)));
@@ -774,7 +786,8 @@ module processing_element(
  
 endmodule
 
-module seq_mac(a, b, out, reset, clk);
+/*
+module seq_mac1(a, b, out, reset, clk);
 input [`DWIDTH-1:0] a;
 input [`DWIDTH-1:0] b;
 input reset;
@@ -848,7 +861,8 @@ input [`DWIDTH-1:0] i_multiplier;
 output [2*`DWIDTH-1:0] o_result;
 
 //assign o_result = i_multiplicand * i_multiplier;
-DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result));
+dsp_multiply u_dsp_mult(.a(i_multiplicand), .b(i_multiplier), .out(o_result));
+//DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result));
 
 endmodule
 
@@ -856,7 +870,9 @@ module qadd(a,b,c);
 input [`DWIDTH-1:0] a;
 input [`DWIDTH-1:0] b;
 output [`DWIDTH-1:0] c;
-
+wire NC;
 //assign c = a + b;
-DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
+dsp_adder u_dsp_adder(.a(a), .b(b), .cin(1'b0), .sumout(c), .cout(NC));
+//DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
 endmodule
+*/
