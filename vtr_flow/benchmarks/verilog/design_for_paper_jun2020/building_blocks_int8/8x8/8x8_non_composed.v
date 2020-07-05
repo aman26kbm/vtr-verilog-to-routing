@@ -1373,6 +1373,7 @@ module processing_element(
  
 endmodule
 
+/*
 module seq_mac(a, b, out, reset, clk);
 input [`DWIDTH-1:0] a;
 input [`DWIDTH-1:0] b;
@@ -1459,3 +1460,4 @@ output [`DWIDTH-1:0] c;
 assign c = a + b;
 //DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
 endmodule
+*/

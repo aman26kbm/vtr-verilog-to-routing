@@ -87,7 +87,7 @@
        that describe them.
   -->
   <models>
-    <model name="multiply">
+    <model name="dsp_multiply">
       <input_ports>
         <port name="a" combinational_sink_ports="out"/>
         <port name="b" combinational_sink_ports="out"/>
@@ -137,6 +137,18 @@
       </output_ports>
     </model>
     <model name="adder">
+      <input_ports>
+        <port name="a" combinational_sink_ports="cout sumout"/>
+        <port name="b" combinational_sink_ports="cout sumout"/>
+        <port name="cin" combinational_sink_ports="cout sumout"/>
+      </input_ports>
+      <output_ports>
+        <port name="cout"/>
+        <port name="sumout"/>
+      </output_ports>
+    </model>
+
+    <model name="dsp_adder">
       <input_ports>
         <port name="a" combinational_sink_ports="cout sumout"/>
         <port name="b" combinational_sink_ports="cout sumout"/>
@@ -267,8 +279,8 @@
   <!-- ODIN II specific config ends -->
   <!-- Physical descriptions begin -->
   <layout>
-    <!-- <auto_layout aspect_ratio="1.0"> -->
-    <fixed_layout name="mylayout" width="350" height="350">
+     <auto_layout aspect_ratio="1.0"> 
+   <!-- <fixed_layout name="mylayout" width="350" height="350"> -->
 
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
       <perimeter type="io" priority="100"/>
@@ -277,8 +289,8 @@
       <fill type="clb" priority="10"/>
       <col type="dsp" startx="4" starty="1" repeatx="7" priority="30"/>
       <col type="memory" startx="6" starty="1" repeatx="7" priority="18"/>
-   <!-- </auto_layout> -->
-   </fixed_layout>
+    </auto_layout>
+<!--   </fixed_layout>-->
   </layout>
   <device>
     <!-- VB & JL: Using Ian Kuon's transistor sizing and drive strength data for routing, at 40 nm. Ian used BPTM 
@@ -875,7 +887,7 @@
       <clock name="clk" num_pins="1"/>
       <!-- combinatorial multiplier mode -->
       <mode name="comb_mult_8x8_mode">
-        <pb_type name="mult_8x8" blif_model=".subckt multiply" num_pb="1">
+        <pb_type name="mult_8x8" blif_model=".subckt dsp_multiply" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
           <output name="out" num_pins="8"/>
@@ -896,7 +908,7 @@
       </mode>
       <!-- combinatorial adder mode -->
       <mode name="comb_adder_8x8_mode">
-        <pb_type name="adder_pb" blif_model=".subckt adder" num_pb="1">
+        <pb_type name="adder_pb" blif_model=".subckt dsp_adder" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
           <input name="cin" num_pins="1"/>

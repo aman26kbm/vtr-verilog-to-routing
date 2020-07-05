@@ -3,20 +3,16 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog/design_for_paper_jun2020/regular_fpga_int8
-#circuits_dir=benchmarks/verilog/design_for_paper_jun2020/building_blocks_int8/4x4
+circuits_dir=benchmarks/verilog/design_for_paper_jun2020/building_blocks_int8/8x8
 
 # Path to directory of architectures to use
 archs_dir=arch/timing/arch_for_paper_jun2020/regular_fpga
-#archs_dir=arch/timing/
 
 # Add circuits to list to sweep
-#circuit_list_add=4x4.v
-circuit_list_add=4x4_from_4x4_regular_fpga.int8.v
+circuit_list_add=8x8_non_composed.v
 
 # Add architectures to list to sweep
 arch_list_add=regular_fpga_DSP.int8.xml
-#arch_list_add=k6_frac_N10_frac_chain_mem32K_40nm.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
