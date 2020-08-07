@@ -247,7 +247,7 @@
         <input name="a" num_pins="8"/>
         <input name="b" num_pins="8"/>
         <input name="cin" num_pins="1"/>
-        <output name="out" num_pins="8"/>
+        <output name="out" num_pins="16"/>
         <output name="cout" num_pins="1"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
@@ -882,7 +882,7 @@
       <input name="a" num_pins="8"/>
       <input name="b" num_pins="8"/>
       <input name="cin" num_pins="1"/>
-      <output name="out" num_pins="8"/>
+      <output name="out" num_pins="16"/>
       <output name="cout" num_pins="1"/>
       <clock name="clk" num_pins="1"/>
       <!-- combinatorial multiplier mode -->
@@ -890,7 +890,7 @@
         <pb_type name="mult_8x8" blif_model=".subckt dsp_multiply" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
-          <output name="out" num_pins="8"/>
+          <output name="out" num_pins="16"/>
           <delay_constant max="0.94e-9" in_port="mult_8x8.a" out_port="mult_8x8.out"/>
           <delay_constant max="0.94e-9" in_port="mult_8x8.b" out_port="mult_8x8.out"/>
         </pb_type>
@@ -931,8 +931,8 @@
           </direct>
           <direct name="cintocin" input="dsp.cin" output="adder_pb.cin">
 		      </direct>
-          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out">
-            <delay_constant max="0.1e-9" in_port="adder_pb.sumout" out_port="dsp.out"/>
+          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out[7:0]">
+            <delay_constant max="0.1e-9" in_port="adder_pb.sumout" out_port="dsp.out[7:0]"/>
           </direct>
           <direct name="couttocout" input="adder_pb.cout" output="dsp.cout">
 		      </direct>
@@ -943,7 +943,7 @@
         <pb_type name="mult_8x8" blif_model=".subckt seq_multiply" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
-          <output name="out" num_pins="8"/>
+          <output name="out" num_pins="16"/>
           <input name="reset" num_pins="1"/>
           <clock name="clk" num_pins="1"/>
           <T_setup value="66e-12" port="mult_8x8.reset" clock="clk"/>
@@ -1017,8 +1017,8 @@
           </direct>
           <direct name="cintocin" input="dsp.cin" output="adder_pb.cin">
 		      </direct>
-          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out">
-            <delay_constant max="0.1e-9" in_port="adder_pb.sumout" out_port="dsp.out"/>
+          <direct name="sumouttosumout" input="adder_pb.sumout" output="dsp.out[7:0]">
+            <delay_constant max="0.1e-9" in_port="adder_pb.sumout" out_port="dsp.out[7:0]"/>
           </direct>
           <direct name="couttocout" input="adder_pb.cout" output="dsp.cout">
 		      </direct>
@@ -1033,7 +1033,7 @@
         <pb_type name="mac_8x8" blif_model=".subckt seq_mac" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
-          <output name="out" num_pins="8"/>
+          <output name="out" num_pins="16"/>
           <input name="reset" num_pins="1"/>
           <clock name="clk" num_pins="1"/>
           <T_setup value="66e-12" port="mac_8x8.reset" clock="clk"/>
