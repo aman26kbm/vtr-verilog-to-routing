@@ -87,7 +87,7 @@
        that describe them.
   -->
   <models>
-    <model name="dsp_multiply">
+    <model name="multiply">
       <input_ports>
         <port name="a" combinational_sink_ports="out"/>
         <port name="b" combinational_sink_ports="out"/>
@@ -887,7 +887,7 @@
       <clock name="clk" num_pins="1"/>
       <!-- combinatorial multiplier mode -->
       <mode name="comb_mult_8x8_mode">
-        <pb_type name="mult_8x8" blif_model=".subckt dsp_multiply" num_pb="1">
+        <pb_type name="mult_8x8" blif_model=".subckt multiply" num_pb="1">
           <input name="a" num_pins="8"/>
           <input name="b" num_pins="8"/>
           <output name="out" num_pins="16"/>
