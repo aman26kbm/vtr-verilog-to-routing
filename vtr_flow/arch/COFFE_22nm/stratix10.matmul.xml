@@ -839,165 +839,184 @@
     <!-- Define general purpose logic block (CLB) ends -->
 
     <!-- Define DSP slice begin -->
+    <!-- TODO: Need to update after all precisions are added to the design. -->
     <pb_type name="dsp">
       <input name="datain" num_pins="74"/>
       <output name="dataout" num_pins="74"/>
 
-      <mode name="two_mult_18x19">
-        <pb_type name="two_mult_18x19" num_pb="2">
-          <input name="a" num_pins="18"/>
-          <input name="b" num_pins="19"/>
-          <output name="out" num_pins="37"/>
-          <pb_type name="mult_18x19" blif_model=".subckt multiply" num_pb="1">
+      <pb_type name="dsp_pb" num_pb="1">
+        <input name="datain" num_pins="74"/>
+        <output name="dataout" num_pins="74"/>
+
+        <mode name="two_mult_18x19">
+          <pb_type name="two_mult_18x19" num_pb="2">
             <input name="a" num_pins="18"/>
             <input name="b" num_pins="19"/>
             <output name="out" num_pins="37"/>
-            <!-- Using the numbers from Arria 10 which is a 22nm technology, an 18x19 multiplier 
-                    can operate at 548 MHz which maps to a delay of 1.825e-9 -->
-            <delay_constant max="1.825e-9" in_port="mult_18x19.a" out_port="mult_18x19.out"/>
-            <delay_constant max="1.825e-9" in_port="mult_18x19.b" out_port="mult_18x19.out"/>
+            <pb_type name="mult_18x19" blif_model=".subckt multiply" num_pb="1">
+              <input name="a" num_pins="18"/>
+              <input name="b" num_pins="19"/>
+              <output name="out" num_pins="37"/>
+              <!-- Using the numbers from Arria 10 which is a 22nm technology, an 18x19 multiplier 
+                      can operate at 548 MHz which maps to a delay of 1.825e-9 -->
+              <delay_constant max="1.825e-9" in_port="mult_18x19.a" out_port="mult_18x19.out"/>
+              <delay_constant max="1.825e-9" in_port="mult_18x19.b" out_port="mult_18x19.out"/>
+            </pb_type>
+            <interconnect>
+              <direct name="a2a" input="two_mult_18x19.a" output="mult_18x19.a">
+                 </direct>
+              <direct name="b2b" input="two_mult_18x19.b" output="mult_18x19.b">
+                 </direct>
+              <direct name="out2out" input="mult_18x19.out" output="two_mult_18x19.out">
+                 </direct>
+            </interconnect>
+            <power method="pin-toggle">
+              <port name="a" energy_per_toggle="1.09e-12"/>
+              <port name="b" energy_per_toggle="1.09e-12"/>
+              <static_power power_per_instance="0.0"/>
+            </power>
           </pb_type>
           <interconnect>
-            <direct name="a2a" input="two_mult_18x19.a" output="mult_18x19.a">
-               </direct>
-            <direct name="b2b" input="two_mult_18x19.b" output="mult_18x19.b">
-               </direct>
-            <direct name="out2out" input="mult_18x19.out" output="two_mult_18x19.out">
-               </direct>
+            <direct name="datain2a1" input="dsp_pb.datain[17:0]" output="two_mult_18x19[0].a">
+              <delay_constant max="134e-12" in_port="dsp_pb.datain[17:0]" out_port="two_mult_18x19[0].a"/>
+            </direct>
+            <direct name="datain2b1" input="dsp_pb.datain[36:18]" output="two_mult_18x19[0].b">
+              <delay_constant max="134e-12" in_port="dsp_pb.datain[36:18]" out_port="two_mult_18x19[0].b"/>
+            </direct>
+            <direct name="datain2a2" input="dsp_pb.datain[54:37]" output="two_mult_18x19[1].a">
+              <delay_constant max="134e-12" in_port="dsp_pb.datain[54:37]" out_port="two_mult_18x19[1].a"/>
+            </direct>
+            <direct name="datain2b2" input="dsp_pb.datain[73:55]" output="two_mult_18x19[1].b">
+              <delay_constant max="134e-12" in_port="dsp_pb.datain[73:55]" out_port="two_mult_18x19[1].b"/>
+            </direct>
+            <direct name="out2dataout" input="two_mult_18x19[1:0].out" output="dsp_pb.dataout">
+              <delay_constant max="1.09e-9" in_port="two_mult_18x19[1:0].out" out_port="dsp_pb.dataout"/>
+            </direct>
           </interconnect>
-          <power method="pin-toggle">
-            <port name="a" energy_per_toggle="1.09e-12"/>
-            <port name="b" energy_per_toggle="1.09e-12"/>
-            <static_power power_per_instance="0.0"/>
-          </power>
-        </pb_type>
-        <interconnect>
-          <direct name="datain2a1" input="dsp.datain[17:0]" output="two_mult_18x19[0].a">
-            <delay_constant max="134e-12" in_port="dsp.datain[17:0]" out_port="two_mult_18x19[0].a"/>
-          </direct>
-          <direct name="datain2b1" input="dsp.datain[36:18]" output="two_mult_18x19[0].b">
-            <delay_constant max="134e-12" in_port="dsp.datain[36:18]" out_port="two_mult_18x19[0].b"/>
-          </direct>
-          <direct name="datain2a2" input="dsp.datain[54:37]" output="two_mult_18x19[1].a">
-            <delay_constant max="134e-12" in_port="dsp.datain[54:37]" out_port="two_mult_18x19[1].a"/>
-          </direct>
-          <direct name="datain2b2" input="dsp.datain[73:55]" output="two_mult_18x19[1].b">
-            <delay_constant max="134e-12" in_port="dsp.datain[73:55]" out_port="two_mult_18x19[1].b"/>
-          </direct>
-          <direct name="out2dataout" input="two_mult_18x19[1:0].out" output="dsp.dataout">
-            <delay_constant max="1.09e-9" in_port="two_mult_18x19[1:0].out" out_port="dsp.dataout"/>
-          </direct>
-        </interconnect>
-      </mode>
+        </mode>
 
-      <mode name="mult_27x27">
-        <pb_type name="one_mult_27x27" num_pb="1">
-          <input name="a" num_pins="27"/>
-          <input name="b" num_pins="27"/>
-          <output name="out" num_pins="54"/>
-          <pb_type name="mult_27x27" blif_model=".subckt multiply" num_pb="1">
+        <mode name="mult_27x27">
+          <pb_type name="one_mult_27x27" num_pb="1">
             <input name="a" num_pins="27"/>
             <input name="b" num_pins="27"/>
             <output name="out" num_pins="54"/>
-            <!-- Using the numbers from Arria 10 which is a 22nm technology, an 27x27 multiplier 
-                    can operate at 541 MHz which maps to a delay of 1.848e-9 -->
-            <delay_constant max="1.848e-9" in_port="mult_27x27.a" out_port="mult_27x27.out"/>
-            <delay_constant max="1.848e-9" in_port="mult_27x27.b" out_port="mult_27x27.out"/>
+            <pb_type name="mult_27x27" blif_model=".subckt multiply" num_pb="1">
+              <input name="a" num_pins="27"/>
+              <input name="b" num_pins="27"/>
+              <output name="out" num_pins="54"/>
+              <!-- Using the numbers from Arria 10 which is a 22nm technology, an 27x27 multiplier 
+                      can operate at 541 MHz which maps to a delay of 1.848e-9 -->
+              <delay_constant max="1.848e-9" in_port="mult_27x27.a" out_port="mult_27x27.out"/>
+              <delay_constant max="1.848e-9" in_port="mult_27x27.b" out_port="mult_27x27.out"/>
+            </pb_type>
+            <interconnect>
+              <direct name="a2a" input="one_mult_27x27.a" output="mult_27x27.a">
+                 </direct>
+              <direct name="b2b" input="one_mult_27x27.b" output="mult_27x27.b">
+                 </direct>
+              <direct name="out2out" input="mult_27x27.out" output="one_mult_27x27.out">
+                 </direct>
+            </interconnect>
+            <power method="pin-toggle">
+              <port name="a" energy_per_toggle="2.13e-12"/>
+              <port name="b" energy_per_toggle="2.13e-12"/>
+              <static_power power_per_instance="0.0"/>
+            </power>
           </pb_type>
           <interconnect>
-            <direct name="a2a" input="one_mult_27x27.a" output="mult_27x27.a">
-               </direct>
-            <direct name="b2b" input="one_mult_27x27.b" output="mult_27x27.b">
-               </direct>
-            <direct name="out2out" input="mult_27x27.out" output="one_mult_27x27.out">
-               </direct>
+            <direct name="datain2a" input="dsp_pb.datain[26:0]" output="one_mult_27x27.a">
+              <delay_constant max="134e-12" in_port="dsp_pb.datain[26:0]" out_port="one_mult_27x27.a"/>
+            </direct>
+            <direct name="datain2b" input="dsp_pb.datain[53:27]" output="one_mult_27x27.b">
+              <delay_constant max="134e-12" in_port="dsp_pb.datain[53:27]" out_port="one_mult_27x27.b"/>
+            </direct>
+            <direct name="out2dataout" input="one_mult_27x27.out" output="dsp_pb.dataout[53:0]">
+              <delay_constant max="1.93e-9" in_port="one_mult_27x27.out" out_port="dsp_pb.dataout[53:0]"/>
+            </direct>
           </interconnect>
-          <power method="pin-toggle">
-            <port name="a" energy_per_toggle="2.13e-12"/>
-            <port name="b" energy_per_toggle="2.13e-12"/>
-            <static_power power_per_instance="0.0"/>
-          </power>
-        </pb_type>
-        <interconnect>
-          <direct name="datain2a" input="dsp.datain[26:0]" output="one_mult_27x27.a">
-            <delay_constant max="134e-12" in_port="dsp.datain[26:0]" out_port="one_mult_27x27.a"/>
-          </direct>
-          <direct name="datain2b" input="dsp.datain[53:27]" output="one_mult_27x27.b">
-            <delay_constant max="134e-12" in_port="dsp.datain[53:27]" out_port="one_mult_27x27.b"/>
-          </direct>
-          <direct name="out2dataout" input="one_mult_27x27.out" output="dsp.dataout[53:0]">
-            <delay_constant max="1.93e-9" in_port="one_mult_27x27.out" out_port="dsp.dataout[53:0]"/>
-          </direct>
-        </interconnect>
-      </mode>
+        </mode>
 
-      <!-- combinatorial floating point multiplier mode -->
-      <mode name="comb_mult_fp32_mode">
-        <pb_type name="mult_fp32" blif_model=".subckt multiply_fp" num_pb="1">
-          <input name="a" num_pins="32"/>
-          <input name="b" num_pins="32"/>
-          <output name="out" num_pins="32"/>
-          <delay_constant max="0.94e-9" in_port="mult_fp32.a" out_port="mult_fp32.out"/>
-          <delay_constant max="0.94e-9" in_port="mult_fp32.b" out_port="mult_fp32.out"/>
-        </pb_type>
-        <interconnect>
-          <direct name="a2a" input="dsp.datain[31:0]" output="mult_fp32.a">
-            <delay_constant max="0.1e-9" in_port="dsp.datain[31:0]" out_port="mult_fp32.a"/>
-          </direct>
-          <direct name="b2b" input="dsp.datain[63:32]" output="mult_fp32.b">
-            <delay_constant max="0.1e-9" in_port="dsp.datain[63:32]" out_port="mult_fp32.b"/>
-          </direct>
-          <direct name="out2out" input="mult_fp32.out" output="dsp.dataout[31:0]">
-            <delay_constant max="0.1e-9" in_port="mult_fp32.out" out_port="dsp.dataout[31:0]"/>
-          </direct>
-        </interconnect>
-      </mode>
+        <!-- combinatorial floating point multiplier mode -->
+        <mode name="comb_mult_fp32_mode">
+          <pb_type name="mult_fp32" blif_model=".subckt multiply_fp" num_pb="1">
+            <input name="a" num_pins="32"/>
+            <input name="b" num_pins="32"/>
+            <output name="out" num_pins="32"/>
+            <delay_constant max="0.94e-9" in_port="mult_fp32.a" out_port="mult_fp32.out"/>
+            <delay_constant max="0.94e-9" in_port="mult_fp32.b" out_port="mult_fp32.out"/>
+          </pb_type>
+          <interconnect>
+            <direct name="a2a" input="dsp_pb.datain[31:0]" output="mult_fp32.a">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[31:0]" out_port="mult_fp32.a"/>
+            </direct>
+            <direct name="b2b" input="dsp_pb.datain[63:32]" output="mult_fp32.b">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="mult_fp32.b"/>
+            </direct>
+            <direct name="out2out" input="mult_fp32.out" output="dsp_pb.dataout[31:0]">
+              <delay_constant max="0.1e-9" in_port="mult_fp32.out" out_port="dsp_pb.dataout[31:0]"/>
+            </direct>
+          </interconnect>
+        </mode>
 
-      <!-- combinatorial floating point adder mode -->
-      <mode name="comb_adder_32x32_mode_fp">
-        <pb_type name="adder_pb" blif_model=".subckt comb_adder_fp" num_pb="1">
-          <input name="a" num_pins="32"/>
-          <input name="b" num_pins="32"/>
-          <output name="out" num_pins="32"/>
-          <!-- Carry link delays included in cin->cout delay -->
-          <delay_constant max="0.33e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
-          <delay_constant max="0.33e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
-        </pb_type>
-        <interconnect>
-          <direct name="atoa" input="dsp.datain[31:0]" output="adder_pb.a">
-            <delay_constant max="0.1e-9" in_port="dsp.datain[31:0]" out_port="adder_pb.a"/>
-          </direct>
-          <direct name="btob" input="dsp.datain[63:32]" output="adder_pb.b">
-            <delay_constant max="0.1e-9" in_port="dsp.datain[63:32]" out_port="adder_pb.b"/>
-          </direct>
-          <direct name="sumouttosumout" input="adder_pb.out" output="dsp.dataout[31:0]">
-            <delay_constant max="0.1e-9" in_port="adder_pb.out" out_port="dsp.dataout[31:0]"/>
-          </direct>
-        </interconnect>
-      </mode>
+        <!-- combinatorial floating point adder mode -->
+        <mode name="comb_adder_32x32_mode_fp">
+          <pb_type name="adder_pb" blif_model=".subckt comb_adder_fp" num_pb="1">
+            <input name="a" num_pins="32"/>
+            <input name="b" num_pins="32"/>
+            <output name="out" num_pins="32"/>
+            <!-- Carry link delays included in cin->cout delay -->
+            <delay_constant max="0.33e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
+            <delay_constant max="0.33e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
+          </pb_type>
+          <interconnect>
+            <direct name="atoa" input="dsp_pb.datain[31:0]" output="adder_pb.a">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[31:0]" out_port="adder_pb.a"/>
+            </direct>
+            <direct name="btob" input="dsp_pb.datain[63:32]" output="adder_pb.b">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="adder_pb.b"/>
+            </direct>
+            <direct name="sumouttosumout" input="adder_pb.out" output="dsp_pb.dataout[31:0]">
+              <delay_constant max="0.1e-9" in_port="adder_pb.out" out_port="dsp_pb.dataout[31:0]"/>
+            </direct>
+          </interconnect>
+        </mode>
 
-      <!-- combinatorial fixed point adder mode -->
-      <mode name="comb_adder_32x32_mode_int">
-        <pb_type name="adder_pb" blif_model=".subckt comb_adder_int" num_pb="1">
-          <input name="a" num_pins="32"/>
-          <input name="b" num_pins="32"/>
-          <output name="out" num_pins="32"/>
-          <!-- Carry link delays included in cin->cout delay -->
-          <delay_constant max="0.33e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
-          <delay_constant max="0.33e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
-        </pb_type>
-        <interconnect>
-          <direct name="atoa" input="dsp.datain[31:0]" output="adder_pb.a">
-            <delay_constant max="0.1e-9" in_port="dsp.datain[31:0]" out_port="adder_pb.a"/>
-          </direct>
-          <direct name="btob" input="dsp.datain[63:32]" output="adder_pb.b">
-            <delay_constant max="0.1e-9" in_port="dsp.datain[63:32]" out_port="adder_pb.b"/>
-          </direct>
-          <direct name="sumouttosumout" input="adder_pb.out" output="dsp.dataout[31:0]">
-            <delay_constant max="0.1e-9" in_port="adder_pb.out" out_port="dsp.dataout[31:0]"/>
-          </direct>
-        </interconnect>
-      </mode>
+        <!-- combinatorial fixed point adder mode -->
+        <mode name="comb_adder_32x32_mode_int">
+          <pb_type name="adder_pb" blif_model=".subckt comb_adder_int" num_pb="1">
+            <input name="a" num_pins="32"/>
+            <input name="b" num_pins="32"/>
+            <output name="out" num_pins="32"/>
+            <!-- Carry link delays included in cin->cout delay -->
+            <delay_constant max="0.33e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
+            <delay_constant max="0.33e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
+          </pb_type>
+          <interconnect>
+            <direct name="atoa" input="dsp_pb.datain[31:0]" output="adder_pb.a">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[31:0]" out_port="adder_pb.a"/>
+            </direct>
+            <direct name="btob" input="dsp_pb.datain[63:32]" output="adder_pb.b">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="adder_pb.b"/>
+            </direct>
+            <direct name="sumouttosumout" input="adder_pb.out" output="dsp_pb.dataout[31:0]">
+              <delay_constant max="0.1e-9" in_port="adder_pb.out" out_port="dsp_pb.dataout[31:0]"/>
+            </direct>
+          </interconnect>
+        </mode>
+      </pb_type>
+
+      <interconnect>
+        <!--TODO: Need to update delays from COFFE-->
+        <!--50% sparse crossbar means 50% of the lines can reach an actual input of the matmul
+        We do this by splitting inputs into two buckets and having two full crossbars-->
+        <complete name="first_half" input="dsp.datain[36:0]" output="dsp_pb.datain[36:0]">
+            <delay_constant max="134e-12" in_port="dsp.datain[36:0]" out_port="dsp_pb.datain[36:0]"/>
+        </complete>
+        <complete name="second_half" input="dsp.datain[73:37]" output="dsp_pb.datain[73:37]">
+            <delay_constant max="134e-12" in_port="dsp.datain[73:37]" out_port="dsp_pb.datain[73:37]"/>
+        </complete>
+        <direct name="outputs" input="dsp_pb.dataout" output="dsp.dataout"></direct>
+      </interconnect>  
 
       <power method="sum-of-children"/>
     </pb_type>
