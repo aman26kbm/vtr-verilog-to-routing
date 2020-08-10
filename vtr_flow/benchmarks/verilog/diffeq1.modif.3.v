@@ -119,8 +119,10 @@ module adder_32bit(
   // Again, we need to handle the carry bits.
   wire [37:0] sum_lower_16;
   wire [37:0] sum_higher_16;
-  mult_add_sum_int u1 (.ax(19'b0), .ay({2'b0, a[15:0]}),  .bx(19'b0), .by({2'b0, b[15:0]}),  .resulta(sum_lower_16));
-  mult_add_sum_int u2 (.ax(19'b0), .ay({2'b0, a[31:16]}), .bx(19'b0), .by({2'b0, b[31:16]}), .resulta(sum_higher_16));
+  wire [37:0] chainout_NC1;
+  wire [37:0] chainout_NC2;
+  mult_add_sum_int u1 (.ax(19'b0), .ay({2'b0, a[15:0]}),  .bx(19'b0), .by({2'b0, b[15:0]}), .chainin(38'b0), .resulta(sum_lower_16) , .chainout(chainout_NC1));
+  mult_add_sum_int u2 (.ax(19'b0), .ay({2'b0, a[31:16]}), .bx(19'b0), .by({2'b0, b[31:16]}),.chainin(38'b0), .resulta(sum_higher_16), .chainout(chainout_NC2));
   assign sumout = {sum_higher_16[15:0], sum_lower_16[15:0]};
   assign cout = cin; //faking it
 

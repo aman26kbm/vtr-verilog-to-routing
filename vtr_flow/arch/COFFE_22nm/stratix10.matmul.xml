@@ -143,13 +143,15 @@
     </model>
     <model name="mult_add_sum_int">
       <input_ports>
-        <port name="ax" combinational_sink_ports="resulta"/>
-        <port name="ay" combinational_sink_ports="resulta"/>
-        <port name="bx" combinational_sink_ports="resulta"/>
-        <port name="by" combinational_sink_ports="resulta"/>
+        <port name="ax" combinational_sink_ports="resulta chainout"/>
+        <port name="ay" combinational_sink_ports="resulta chainout"/>
+        <port name="bx" combinational_sink_ports="resulta chainout"/>
+        <port name="by" combinational_sink_ports="resulta chainout"/>
+        <port name="chainin" combinational_sink_ports="resulta chainout"/>
       </input_ports>
       <output_ports>
         <port name="resulta"/>
+        <port name="chainout"/>
       </output_ports>
     </model>
     <model name="mac_fp">
@@ -997,12 +999,21 @@
             <input name="ay" num_pins="19"/>
             <input name="bx" num_pins="18"/>
             <input name="by" num_pins="19"/>
+            <input name="chainin" num_pins="38"/>
             <output name="resulta" num_pins="38"/>
+            <output name="chainout" num_pins="38"/>
             <!--TODO: Add mode signals like SUB -->
             <delay_constant max="1.848e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.resulta"/>
             <delay_constant max="1.848e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.resulta"/>
             <delay_constant max="1.848e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.resulta"/>
             <delay_constant max="1.848e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.resulta"/>
+
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.chainout"/>
           </pb_type>
           <interconnect>
             <direct name="datain2ax" input="dsp_pb.datain[17:0]" output="mult_add_sum.ax">
@@ -1013,7 +1024,11 @@
             </direct>
             <direct name="datain2by" input="dsp_pb.datain[73:55]" output="mult_add_sum.by">
             </direct>
+            <direct name="chainin"   input="dsp_pb.chainin[37:0]" output="mult_add_sum.chainin">
+            </direct>
             <direct name="dataout2result" input="mult_add_sum.resulta" output="dsp_pb.resulta[37:0]">
+            </direct>
+            <direct name="chainout" input="mult_add_sum.chainout" output="dsp_pb.chainout[37:0]">
             </direct>
           </interconnect>
         </mode>
@@ -1086,7 +1101,6 @@
             </direct>
           </interconnect>
         </mode>
-
 
       </pb_type>
 
