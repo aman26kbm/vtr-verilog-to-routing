@@ -103,9 +103,27 @@ module adder_32bit(
    output cout
 );
   
-  comb_adder_int u_add(.a(a), .b(b), .out(sumout));
+  // There are two options
+  /*
+  // One is to use adder_int. These are available inside the matmul (individual PE mode).
+  // They provide a 16 bit addition mode. But there are no carry bits. So, that need to be handled correctly.
+  wire [15:0] sum_lower_16;
+  wire [15:0] sum_higher_16;
+  adder_int u_add1(.a(a[15:0]),  .b(b[15:0]),  .out(sum_lower_16));
+  adder_int u_add2(.a(a[31:16]), .b(b[31:16]), .out(sum_higher_16));
+  assign sumout = {sum_higher_16, sum_lower_16};
   assign cout = cin; //faking it
-  
+  */
+  // Option two is to use mult_add_sum. They are available inside the DSP slice.
+  // bx (18) * by (19) + ax (18) * ay (19)
+  // Again, we need to handle the carry bits.
+  wire [37:0] sum_lower_16;
+  wire [37:0] sum_higher_16;
+  mult_add_sum_int u1 (.ax(19'b0), .ay({2'b0, a[15:0]}),  .bx(19'b0), .by({2'b0, b[15:0]}),  .resulta(sum_lower_16));
+  mult_add_sum_int u2 (.ax(19'b0), .ay({2'b0, a[31:16]}), .bx(19'b0), .by({2'b0, b[31:16]}), .resulta(sum_higher_16));
+  assign sumout = {sum_higher_16[15:0], sum_lower_16[15:0]};
+  assign cout = cin; //faking it
+
 //   wire cout0;
 //   wire cout1;
 //   wire cout2;

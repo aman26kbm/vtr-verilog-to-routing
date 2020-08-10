@@ -288,13 +288,19 @@
       </sub_tile>
     </tile>
     <!-- TODO: Add area from COFFE-->
-    <tile name="dsp" height="2" width="1" area="0">
-      <sub_tile name="dsp">
+    <tile name="dsp_top" height="2" width="1" area="0">
+      <sub_tile name="dsp_top">
         <equivalent_sites>
-          <site pb_type="dsp" pin_mapping="direct"/>
+          <site pb_type="dsp_top" pin_mapping="direct"/>
         </equivalent_sites>
-        <input name="datain" num_pins="74"/>
-        <output name="dataout" num_pins="74"/>
+        <input name="reset" num_pins="1" is_non_clock_global="true"/>
+        <input name="dsp_I1" num_pins="63" equivalent="full"/>
+        <input name="dsp_I2" num_pins="63" equivalent="full"/>
+        <input name="chainin" num_pins="64"/>
+        <output name="resulta" num_pins="64"/>
+        <output name="resultb" num_pins="37"/>
+        <output name="chainout" num_pins="64"/>
+        <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
         <pinlocations pattern="spread"/>
       </sub_tile>
@@ -391,7 +397,7 @@
       <!--Fill with 'clb'-->
       <fill type="clb" priority="10"/>
       <!--Column of 'mult_27' with 'EMPTY' blocks wherever a 'mult_27' does not fit. Vertical offset by 1 for perimeter.-->
-      <col type="dsp" startx="6" starty="1" repeatx="8" priority="20"/>
+      <col type="dsp_top" startx="6" starty="1" repeatx="8" priority="20"/>
       <col type="EMPTY" startx="6" repeatx="8" starty="1" priority="19"/>
       <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. Vertical offset by 1 for perimeter.-->
       <col type="memory" startx="2" starty="1" repeatx="8" priority="20"/>
@@ -442,6 +448,7 @@
     <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_top.a_data_out[63:0]" to_pin="matmul_top.a_data_in[63:0]" x_offset="11" y_offset="0" z_offset="0" switch_name="short_switch"/>
     <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_top.b_data_out[63:0]" to_pin="matmul_top.b_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
     <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_top.c_data_out_dir_int[63:0]" to_pin="matmul_top.c_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
+    <direct name="dsp_interconnect" from_pin="dsp_top.chainout" to_pin="dsp_top.chainin" x_offset="0" y_offset="-2" z_offset="0" switch_name="short_switch"/>
   </directlist>
   <complexblocklist>
     <!-- Define I/O pads begin -->
@@ -843,15 +850,53 @@
 
     <!-- Define DSP slice begin -->
     <!-- TODO: Need to update after all precisions are added to the design. -->
-    <pb_type name="dsp">
-      <input name="datain" num_pins="74"/>
-      <output name="dataout" num_pins="74"/>
-      <!--TODO: Add full list of IOs-->
+    <pb_type name="dsp_top">
+      <input name="reset" num_pins="1" is_non_clock_global="true"/>
+      <input name="dsp_I1" num_pins="63" equivalent="full"/>
+      <input name="dsp_I2" num_pins="63" equivalent="full"/>
+      <input name="chainin" num_pins="64"/>
+      <output name="resulta" num_pins="64"/>
+      <output name="resultb" num_pins="37"/>
+      <output name="chainout" num_pins="64"/>
+      <clock name="clk" num_pins="1"/>
+
+    <pb_type name="dsp" num_pb="1">
+      <input name="reset" num_pins="1"/>
+      <input name="enable" num_pins="1"/>
+      <input name="loadconst" num_pins="1"/>
+      <input name="accumulate" num_pins="1"/>
+      <input name="negate" num_pins="1"/>
+      <input name="sub" num_pins="1"/>
+      <input name="mode" num_pins="1"/>
+      <input name="mux9_select" num_pins="1"/>
+      <input name="internal_coeffa" num_pins="1"/>
+      <input name="internal_coeffb" num_pins="1"/>
+      <input name="datain" num_pins="116"/>
+      <input name="chainin" num_pins="64"/>
+      <output name="resulta" num_pins="64"/>
+      <output name="resultb" num_pins="37"/>
+      <output name="chainout" num_pins="64"/>
+      <clock name="clk" num_pins="1"/>
 
       <pb_type name="dsp_pb" num_pb="1">
-        <input name="datain" num_pins="74"/>
-        <output name="dataout" num_pins="74"/>
+        <input name="reset" num_pins="1"/>
+        <input name="enable" num_pins="1"/>
+        <input name="loadconst" num_pins="1"/>
+        <input name="accumulate" num_pins="1"/>
+        <input name="negate" num_pins="1"/>
+        <input name="sub" num_pins="1"/>
+        <input name="mode" num_pins="1"/>
+        <input name="mux9_select" num_pins="1"/>
+        <input name="internal_coeffa" num_pins="1"/>
+        <input name="internal_coeffb" num_pins="1"/>
+        <input name="datain" num_pins="116"/>
+        <input name="chainin" num_pins="64"/>
+        <output name="resulta" num_pins="64"/>
+        <output name="resultb" num_pins="37"/>
+        <output name="chainout" num_pins="64"/>
+        <clock name="clk" num_pins="1"/>
 
+        <!--TODO: In each mode, use all signals in connections. For example, use chainin, chainout, mode, sub, etc-->
         <!-- fixed-point multiplier mode (2 18x19 multipliers) resulta = ax*ay, resultb = bx*by -->
         <mode name="two_mult_18x19">
           <pb_type name="two_mult_18x19" num_pb="2">
@@ -894,8 +939,11 @@
             <direct name="datain2b2" input="dsp_pb.datain[73:55]" output="two_mult_18x19[1].b">
               <delay_constant max="134e-12" in_port="dsp_pb.datain[73:55]" out_port="two_mult_18x19[1].b"/>
             </direct>
-            <direct name="out2dataout" input="two_mult_18x19[1:0].out" output="dsp_pb.dataout">
-              <delay_constant max="1.09e-9" in_port="two_mult_18x19[1:0].out" out_port="dsp_pb.dataout"/>
+            <direct name="out2resulta" input="two_mult_18x19[0].out" output="dsp_pb.resulta[36:0]">
+              <delay_constant max="1.09e-9" in_port="two_mult_18x19[0].out" out_port="dsp_pb.resulta[36:0]"/>
+            </direct>
+            <direct name="out2resultb" input="two_mult_18x19[1].out" output="dsp_pb.resultb[36:0]">
+              <delay_constant max="1.09e-9" in_port="two_mult_18x19[1].out" out_port="dsp_pb.resultb[36:0]"/>
             </direct>
           </interconnect>
         </mode>
@@ -936,8 +984,8 @@
             <direct name="datain2b" input="dsp_pb.datain[53:27]" output="one_mult_27x27.b">
               <delay_constant max="134e-12" in_port="dsp_pb.datain[53:27]" out_port="one_mult_27x27.b"/>
             </direct>
-            <direct name="out2dataout" input="one_mult_27x27.out" output="dsp_pb.dataout[53:0]">
-              <delay_constant max="1.93e-9" in_port="one_mult_27x27.out" out_port="dsp_pb.dataout[53:0]"/>
+            <direct name="out2dataout" input="one_mult_27x27.out" output="dsp_pb.resulta[53:0]">
+              <delay_constant max="1.93e-9" in_port="one_mult_27x27.out" out_port="dsp_pb.resulta[53:0]"/>
             </direct>
           </interconnect>
         </mode>
@@ -965,7 +1013,7 @@
             </direct>
             <direct name="datain2by" input="dsp_pb.datain[73:55]" output="mult_add_sum.by">
             </direct>
-            <direct name="dataout2result" input="mult_add_sum.resulta" output="dsp_pb.dataout[37:0]">
+            <direct name="dataout2result" input="mult_add_sum.resulta" output="dsp_pb.resulta[37:0]">
             </direct>
           </interconnect>
         </mode>
@@ -986,8 +1034,8 @@
             <direct name="b2b" input="dsp_pb.datain[63:32]" output="mult_fp32.b">
               <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="mult_fp32.b"/>
             </direct>
-            <direct name="out2out" input="mult_fp32.out" output="dsp_pb.dataout[31:0]">
-              <delay_constant max="0.1e-9" in_port="mult_fp32.out" out_port="dsp_pb.dataout[31:0]"/>
+            <direct name="out2out" input="mult_fp32.out" output="dsp_pb.resulta[31:0]">
+              <delay_constant max="0.1e-9" in_port="mult_fp32.out" out_port="dsp_pb.resulta[31:0]"/>
             </direct>
           </interconnect>
         </mode>
@@ -1010,8 +1058,8 @@
             <direct name="btob" input="dsp_pb.datain[63:32]" output="adder_pb.b">
               <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="adder_pb.b"/>
             </direct>
-            <direct name="sumouttosumout" input="adder_pb.out" output="dsp_pb.dataout[31:0]">
-              <delay_constant max="0.1e-9" in_port="adder_pb.out" out_port="dsp_pb.dataout[31:0]"/>
+            <direct name="sumouttosumout" input="adder_pb.out" output="dsp_pb.resulta[31:0]">
+              <delay_constant max="0.1e-9" in_port="adder_pb.out" out_port="dsp_pb.resulta[31:0]"/>
             </direct>
           </interconnect>
         </mode>
@@ -1033,8 +1081,8 @@
             <direct name="btob" input="dsp_pb.datain[63:32]" output="mac_fp32.b">
               <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="mac_fp32.b"/>
             </direct>
-            <direct name="sumouttosumout" input="mac_fp32.out" output="dsp_pb.dataout[31:0]">
-              <delay_constant max="0.1e-9" in_port="mac_fp32.out" out_port="dsp_pb.dataout[31:0]"/>
+            <direct name="sumouttosumout" input="mac_fp32.out" output="dsp_pb.resulta[31:0]">
+              <delay_constant max="0.1e-9" in_port="mac_fp32.out" out_port="dsp_pb.resulta[31:0]"/>
             </direct>
           </interconnect>
         </mode>
@@ -1046,18 +1094,181 @@
         <!--TODO: Need to update delays from COFFE-->
         <!--50% sparse crossbar means 50% of the lines can reach an actual input of the matmul
         We do this by splitting inputs into two buckets and having two full crossbars-->
-        <complete name="first_half" input="dsp.datain[36:0]" output="dsp_pb.datain[36:0]">
-            <delay_constant max="134e-12" in_port="dsp.datain[36:0]" out_port="dsp_pb.datain[36:0]"/>
+        <complete name="first_half" 
+          input="dsp.enable
+                 dsp.loadconst
+                 dsp.accumulate
+                 dsp.negate
+                 dsp.sub
+                 dsp.mode
+                 dsp.mux9_select
+                 dsp.internal_coeffa
+                 dsp.internal_coeffb
+                 dsp.datain[52:0]"
+
+         output="dsp_pb.enable
+                 dsp_pb.loadconst
+                 dsp_pb.accumulate
+                 dsp_pb.negate
+                 dsp_pb.sub
+                 dsp_pb.mode
+                 dsp_pb.mux9_select
+                 dsp_pb.internal_coeffa
+                 dsp_pb.internal_coeffb
+                 dsp_pb.datain[52:0]">
+            <!-- TODO: Update delays from COFFE -->
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.enable" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.loadconst" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.accumulate" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.negate" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.sub" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.mode" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.mux9_select" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffa" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.internal_coeffb" out_port="dsp_pb.datain[52:0]"/>
+
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.enable"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.loadconst"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.accumulate"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.negate"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.sub"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.mode"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.mux9_select"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.internal_coeffa"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.internal_coeffb"/>
+            <delay_constant max="134e-12" in_port="dsp.datain[52:0]" out_port="dsp_pb.datain[52:0]"/>
+
         </complete>
-        <complete name="second_half" input="dsp.datain[73:37]" output="dsp_pb.datain[73:37]">
-            <delay_constant max="134e-12" in_port="dsp.datain[73:37]" out_port="dsp_pb.datain[73:37]"/>
+        <complete name="second_half" input="dsp.datain[115:53]" output="dsp_pb.datain[115:53]">
+            <delay_constant max="134e-12" in_port="dsp.datain[115:53]" out_port="dsp_pb.datain[115:53]"/>
         </complete>
-        <direct name="outputs" input="dsp_pb.dataout" output="dsp.dataout"></direct>
+        <direct name="reset" input="dsp.reset" output="dsp_pb.reset"></direct>
+        <direct name="chainin" input="dsp.chainin"    output="dsp_pb.chainin"></direct>
+        <direct name="chainout" input="dsp_pb.chainout" output="dsp.chainout"></direct>
+        <direct name="resulta" input="dsp_pb.resulta" output="dsp.resulta"></direct>
+        <direct name="resultb" input="dsp_pb.resultb" output="dsp.resultb"></direct>
+        <direct name="clk" input="dsp.clk" output="dsp_pb.clk"></direct>
       </interconnect>  
 
       <power method="sum-of-children"/>
     </pb_type>
-    <!-- Define fracturable multiplier end -->
+    <interconnect>
+       <complete name="first_half"  
+         input="dsp_top.dsp_I1"
+         output="dsp.enable
+                 dsp.loadconst
+                 dsp.accumulate
+                 dsp.negate
+                 dsp.sub
+                 dsp.mode
+                 dsp.mux9_select
+                 dsp.internal_coeffa
+                 dsp.internal_coeffb
+                 dsp.datain[52:0]"/>
+
+        <complete name="second_half" 
+          input="dsp_top.dsp_I2"
+          output="dsp.datain[115:53]"/>
+
+        <direct name="reset" input="dsp_top.reset" output="dsp.reset"></direct>
+        <direct name="chainin" input="dsp_top.chainin" output="dsp.chainin"></direct>
+        <direct name="chainout" input="dsp.chainout" output="dsp_top.chainout"></direct>
+        <direct name="resulta" input="dsp.resulta" output="dsp_top.resulta"></direct>
+        <direct name="resultb" input="dsp.resultb" output="dsp_top.resultb"></direct>
+        <direct name="clk" input="dsp_top.clk" output="dsp.clk"></direct>
+
+    </interconnect>
+    </pb_type>
+    <!-- Define DSP slice end -->
 
     <!-- Define matrix multiplier begin -->
     <pb_type name="matmul_top">
