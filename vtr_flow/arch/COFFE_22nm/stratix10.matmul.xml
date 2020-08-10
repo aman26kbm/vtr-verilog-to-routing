@@ -324,33 +324,38 @@
       </sub_tile>
     </tile>
     <!-- TODO: Need to update the height, width, area of the matmul -->
-    <tile name="matmul" height="4" width="4" area="365120">
-      <sub_tile name="matmul">
+    <tile name="matmul_top" height="4" width="4" area="365120">
+      <sub_tile name="matmul_top">
         <equivalent_sites>
-          <site pb_type="matmul" pin_mapping="direct"/>
+          <site pb_type="matmul_top" pin_mapping="direct"/>
         </equivalent_sites>
         <input name="reset" num_pins="1" is_non_clock_global="true"/>
         <input name="pe_reset" num_pins="1" is_non_clock_global="true"/>
+        <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
+        <input name="matmul_I1" num_pins="136" equivalent="full"/>
+        <input name="matmul_I2" num_pins="138" equivalent="full"/>
         <input name="a_data_in" num_pins="64"/>
         <input name="b_data_in" num_pins="64"/>
-        <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
-        <input name="address_mat_a" num_pins="16"/>
-        <input name="address_mat_b" num_pins="16"/>
-        <input name="address_mat_c" num_pins="16"/>
-        <input name="address_stride_a" num_pins="16"/>
-        <input name="address_stride_b" num_pins="16"/>
-        <input name="address_stride_c" num_pins="16"/>
-        <input name="a_data" num_pins="64"/>
-        <input name="b_data" num_pins="64"/>
         <input name="c_data_in" num_pins="64"/>
-        <input name="validity_mask_a_rows" num_pins="8"/>
-        <input name="validity_mask_a_cols_b_rows" num_pins="8"/>
-        <input name="validity_mask_b_cols" num_pins="8"/>
-        <input name="final_mat_mul_size" num_pins="8"/>
-        <input name="a_loc" num_pins="8"/>
-        <input name="b_loc" num_pins="8"/>
-        <input name="slice_dtype" num_pins="1"/>
-        <input name="slice_mode" num_pins="1"/>
+        <!--
+        <input name="address_mat_a" num_pins="16"/>                 matmul_I1[135:120]
+        <input name="address_mat_b" num_pins="16"/>                 matmul_I1[119:104]
+        <input name="address_mat_c" num_pins="16"/>                 matmul_I1[103:88]
+        <input name="address_stride_a" num_pins="16"/>              matmul_I1[87:72]
+        <input name="address_stride_b" num_pins="16"/>              matmul_I1[71:56]
+        <input name="address_stride_c" num_pins="16"/>              matmul_I1[55:40]
+        <input name="validity_mask_a_rows" num_pins="8"/>           matmul_I1[39:32]
+        <input name="validity_mask_a_cols_b_rows" num_pins="8"/>    matmul_I1[31:24]
+        <input name="validity_mask_b_cols" num_pins="8"/>           matmul_I1[23:16]
+        <input name="a_loc" num_pins="8"/>                          matmul_I1[15:8]
+        <input name="b_loc" num_pins="8"/>                          matmul_I1[7:0]
+
+        <input name="a_data" num_pins="64"/>                         matmul_I2[137:74]
+        <input name="b_data" num_pins="64"/>                         matmul_I2[73:10]
+        <input name="slice_dtype" num_pins="1"/>                     matmul_I2[9]
+        <input name="slice_mode" num_pins="1"/>                      matmul_I2[8]
+        <input name="final_mat_mul_size" num_pins="8"/>              matmul_I2[7:0]
+        -->
         <output name="a_data_out" num_pins="64"/>
         <output name="b_data_out" num_pins="64"/>
         <output name="c_data_out" num_pins="64"/>
@@ -369,14 +374,17 @@
           <fc_override fc_type="frac" fc_val="0" port_name="c_data_in[63:0]"/>
           <fc_override fc_type="frac" fc_val="0" port_name="c_data_out_dir_int[63:0]"/>
         </fc>
-        <!-- There are 776 IOs on the matmul. Dividing by 4, we get 194 pins on each side. -->
+        <!-- There are 776 IOs on the matmul_top. Dividing by 4, we get 194 pins on each side. -->
         <!-- The things we care about are a_data_in on left, a_data_out on right, b_data_in & c_data_in on top and b_data_out & c_data_out_dir_int on bottom -->
+        <pinlocations pattern="spread"/>
+        <!--
         <pinlocations pattern="custom">
-          <loc side="left">  matmul.a_data_in[63:0]   matmul.a_addr[15:0]  matmul.pe_reset matmul.address_mat_a[15:0]   matmul.a_data[63:0]   matmul.slice_dtype matmul.slice_mode  matmul.validity_mask_a_cols_b_rows[7:0] matmul.address_stride_c[15:0] matmul.clk matmul.a_loc[7:0] </loc> <!--196-->
-          <loc side="top">   matmul.b_data_in[63:0]   matmul.c_data_in[63:0] matmul.b_data[63:0] matmul.start_mat_mul matmul.done_mat_mul </loc> <!--194-->
-          <loc side="right"> matmul.a_data_out[63:0]  matmul.c_addr[15:0]   matmul.c_data_available matmul.reset  matmul.b_addr[15:0]  matmul.address_mat_b[15:0]      matmul.address_mat_c[15:0]  matmul.c_data_out[63:0]</loc> <!--194-->
-          <loc side="bottom">matmul.b_data_out[63:0]  matmul.c_data_out_dir_int[63:0]  matmul.final_mat_mul_size[7:0] matmul.address_stride_a[15:0] matmul.address_stride_b[15:0]  matmul.validity_mask_a_rows[7:0]  matmul.validity_mask_b_cols[7:0] matmul.b_loc[7:0] </loc> <!--192-->
+          <loc side="left">  matmul_top.a_data_in[63:0]   matmul_top.a_addr[15:0]  matmul_top.pe_reset matmul_top.address_mat_a[15:0]   matmul_top.a_data[63:0]   matmul_top.slice_dtype matmul_top.slice_mode  matmul_top.validity_mask_a_cols_b_rows[7:0] matmul_top.address_stride_c[15:0] matmul_top.clk matmul_top.a_loc[7:0] </loc> 
+          <loc side="top">   matmul_top.b_data_in[63:0]   matmul_top.c_data_in[63:0] matmul_top.b_data[63:0] matmul_top.start_mat_mul matmul_top.done_mat_mul </loc> 
+          <loc side="right"> matmul_top.a_data_out[63:0]  matmul_top.c_addr[15:0]   matmul_top.c_data_available matmul_top.reset  matmul_top.b_addr[15:0]  matmul_top.address_mat_b[15:0]      matmul_top.address_mat_c[15:0]  matmul_top.c_data_out[63:0]</loc> 
+          <loc side="bottom">matmul_top.b_data_out[63:0]  matmul_top.c_data_out_dir_int[63:0]  matmul_top.final_mat_mul_size[7:0] matmul_top.address_stride_a[15:0] matmul_top.address_stride_b[15:0]  matmul_top.validity_mask_a_rows[7:0]  matmul_top.validity_mask_b_cols[7:0] matmul_top.b_loc[7:0] </loc> 
         </pinlocations>
+        -->
       </sub_tile>
     </tile>
   </tiles>
@@ -396,7 +404,9 @@
       <col type="memory" startx="2" starty="1" repeatx="8" priority="20"/>
       <col type="EMPTY" startx="2" repeatx="8" starty="1" priority="19"/>
       <!-- Matmul columns. TODO: Need to fix the locations of matmuls -->
-      <col type="matmul" startx="9" starty="1" repeatx="11" priority="30"/>
+      <!--
+      <col type="matmul_top" startx="9" starty="1" repeatx="11" priority="30"/>
+      -->
     </auto_layout>
   </layout>
   <device>
@@ -436,9 +446,9 @@
     <direct name="direct_left_4" from_pin="clb.O[39:35]" to_pin="clb.I4[14:10]" x_offset="-1" y_offset="0" z_offset="0"/>
     <!-- Direct connect to left, right, top, bottom matmul slices -->
     <!-- TODO: Need to fix the offsets depending on location of matmuls-->
-    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul.a_data_out[63:0]" to_pin="matmul.a_data_in[63:0]" x_offset="11" y_offset="0" z_offset="0" switch_name="short_switch"/>
-    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul.b_data_out[63:0]" to_pin="matmul.b_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
-    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul.c_data_out_dir_int[63:0]" to_pin="matmul.c_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_top.a_data_out[63:0]" to_pin="matmul_top.a_data_in[63:0]" x_offset="11" y_offset="0" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_top.b_data_out[63:0]" to_pin="matmul_top.b_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
+    <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_top.c_data_out_dir_int[63:0]" to_pin="matmul_top.c_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
   </directlist>
   <complexblocklist>
     <!-- Define I/O pads begin -->
@@ -1023,13 +1033,33 @@
     <!-- Define fracturable multiplier end -->
 
     <!-- Define matrix multiplier begin -->
-    <pb_type name="matmul">
-
+    <pb_type name="matmul_top">
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
       <input name="pe_reset" num_pins="1" is_non_clock_global="true"/>
+      <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
+      <input name="matmul_I1" num_pins="136" equivalent="full"/>
+      <input name="matmul_I2" num_pins="138" equivalent="full"/>
       <input name="a_data_in" num_pins="64"/>
       <input name="b_data_in" num_pins="64"/>
-      <input name="start_mat_mul" num_pins="1" is_non_clock_global="true"/>
+      <input name="c_data_in" num_pins="64"/>
+      <output name="a_data_out" num_pins="64"/>
+      <output name="b_data_out" num_pins="64"/>
+      <output name="c_data_out" num_pins="64"/>
+      <output name="c_data_out_dir_int" num_pins="64"/>
+      <output name="done_mat_mul" num_pins="1"/>
+      <output name="a_addr" num_pins="16"/>
+      <output name="b_addr" num_pins="16"/>
+      <output name="c_addr" num_pins="16"/>
+      <output name="c_data_available" num_pins="1"/>
+      <clock name="clk" num_pins="1"/>
+
+    <pb_type name="matmul" num_pb="1">
+
+      <input name="reset" num_pins="1"/>
+      <input name="pe_reset" num_pins="1"/>
+      <input name="start_mat_mul" num_pins="1"/>
+      <input name="a_data_in" num_pins="64"/>
+      <input name="b_data_in" num_pins="64"/>
       <input name="address_mat_a" num_pins="16"/>
       <input name="address_mat_b" num_pins="16"/>
       <input name="address_mat_c" num_pins="16"/>
@@ -1940,8 +1970,7 @@
         <!--50% sparse crossbar means 50% of the lines can reach an actual input of the matmul
             We do this by splitting inputs into two buckets and having two full crossbars-->
         <complete name="first_half"  
-          input="matmul.start_mat_mul 
-                 matmul.address_mat_a 
+          input="matmul.address_mat_a 
                  matmul.address_mat_b 
                  matmul.address_mat_c 
                  matmul.address_stride_a 
@@ -1952,8 +1981,7 @@
                  matmul.validity_mask_b_cols
                  matmul.a_loc
                  matmul.b_loc"
-         output="matmul_pb.start_mat_mul 
-                 matmul_pb.address_mat_a 
+         output="matmul_pb.address_mat_a 
                  matmul_pb.address_mat_b 
                  matmul_pb.address_mat_c 
                  matmul_pb.address_stride_a 
@@ -1965,20 +1993,6 @@
                  matmul_pb.a_loc
                  matmul_pb.b_loc">
             <!-- TODO: Need to update delays-->
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.start_mat_mul"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.address_mat_a"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.address_mat_b"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.address_mat_c"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.address_stride_a"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.address_stride_b"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.address_stride_c"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.validity_mask_a_rows"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.validity_mask_a_cols_b_rows"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.validity_mask_b_cols"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.a_loc"/>
-            <delay_constant max="134e-12" in_port="matmul.start_mat_mul" out_port="matmul_pb.b_loc"/>
-
-            <delay_constant max="134e-12" in_port="matmul.address_mat_a" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_a" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_a" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_a" out_port="matmul_pb.address_mat_c"/>
@@ -1991,7 +2005,6 @@
             <delay_constant max="134e-12" in_port="matmul.address_mat_a" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_a" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.address_mat_b" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_b" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_b" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_b" out_port="matmul_pb.address_mat_c"/>
@@ -2004,7 +2017,6 @@
             <delay_constant max="134e-12" in_port="matmul.address_mat_b" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_b" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.address_mat_c" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_c" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_c" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_c" out_port="matmul_pb.address_mat_c"/>
@@ -2017,7 +2029,6 @@
             <delay_constant max="134e-12" in_port="matmul.address_mat_c" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.address_mat_c" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.address_stride_a" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_a" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_a" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_a" out_port="matmul_pb.address_mat_c"/>
@@ -2030,7 +2041,6 @@
             <delay_constant max="134e-12" in_port="matmul.address_stride_a" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_a" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.address_stride_b" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_b" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_b" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_b" out_port="matmul_pb.address_mat_c"/>
@@ -2043,7 +2053,6 @@
             <delay_constant max="134e-12" in_port="matmul.address_stride_b" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_b" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.address_stride_c" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_c" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_c" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_c" out_port="matmul_pb.address_mat_c"/>
@@ -2056,7 +2065,6 @@
             <delay_constant max="134e-12" in_port="matmul.address_stride_c" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.address_stride_c" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.validity_mask_a_rows" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_rows" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_rows" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_rows" out_port="matmul_pb.address_mat_c"/>
@@ -2069,7 +2077,6 @@
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_rows" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_rows" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.validity_mask_a_cols_b_rows" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_cols_b_rows" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_cols_b_rows" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_cols_b_rows" out_port="matmul_pb.address_mat_c"/>
@@ -2082,7 +2089,6 @@
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_cols_b_rows" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_a_cols_b_rows" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.validity_mask_b_cols" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_b_cols" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_b_cols" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_b_cols" out_port="matmul_pb.address_mat_c"/>
@@ -2095,7 +2101,6 @@
             <delay_constant max="134e-12" in_port="matmul.validity_mask_b_cols" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.validity_mask_b_cols" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.a_loc" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.a_loc" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.a_loc" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.a_loc" out_port="matmul_pb.address_mat_c"/>
@@ -2109,7 +2114,6 @@
             <delay_constant max="134e-12" in_port="matmul.a_loc" out_port="matmul_pb.a_loc"/>
             <delay_constant max="134e-12" in_port="matmul.a_loc" out_port="matmul_pb.b_loc"/>
 
-            <delay_constant max="134e-12" in_port="matmul.b_loc" out_port="matmul_pb.start_mat_mul"/>
             <delay_constant max="134e-12" in_port="matmul.b_loc" out_port="matmul_pb.address_mat_a"/>
             <delay_constant max="134e-12" in_port="matmul.b_loc" out_port="matmul_pb.address_mat_b"/>
             <delay_constant max="134e-12" in_port="matmul.b_loc" out_port="matmul_pb.address_mat_c"/>
@@ -2167,6 +2171,7 @@
         </complete>  
         <direct name="reset" input="matmul.reset" output="matmul_pb.reset"></direct>
         <direct name="pe_reset" input="matmul.pe_reset" output="matmul_pb.pe_reset"></direct>
+        <direct name="start_mat_mul" input="matmul.start_mat_mul" output="matmul_pb.start_mat_mul"></direct>
         <direct name="a_data_in" input="matmul.a_data_in"    output="matmul_pb.a_data_in"></direct>
         <direct name="b_data_in" input="matmul.b_data_in"    output="matmul_pb.b_data_in"></direct>
         <direct name="c_data_in" input="matmul.c_data_in"    output="matmul_pb.c_data_in"></direct>
@@ -2184,6 +2189,48 @@
 
       <power method="sum-of-children"/>
     </pb_type> <!-- End of matmul -->
+    <interconnect>
+        <complete name="first_half"  
+         input="matmul_top.matmul_I1"
+         output="matmul.address_mat_a 
+                 matmul.address_mat_b 
+                 matmul.address_mat_c 
+                 matmul.address_stride_a 
+                 matmul.address_stride_b 
+                 matmul.address_stride_c 
+                 matmul.validity_mask_a_rows
+                 matmul.validity_mask_a_cols_b_rows
+                 matmul.validity_mask_b_cols
+                 matmul.a_loc
+                 matmul.b_loc"/>
+
+        <complete name="second_half" 
+          input="matmul_top.matmul_I2"
+          output="matmul.a_data 
+                  matmul.b_data 
+                  matmul.slice_dtype
+                  matmul.slice_mode
+                  matmul.final_mat_mul_size"/>
+
+        <direct name="reset" input="matmul_top.reset" output="matmul.reset"></direct>
+        <direct name="pe_reset" input="matmul_top.pe_reset" output="matmul.pe_reset"></direct>
+        <direct name="start_mat_mul" input="matmul_top.start_mat_mul" output="matmul.start_mat_mul"></direct>
+        <direct name="a_data_in" input="matmul_top.a_data_in"    output="matmul.a_data_in"></direct>
+        <direct name="b_data_in" input="matmul_top.b_data_in"    output="matmul.b_data_in"></direct>
+        <direct name="c_data_in" input="matmul_top.c_data_in"    output="matmul.c_data_in"></direct>
+        <direct name="a_data_out" input="matmul.a_data_out" output="matmul_top.a_data_out"></direct>
+        <direct name="b_data_out" input="matmul.b_data_out" output="matmul_top.b_data_out"></direct>
+        <direct name="c_data_out" input="matmul.c_data_out" output="matmul_top.c_data_out"></direct>
+        <direct name="c_data_out_dir_int" input="matmul.c_data_out_dir_int" output="matmul_top.c_data_out_dir_int"></direct>
+        <direct name="done_mat_mul" input="matmul.done_mat_mul" output="matmul_top.done_mat_mul"></direct>
+        <direct name="a_addr" input="matmul.a_addr" output="matmul_top.a_addr"></direct>
+        <direct name="b_addr" input="matmul.b_addr" output="matmul_top.b_addr"></direct>
+        <direct name="c_addr" input="matmul.c_addr" output="matmul_top.c_addr"></direct>
+        <direct name="c_data_available" input="matmul.c_data_available" output="matmul_top.c_data_available"></direct>
+        <direct name="clk" input="matmul_top.clk" output="matmul.clk"></direct>
+    </interconnect>
+    </pb_type>
+    <!-- End of matmul top level -->
     <!-- Define matrix multiplier end -->
 
     <!-- Define fracturable memory begin -->
