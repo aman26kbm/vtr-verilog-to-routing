@@ -45,27 +45,6 @@
          that describe them.
     -->
   <models>
-    <!-- Used inside DSPs and individual PE mode of matmul. 
-         Fixed point multiplication.
-         ODIN infers these when * sign appears in RTL. -->
-    <model name="multiply">
-      <input_ports>
-        <port name="a" combinational_sink_ports="out"/>
-        <port name="b" combinational_sink_ports="out"/>
-      </input_ports>
-      <output_ports>
-        <port name="out"/>
-      </output_ports>
-    </model>
-    <model name="multiply_fp">
-      <input_ports>
-        <port name="a" combinational_sink_ports="out"/>
-        <port name="b" combinational_sink_ports="out"/>
-      </input_ports>
-      <output_ports>
-        <port name="out"/>
-      </output_ports>
-    </model>    
     <model name="single_port_ram">
       <input_ports>
         <port name="we" clock="clk"/>
@@ -106,6 +85,27 @@
         <!-- output can be broken down into smaller bit widths minimum size 1 -->
       </output_ports>
     </model>
+    <!-- Used inside DSPs and individual PE mode of matmul. 
+         Fixed point multiplication.
+         ODIN infers these when * sign appears in RTL. -->
+    <model name="multiply">
+      <input_ports>
+        <port name="a" combinational_sink_ports="out"/>
+        <port name="b" combinational_sink_ports="out"/>
+      </input_ports>
+      <output_ports>
+        <port name="out"/>
+      </output_ports>
+    </model>
+    <model name="multiply_fp">
+      <input_ports>
+        <port name="a" combinational_sink_ports="out"/>
+        <port name="b" combinational_sink_ports="out"/>
+      </input_ports>
+      <output_ports>
+        <port name="out"/>
+      </output_ports>
+    </model>   
     <!-- Only used inside CLBs for 1-bit adder.
          ODIN infers these when + sign appears in RTL.
          Can't use this inside DSP slice or individual PE mode of matmul
@@ -122,7 +122,8 @@
         <port name="sumout"/>
       </output_ports>
     </model>
-    <model name="comb_adder_int">
+    <!-- Multi bit adder inside DSP slices -->
+    <model name="adder_int">
       <input_ports>
         <port name="a" combinational_sink_ports="out"/>
         <port name="b" combinational_sink_ports="out"/>
@@ -131,7 +132,7 @@
         <port name="out"/>
       </output_ports>
     </model>
-    <model name="comb_adder_fp">
+    <model name="adder_fp">
       <input_ports>
         <port name="a" combinational_sink_ports="out"/>
         <port name="b" combinational_sink_ports="out"/>
@@ -140,43 +141,35 @@
         <port name="out"/>
       </output_ports>
     </model>
-    <!--
-    <model name="seq_adder">
+    <model name="mult_add_sum_int">
       <input_ports>
-        <port name="a" clock="clk" combinational_sink_ports="cout sumout"/>
-        <port name="b" clock="clk" combinational_sink_ports="cout sumout"/>
-        <port name="cin" clock="clk" combinational_sink_ports="cout sumout"/>
-        <port name="clk" is_clock="1"/>
-        <port name="reset" clock="clk" combinational_sink_ports="cout sumout"/>
+        <port name="ax" combinational_sink_ports="resulta"/>
+        <port name="ay" combinational_sink_ports="resulta"/>
+        <port name="bx" combinational_sink_ports="resulta"/>
+        <port name="by" combinational_sink_ports="resulta"/>
       </input_ports>
       <output_ports>
-        <port name="cout" clock="clk"/>
-        <port name="sumout" clock="clk"/>
+        <port name="resulta"/>
       </output_ports>
     </model>
-    <model name="seq_multiply">
+    <model name="mac_fp">
       <input_ports>
-        <port name="a" clock="clk" combinational_sink_ports="out"/>
-        <port name="b" clock="clk" combinational_sink_ports="out"/>
-        <port name="clk" is_clock="1"/>
-        <port name="reset" clock="clk" combinational_sink_ports="out"/>
+        <port name="a" combinational_sink_ports="out"/>
+        <port name="b" combinational_sink_ports="out"/>
       </input_ports>
       <output_ports>
-        <port name="out" clock="clk"/>
+        <port name="out"/>
       </output_ports>
     </model>
-    <model name="seq_mac">
+    <model name="mac_int">
       <input_ports>
-        <port name="a" clock="clk" combinational_sink_ports="out"/>
-        <port name="b" clock="clk" combinational_sink_ports="out"/>
-        <port name="clk" is_clock="1"/>
-        <port name="reset" clock="clk" combinational_sink_ports="out"/>
+        <port name="a" combinational_sink_ports="out"/>
+        <port name="b" combinational_sink_ports="out"/>
       </input_ports>
       <output_ports>
-        <port name="out" clock="clk"/>
+        <port name="out"/>
       </output_ports>
     </model>
-    -->
     <model name="matmul_fp16">
       <input_ports>
         <port name="clk" is_clock="1"/>  
@@ -853,11 +846,13 @@
     <pb_type name="dsp">
       <input name="datain" num_pins="74"/>
       <output name="dataout" num_pins="74"/>
+      <!--TODO: Add full list of IOs-->
 
       <pb_type name="dsp_pb" num_pb="1">
         <input name="datain" num_pins="74"/>
         <output name="dataout" num_pins="74"/>
 
+        <!-- fixed-point multiplier mode (2 18x19 multipliers) resulta = ax*ay, resultb = bx*by -->
         <mode name="two_mult_18x19">
           <pb_type name="two_mult_18x19" num_pb="2">
             <input name="a" num_pins="18"/>
@@ -905,7 +900,8 @@
           </interconnect>
         </mode>
 
-        <mode name="mult_27x27">
+        <!-- fixed-point multiplier mode (1 27x27 multiplier) resulta = ax*ay -->
+        <mode name="one_mult_27x27">
           <pb_type name="one_mult_27x27" num_pb="1">
             <input name="a" num_pins="27"/>
             <input name="b" num_pins="27"/>
@@ -946,8 +942,36 @@
           </interconnect>
         </mode>
 
-        <!-- combinatorial floating point multiplier mode -->
-        <mode name="comb_mult_fp32_mode">
+        <!-- fixed-point multiplier-add-sum mode resulta = (bx * by) +/- (ax * ay)  -->
+        <mode name="mult_add_sum_mode">
+          <pb_type name="mult_add_sum" num_pb="1" blif_model=".subckt mult_add_sum_int">
+            <input name="ax" num_pins="18"/>
+            <input name="ay" num_pins="19"/>
+            <input name="bx" num_pins="18"/>
+            <input name="by" num_pins="19"/>
+            <output name="resulta" num_pins="38"/>
+            <!--TODO: Add mode signals like SUB -->
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="1.848e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.resulta"/>
+          </pb_type>
+          <interconnect>
+            <direct name="datain2ax" input="dsp_pb.datain[17:0]" output="mult_add_sum.ax">
+            </direct>
+            <direct name="datain2ay" input="dsp_pb.datain[36:18]" output="mult_add_sum.ay">
+            </direct>
+            <direct name="datain2bx" input="dsp_pb.datain[54:37]" output="mult_add_sum.bx">
+            </direct>
+            <direct name="datain2by" input="dsp_pb.datain[73:55]" output="mult_add_sum.by">
+            </direct>
+            <direct name="dataout2result" input="mult_add_sum.resulta" output="dsp_pb.dataout[37:0]">
+            </direct>
+          </interconnect>
+        </mode>
+
+        <!-- floating point multiplier mode (result = a * b)-->
+        <mode name="mult_fp32_mode">
           <pb_type name="mult_fp32" blif_model=".subckt multiply_fp" num_pb="1">
             <input name="a" num_pins="32"/>
             <input name="b" num_pins="32"/>
@@ -968,12 +992,13 @@
           </interconnect>
         </mode>
 
-        <!-- combinatorial floating point adder mode -->
-        <mode name="comb_adder_32x32_mode_fp">
-          <pb_type name="adder_pb" blif_model=".subckt comb_adder_fp" num_pb="1">
+        <!-- floating point adder mode (result = a +/- b)-->
+        <mode name="adder_fp32_mode"> 
+          <pb_type name="adder_pb" blif_model=".subckt adder_fp" num_pb="1">
             <input name="a" num_pins="32"/>
             <input name="b" num_pins="32"/>
             <output name="out" num_pins="32"/>
+            <!--TODO: Add mode signals like SUB-->
             <!-- Carry link delays included in cin->cout delay -->
             <delay_constant max="0.33e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
             <delay_constant max="0.33e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
@@ -991,28 +1016,30 @@
           </interconnect>
         </mode>
 
-        <!-- combinatorial fixed point adder mode -->
-        <mode name="comb_adder_32x32_mode_int">
-          <pb_type name="adder_pb" blif_model=".subckt comb_adder_int" num_pb="1">
+        <!-- floating point mac mode (result = a*b +/- accumulated value-->
+        <mode name="mac_fp32_mode">
+          <pb_type name="mac_fp32" blif_model=".subckt mac_fp" num_pb="1">
             <input name="a" num_pins="32"/>
             <input name="b" num_pins="32"/>
             <output name="out" num_pins="32"/>
             <!-- Carry link delays included in cin->cout delay -->
-            <delay_constant max="0.33e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
-            <delay_constant max="0.33e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
+            <delay_constant max="0.33e-9" in_port="mac_fp32.a" out_port="mac_fp32.out"/>
+            <delay_constant max="0.33e-9" in_port="mac_fp32.b" out_port="mac_fp32.out"/>
           </pb_type>
           <interconnect>
-            <direct name="atoa" input="dsp_pb.datain[31:0]" output="adder_pb.a">
-              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[31:0]" out_port="adder_pb.a"/>
+            <direct name="atoa" input="dsp_pb.datain[31:0]" output="mac_fp32.a">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[31:0]" out_port="mac_fp32.a"/>
             </direct>
-            <direct name="btob" input="dsp_pb.datain[63:32]" output="adder_pb.b">
-              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="adder_pb.b"/>
+            <direct name="btob" input="dsp_pb.datain[63:32]" output="mac_fp32.b">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[63:32]" out_port="mac_fp32.b"/>
             </direct>
-            <direct name="sumouttosumout" input="adder_pb.out" output="dsp_pb.dataout[31:0]">
-              <delay_constant max="0.1e-9" in_port="adder_pb.out" out_port="dsp_pb.dataout[31:0]"/>
+            <direct name="sumouttosumout" input="mac_fp32.out" output="dsp_pb.dataout[31:0]">
+              <delay_constant max="0.1e-9" in_port="mac_fp32.out" out_port="dsp_pb.dataout[31:0]"/>
             </direct>
           </interconnect>
         </mode>
+
+
       </pb_type>
 
       <interconnect>
@@ -1851,73 +1878,101 @@
 
             <!-- There are total 12 modes under the individual pe mode. They arise from cross combinations of:
                  1. int8, fp16
-                 2. sequential, combinatorial
+                 2. sequential, combinatorial (or, with flop stages for IOs and without flop stages for IOs)
                  3. add, mult, mac
-
-                 But I don't expect to instantiate modules that use the sequential
-                 add and mult modes. So I am skipping describing the modes, to save time. 
-                 Also, I don't expect to instantiate modules that use mac (seq or comb).
-                 So, I am skipping describing those as well.
+                 The sequential vs combinatorial modes are selectable by mode signal on each of the PBs below.
+                 TODO: Add the seq_vs_comb mode signal in each PB below. 
             -->
-            <mode name="indiv_pe_int8_comb_add_mode">
-              <pb_type name="indiv_pe_int8_comb_add" blif_model=".subckt comb_adder_int" num_pb="1">
+            <mode name="indiv_pe_int8_add_mode">
+              <pb_type name="indiv_pe_int8_add" blif_model=".subckt adder_int" num_pb="1">
                 <input name="a" num_pins="16"/>
                 <input name="b" num_pins="16"/>
                 <output name="out" num_pins="16"/>
-                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_comb_add.a" out_port="indiv_pe_int8_comb_add.out"/>
-                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_comb_add.b" out_port="indiv_pe_int8_comb_add.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_add.a" out_port="indiv_pe_int8_add.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_add.b" out_port="indiv_pe_int8_add.out"/>
 
               </pb_type>
               <interconnect>
-                <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_int8_comb_add.a"/>
-                <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_int8_comb_add.b"/>
-                <direct name="out" input="indiv_pe_int8_comb_add.out" output="indiv_pe_pb.direct_out"/>
+                <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_int8_add.a"/>
+                <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_int8_add.b"/>
+                <direct name="out" input="indiv_pe_int8_add.out" output="indiv_pe_pb.direct_out"/>
               </interconnect>
             </mode>
 
-            <mode name="indiv_pe_int8_comb_mult_mode">
-              <pb_type name="indiv_pe_int8_comb_mult" blif_model=".subckt multiply" num_pb="1">
+            <mode name="indiv_pe_int8_mult_mode">
+              <pb_type name="indiv_pe_int8_mult" blif_model=".subckt multiply" num_pb="1">
                 <input name="a" num_pins="8"/>
                 <input name="b" num_pins="8"/>
                 <output name="out" num_pins="16"/>
-                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_comb_mult.a" out_port="indiv_pe_int8_comb_mult.out"/>
-                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_comb_mult.b" out_port="indiv_pe_int8_comb_mult.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_mult.a" out_port="indiv_pe_int8_mult.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_mult.b" out_port="indiv_pe_int8_mult.out"/>
 
               </pb_type>
               <interconnect>
-                <direct name="a" input="indiv_pe_pb.direct_inputs_a[7:0]" output="indiv_pe_int8_comb_mult.a"/>
-                <direct name="b" input="indiv_pe_pb.direct_inputs_b[7:0]" output="indiv_pe_int8_comb_mult.b"/>
-                <direct name="out" input="indiv_pe_int8_comb_mult.out" output="indiv_pe_pb.direct_out"/>
+                <direct name="a" input="indiv_pe_pb.direct_inputs_a[7:0]" output="indiv_pe_int8_mult.a"/>
+                <direct name="b" input="indiv_pe_pb.direct_inputs_b[7:0]" output="indiv_pe_int8_mult.b"/>
+                <direct name="out" input="indiv_pe_int8_mult.out" output="indiv_pe_pb.direct_out"/>
               </interconnect>
             </mode>
 
-            <mode name="indiv_pe_fp16_comb_add_mode">
-              <pb_type name="indiv_pe_fp16_comb_add" blif_model=".subckt comb_adder_fp" num_pb="1">
+            <mode name="indiv_pe_int8_mac_mode">
+              <pb_type name="indiv_pe_int8_mac" blif_model=".subckt mac_int" num_pb="1">
+                <input name="a" num_pins="8"/>
+                <input name="b" num_pins="8"/>
+                <output name="out" num_pins="16"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_mac.a" out_port="indiv_pe_int8_mac.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_mac.b" out_port="indiv_pe_int8_mac.out"/>
+
+              </pb_type>
+              <interconnect>
+                <direct name="a" input="indiv_pe_pb.direct_inputs_a[7:0]" output="indiv_pe_int8_mac.a"/>
+                <direct name="b" input="indiv_pe_pb.direct_inputs_b[7:0]" output="indiv_pe_int8_mac.b"/>
+                <direct name="out" input="indiv_pe_int8_mac.out" output="indiv_pe_pb.direct_out"/>
+              </interconnect>
+            </mode>
+
+            <mode name="indiv_pe_fp16_add_mode">
+              <pb_type name="indiv_pe_fp16_add" blif_model=".subckt adder_fp" num_pb="1">
                 <input name="a" num_pins="16"/>
                 <input name="b" num_pins="16"/>
                 <output name="out" num_pins="16"/>
-                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_comb_add.a" out_port="indiv_pe_fp16_comb_add.out"/>
-                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_comb_add.b" out_port="indiv_pe_fp16_comb_add.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_add.a" out_port="indiv_pe_fp16_add.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_add.b" out_port="indiv_pe_fp16_add.out"/>
               </pb_type>
               <interconnect>
-                <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_comb_add.a"/>
-                <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_comb_add.b"/>
-                <direct name="out" input="indiv_pe_fp16_comb_add.out" output="indiv_pe_pb.direct_out"/>
+                <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_add.a"/>
+                <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_add.b"/>
+                <direct name="out" input="indiv_pe_fp16_add.out" output="indiv_pe_pb.direct_out"/>
               </interconnect>
             </mode>
 
-            <mode name="indiv_pe_fp16_comb_mult_mode">
-                <pb_type name="indiv_pe_fp16_comb_mult" blif_model=".subckt multiply_fp" num_pb="1">
+            <mode name="indiv_pe_fp16_mult_mode">
+                <pb_type name="indiv_pe_fp16_mult" blif_model=".subckt multiply_fp" num_pb="1">
                   <input name="a" num_pins="16"/>
                   <input name="b" num_pins="16"/>
                   <output name="out" num_pins="16"/>
-                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_comb_mult.a" out_port="indiv_pe_fp16_comb_mult.out"/>
-                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_comb_mult.b" out_port="indiv_pe_fp16_comb_mult.out"/>
+                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mult.a" out_port="indiv_pe_fp16_mult.out"/>
+                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mult.b" out_port="indiv_pe_fp16_mult.out"/>
                 </pb_type>
                 <interconnect>
-                  <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_comb_mult.a"/>
-                  <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_comb_mult.b"/>
-                  <direct name="out" input="indiv_pe_fp16_comb_mult.out" output="indiv_pe_pb.direct_out"/>
+                  <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_mult.a"/>
+                  <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_mult.b"/>
+                  <direct name="out" input="indiv_pe_fp16_mult.out" output="indiv_pe_pb.direct_out"/>
+                </interconnect>
+            </mode>
+
+            <mode name="indiv_pe_fp16_mac_mode">
+                <pb_type name="indiv_pe_fp16_mac" blif_model=".subckt mac_fp" num_pb="1">
+                  <input name="a" num_pins="16"/>
+                  <input name="b" num_pins="16"/>
+                  <output name="out" num_pins="16"/>
+                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mac.a" out_port="indiv_pe_fp16_mac.out"/>
+                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mac.b" out_port="indiv_pe_fp16_mac.out"/>
+                </pb_type>
+                <interconnect>
+                  <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_mac.a"/>
+                  <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_mac.b"/>
+                  <direct name="out" input="indiv_pe_fp16_mac.out" output="indiv_pe_pb.direct_out"/>
                 </interconnect>
             </mode>
           </pb_type>
