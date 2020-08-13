@@ -156,20 +156,24 @@
     </model>
     <model name="mac_fp">
       <input_ports>
-        <port name="a" combinational_sink_ports="out"/>
-        <port name="b" combinational_sink_ports="out"/>
+        <port name="clk" is_clock="1"/>  
+        <port name="reset" clock="clk" combinational_sink_ports="out"/>
+        <port name="a" clock="clk" combinational_sink_ports="out"/>
+        <port name="b" clock="clk" combinational_sink_ports="out"/>
       </input_ports>
       <output_ports>
-        <port name="out"/>
+        <port name="out" clock="clk"/>
       </output_ports>
     </model>
     <model name="mac_int">
       <input_ports>
-        <port name="a" combinational_sink_ports="out"/>
-        <port name="b" combinational_sink_ports="out"/>
+        <port name="clk" is_clock="1"/>  
+        <port name="reset" clock="clk" combinational_sink_ports="out"/>
+        <port name="a" clock="clk" combinational_sink_ports="out"/>
+        <port name="b" clock="clk" combinational_sink_ports="out"/>
       </input_ports>
       <output_ports>
-        <port name="out"/>
+        <port name="out" clock="clk"/>
       </output_ports>
     </model>
     <model name="matmul_fp16">
@@ -1033,6 +1037,43 @@
           </interconnect>
         </mode>
 
+        <!-- Fixed point mac mode (result = a*b +/- accumulated value-->
+        <mode name="mac_fixed_pt_mode">
+          <pb_type name="mac_fixed_pt" blif_model=".subckt mac_int" num_pb="1">
+            <input name="reset" num_pins="1"/>
+            <input name="a" num_pins="18"/>
+            <input name="b" num_pins="19"/>
+            <output name="out" num_pins="38"/>
+            <clock name="clk" num_pins="1"/>
+            <delay_constant max="0.33e-9" in_port="mac_fixed_pt.a" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="0.33e-9" in_port="mac_fixed_pt.b" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="68.74e-12" in_port="mac_fixed_pt.reset" out_port="mac_fixed_pt.out"/>
+
+            <T_setup value="66e-12" port="mac_fixed_pt.reset" clock="clk"/>
+            <T_setup value="66e-12" port="mac_fixed_pt.a" clock="clk"/>
+            <T_setup value="66e-12" port="mac_fixed_pt.b" clock="clk"/>
+            <T_setup value="66e-12" port="mac_fixed_pt.out" clock="clk"/>
+
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fixed_pt.reset" clock="clk"/>
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fixed_pt.a" clock="clk"/>
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fixed_pt.b" clock="clk"/>
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fixed_pt.out" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="reset" input="dsp_pb.reset" output="mac_fixed_pt.reset"/>
+            <direct name="clk" input="dsp_pb.clk" output="mac_fixed_pt.clk"/>
+            <direct name="atoa" input="dsp_pb.datain[17:0]" output="mac_fixed_pt.a">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[17:0]" out_port="mac_fixed_pt.a"/>
+            </direct>
+            <direct name="btob" input="dsp_pb.datain[36:18]" output="mac_fixed_pt.b">
+              <delay_constant max="0.1e-9" in_port="dsp_pb.datain[36:18]" out_port="mac_fixed_pt.b"/>
+            </direct>
+            <direct name="sumouttosumout" input="mac_fixed_pt.out" output="dsp_pb.resulta[37:0]">
+              <delay_constant max="0.1e-9" in_port="mac_fixed_pt.out" out_port="dsp_pb.resulta[37:0]"/>
+            </direct>
+          </interconnect>
+        </mode>
+
         <!-- floating point multiplier mode (result = a * b)-->
         <mode name="mult_fp32_mode">
           <pb_type name="mult_fp32" blif_model=".subckt multiply_fp" num_pb="1">
@@ -1082,14 +1123,29 @@
         <!-- floating point mac mode (result = a*b +/- accumulated value-->
         <mode name="mac_fp32_mode">
           <pb_type name="mac_fp32" blif_model=".subckt mac_fp" num_pb="1">
+            <input name="reset" num_pins="1"/>
             <input name="a" num_pins="32"/>
             <input name="b" num_pins="32"/>
             <output name="out" num_pins="32"/>
-            <!-- Carry link delays included in cin->cout delay -->
+            <clock name="clk" num_pins="1"/>
+
             <delay_constant max="0.33e-9" in_port="mac_fp32.a" out_port="mac_fp32.out"/>
             <delay_constant max="0.33e-9" in_port="mac_fp32.b" out_port="mac_fp32.out"/>
+            <delay_constant max="68.74e-12" in_port="mac_fp32.reset" out_port="mac_fp32.out"/>
+
+            <T_setup value="66e-12" port="mac_fp32.reset" clock="clk"/>
+            <T_setup value="66e-12" port="mac_fp32.a" clock="clk"/>
+            <T_setup value="66e-12" port="mac_fp32.b" clock="clk"/>
+            <T_setup value="66e-12" port="mac_fp32.out" clock="clk"/>
+
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fp32.reset" clock="clk"/>
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fp32.a" clock="clk"/>
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fp32.b" clock="clk"/>
+            <T_clock_to_Q max="124e-12" min="124e-12" port="mac_fp32.out" clock="clk"/>
           </pb_type>
           <interconnect>
+            <direct name="reset" input="dsp_pb.reset" output="mac_fp32.reset"/>
+            <direct name="clk" input="dsp_pb.clk" output="mac_fp32.clk"/>
             <direct name="atoa" input="dsp_pb.datain[31:0]" output="mac_fp32.a">
               <delay_constant max="0.1e-9" in_port="dsp_pb.datain[31:0]" out_port="mac_fp32.a"/>
             </direct>
@@ -2115,7 +2171,6 @@
                 <output name="out" num_pins="16"/>
                 <delay_constant max="68.74e-12" in_port="indiv_pe_int8_add.a" out_port="indiv_pe_int8_add.out"/>
                 <delay_constant max="68.74e-12" in_port="indiv_pe_int8_add.b" out_port="indiv_pe_int8_add.out"/>
-
               </pb_type>
               <interconnect>
                 <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_int8_add.a"/>
@@ -2142,14 +2197,29 @@
 
             <mode name="indiv_pe_int8_mac_mode">
               <pb_type name="indiv_pe_int8_mac" blif_model=".subckt mac_int" num_pb="1">
+                <input name="reset" num_pins="1"/>
                 <input name="a" num_pins="8"/>
                 <input name="b" num_pins="8"/>
                 <output name="out" num_pins="16"/>
+                <clock name="clk" num_pins="1"/>
+
                 <delay_constant max="68.74e-12" in_port="indiv_pe_int8_mac.a" out_port="indiv_pe_int8_mac.out"/>
                 <delay_constant max="68.74e-12" in_port="indiv_pe_int8_mac.b" out_port="indiv_pe_int8_mac.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_int8_mac.reset" out_port="indiv_pe_int8_mac.out"/>
 
+                <T_setup value="66e-12" port="indiv_pe_int8_mac.reset" clock="clk"/>
+                <T_setup value="66e-12" port="indiv_pe_int8_mac.a" clock="clk"/>
+                <T_setup value="66e-12" port="indiv_pe_int8_mac.b" clock="clk"/>
+                <T_setup value="66e-12" port="indiv_pe_int8_mac.out" clock="clk"/>
+
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_int8_mac.reset" clock="clk"/>
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_int8_mac.a" clock="clk"/>
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_int8_mac.b" clock="clk"/>
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_int8_mac.out" clock="clk"/>
               </pb_type>
               <interconnect>
+                <direct name="reset" input="indiv_pe_pb.reset" output="indiv_pe_int8_mac.reset"/>
+                <direct name="clk" input="indiv_pe_pb.clk" output="indiv_pe_int8_mac.clk"/>
                 <direct name="a" input="indiv_pe_pb.direct_inputs_a[7:0]" output="indiv_pe_int8_mac.a"/>
                 <direct name="b" input="indiv_pe_pb.direct_inputs_b[7:0]" output="indiv_pe_int8_mac.b"/>
                 <direct name="out" input="indiv_pe_int8_mac.out" output="indiv_pe_pb.direct_out"/>
@@ -2172,33 +2242,47 @@
             </mode>
 
             <mode name="indiv_pe_fp16_mult_mode">
-                <pb_type name="indiv_pe_fp16_mult" blif_model=".subckt multiply_fp" num_pb="1">
-                  <input name="a" num_pins="16"/>
-                  <input name="b" num_pins="16"/>
-                  <output name="out" num_pins="16"/>
-                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mult.a" out_port="indiv_pe_fp16_mult.out"/>
-                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mult.b" out_port="indiv_pe_fp16_mult.out"/>
-                </pb_type>
-                <interconnect>
-                  <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_mult.a"/>
-                  <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_mult.b"/>
-                  <direct name="out" input="indiv_pe_fp16_mult.out" output="indiv_pe_pb.direct_out"/>
-                </interconnect>
+              <pb_type name="indiv_pe_fp16_mult" blif_model=".subckt multiply_fp" num_pb="1">
+                <input name="a" num_pins="16"/>
+                <input name="b" num_pins="16"/>
+                <output name="out" num_pins="16"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mult.a" out_port="indiv_pe_fp16_mult.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mult.b" out_port="indiv_pe_fp16_mult.out"/>
+              </pb_type>
+              <interconnect>
+                <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_mult.a"/>
+                <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_mult.b"/>
+                <direct name="out" input="indiv_pe_fp16_mult.out" output="indiv_pe_pb.direct_out"/>
+              </interconnect>
             </mode>
 
             <mode name="indiv_pe_fp16_mac_mode">
-                <pb_type name="indiv_pe_fp16_mac" blif_model=".subckt mac_fp" num_pb="1">
-                  <input name="a" num_pins="16"/>
-                  <input name="b" num_pins="16"/>
-                  <output name="out" num_pins="16"/>
-                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mac.a" out_port="indiv_pe_fp16_mac.out"/>
-                  <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mac.b" out_port="indiv_pe_fp16_mac.out"/>
-                </pb_type>
-                <interconnect>
-                  <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_mac.a"/>
-                  <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_mac.b"/>
-                  <direct name="out" input="indiv_pe_fp16_mac.out" output="indiv_pe_pb.direct_out"/>
-                </interconnect>
+              <pb_type name="indiv_pe_fp16_mac" blif_model=".subckt mac_fp" num_pb="1">
+                <input name="reset" num_pins="1"/>
+                <input name="a" num_pins="16"/>
+                <input name="b" num_pins="16"/>
+                <output name="out" num_pins="16"/>
+                <clock name="clk" num_pins="1"/>
+
+                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mac.a" out_port="indiv_pe_fp16_mac.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mac.b" out_port="indiv_pe_fp16_mac.out"/>
+                <delay_constant max="68.74e-12" in_port="indiv_pe_fp16_mac.reset" out_port="indiv_pe_fp16_mac.out"/>
+
+                <T_setup value="66e-12" port="indiv_pe_fp16_mac.reset" clock="clk"/>
+                <T_setup value="66e-12" port="indiv_pe_fp16_mac.a" clock="clk"/>
+                <T_setup value="66e-12" port="indiv_pe_fp16_mac.b" clock="clk"/>
+                <T_setup value="66e-12" port="indiv_pe_fp16_mac.out" clock="clk"/>
+
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_fp16_mac.reset" clock="clk"/>
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_fp16_mac.a" clock="clk"/>
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_fp16_mac.b" clock="clk"/>
+                <T_clock_to_Q max="124e-12" min="124e-12" port="indiv_pe_fp16_mac.out" clock="clk"/>
+              </pb_type>
+              <interconnect>
+                <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_mac.a"/>
+                <direct name="b" input="indiv_pe_pb.direct_inputs_b" output="indiv_pe_fp16_mac.b"/>
+                <direct name="out" input="indiv_pe_fp16_mac.out" output="indiv_pe_pb.direct_out"/>
+              </interconnect>
             </mode>
           </pb_type>
 
