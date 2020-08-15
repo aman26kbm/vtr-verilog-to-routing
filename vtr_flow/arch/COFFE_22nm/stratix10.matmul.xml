@@ -385,7 +385,10 @@
         <output name="resultb" num_pins="37"/>
         <output name="chainout" num_pins="64"/>
         <clock name="clk" num_pins="1"/>
-        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+          <fc_override port_name="chainin" fc_type="frac" fc_val="0"/>
+          <fc_override port_name="chainout" fc_type="frac" fc_val="0"/>
+        </fc>
         <pinlocations pattern="spread"/>
       </sub_tile>
     </tile>
@@ -535,7 +538,7 @@
     <direct name="systolic_matmul_direct_interconnect_a" from_pin="matmul_top.a_data_out[63:0]" to_pin="matmul_top.a_data_in[63:0]" x_offset="11" y_offset="0" z_offset="0" switch_name="short_switch"/>
     <direct name="systolic_matmul_direct_interconnect_b" from_pin="matmul_top.b_data_out[63:0]" to_pin="matmul_top.b_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
     <direct name="systolic_matmul_direct_interconnect_c" from_pin="matmul_top.c_data_out_dir_int[63:0]" to_pin="matmul_top.c_data_in[63:0]" x_offset="0" y_offset="-3" z_offset="0" switch_name="short_switch"/>
-    <direct name="dsp_interconnect" from_pin="dsp_top.chainout" to_pin="dsp_top.chainin" x_offset="0" y_offset="-2" z_offset="0" switch_name="short_switch"/>
+    <direct name="dsp_interconnect" from_pin="dsp_top.chainout" to_pin="dsp_top.chainin" x_offset="0" y_offset="-5" z_offset="0" switch_name="short_switch"/>
   </directlist>
   <complexblocklist>
     <!-- Define I/O pads begin -->
