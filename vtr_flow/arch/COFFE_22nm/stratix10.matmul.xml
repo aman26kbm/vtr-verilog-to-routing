@@ -393,7 +393,7 @@
       </sub_tile>
     </tile>
     <!-- TODO: Add area from COFFE-->
-    <tile name="memory" height="4" width="1" area="6880">
+    <tile name="memory" height="3" width="2" area="6880">
       <sub_tile name="memory">
         <equivalent_sites>
           <site pb_type="memory" pin_mapping="direct"/>
@@ -486,12 +486,10 @@
       <corners type="EMPTY" priority="101"/>
       <!--Fill with 'clb'-->
       <fill type="clb" priority="10"/>
-      <!--Column of 'mult_27' with 'EMPTY' blocks wherever a 'mult_27' does not fit. Vertical offset by 1 for perimeter.-->
-      <col type="dsp_top" startx="6" starty="1" repeatx="5" priority="20"/>
-      <col type="EMPTY" startx="6" repeatx="8" starty="1" priority="19"/>
-      <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. Vertical offset by 1 for perimeter.-->
-      <col type="memory" startx="2" starty="1" repeatx="4" priority="15"/>
-      <col type="EMPTY" startx="2" repeatx="8" starty="1" priority="19"/>
+      <!--Column of 'mult_27' with 'EMPTY' blocks wherever a 'mult_27' does not fit. -->
+      <col type="dsp_top" startx="6" starty="0" repeatx="10" priority="20"/>
+      <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. -->
+      <col type="memory" startx="2" starty="0" repeatx="10" priority="15"/>
       <!-- Matmul columns.  -->
       <region type="matmul_top" startx="100" starty="1" endx="200" endy="329" incrx="10" priority="30"/>
     <!--
