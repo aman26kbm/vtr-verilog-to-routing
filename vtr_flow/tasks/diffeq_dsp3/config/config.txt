@@ -1,0 +1,26 @@
+##############################################
+# Configuration file for running experiments
+##############################################
+
+# Path to directory of circuits to use
+#circuits_dir=benchmarks/verilog/design_for_paper_jun2020/regular_fpga_int8
+circuits_dir=benchmarks/verilog/
+
+# Path to directory of architectures to use
+#archs_dir=arch/timing/arch_for_paper_jun2020/regular_fpga
+#archs_dir=arch/timing/
+archs_dir=arch/COFFE_22nm/
+
+# Add circuits to list to sweep
+circuit_list_add=diffeq1.modif.3.v
+
+# Add architectures to list to sweep
+#arch_list_add=regular_fpga_DSP.int8.xml
+#arch_list_add=k6_frac_N10_frac_chain_mem32K_40nm.xml
+arch_list_add=stratix10.matmul.xml
+
+# Parse info and how to parse
+parse_file=vpr_standard.txt
+
+# Pass requirements
+pass_requirements_file=pass_requirements.txt
