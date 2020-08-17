@@ -394,8 +394,10 @@
         <output name="chainout" num_pins="64"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+        <!--
           <fc_override port_name="chainin" fc_type="frac" fc_val="0"/>
           <fc_override port_name="chainout" fc_type="frac" fc_val="0"/>
+        -->
         </fc>
         <pinlocations pattern="perimeter"/>
         <!--The one we care about are chainin and chainout-->
@@ -479,12 +481,14 @@
         <output name="c_data_available" num_pins="1"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+        <!--
           <fc_override fc_type="frac" fc_val="0" port_name="a_data_in[63:0]"/>
           <fc_override fc_type="frac" fc_val="0" port_name="a_data_out[63:0]"/>
           <fc_override fc_type="frac" fc_val="0" port_name="b_data_in[63:0]"/>
           <fc_override fc_type="frac" fc_val="0" port_name="b_data_out[63:0]"/>
           <fc_override fc_type="frac" fc_val="0" port_name="c_data_in[63:0]"/>
           <fc_override fc_type="frac" fc_val="0" port_name="c_data_out_dir_int[63:0]"/>
+        -->
         </fc>
         <!-- There are 776 IOs on the matmul_top. Dividing by 4, we get 194 pins on each side. -->
         <!-- The things we care about are a_data_in on left, a_data_out on right, b_data_in & c_data_in on top and b_data_out & c_data_out_dir_int on bottom -->
