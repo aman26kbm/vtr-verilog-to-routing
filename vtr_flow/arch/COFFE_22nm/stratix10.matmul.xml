@@ -367,6 +367,8 @@
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
           <fc_override port_name="cin" fc_type="frac" fc_val="0"/>
           <fc_override port_name="cout" fc_type="frac" fc_val="0"/>
+          <!-- clock pins do not connect to local routing -->
+          <fc_override fc_type="frac" fc_val="0" port_name="clk"/>
         </fc>
         <pinlocations pattern="spread"/>
         <!--
@@ -393,6 +395,8 @@
         <output name="chainout" num_pins="64"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+          <!-- clock pins do not connect to local routing -->
+          <fc_override fc_type="frac" fc_val="0" port_name="clk"/>
         <!--
           <fc_override port_name="chainin" fc_type="frac" fc_val="0"/>
           <fc_override port_name="chainout" fc_type="frac" fc_val="0"/>
@@ -431,7 +435,10 @@
         <input name="we2" num_pins="1"/>
         <output name="out" num_pins="40"/>
         <clock name="clk" num_pins="1"/>
-        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+          <!-- clock pins do not connect to local routing -->
+          <fc_override fc_type="frac" fc_val="0" port_name="clk"/>
+        </fc>  
         <pinlocations pattern="spread"/>
       </sub_tile>
     </tile>
@@ -478,6 +485,8 @@
         <output name="c_data_available" num_pins="1"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+          <!-- clock pins do not connect to local routing -->
+          <fc_override fc_type="frac" fc_val="0" port_name="clk"/>
         <!--
           <fc_override fc_type="frac" fc_val="0" port_name="a_data_in[63:0]"/>
           <fc_override fc_type="frac" fc_val="0" port_name="a_data_out[63:0]"/>

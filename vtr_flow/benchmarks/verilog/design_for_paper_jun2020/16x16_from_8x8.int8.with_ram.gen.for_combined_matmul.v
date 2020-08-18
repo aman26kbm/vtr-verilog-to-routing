@@ -1,7 +1,7 @@
 
 `timescale 1ns/1ns
 `define DWIDTH 8
-`define AWIDTH 16
+`define AWIDTH 10
 `define MEM_SIZE 2048
 `define DESIGN_SIZE 16
 `define MAT_MUL_SIZE 8
@@ -27,7 +27,6 @@
   input clk_mem,
   input resetn,
   input pe_resetn,
-  input                             PCLK,
   input                             PRESETn,
   input        [`REG_ADDRWIDTH-1:0] PADDR,
   input                             PWRITE,
@@ -43,7 +42,8 @@
   input  [`MAT_MUL_SIZE-1:0] bram_we_ext
 );
 
-
+  wire PCLK;
+  assign PCLK = clk;
   reg start_reg;
   reg clear_done_reg;
   //Dummy register to sync all other invalid/unimplemented addresses
@@ -540,14 +540,17 @@ module matmul_16x16_systolic(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0_to_0_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0_to_1_0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_0_0_NC;
+  assign a_data_in_0_0_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in_0_0_NC;
+  assign c_data_in_0_0_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_0_NC;
+  assign b_data_in_0_0_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_0_0_to_0_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_0_0_to_0_1_NC;
   wire [`AWIDTH-1:0] c_addr_0_0_NC;
   wire c_data_0_0_available_NC;
 
-matmul_slice u_matmul_8x8_systolic_0_0(
+matmul_int8 u_matmul_8x8_systolic_0_0(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -564,8 +567,8 @@ matmul_slice u_matmul_8x8_systolic_0_0(
   .a_data_in(a_data_in_0_0_NC),
   .b_data_in(b_data_in_0_0_NC),
   .c_data_in(c_data_in_0_0_NC),
-  .c_data_out(c_data_0_0_to_0_1_NC),
-  .c_data_out_dir_int(c_data_0_0_to_0_1),
+  .c_data_out(c_data_0_0_to_0_1),
+  .c_data_out_dir_int(c_data_0_0_to_0_1_NC),
   .a_data_out(a_data_0_0_to_0_1),
   .b_data_out(b_data_0_0_to_1_0),
   .a_addr(a_addr_0_0),
@@ -593,9 +596,11 @@ matmul_slice u_matmul_8x8_systolic_0_0(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1_to_1_1;
   wire [`AWIDTH-1:0] a_addr_0_1_NC;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_1_NC;
+  assign a_data_0_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_1_NC;
+  assign b_data_in_0_1_NC = 0;
 
-matmul_slice u_matmul_8x8_systolic_0_1(
+matmul_int8 u_matmul_8x8_systolic_0_1(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -641,14 +646,17 @@ matmul_slice u_matmul_8x8_systolic_0_1(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_0_to_2_0;
   wire [`AWIDTH-1:0] b_addr_1_0_NC;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_0_NC;
+  assign b_data_1_0_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_1_0_NC;
+  assign a_data_in_1_0_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in_1_0_NC;
+  assign c_data_in_1_0_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_1_0_to_1_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_1_0_to_1_1_NC;
   wire [`AWIDTH-1:0] c_addr_1_0_NC;
   wire c_data_1_0_available_NC;
 
-matmul_slice u_matmul_8x8_systolic_1_0(
+matmul_int8 u_matmul_8x8_systolic_1_0(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -665,8 +673,8 @@ matmul_slice u_matmul_8x8_systolic_1_0(
   .a_data_in(a_data_in_1_0_NC),
   .b_data_in(b_data_0_0_to_1_0),
   .c_data_in(c_data_in_1_0_NC),
-  .c_data_out(c_data_1_0_to_1_1_NC),
-  .c_data_out_dir_int(c_data_1_0_to_1_1),
+  .c_data_out(c_data_1_0_to_1_1),
+  .c_data_out_dir_int(c_data_1_0_to_1_1_NC),
   .a_data_out(a_data_1_0_to_1_1),
   .b_data_out(b_data_1_0_to_2_0),
   .a_addr(a_addr_1_0),
@@ -695,9 +703,11 @@ matmul_slice u_matmul_8x8_systolic_1_0(
   wire [`AWIDTH-1:0] a_addr_1_1_NC;
   wire [`AWIDTH-1:0] b_addr_1_1_NC;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_1_NC;
+  assign a_data_1_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_1_NC;
+  assign b_data_1_1_NC = 0;
 
-matmul_slice u_matmul_8x8_systolic_1_1(
+matmul_int8 u_matmul_8x8_systolic_1_1(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -811,5 +821,3 @@ dual_port_ram u_dual_port_ram(
 
 
 endmodule
-
-  
