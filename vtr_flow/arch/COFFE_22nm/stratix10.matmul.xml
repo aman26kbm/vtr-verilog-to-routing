@@ -423,23 +423,20 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="memory" height="3" width="2" area="6880">
-      <sub_tile name="memory">
+    <tile name="memory_top" height="3" width="2" area="6880">
+      <sub_tile name="memory_top">
         <equivalent_sites>
-          <site pb_type="memory" pin_mapping="direct"/>
+          <site pb_type="memory_top" pin_mapping="direct"/>
         </equivalent_sites>
-        <input name="addr1" num_pins="11"/>
-        <input name="addr2" num_pins="11"/>
-        <input name="data" num_pins="40"/>
-        <input name="we1" num_pins="1"/>
-        <input name="we2" num_pins="1"/>
+        <input name="memory_I1" num_pins="32" equivalent="full"/>
+        <input name="memory_I2" num_pins="32" equivalent="full"/>
         <output name="out" num_pins="40"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
           <!-- clock pins do not connect to local routing -->
           <fc_override fc_type="frac" fc_val="0" port_name="clk"/>
         </fc>  
-        <pinlocations pattern="spread"/>
+        <pinlocations pattern="perimeter"/>
       </sub_tile>
     </tile>
     <tile name="matmul_top" height="6" width="4" area="365120">
@@ -571,7 +568,7 @@
       <!--Column of 'mult_27' with 'EMPTY' blocks wherever a 'mult_27' does not fit. -->
       <col type="dsp_top" startx="6" starty="1" repeatx="10" priority="20"/>
       <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. -->
-      <col type="memory" startx="2" starty="1" repeatx="10" priority="15"/>
+      <col type="memory_top" startx="2" starty="1" repeatx="10" priority="15"/>
       <!-- Matmul columns.  -->
       <!--
       <region type="matmul_top" startx="100" starty="1" endx="200" endy="329" incrx="10" priority="30"/>
@@ -3067,7 +3064,13 @@
        Scaling down from 40nm to 22nm (assuming 1V operation in both cases)
        is not required because the area is already in MWTAs
       -->
-    <pb_type name="memory">
+    <pb_type name="memory_top">
+      <input name="memory_I1" num_pins="32" equivalent="full"/>
+      <input name="memory_I2" num_pins="32" equivalent="full"/>
+      <output name="out" num_pins="40"/>
+      <clock name="clk" num_pins="1"/>
+
+    <pb_type name="memory" num_pb="1">
       <input name="addr1" num_pins="11"/>
       <input name="addr2" num_pins="11"/>
       <input name="data" num_pins="40"/>
@@ -3491,6 +3494,31 @@
       <!-- Place this memory block every 8 columns from (and including) the second column -->
       <power method="sum-of-children"/>
     </pb_type>
+    
+    <interconnect>
+      <complete name="first_half"
+        input="memory_top.memory_I1"
+        output="memory.addr1
+                memory.data[19:0]
+                memory.we1">
+          <delay_constant max="29.64e-12" in_port="memory_top.memory_I1[10:0]" out_port="memory.addr1"/>
+          <delay_constant max="29.64e-12" in_port="memory_top.memory_I1[30:11]" out_port="memory.data[19:0]"/>
+          <delay_constant max="29.64e-12" in_port="memory_top.memory_I1[31]" out_port="memory.we1"/>
+      </complete>
+      <complete name="second_half"
+        input="memory_top.memory_I2"
+        output="memory.addr2
+                memory.data[39:20]
+                memory.we2">
+          <delay_constant max="29.64e-12" in_port="memory_top.memory_I1[10:0]" out_port="memory.addr2"/>
+          <delay_constant max="29.64e-12" in_port="memory_top.memory_I1[30:11]" out_port="memory.data[39:20]"/>
+          <delay_constant max="29.64e-12" in_port="memory_top.memory_I1[31]" out_port="memory.we2"/>
+      </complete>
+      <direct name="out" input="memory.out" output="memory_top.out"></direct>
+      <direct name="clk" input="memory_top.clk" output="memory.clk"></direct>
+    </interconnect>
+    </pb_type>
+
     <!-- Define fracturable memory end -->
   </complexblocklist>
   <power>

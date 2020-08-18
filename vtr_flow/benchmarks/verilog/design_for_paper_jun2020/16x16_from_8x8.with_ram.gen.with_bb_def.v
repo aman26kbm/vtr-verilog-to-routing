@@ -2,7 +2,7 @@
 `timescale 1ns/1ns
 `define DWIDTH 8
 `define AWIDTH 10
-`define MEM_SIZE 2048
+`define MEM_SIZE 1024
 `define DESIGN_SIZE 16
 `define MAT_MUL_SIZE 8
 `define MASK_WIDTH 8
