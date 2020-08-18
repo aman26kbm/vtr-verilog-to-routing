@@ -1078,8 +1078,8 @@
               <input name="a" num_pins="18"/>
               <input name="b" num_pins="19"/>
               <output name="out" num_pins="37"/>
-              <delay_constant max="2.02e-9" in_port="mult_18x19.a" out_port="mult_18x19.out"/>
-              <delay_constant max="2.02e-9" in_port="mult_18x19.b" out_port="mult_18x19.out"/>
+              <delay_constant max="2.16e-9" in_port="mult_18x19.a" out_port="mult_18x19.out"/>
+              <delay_constant max="2.16e-9" in_port="mult_18x19.b" out_port="mult_18x19.out"/>
             </pb_type>
             <interconnect>
               <direct name="a2a" input="two_mult_18x19.a" output="mult_18x19.a">
@@ -1121,8 +1121,8 @@
               <input name="a" num_pins="27"/>
               <input name="b" num_pins="27"/>
               <output name="out" num_pins="54"/>
-              <delay_constant max="2.02e-9" in_port="mult_27x27.a" out_port="mult_27x27.out"/>
-              <delay_constant max="2.02e-9" in_port="mult_27x27.b" out_port="mult_27x27.out"/>
+              <delay_constant max="2.16e-9" in_port="mult_27x27.a" out_port="mult_27x27.out"/>
+              <delay_constant max="2.16e-9" in_port="mult_27x27.b" out_port="mult_27x27.out"/>
             </pb_type>
             <interconnect>
               <direct name="a2a" input="one_mult_27x27.a" output="mult_27x27.a">
@@ -1159,17 +1159,17 @@
             <output name="resulta" num_pins="38"/>
             <output name="chainout" num_pins="38"/>
             <!--TODO: Add mode signals like SUB -->
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.resulta"/>
 
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.02e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.16e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.chainout"/>
           </pb_type>
           <interconnect>
             <direct name="datain2ax" input="dsp_pb.datain[17:0]" output="mult_add_sum.ax">
@@ -1204,25 +1204,25 @@
             <output name="resulta" num_pins="64"/>
             <output name="chainout" num_pins="64"/>
             <!--TODO: Add mode signals like SUB -->
-            <delay_constant max="2.02e-9" in_port="sop_4.ax" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.ay" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.bx" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.by" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.cx" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.cy" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.dx" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.dy" out_port="sop_4.resulta"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.chainin" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.ax" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.ay" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.bx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.by" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.cx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.cy" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.dx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.dy" out_port="sop_4.resulta"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.chainin" out_port="sop_4.resulta"/>
 
-            <delay_constant max="2.02e-9" in_port="sop_4.ax" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.ay" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.bx" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.by" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.cx" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.cy" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.dx" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.dy" out_port="sop_4.chainout"/>
-            <delay_constant max="2.02e-9" in_port="sop_4.chainin" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.ax" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.ay" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.bx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.by" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.cx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.cy" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.dx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.dy" out_port="sop_4.chainout"/>
+            <delay_constant max="2.16e-9" in_port="sop_4.chainin" out_port="sop_4.chainout"/>
           </pb_type>
           <interconnect>
             <direct name="datain2ax" input="dsp_pb.datain[8:0]" output="sop_4.ax">
@@ -1258,9 +1258,9 @@
             <input name="b" num_pins="19"/>
             <output name="out" num_pins="38"/>
             <clock name="clk" num_pins="1"/>
-            <delay_constant max="2.02e-9" in_port="mac_fixed_pt.a" out_port="mac_fixed_pt.out"/>
-            <delay_constant max="2.02e-9" in_port="mac_fixed_pt.b" out_port="mac_fixed_pt.out"/>
-            <delay_constant max="2.02e-9" in_port="mac_fixed_pt.reset" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="2.16e-9" in_port="mac_fixed_pt.a" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="2.16e-9" in_port="mac_fixed_pt.b" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="2.16e-9" in_port="mac_fixed_pt.reset" out_port="mac_fixed_pt.out"/>
 
             <T_setup value="18.91e-12" port="mac_fixed_pt.reset" clock="clk"/>
             <T_setup value="18.91e-12" port="mac_fixed_pt.a" clock="clk"/>
