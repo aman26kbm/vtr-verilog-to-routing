@@ -380,7 +380,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="dsp_top" height="5" width="1.37" area="259863">
+    <tile name="dsp_top" height="5" width="1" area="259863">
       <sub_tile name="dsp_top">
         <equivalent_sites>
           <site pb_type="dsp_top" pin_mapping="direct"/>
@@ -422,7 +422,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="memory" height="3" width="1.47" area="6880">
+    <tile name="memory" height="3" width="1" area="6880">
       <sub_tile name="memory">
         <equivalent_sites>
           <site pb_type="memory" pin_mapping="direct"/>
@@ -440,7 +440,7 @@
         <pinlocations pattern="perimeter"/>
       </sub_tile>
     </tile>
-    <tile name="matmul_top" height="6" width="3.16" area="365120">
+    <tile name="matmul_top" height="6" width="1" area="365120">
       <sub_tile name="matmul_top">
         <equivalent_sites>
           <site pb_type="matmul_top" pin_mapping="direct"/>
@@ -557,23 +557,36 @@
   <layout>
     <!-- Physical descriptions begin -->
     <!--TODO: The layout needs to be fixed to have the right number/ratio of matmuls-->
-    <auto_layout aspect_ratio="1.0">
     <!--
-    <fixed_layout name="mylayout" width="330" height="330">
+    <auto_layout aspect_ratio="1.0">
     -->
+    <fixed_layout name="mylayout" width="203" height="122">
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
       <perimeter type="io" priority="100"/>
       <corners type="EMPTY" priority="101"/>
-      <!--Fill with 'clb'-->
-      <fill type="clb" priority="10"/>
-      <!--Column of 'mult_27' with 'EMPTY' blocks wherever a 'mult_27' does not fit. -->
-      <col type="dsp_top" startx="6" starty="1" repeatx="10" priority="20"/>
+      <region type="clb" startx="1"   endx="3"   starty="1"   priority="20"/>
+      <region type="clb" startx="6"   endx="8"   starty="1"   priority="20"/>
+      <region type="clb" startx="11"  endx="13"  starty="1"   priority="20"/>
+      <region type="clb" startx="16"  endx="18"  starty="1"   priority="20"/>
+      <region type="clb" startx="21"  endx="22"  starty="1"   priority="20"/>
+      <region type="clb" startx="26"  endx="26"  starty="1"   priority="20"/>
+      <!--Column of 'dsp' with 'EMPTY' blocks wherever a 'mult_27' does not fit. -->
+      <col type="dsp_top" startx="4"  starty="1" priority="20"/>
+      <col type="dsp_top" startx="9"  starty="1" priority="20"/>
+      <col type="dsp_top" startx="14" starty="1" priority="20"/>
+      <col type="dsp_top" startx="19" starty="1" priority="20"/>
+      <col type="dsp_top" startx="24" starty="1" priority="20"/>
       <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. -->
-      <col type="memory" startx="2" starty="1" repeatx="10" priority="15"/>
-    </auto_layout>
+      <col type="memory"  startx="5"  starty="1" priority="15"/>
+      <col type="memory"  startx="10"  starty="1" priority="15"/>
+      <col type="memory"  startx="15"  starty="1" priority="15"/>
+      <col type="memory"  startx="20"  starty="1" priority="15"/>
+      <col type="memory"  startx="25"  starty="1" priority="15"/>
+      <col type="memory"  startx="27"  starty="1" priority="15"/>
     <!--
-    </fixed_layout> 
+    </auto_layout>
     -->
+    </fixed_layout> 
   </layout>
   <device>
     <sizing R_minW_nmos="13090" R_minW_pmos="19086.83"/>
