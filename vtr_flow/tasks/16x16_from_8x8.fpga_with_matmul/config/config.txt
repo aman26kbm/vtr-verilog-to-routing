@@ -12,9 +12,18 @@ archs_dir=arch/COFFE_22nm/
 
 # Add circuits to list to sweep
 circuit_list_add=16x16_from_8x8.int8.with_ram.gen.for_combined_matmul.v
+#circuit_list_add=16x16_from_8x8.int8.with_ram.gen.for_combined_matmul.modif.v
+#circuit_list_add=16x16_from_8x8.with_ram.gen.with_bb_def.modif.v
+#circuit_list_add=8x8.v
+#circuit_list_add=8x8_using_matmul.v
 
 # Add architectures to list to sweep
-arch_list_add=stratix10.matmul.xml
+arch_list_add=stratix10.matmul.for_temp_use.xml
+#arch_list_add=stratix10.matmul.only_int_mode.no_local_mux.xml
+#arch_list_add=stratix10_arch.from_moh.matmul_plop.xml
+#arch_list_add=stratix10.matmul_no.dsp_yes.bram_yes.xml
+#arch_list_add=stratix10.matmul_no.dsp_yes.bram_no.xml
+#arch_list_add=stratix10.matmul_yes.dsp_yes.bram_no.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
