@@ -380,7 +380,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="dsp_top" height="5" width="2" area="259863">
+    <tile name="dsp_top" height="5" width="1.37" area="259863">
       <sub_tile name="dsp_top">
         <equivalent_sites>
           <site pb_type="dsp_top" pin_mapping="direct"/>
@@ -422,7 +422,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="memory" height="3" width="2" area="6880">
+    <tile name="memory" height="3" width="1.47" area="6880">
       <sub_tile name="memory">
         <equivalent_sites>
           <site pb_type="memory" pin_mapping="direct"/>
@@ -440,7 +440,7 @@
         <pinlocations pattern="perimeter"/>
       </sub_tile>
     </tile>
-    <tile name="matmul_top" height="6" width="4" area="365120">
+    <tile name="matmul_top" height="6" width="3.16" area="365120">
       <sub_tile name="matmul_top">
         <equivalent_sites>
           <site pb_type="matmul_top" pin_mapping="direct"/>
