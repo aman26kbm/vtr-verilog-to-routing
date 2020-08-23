@@ -557,28 +557,61 @@
   <layout>
     <!-- Physical descriptions begin -->
     <!--TODO: The layout needs to be fixed to have the right number/ratio of matmuls-->
-    <auto_layout aspect_ratio="1.0">
     <!--
-    <fixed_layout name="mylayout" width="330" height="330">
+    <auto_layout aspect_ratio="1.0">
     -->
+    <fixed_layout name="mylayout" width="200" height="32">
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
       <perimeter type="io" priority="100"/>
       <corners type="EMPTY" priority="101"/>
-      <!--Fill with 'clb'-->
-      <fill type="clb" priority="10"/>
-      <!--Column of 'mult_27' with 'EMPTY' blocks wherever a 'mult_27' does not fit. -->
-      <col type="dsp_top" startx="6" starty="1" repeatx="10" priority="20"/>
-      <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. -->
-      <col type="memory" startx="2" starty="1" repeatx="10" priority="15"/>
-      <!-- Matmul columns.  -->
-      <!--
-      <region type="matmul_top" startx="100" starty="1" endx="200" endy="329" incrx="10" priority="30"/>
-      -->
-      <col type="matmul_top" startx="15" starty="1" repeatx="15" priority="30"/>
-    </auto_layout>
+
+      <region type="clb" startx="1"   endx="2"   starty="1"   priority="50"/>
+      <col type="memory"  startx="3"  starty="1"    priority="50"/>
+      <region type="clb" startx="4"   endx="6"   starty="1"   priority="50"/>
+      <col type="memory"  startx="7"  starty="1"   priority="50"/>
+      <col type="dsp_top" startx="8"  starty="1"  priority="50"/>
+      <col type="memory"  startx="9"  starty="1"    priority="50"/>
+
+      <region type="clb" startx="10"  endx="12"  starty="1" repeatx="20"  priority="20"/>
+      <region type="clb" startx="15"  endx="17"  starty="1" repeatx="20"  priority="20"/>
+      <region type="clb" startx="20"  endx="22"  starty="1" repeatx="20"  priority="20"/>
+      <region type="clb" startx="25"  endx="27"  starty="1" repeatx="20"  priority="20"/>
+
+      <col type="dsp_top" startx="13" starty="1"  repeatx="20" priority="20"/>
+      <col type="dsp_top" startx="18" starty="1"  repeatx="20" priority="20"/>
+      <col type="dsp_top" startx="23" starty="1"  repeatx="20" priority="20"/>
+      <col type="dsp_top" startx="28" starty="1"  repeatx="20" priority="20"/>
+
+      <col type="memory"  startx="14"  starty="1" repeatx="20"  priority="20"/>
+      <col type="memory"  startx="19"  starty="1" repeatx="20"  priority="20"/>
+      <col type="memory"  startx="24"  starty="1" repeatx="20"  priority="20"/>
+      <col type="memory"  startx="29"  starty="1" repeatx="20"  priority="20"/>
+
+      <col type="clb"  startx="95"  starty="1"  priority="10"/>
+      <col type="memory"  startx="96"  starty="1"   priority="50"/>
+      <col type="clb"  startx="97"  starty="1"  priority="10"/>
+      <col type="memory"  startx="98"  starty="1"  priority="50"/>
+      <col type="matmul_top" startx="99" starty="1"  priority="50"/>
+      <col type="clb"  startx="100"  starty="1"  priority="10"/>
+      <col type="matmul_top" startx="101" starty="1" priority="50"/>
+      <col type="memory"  startx="102"  starty="1"  priority="50"/>
+      <col type="clb"  startx="103"  starty="1"  priority="0"/>
+      <col type="memory"  startx="104"  starty="1"  priority="5"/>
+
+      <col type="clb"  startx="190"  starty="1"  priority="10"/>
+      <col type="clb"  startx="191"  starty="1"  priority="10"/>
+      <col type="memory"  startx="192"  starty="1"    priority="80"/>
+      <col type="clb"  startx="193"  starty="1"  priority="80"/>
+      <col type="clb"  startx="194"  starty="1"  priority="80"/>
+      <col type="clb"  startx="195"  starty="1"  priority="10"/>
+      <col type="memory"  startx="196"  starty="1"   priority="80"/>
+      <col type="dsp_top" startx="197"  starty="1"  priority="80"/>
+      <col type="memory"  startx="198"  starty="1"    priority="80"/>
+
     <!--
-    </fixed_layout> 
+    </auto_layout>
     -->
+    </fixed_layout> 
   </layout>
   <device>
     <sizing R_minW_nmos="13090" R_minW_pmos="19086.83"/>

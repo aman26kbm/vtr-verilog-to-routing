@@ -560,29 +560,46 @@
     <!--
     <auto_layout aspect_ratio="1.0">
     -->
-    <fixed_layout name="mylayout" width="203" height="122">
+    <fixed_layout name="mylayout" width="203" height="32">
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
-      <perimeter type="io" priority="100"/>
-      <corners type="EMPTY" priority="101"/>
-      <region type="clb" startx="1"   endx="3"   starty="1"   priority="20"/>
-      <region type="clb" startx="6"   endx="8"   starty="1"   priority="20"/>
-      <region type="clb" startx="11"  endx="13"  starty="1"   priority="20"/>
-      <region type="clb" startx="16"  endx="18"  starty="1"   priority="20"/>
-      <region type="clb" startx="21"  endx="22"  starty="1"   priority="20"/>
-      <region type="clb" startx="26"  endx="26"  starty="1"   priority="20"/>
-      <!--Column of 'dsp' with 'EMPTY' blocks wherever a 'mult_27' does not fit. -->
-      <col type="dsp_top" startx="4"  starty="1" priority="20"/>
-      <col type="dsp_top" startx="9"  starty="1" priority="20"/>
-      <col type="dsp_top" startx="14" starty="1" priority="20"/>
-      <col type="dsp_top" startx="19" starty="1" priority="20"/>
-      <col type="dsp_top" startx="24" starty="1" priority="20"/>
-      <!--Column of 'memory' with 'EMPTY' blocks wherever a 'memory' does not fit. -->
-      <col type="memory"  startx="5"  starty="1" priority="15"/>
-      <col type="memory"  startx="10"  starty="1" priority="15"/>
-      <col type="memory"  startx="15"  starty="1" priority="15"/>
-      <col type="memory"  startx="20"  starty="1" priority="15"/>
-      <col type="memory"  startx="25"  starty="1" priority="15"/>
-      <col type="memory"  startx="27"  starty="1" priority="15"/>
+      <perimeter type="io" priority="101"/>
+      <corners type="EMPTY" priority="102"/>
+
+      <col type="clb"  startx="1"  starty="1"  priority="100"/>
+      <col type="clb"  startx="2"  starty="1"  priority="100"/>
+      <col type="dsp_top"  startx="3"  starty="1"  priority="100"/>
+
+      <region type="clb" startx="4"   endx="6"   starty="1" repeatx="39"  priority="20"/>
+      <region type="clb" startx="9"   endx="11"  starty="1" repeatx="39"  priority="20"/>
+      <region type="clb" startx="14"  endx="16"  starty="1" repeatx="39"  priority="20"/>
+      <region type="clb" startx="19"  endx="21"  starty="1" repeatx="39"  priority="20"/>
+      <region type="clb" startx="24"  endx="26"  starty="1" repeatx="39"  priority="20"/>
+      <region type="clb" startx="29"  endx="31"  starty="1" repeatx="39"  priority="20"/>
+      <region type="clb" startx="34"  endx="36"  starty="1" repeatx="39"  priority="20"/>
+      <region type="clb" startx="39"  endx="40"  starty="1" repeatx="39"  priority="20"/>
+
+      <col type="dsp_top" startx="7"   starty="1"  repeatx="39" priority="20"/>
+      <col type="dsp_top" startx="12"  starty="1"  repeatx="39" priority="20"/>
+      <col type="dsp_top" startx="17"  starty="1"  repeatx="39" priority="20"/>
+      <col type="dsp_top" startx="22"  starty="1"  repeatx="39" priority="20"/>
+      <col type="dsp_top" startx="27"  starty="1"  repeatx="39" priority="20"/>
+      <col type="dsp_top" startx="32"  starty="1"  repeatx="39" priority="20"/>
+      <col type="dsp_top" startx="37"  starty="1"  repeatx="39" priority="20"/>
+
+      <col type="memory"  startx="8"   starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="13"  starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="18"  starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="23"  starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="28"  starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="33"  starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="38"  starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="41"  starty="1" repeatx="39"  priority="20"/>
+      <col type="memory"  startx="42"  starty="1" repeatx="39"  priority="20"/>
+
+      <col type="dsp_top"  startx="199"  starty="1"  priority="20"/>
+      <col type="clb"  startx="200"  starty="1"  priority="1"/>
+      <col type="clb"  startx="201"  starty="1"  priority="1"/>
+
     <!--
     </auto_layout>
     -->
