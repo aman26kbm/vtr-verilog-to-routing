@@ -560,7 +560,7 @@
     <!--
     <auto_layout aspect_ratio="1.0">
     -->
-    <fixed_layout name="mylayout" width="203" height="32">
+    <fixed_layout name="mylayout" width="203" height="182">
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
       <perimeter type="io" priority="101"/>
       <corners type="EMPTY" priority="102"/>
