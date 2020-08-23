@@ -1,0 +1,4 @@
+16x16_from_8x8.int8.fpga_with_matmul,run051
+16x16_from_8x8.int8.fpga_with_dsp,run035
+16x16_from_4x4.fp16.fpga_with_dsp,run002
+16x16_from_4x4.fp16.fpga_with_dsp,run002
