@@ -424,7 +424,7 @@ sub generate_single_task_actions {
     #Create the run directory
 	mkdir( $run_dir, 0775 ) or die "Failed to make directory ($run_dir): $!";
 	chmod( 0775, $run_dir );
-  printf("Run directory is %s\n", $run_dir);
+        printf("Task: %s, Run directory: %s\n", $task, $run_dir);
 
     #Create a symlink that points to the latest run
     my $symlink_name = "latest";
