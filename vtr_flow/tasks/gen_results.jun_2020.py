@@ -136,13 +136,16 @@ class GenResults():
           crit_path_match1 = re.search(r'matrix_multiplication.clk to matrix_multiplication.clk CPD: (.*) ns \((.*) MHz\)', line)
           crit_path_match2 = re.search(r'top.clk to top.clk CPD: (.*) ns \((.*) MHz\)', line)
           crit_path_match3 = re.search(r'Final critical path: (.*) ns, Fmax: (.*) MHz', line)
-          if crit_path_match1 is not None or crit_path_match2 is not None or crit_path_match3 is not None:
+          crit_path_match4 = re.search(r'Final critical path delay \(least slack\): (.*) ns, Fmax: (.*) MHz', line)
+          if crit_path_match1 is not None or crit_path_match2 is not None or crit_path_match3 is not None or crit_path_match4 is not None:
             if crit_path_match1 is not None:
               crit_path_match = crit_path_match1
             if crit_path_match2 is not None:
               crit_path_match = crit_path_match2
             if crit_path_match3 is not None:
               crit_path_match = crit_path_match3
+            if crit_path_match4 is not None:
+              crit_path_match = crit_path_match4
             critical_path = crit_path_match.group(1)
             frequency = crit_path_match.group(2)
             result_dict['critical_path'] = critical_path or "Not found"
