@@ -8265,23 +8265,21 @@ endmodule
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-  module adder_32bit(
+module adder_32bit(
    input [31:0] a,
    input [31:0] b,
    input cin,
    output [31:0] sumout,
    output cout
-); //add input sub when modifying xml
+); 
   wire [37:0] sum_lower_16;
   wire [37:0] sum_higher_16;
-  wire [37:0] chainout_NC1;
-  wire [37:0] chainout_NC2;
-  mult_add_sum_int u1 (.ax(19'b0), .ay({2'b0, a[15:0]}),  .bx(19'b0), .by({2'b0, b[15:0]}), .chainin(38'b0), .resulta(sum_lower_16) , .chainout(chainout_NC1));
-  //mult_add_sum_int u1 (.ax(19'b0), .ay({2'b0, a[15:0]}),  .bx(19'b0), .by({2'b0, b[15:0]}), .chainin(38'b0), .resulta(sum_lower_16) , .chainout(chainout_NC1), .sub(sub));
-  
-  mult_add_sum_int u2 (.ax(19'b0), .ay({2'b0, a[31:16]}), .bx(19'b0), .by({2'b0, b[31:16]}),.chainin(38'b0), .resulta(sum_higher_16), .chainout(chainout_NC2));
+  wire [37:0] chainout_1;
+  wire [37:0] chainout_2;
+  mult_add_sum_int u1 (.ax(19'b0), .ay({2'b0, a[15:0]}),  .bx(19'b0), .by({2'b0, b[15:0]}), .chainin({37'b0, cin}), .resulta(sum_lower_16) , .chainout(chainout_1), .mode_sigs(11'b0));
+  mult_add_sum_int u2 (.ax(19'b0), .ay({2'b0, a[31:16]}), .bx(19'b0), .by({2'b0, b[31:16]}),.chainin(chainout_1),   .resulta(sum_higher_16), .chainout(chainout_2), .mode_sigs(11'b0));
   assign sumout = {sum_higher_16[15:0], sum_lower_16[15:0]};
-  assign cout = cin; //faking it
+  assign cout = sum_higher_16[16];
 endmodule
 
 
@@ -8294,12 +8292,11 @@ module adder_34bit(
 );
   wire [37:0] sum_lower_16;
   wire [37:0] sum_higher_16;
-  wire [37:0] chainout_NC1;
-  wire [37:0] chainout_NC2;
-  mult_add_sum_int u3 (.ax(19'b0), .ay({1'b0, a[16:0]}),  .bx(19'b0), .by({1'b0, b[16:0]}), .chainin(38'b0), .resulta(sum_lower_16) , .chainout(chainout_NC1));
-  mult_add_sum_int u4 (.ax(19'b0), .ay({1'b0, a[33:17]}), .bx(19'b0), .by({1'b0, b[33:17]}),.chainin(38'b0), .resulta(sum_higher_16), .chainout(chainout_NC2));
+  wire [37:0] chainout_1;
+  wire [37:0] chainout_2;
+  mult_add_sum_int u3 (.ax(19'b1), .ay({1'b0, a[16:0]}),  .bx(19'b1), .by({1'b0, b[16:0]}), .chainin({37'b0, cin}), .resulta(sum_lower_16) , .chainout(chainout_1), .mode_sigs(11'b0));
+  mult_add_sum_int u4 (.ax(19'b1), .ay({1'b0, a[33:17]}), .bx(19'b1), .by({1'b0, b[33:17]}),.chainin(chainout_1),    .resulta(sum_higher_16), .chainout(chainout_2), .mode_sigs(11'b0));
   assign sumout = {sum_higher_16[16:0], sum_lower_16[16:0]};
-  assign cout = cin; //faking it
-  
-  endmodule
+  assign cout = sum_higher_16[17];
+endmodule
 

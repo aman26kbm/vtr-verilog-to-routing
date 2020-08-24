@@ -1288,7 +1288,7 @@
 
         <!-- Fixed point mac mode (result = a*b +/- accumulated value-->
         <mode name="mac_fixed_pt_mode">
-          <pb_type name="mac_fixed_pt" blif_model=".subckt mac_int" num_pb="1">
+          <pb_type name="mac_fixed_pt" blif_model=".subckt mac_int" num_pb="2">
             <input name="reset" num_pins="1"/>
             <input name="a" num_pins="18"/>
             <input name="b" num_pins="19"/>
@@ -1310,14 +1310,16 @@
             <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_fixed_pt.out" clock="clk"/>
           </pb_type>
           <interconnect>
-            <direct name="reset" input="dsp_pb.reset" output="mac_fixed_pt.reset"/>
-            <direct name="clk" input="dsp_pb.clk" output="mac_fixed_pt.clk"/>
-            <direct name="atoa" input="dsp_pb.datain[17:0]" output="mac_fixed_pt.a">
-            </direct>
-            <direct name="btob" input="dsp_pb.datain[36:18]" output="mac_fixed_pt.b">
-            </direct>
-            <direct name="sumouttosumout" input="mac_fixed_pt.out" output="dsp_pb.resulta[37:0]">
-            </direct>
+            <direct name="reset0" input="dsp_pb.reset" output="mac_fixed_pt[0].reset"/>
+            <direct name="reset1" input="dsp_pb.reset" output="mac_fixed_pt[1].reset"/>
+            <direct name="clk0" input="dsp_pb.clk" output="mac_fixed_pt[0].clk"/>
+            <direct name="clk1" input="dsp_pb.clk" output="mac_fixed_pt[1].clk"/>
+            <direct name="atoa0" input="dsp_pb.datain[17:0]" output="mac_fixed_pt[0].a"/>
+            <direct name="btob0" input="dsp_pb.datain[36:18]" output="mac_fixed_pt[0].b"/>
+            <direct name="atoa1" input="dsp_pb.datain[54:37]" output="mac_fixed_pt[1].a"/>
+            <direct name="btob1" input="dsp_pb.datain[73:55]" output="mac_fixed_pt[1].b"/>
+            <direct name="sumouttosumout0" input="mac_fixed_pt[0].out" output="dsp_pb.resulta[37:0]"/>
+            <direct name="sumouttosumout1" input="mac_fixed_pt[1].out" output="dsp_pb.chainout[37:0]"/>
           </interconnect>
         </mode>
 
