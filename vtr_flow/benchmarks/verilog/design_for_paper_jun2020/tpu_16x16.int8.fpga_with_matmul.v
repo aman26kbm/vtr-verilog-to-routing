@@ -388,7 +388,7 @@ module matmul_16x16_systolic_composed_from_8x8(
   wire done_mat_mul_1_0;
   wire done_mat_mul_1_1;
 
-  assign done_mat_mul = done_mat_mul_0_0;
+  assign done_mat_mul = done_mat_mul_0_0 || done_mat_mul_0_1 || done_mat_mul_1_0 || done_mat_mul_1_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_0_1_NC;
     
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_1_1_NC;
@@ -409,15 +409,23 @@ module matmul_16x16_systolic_composed_from_8x8(
   wire [`AWIDTH-1:0] c_addr_0_0_NC;
   wire c_data_0_0_available_NC;
 
+  wire [15:0] a_addr_0_0_temp;
+  wire [15:0] b_addr_0_0_temp;
+  wire [15:0] c_addr_0_0_temp;
+
+  assign a_addr_0_0    = a_addr_0_0_temp[`AWIDTH-1:0];
+  assign b_addr_0_0    = b_addr_0_0_temp[`AWIDTH-1:0];
+  assign c_addr_0_0_NC = c_addr_0_0_temp[`AWIDTH-1:0];
+
 matmul_int8 u_matmul_8x8_systolic_0_0(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
   .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_0_0),
-  .address_mat_a(address_mat_a),
-  .address_mat_b(address_mat_b),
-  .address_mat_c(address_mat_c),
+  .address_mat_a({6'b0,address_mat_a}),
+  .address_mat_b({6'b0,address_mat_b}),
+  .address_mat_c({6'b0,address_mat_c}),
   .address_stride_a(address_stride_a),
   .address_stride_b(address_stride_b),
   .address_stride_c(address_stride_c),
@@ -426,13 +434,13 @@ matmul_int8 u_matmul_8x8_systolic_0_0(
   .a_data_in(a_data_in_0_0_NC),
   .b_data_in(b_data_in_0_0_NC),
   .c_data_in(c_data_in_0_0_NC),
-  .c_data_out(c_data_0_0_to_0_1_NC),
-  .c_data_out_dir_int(c_data_0_0_to_0_1),
+  .c_data_out(c_data_0_0_to_0_1),
+  .c_data_out_dir_int(c_data_0_0_to_0_1_NC),
   .a_data_out(a_data_0_0_to_0_1),
   .b_data_out(b_data_0_0_to_1_0),
-  .a_addr(a_addr_0_0),
-  .b_addr(b_addr_0_0),
-  .c_addr(c_addr_0_0_NC),
+  .a_addr(a_addr_0_0_temp),
+  .b_addr(b_addr_0_0_temp),
+  .c_addr(c_addr_0_0_temp),
   .c_data_available(c_data_0_0_available_NC),
 
   .validity_mask_a_rows(validity_mask_a_rows),
@@ -459,15 +467,23 @@ matmul_int8 u_matmul_8x8_systolic_0_0(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_1_NC;
   assign b_data_in_0_1_NC = 0;
 
+  wire [15:0] a_addr_0_1_temp;
+  wire [15:0] b_addr_0_1_temp;
+  wire [15:0] c_addr_0_1_temp;
+
+  assign a_addr_0_1_NC = a_addr_0_1_temp[`AWIDTH-1:0];
+  assign b_addr_0_1    = b_addr_0_1_temp[`AWIDTH-1:0];
+  assign c_addr_0_1    = c_addr_0_1_temp[`AWIDTH-1:0];
+
 matmul_int8 u_matmul_8x8_systolic_0_1(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
   .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_0_1),
-  .address_mat_a(address_mat_a),
-  .address_mat_b(address_mat_b),
-  .address_mat_c(address_mat_c),
+  .address_mat_a({6'b0,address_mat_a}),
+  .address_mat_b({6'b0,address_mat_b}),
+  .address_mat_c({6'b0,address_mat_c}),
   .address_stride_a(address_stride_a),
   .address_stride_b(address_stride_b),
   .address_stride_c(address_stride_c),
@@ -480,9 +496,9 @@ matmul_int8 u_matmul_8x8_systolic_0_1(
   .c_data_out_dir_int(c_data_0_1_NC),
   .a_data_out(a_data_0_1_to_0_2),
   .b_data_out(b_data_0_1_to_1_1),
-  .a_addr(a_addr_0_1_NC),
-  .b_addr(b_addr_0_1),
-  .c_addr(c_addr_0_1),
+  .a_addr(a_addr_0_1_temp),
+  .b_addr(b_addr_0_1_temp),
+  .c_addr(c_addr_0_1_temp),
   .c_data_available(c_data_0_1_available),
 
   .validity_mask_a_rows(validity_mask_a_rows),
@@ -515,15 +531,23 @@ matmul_int8 u_matmul_8x8_systolic_0_1(
   wire [`AWIDTH-1:0] c_addr_1_0_NC;
   wire c_data_1_0_available_NC;
 
+  wire [15:0] a_addr_1_0_temp;
+  wire [15:0] b_addr_1_0_temp;
+  wire [15:0] c_addr_1_0_temp;
+
+  assign a_addr_1_0    = a_addr_1_0_temp[`AWIDTH-1:0];
+  assign b_addr_1_0_NC = b_addr_1_0_temp[`AWIDTH-1:0];
+  assign c_addr_1_0_NC = c_addr_1_0_temp[`AWIDTH-1:0];
+
 matmul_int8 u_matmul_8x8_systolic_1_0(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
   .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_1_0),
-  .address_mat_a(address_mat_a),
-  .address_mat_b(address_mat_b),
-  .address_mat_c(address_mat_c),
+  .address_mat_a({6'b0,address_mat_a}),
+  .address_mat_b({6'b0,address_mat_b}),
+  .address_mat_c({6'b0,address_mat_c}),
   .address_stride_a(address_stride_a),
   .address_stride_b(address_stride_b),
   .address_stride_c(address_stride_c),
@@ -532,13 +556,13 @@ matmul_int8 u_matmul_8x8_systolic_1_0(
   .a_data_in(a_data_in_1_0_NC),
   .b_data_in(b_data_0_0_to_1_0),
   .c_data_in(c_data_in_1_0_NC),
-  .c_data_out(c_data_1_0_to_1_1_NC),
-  .c_data_out_dir_int(c_data_1_0_to_1_1),
+  .c_data_out(c_data_1_0_to_1_1),
+  .c_data_out_dir_int(c_data_1_0_to_1_1_NC),
   .a_data_out(a_data_1_0_to_1_1),
   .b_data_out(b_data_1_0_to_2_0),
-  .a_addr(a_addr_1_0),
-  .b_addr(b_addr_1_0_NC),
-  .c_addr(c_addr_1_0_NC),
+  .a_addr(a_addr_1_0_temp),
+  .b_addr(b_addr_1_0_temp),
+  .c_addr(c_addr_1_0_temp),
   .c_data_available(c_data_1_0_available_NC),
 
   .validity_mask_a_rows(validity_mask_a_rows),
@@ -566,15 +590,26 @@ matmul_int8 u_matmul_8x8_systolic_1_0(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_1_NC;
   assign b_data_1_1_NC = 0;
 
+  wire [15:0] a_addr_1_1_temp;
+  wire [15:0] b_addr_1_1_temp;
+  wire [15:0] c_addr_1_1_temp;
+
+  assign a_addr_1_1_NC = a_addr_1_1_temp[`AWIDTH-1:0];
+  assign b_addr_1_1_NC = b_addr_1_1_temp[`AWIDTH-1:0];
+  assign c_addr_1_1    = c_addr_1_1_temp[`AWIDTH-1:0];
+
+  wire c_data_1_1_available_temp;
+  assign c_data_1_1_available = c_data_1_1_available_temp | (|a_data_1_1_to_1_2); //  | (|b_data_1_1_to_2_1); //Adding fake logic to avoid optimization by VTR
+
 matmul_int8 u_matmul_8x8_systolic_1_1(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
   .start_mat_mul(start_mat_mul),
   .done_mat_mul(done_mat_mul_1_1),
-  .address_mat_a(address_mat_a),
-  .address_mat_b(address_mat_b),
-  .address_mat_c(address_mat_c),
+  .address_mat_a({6'b0,address_mat_a}),
+  .address_mat_b({6'b0,address_mat_b}),
+  .address_mat_c({6'b0,address_mat_c}),
   .address_stride_a(address_stride_a),
   .address_stride_b(address_stride_b),
   .address_stride_c(address_stride_c),
@@ -587,10 +622,10 @@ matmul_int8 u_matmul_8x8_systolic_1_1(
   .c_data_out_dir_int(c_data_1_1_NC),
   .a_data_out(a_data_1_1_to_1_2),
   .b_data_out(b_data_1_1_to_2_1),
-  .a_addr(a_addr_1_1_NC),
-  .b_addr(b_addr_1_1_NC),
-  .c_addr(c_addr_1_1),
-  .c_data_available(c_data_1_1_available),
+  .a_addr(a_addr_1_1_temp),
+  .b_addr(b_addr_1_1_temp),
+  .c_addr(c_addr_1_1_temp),
+  .c_data_available(c_data_1_1_available_temp),
 
   .validity_mask_a_rows(validity_mask_a_rows),
   .validity_mask_a_cols_b_rows(validity_mask_a_cols_b_rows),
@@ -739,9 +774,8 @@ final_mat_mul_size,
     wire c_data_0_1_available;
     wire c_data_1_1_available;
 
-
-    assign a_addr = bram_addr_a_0_0;
-    assign b_addr = bram_addr_b_0_0;
+    assign a_addr = bram_addr_a_0_0 | bram_addr_a_1_0; //fake OR to avoid VTR optimization
+    assign b_addr = bram_addr_b_0_0 | bram_addr_b_0_1; //fake OR to avoid VTR optimization
 
 	reg [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_delayed_1;
 	reg [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_delayed_2;
@@ -814,8 +848,8 @@ final_mat_mul_size,
     end
 
 assign c_data_out = {bram_wdata_c_1_1, bram_wdata_c_0_1};
-assign c_data_available = c_data_0_1_available;
-assign c_addr = bram_addr_c_0_1;
+assign c_data_available = c_data_0_1_available | c_data_1_1_available; //fake ORing to prevent VTR optimization
+assign c_addr = bram_addr_c_0_1; // | bram_addr_c_1_1; //fake ORing to prevent VTR optimization
 
 matmul_16x16_systolic_composed_from_8x8 u_matmul_16x16_systolic (
   .clk(clk),
@@ -1159,8 +1193,8 @@ assign done_norm = (enable_norm) ? done_norm_internal : 1'b1;
 //loc = 3;
 //PA[loc -:4] = PA[loc+1 +:4];  // equivalent to PA[3:0] = PA[7:4];
 
-integer cycle_count;
-integer i;
+reg [31:0] cycle_count;
+reg [7:0] i;
 always @(posedge clk) begin
     if ((reset || ~enable_norm)) begin
         mean_applied_data <= 0;
@@ -1254,7 +1288,7 @@ input clk;
 `ifdef SIMULATION
 
 reg [7:0] ram[((1<<`AWIDTH)-1):0];
-integer i;
+reg [7:0] i;
 
 always @(posedge clk)  
 begin 
@@ -1452,8 +1486,9 @@ module pool(
 reg [`DESIGN_SIZE*`DWIDTH-1:0] out_data_temp;
 reg done_pool_temp;
 reg out_data_available_temp;
-integer i,j;
-integer cycle_count;
+reg [7:0] i;
+reg [7:0] j;
+reg [31:0] cycle_count;
 
 always @(posedge clk) begin
 	if (reset || ~enable_pool || ~in_data_available) begin
@@ -1526,8 +1561,8 @@ wire [`DESIGN_SIZE*`DWIDTH-1:0] out_data_internal;
 reg [`DESIGN_SIZE*`DWIDTH-1:0] slope_applied_data_internal;
 reg [`DESIGN_SIZE*`DWIDTH-1:0] intercept_applied_data_internal;
 reg [`DESIGN_SIZE*`DWIDTH-1:0] relu_applied_data_internal;
-integer i;
-integer cycle_count;
+reg [7:0] i;
+reg [31:0] cycle_count;
 reg activation_in_progress;
 
 reg [(`DESIGN_SIZE*4)-1:0] address;

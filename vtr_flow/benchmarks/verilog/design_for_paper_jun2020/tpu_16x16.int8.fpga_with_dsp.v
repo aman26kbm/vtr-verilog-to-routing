@@ -367,7 +367,8 @@ module matmul_16x16_systolic_composed_from_8x8(
   wire done_mat_mul_1_0;
   wire done_mat_mul_1_1;
 
-  assign done_mat_mul = done_mat_mul_0_0;  /////////////////////////////////////////////////
+  assign done_mat_mul = done_mat_mul_0_0 || done_mat_mul_0_1 || done_mat_mul_1_0 || done_mat_mul_1_1;
+  /////////////////////////////////////////////////
   // Matmul 0_0
   /////////////////////////////////////////////////
 
@@ -681,9 +682,8 @@ final_mat_mul_size,
     wire c_data_0_1_available;
     wire c_data_1_1_available;
 
-
-    assign a_addr = bram_addr_a_0_0;
-    assign b_addr = bram_addr_b_0_0;
+    assign a_addr = bram_addr_a_0_0 | bram_addr_a_1_0; //fake OR to avoid ODIN optimization
+    assign b_addr = bram_addr_b_0_0 | bram_addr_b_0_1; //fake OR to avoid ODIN optimization
 
 	reg [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_delayed_1;
 	reg [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_delayed_2;
@@ -756,8 +756,8 @@ final_mat_mul_size,
     end
 
 assign c_data_out = {bram_wdata_c_1_1, bram_wdata_c_0_1};
-assign c_data_available = c_data_0_1_available;
-assign c_addr = bram_addr_c_0_1;
+assign c_data_available = c_data_0_1_available | c_data_1_1_available; //fake ORing to prevent ODIN optimization
+assign c_addr = bram_addr_c_0_1 | bram_addr_c_1_1; //fake ORing to prevent ODIN optimization
 
 matmul_16x16_systolic_composed_from_8x8 u_matmul_16x16_systolic (
   .clk(clk),
@@ -1573,7 +1573,7 @@ assign row_latch_en =
 reg c_data_available;
 reg [`AWIDTH-1:0] c_addr;
 reg start_capturing_c_data;
-integer counter;
+reg [31:0] counter;
 reg [8*`DWIDTH-1:0] c_data_out;
 reg [8*`DWIDTH-1:0] c_data_out_1;
 reg [8*`DWIDTH-1:0] c_data_out_2;
@@ -2796,8 +2796,8 @@ assign done_norm = (enable_norm) ? done_norm_internal : 1'b1;
 //loc = 3;
 //PA[loc -:4] = PA[loc+1 +:4];  // equivalent to PA[3:0] = PA[7:4];
 
-integer cycle_count;
-integer i;
+reg [31:0] cycle_count;
+reg [7:0] i;
 always @(posedge clk) begin
     if ((reset || ~enable_norm)) begin
         mean_applied_data <= 0;
@@ -2891,7 +2891,7 @@ input clk;
 `ifdef SIMULATION
 
 reg [7:0] ram[((1<<`AWIDTH)-1):0];
-integer i;
+reg [7:0] i;
 
 always @(posedge clk)  
 begin 
@@ -3089,8 +3089,9 @@ module pool(
 reg [`DESIGN_SIZE*`DWIDTH-1:0] out_data_temp;
 reg done_pool_temp;
 reg out_data_available_temp;
-integer i,j;
-integer cycle_count;
+reg [7:0] i;
+reg [7:0] j;
+reg [31:0] cycle_count;
 
 always @(posedge clk) begin
 	if (reset || ~enable_pool || ~in_data_available) begin
@@ -3163,8 +3164,8 @@ wire [`DESIGN_SIZE*`DWIDTH-1:0] out_data_internal;
 reg [`DESIGN_SIZE*`DWIDTH-1:0] slope_applied_data_internal;
 reg [`DESIGN_SIZE*`DWIDTH-1:0] intercept_applied_data_internal;
 reg [`DESIGN_SIZE*`DWIDTH-1:0] relu_applied_data_internal;
-integer i;
-integer cycle_count;
+reg [7:0] i;
+reg [31:0] cycle_count;
 reg activation_in_progress;
 
 reg [(`DESIGN_SIZE*4)-1:0] address;

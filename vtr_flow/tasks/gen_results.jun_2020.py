@@ -4,6 +4,12 @@ import argparse
 import csv
 
 
+#area values from coffe, changed from um2 to mwtas
+routing_area_clb = (612+305) / 0.033864
+routing_area_dsp = (3060+1087) / 0.033864
+routing_area_matmul = (3672+1397) / 0.033864
+routing_area_memory = (979+290) / 0.033864
+
 # ###############################################################
 # Class for parsing VTR results for various experiments
 # ###############################################################
@@ -156,10 +162,10 @@ class GenResults():
             logic_area = logic_area_match.group(1)
             result_dict['logic_area'] = logic_area or "Not found"
 
-          routing_area_match = re.search(r'Total routing area: (.*), per logic tile', line)
-          if routing_area_match is not None:
-            routing_area = routing_area_match.group(1)
-            result_dict['routing_area'] = routing_area or "Not found"
+          #routing_area_match = re.search(r'Total routing area: (.*), per logic tile', line)
+          #if routing_area_match is not None:
+          #  routing_area = routing_area_match.group(1)
+          #  result_dict['routing_area'] = routing_area or "Not found"
 
           channel_width_match = re.search(r'Circuit successfully routed with a channel width factor of (.*)\.', line)
           if channel_width_match is not None:
@@ -194,27 +200,31 @@ class GenResults():
           resource_usage_clb_match = re.search(r'(\d+)\s+blocks of type: clb', line)
           if resource_usage_clb_match is not None and ("Netlist" in prev_line):
             resource_usage_clb = resource_usage_clb_match.group(1)
-            result_dict['resource_usage_clb'] = resource_usage_clb or "Not found"
+            result_dict['resource_usage_clb'] = int(resource_usage_clb) or 0
 
           resource_usage_dsp_match = re.search(r'(\d+)\s+blocks of type: dsp_top', line)
           if resource_usage_dsp_match is not None and ("Netlist" in prev_line):
             resource_usage_dsp = resource_usage_dsp_match.group(1)
-            result_dict['resource_usage_dsp'] = resource_usage_dsp or "Not found"
+            result_dict['resource_usage_dsp'] = int(resource_usage_dsp) or 0
 
           resource_usage_matmul_match = re.search(r'(\d+)\s+blocks of type: matmul_top', line)
           if resource_usage_matmul_match is not None and ("Netlist" in prev_line):
             resource_usage_matmul = resource_usage_matmul_match.group(1)
-            result_dict['resource_usage_matmul'] = resource_usage_matmul or "Not found"
+            result_dict['resource_usage_matmul'] = int(resource_usage_matmul) or 0
 
           resource_usage_memory_match = re.search(r'(\d+)\s+blocks of type: memory', line)
           if resource_usage_memory_match is not None and ("Netlist" in prev_line):
             resource_usage_memory = resource_usage_memory_match.group(1)
-            result_dict['resource_usage_memory'] = resource_usage_memory or "Not found"
+            result_dict['resource_usage_memory'] = int(resource_usage_memory) or 0
 
           prev_line = line 
           
         #calculated metrics
-        if 'logic_area' in result_dict and 'routing_area' in result_dict and 'critical_path' in result_dict:
+        if 'logic_area' in result_dict and 'critical_path' in result_dict and 'resource_usage_clb' in result_dict and 'resource_usage_dsp' in result_dict and 'resource_usage_matmul' in result_dict and 'resource_usage_memory' in result_dict:
+          result_dict['routing_area'] = (routing_area_clb * result_dict['resource_usage_clb']) +\
+                                        (routing_area_dsp * result_dict['resource_usage_dsp']) +\
+                                        (routing_area_matmul * result_dict['resource_usage_matmul']) +\
+                                        (routing_area_memory * result_dict['resource_usage_memory'])
           result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
           result_dict['area_delay_product'] = float(result_dict['total_area']) * float(result_dict['critical_path'])
 

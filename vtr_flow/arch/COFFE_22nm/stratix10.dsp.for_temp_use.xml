@@ -396,7 +396,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="dsp_top" height="5" width="1" area="259863">
+    <tile name="dsp_top" height="5" width="1" area="251033">
       <sub_tile name="dsp_top">
         <equivalent_sites>
           <site pb_type="dsp_top" pin_mapping="direct"/>
@@ -438,7 +438,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="memory" height="3" width="1" area="6880">
+    <tile name="memory" height="3" width="1" area="203047">
       <sub_tile name="memory">
         <equivalent_sites>
           <site pb_type="memory" pin_mapping="direct"/>
@@ -456,7 +456,7 @@
         <pinlocations pattern="perimeter"/>
       </sub_tile>
     </tile>
-    <tile name="matmul_top" height="6" width="1" area="365120">
+    <tile name="matmul_top" height="6" width="1" area="883740">
       <sub_tile name="matmul_top">
         <equivalent_sites>
           <site pb_type="matmul_top" pin_mapping="direct"/>
@@ -623,7 +623,7 @@
   </layout>
   <device>
     <sizing R_minW_nmos="13090" R_minW_pmos="19086.83"/>
-    <area grid_logic_tile_area="54394.04"/>
+    <area grid_logic_tile_area="54512"/>
     <chan_width_distr>
       <x distr="uniform" peak="1.000000"/>
       <y distr="uniform" peak="1.000000"/>
@@ -2724,22 +2724,38 @@
             <delay_constant max="929e-12" in_port="matmul_top.matmul_I2" out_port="matmul.matmul_I2"/> 
         </complete>
         -->
-        <direct name ="address_mat_a" input="matmul_top.matmul_I1[135:120]" output="matmul.matmul_I1[135:120]"/>
-        <direct name ="address_mat_b" input="matmul_top.matmul_I1[119:104]" output="matmul.matmul_I1[119:104]"/>
-        <direct name ="address_mat_c" input="matmul_top.matmul_I1[103:88]" output="matmul.matmul_I1[103:88]"/>
-        <direct name ="address_stride_a" input="matmul_top.matmul_I1[87:72]" output="matmul.matmul_I1[87:72]"/>
-        <direct name ="address_stride_b" input="matmul_top.matmul_I1[71:56]" output="matmul.matmul_I1[71:56]"/>
-        <direct name ="address_stride_c" input="matmul_top.matmul_I1[55:40]" output="matmul.matmul_I1[55:40]"/>
-        <direct name ="validity_mask_a" input="matmul_top.matmul_I1[39:32]" output="matmul.matmul_I1[39:32]"/>
-        <direct name ="validity_mask_ab" input="matmul_top.matmul_I1[31:24]" output="matmul.matmul_I1[31:24]"/>
-        <direct name ="validity_mask_b" input="matmul_top.matmul_I1[23:16]" output="matmul.matmul_I1[23:16]"/>
-        <direct name ="a_loc" input="matmul_top.matmul_I1[15:8]" output="matmul.matmul_I1[15:8]"/>
-        <direct name ="b_loc" input="matmul_top.matmul_I1[7:0]" output="matmul.matmul_I1[7:0]"/>
-        <direct name ="a_data" input="matmul_top.matmul_I2[137:74]" output="matmul.matmul_I2[137:74]"/>
-        <direct name ="b_data" input="matmul_top.matmul_I2[73:10]" output="matmul.matmul_I2[73:10]"/>
-        <direct name ="slice_dtype" input="matmul_top.matmul_I2[9]" output="matmul.matmul_I2[9]"/>
-        <direct name ="slice_mode" input="matmul_top.matmul_I2[8]" output="matmul.matmul_I2[8]"/>
-        <direct name ="final_mat_mul_size" input="matmul_top.matmul_I2[7:0]" output="matmul.matmul_I2[7:0]"/>
+        <direct name="address_mat_a" input="matmul_top.matmul_I1[135:120]" output="matmul.matmul_I1[135:120]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[135:120]" out_port="matmul.matmul_I1[135:120]"/></direct>
+        <direct name="address_mat_b" input="matmul_top.matmul_I1[119:104]" output="matmul.matmul_I1[119:104]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[119:104]" out_port="matmul.matmul_I1[119:104]"/></direct>
+        <direct name="address_mat_c" input="matmul_top.matmul_I1[103:88]" output="matmul.matmul_I1[103:88]">  
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[103:88]" out_port="matmul.matmul_I1[103:88]"/></direct>
+        <direct name="address_stride_a" input="matmul_top.matmul_I1[87:72]" output="matmul.matmul_I1[87:72]"> 
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[87:72]" out_port="matmul.matmul_I1[87:72]"/></direct>
+        <direct name="address_stride_b" input="matmul_top.matmul_I1[71:56]" output="matmul.matmul_I1[71:56]"> 
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[71:56]" out_port="matmul.matmul_I1[71:56]"/></direct>
+        <direct name="address_stride_c" input="matmul_top.matmul_I1[55:40]" output="matmul.matmul_I1[55:40]"> 
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[55:40]" out_port="matmul.matmul_I1[55:40]"/></direct>
+        <direct name="validity_mask_a" input="matmul_top.matmul_I1[39:32]" output="matmul.matmul_I1[39:32]">  
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[39:32]" out_port="matmul.matmul_I1[39:32]"/></direct>
+        <direct name="validity_mask_ab" input="matmul_top.matmul_I1[31:24]" output="matmul.matmul_I1[31:24]"> 
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[31:24]" out_port="matmul.matmul_I1[31:24]"/></direct>
+        <direct name="validity_mask_b" input="matmul_top.matmul_I1[23:16]" output="matmul.matmul_I1[23:16]">  
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[23:16]" out_port="matmul.matmul_I1[23:16]"/></direct>
+        <direct name="a_loc" input="matmul_top.matmul_I1[15:8]" output="matmul.matmul_I1[15:8]">              
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[15:8]" out_port="matmul.matmul_I1[15:8]"/></direct>
+        <direct name="b_loc" input="matmul_top.matmul_I1[7:0]" output="matmul.matmul_I1[7:0]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[7:0]" out_port="matmul.matmul_I1[7:0]"/></direct>
+        <direct name="a_data" input="matmul_top.matmul_I2[137:74]" output="matmul.matmul_I2[137:74]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[137:74]" out_port="matmul.matmul_I2[137:74]"/></direct>
+        <direct name="b_data" input="matmul_top.matmul_I2[73:10]" output="matmul.matmul_I2[73:10]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[73:10]" out_port="matmul.matmul_I2[73:10]"/></direct>
+        <direct name="slice_dtype" input="matmul_top.matmul_I2[9]" output="matmul.matmul_I2[9]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[9]" out_port="matmul.matmul_I2[9]"/></direct>
+        <direct name="slice_mode" input="matmul_top.matmul_I2[8]" output="matmul.matmul_I2[8]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[8]" out_port="matmul.matmul_I2[8]"/></direct>
+        <direct name="final_mat_mul_size" input="matmul_top.matmul_I2[7:0]" output="matmul.matmul_I2[7:0]">
+          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[7:0]" out_port="matmul.matmul_I2[7:0]"/></direct>
 
         <direct name="reset" input="matmul_top.reset" output="matmul.reset"></direct>
         <direct name="pe_reset" input="matmul_top.pe_reset" output="matmul.pe_reset"></direct>
