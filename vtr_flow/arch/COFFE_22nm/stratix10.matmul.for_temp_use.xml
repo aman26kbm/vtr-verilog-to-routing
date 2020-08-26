@@ -611,7 +611,7 @@
       <col type="clb"  startx="100"  starty="1"  priority="10"/>
       <col type="matmul_top" startx="101" starty="1" priority="50"/>
       <col type="memory"  startx="102"  starty="1"  priority="50"/>
-      <col type="clb"  startx="103"  starty="1"  priority="0"/>
+      <col type="clb"  startx="103"  starty="1"  priority="50"/>
       <col type="memory"  startx="104"  starty="1"  priority="5"/>
 
       <col type="clb"  startx="190"  starty="1"  priority="10"/>
