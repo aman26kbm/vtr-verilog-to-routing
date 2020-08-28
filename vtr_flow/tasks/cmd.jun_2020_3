@@ -1,0 +1,19 @@
+#-Please run the command under tasks directory
+#nohup cmd.jun_2020 &
+#!/bin/bash
+RANDOM=$$
+../scripts/run_vtr_task.pl arm_core_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl arm_core_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+../scripts/run_vtr_task.pl stereovision0_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated"  &
+../scripts/run_vtr_task.pl stereovision0_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated"  
+#
+../scripts/run_vtr_task.pl arm_core_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &  
+../scripts/run_vtr_task.pl arm_core_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+../scripts/run_vtr_task.pl stereovision0_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated"  &
+../scripts/run_vtr_task.pl stereovision0_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated"  
+#
+../scripts/run_vtr_task.pl arm_core_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &  
+../scripts/run_vtr_task.pl arm_core_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+../scripts/run_vtr_task.pl stereovision0_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated"  &
+../scripts/run_vtr_task.pl stereovision0_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated"  
+#

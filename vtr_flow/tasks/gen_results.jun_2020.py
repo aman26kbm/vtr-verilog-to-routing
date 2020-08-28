@@ -3,7 +3,6 @@ import re
 import argparse
 import csv
 
-
 #area values from coffe, changed from um2 to mwtas
 routing_area_clb = (612+305) / 0.033864
 routing_area_dsp = (3060+1087) / 0.033864
@@ -22,7 +21,8 @@ class GenResults():
     self.infile = ""
     self.outfile = ""
     self.result_list = []
-    self.metrics = ["dirname", \
+    self.metrics = ["exp",\
+                    "dirname", \
                     "file_found", \
                     "precision", \
                     "building_block", \
@@ -106,14 +106,25 @@ class GenResults():
 
       #extract experiment info from dirname
       #16x16_from_4x4.fp16.fpga_with_matmul
-      info = re.search(r'(\d*x\d*)_from_(\d*x\d*)\.(.*)\.fpga_with_(.*)', dirname)
-      if info is not None:
-        result_dict['design_size'] = info.group(1)
-        result_dict['building_block'] = info.group(2)
-        result_dict['precision'] = info.group(3)
-        result_dict['fpga_arch'] = info.group(4)
+      info1 = re.search(r'(\d*x\d*)_from_(\d*x\d*)\.(.*)\.fpga_with_(.*)', dirname)
+      info2 = re.search(r'(.*)_(dsp|matmul).*', dirname)
+      if info1 is not None:
+        result_dict['design_size'] = info1.group(1)
+        result_dict['building_block'] = info1.group(2)
+        result_dict['precision'] = info1.group(3)
+        result_dict["exp"] = result_dict["design_size"] + "_matmul_" + result_dict["precision"]
+      elif info2 is not None:
+        result_dict['design_size'] = ""
+        result_dict['building_block'] = ""
+        result_dict['precision'] = ""
+        result_dict['exp'] = info2.group(1)
       else:
         print("Unable to extract experiment info from " + dirname)
+
+      if re.search(r'matmul', dirname) is not None:
+        result_dict['fpga_arch'] = "matmul"
+      else:
+        result_dict['fpga_arch'] = "dsp"
 
       print("Extracting info for " + dirname)
       #try to find vpr.crit.path.out

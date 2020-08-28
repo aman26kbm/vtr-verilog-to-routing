@@ -1,15 +1,23 @@
 #-Please run the command under tasks directory
 #nohup cmd.jun_2020 &
-#Running each experiment 5 times
-../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_matmul -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_matmul -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" 
-../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_matmul -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_matmul -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" 
-../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_matmul -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_matmul -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" &
-../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed 123 --timing_report_npaths 1000 --timing_report_detail aggregated" 
+#!/bin/bash
+RANDOM=$$
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+#
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+#
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+#
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_matmul -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl 16x16_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed $RANDOM --timing_report_npaths 1000 --timing_report_detail aggregated" 
