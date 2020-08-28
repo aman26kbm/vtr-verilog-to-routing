@@ -81,7 +81,7 @@ class GenTaskDirs():
         print("Incorrect fpga arch {}".format(fpga_arch))
       
       #check it exists
-      arch_file_path = "../arch/COFFE_22nm/" + arch_file
+      arch_file_path = "../arch/COFFE_22nm/arch_for_paper_jun_2020/" + arch_file
       if not os.path.exists(arch_file_path):
         print("Arch file {} doesn't exist".format(arch_file_path))
         raise SystemExit(0)
@@ -131,7 +131,7 @@ class GenTaskDirs():
       print("")
       if not self.only_print:
         ret = os.system("mkdir -p " + config_dirname)
-        if ret==0:
+        if ret!=0:
           print("Directory " + config_dirname + " couldn't be created")
 
         try:
