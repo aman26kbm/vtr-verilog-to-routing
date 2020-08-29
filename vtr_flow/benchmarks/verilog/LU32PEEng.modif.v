@@ -5231,7 +5231,7 @@ module exponent(expa, expb, expsum, twoormore, tiny);
 	
 	wire [17:0] out21;
 	wire cout21;
-	adder_18bit u_add21(.a({8'b0, out20[9:0]}), .b({10'b0, 8'd`BIAS}), .cin(1'b0), .sumout(out21), .cout(cout21));
+	adder_18bit u_add21(.a({8'b0, out20[9:0]}), .b({10'b0, 8'd127}), .cin(1'b0), .sumout(out21), .cout(cout21));
 	
 	
   assign expsum = out21[9:0];
