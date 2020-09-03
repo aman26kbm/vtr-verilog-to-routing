@@ -19,25 +19,27 @@ module diffeq_paj_convert (Xinport, Yinport, Uinport, Aport, DXport, Xoutport, Y
       wire[31:0] temp; 
       reg looping; 
  
-//assign temp = u_var * DXport;
-wire [63:0] out_temp;
-multiplier_32bit u_mult1(.a(u_var), .b(DXport), .out(out_temp));
-assign temp = out_temp[31:0];
+assign temp = u_var * DXport;
+//wire [63:0] out_temp;
+//multiplier_32bit u_mult1(.a(u_var), .b(DXport), .out(out_temp));
+//assign temp = out_temp[31:0];
 
 //u_var <= (u_var - (temp * 3 * x_var)) - (DXport * 3 * y_var); 
-wire [63:0] out1;
-wire [31:0] const1;
-assign const = 32'd3;
-multiplier_32bit u_mult2(.a(temp), .b(const), .out(out1));
+//wire [63:0] out1;
+//wire [31:0] const1;
+//assign const = 32'd3;
+//multiplier_32bit u_mult2(.a(temp), .b(const), .out(out1));
 wire [63:0] out2;
-multiplier_32bit u_mult3(.a(out1[31:0]), .b(x_var), .out(out2));
+//multiplier_32bit u_mult3(.a(out1[31:0]), .b(x_var), .out(out2));
+assign out2 = temp * 3 * x_var;
 wire [31:0] out5;
 assign out5 = ~out2[31:0] + 1;
 
-wire [63:0] out3;
-multiplier_32bit u_mult4(.a(DXport), .b(const), .out(out3));
+//wire [63:0] out3;
+//multiplier_32bit u_mult4(.a(DXport), .b(const), .out(out3));
 wire [63:0] out4;
-multiplier_32bit u_mult5(.a(out3[31:0]), .b(y_var), .out(out4));
+//multiplier_32bit u_mult5(.a(out3[31:0]), .b(y_var), .out(out4));
+assign out4 = DXport * 3 * y_var;
 wire [31:0] out6;
 assign out6 = ~out4[31:0] + 1;
 
@@ -47,6 +49,13 @@ wire [31:0] out7;
 wire [31:0] out8;
 adder_32bit u_add1(.a(u_var), .b(out5), .cin(1'b0), .sumout(out7), .cout(cout0));
 adder_32bit u_add2(.a(out7), .b(out6), .cin(cout0), .sumout(out8), .cout(cout1));
+
+wire[31:0] out9;
+wire[31:0] out10;
+wire cout2;
+wire cout3;
+adder_32bit u_add3(.a(y_var), .b(temp), .cin(1'b0), .sumout(out9), .cout(cout2));
+adder_32bit u_add4(.a(x_var), .b(DXport), .cin(1'b0), .sumout(out10), .cout(cout3));
 
     always @(posedge clk)
     begin
@@ -69,8 +78,10 @@ adder_32bit u_add2(.a(out7), .b(out6), .cin(cout0), .sumout(out8), .cout(cout1))
           begin
              //u_var <= (u_var - (temp * 3 * x_var)) - (DXport * 3 * y_var); 
              u_var <= out8;
-             y_var <= y_var + temp; 
-             x_var <= x_var + DXport; 
+             //y_var <= y_var + temp; 
+             y_var <= out9;
+             //x_var <= x_var + DXport; 
+             x_var <= out10;
 			looping <= looping;
           end
           else
@@ -92,24 +103,47 @@ module adder_32bit(
    output cout
 );
   
-   wire cout0;
-   wire cout1;
-   wire cout2;
+  // There are two options
+  /*
+  // One is to use adder_int. These are available inside the matmul (individual PE mode).
+  // They provide a 16 bit addition mode. But there are no carry bits. So, that need to be handled correctly.
+  wire [15:0] sum_lower_16;
+  wire [15:0] sum_higher_16;
+  adder_int u_add1(.a(a[15:0]),  .b(b[15:0]),  .out(sum_lower_16));
+  adder_int u_add2(.a(a[31:16]), .b(b[31:16]), .out(sum_higher_16));
+  assign sumout = {sum_higher_16, sum_lower_16};
+  assign cout = cin; //faking it
+  */
+  // Option two is to use mult_add_sum. They are available inside the DSP slice.
+  // bx (18) * by (19) + ax (18) * ay (19)
+  // Again, we need to handle the carry bits.
+  wire [37:0] sum_lower_16;
+  wire [37:0] sum_higher_16;
+  wire [37:0] chainout_1;
+  wire [37:0] chainout_2;
+  mult_add_sum_int u1 (.ax(19'b0), .ay({2'b0, a[15:0]}),  .bx(19'b0), .by({2'b0, b[15:0]}), .chainin({37'b0, cin}), .resulta(sum_lower_16) , .chainout(chainout_1), .mode_sigs(11'b0));
+  mult_add_sum_int u2 (.ax(19'b0), .ay({2'b0, a[31:16]}), .bx(19'b0), .by({2'b0, b[31:16]}),.chainin(chainout_1),   .resulta(sum_higher_16), .chainout(chainout_2), .mode_sigs(11'b0));
+  assign sumout = {sum_higher_16[15:0], sum_lower_16[15:0]};
+  assign cout = sum_higher_16[16];
 
-   wire [7:0] sumout0;
-   wire [7:0] sumout1;
-   wire [7:0] sumout2;
-   wire [7:0] sumout3;
-
-   // These adders are 8 bit + 8 bit -> 8 bits
-   dsp_adder u_add0(.a(a[7:0]),   .b(b[7:0]),   .cin(cin),   .sumout(sumout0),  .cout(cout0));
-   dsp_adder u_add1(.a(a[15:8]),  .b(b[15:8]),  .cin(cout0), .sumout(sumout1),  .cout(cout1));
-   dsp_adder u_add2(.a(a[23:16]), .b(b[23:16]), .cin(cout1), .sumout(sumout2), .cout(cout2));
-   dsp_adder u_add3(.a(a[31:24]), .b(b[31:24]), .cin(cout2), .sumout(sumout3), .cout(cout));
-   assign sumout = {sumout3, sumout2, sumout1, sumout0};
+//   wire cout0;
+//   wire cout1;
+//   wire cout2;
+//
+//   wire [7:0] sumout0;
+//   wire [7:0] sumout1;
+//   wire [7:0] sumout2;
+//   wire [7:0] sumout3;
+//
+//   // These adders are 8 bit + 8 bit -> 8 bits
+//   dsp_adder u_add0(.a(a[7:0]),   .b(b[7:0]),   .cin(cin),   .sumout(sumout0),  .cout(cout0));
+//   dsp_adder u_add1(.a(a[15:8]),  .b(b[15:8]),  .cin(cout0), .sumout(sumout1),  .cout(cout1));
+//   dsp_adder u_add2(.a(a[23:16]), .b(b[23:16]), .cin(cout1), .sumout(sumout2), .cout(cout2));
+//   dsp_adder u_add3(.a(a[31:24]), .b(b[31:24]), .cin(cout2), .sumout(sumout3), .cout(cout));
+//   assign sumout = {sumout3, sumout2, sumout1, sumout0};
 
 endmodule
-
+/*
 module adder_64bit(
    input [63:0] a,
    input [63:0] b,
@@ -128,6 +162,7 @@ module adder_64bit(
    assign sumout = {sumout1, sumout0};
 
 endmodule
+
 
 module adder4_64bit(
    input [63:0] a,
@@ -148,9 +183,8 @@ module adder4_64bit(
    adder_64bit u_add2(.a(ab),  .b(cd),  .cin(1'b0),   .sumout(sumout), .cout(cout2));
 
 endmodule
-
-
-
+*/
+/*
 module multiplier_32bit(
    input [31:0] a,
    input [31:0] b,
@@ -207,6 +241,7 @@ module multiplier_32bit(
    adder4_64bit u_add5(.a(sum0), .b(sum1), .c(sum2), .d(sum3), .sumout(out));
 
 endmodule   
+*/
 /*
 module dsp_adder(
     input [7:0] a,

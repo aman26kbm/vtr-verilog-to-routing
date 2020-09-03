@@ -107,7 +107,7 @@ class GenResults():
       #extract experiment info from dirname
       #16x16_from_4x4.fp16.fpga_with_matmul
       info1 = re.search(r'(\d*x\d*)_from_(\d*x\d*)\.(.*)\.fpga_with_(.*)', dirname)
-      info2 = re.search(r'agilex\.(.*).fpga_with_(dsp|matmul).*', dirname)
+      info2 = re.search(r'(.*)_(dsp|matmul).*', dirname)
       if info1 is not None:
         result_dict['design_size'] = info1.group(1)
         result_dict['building_block'] = info1.group(2)
@@ -121,11 +121,10 @@ class GenResults():
       else:
         print("Unable to extract experiment info from " + dirname)
 
-      info = re.search(r'fpga_with_(.*)', dirname)
-      if info is not None:
-        result_dict['fpga_arch'] = info.group(1)
+      if re.search(r'matmul', dirname) is not None:
+        result_dict['fpga_arch'] = "matmul"
       else:
-        print("Unable to extract fpga arch from " + dirname)
+        result_dict['fpga_arch'] = "dsp"
 
       print("Extracting info for " + dirname)
       #try to find vpr.crit.path.out
