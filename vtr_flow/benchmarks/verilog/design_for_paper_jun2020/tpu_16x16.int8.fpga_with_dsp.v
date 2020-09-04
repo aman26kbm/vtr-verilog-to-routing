@@ -2780,8 +2780,8 @@ reg done_norm_internal;
 reg norm_in_progress;
 
 //Muxing logic to handle the case when this block is disabled
-assign out_data_available = (enable_norm) ? out_data_available_internal : in_data_available;
-assign out_data = (enable_norm) ? out_data_internal : inp_data;
+assign out_data_available = (enable_norm) ? out_data_available_internal : in_data_available_flopped;
+assign out_data = (enable_norm) ? out_data_internal : inp_data_flopped;
 assign done_norm = (enable_norm) ? done_norm_internal : 1'b1;
 
 //inp_data will have multiple elements in it. the number of elements is the same as size of the matmul.
@@ -2796,6 +2796,9 @@ assign done_norm = (enable_norm) ? done_norm_internal : 1'b1;
 //loc = 3;
 //PA[loc -:4] = PA[loc+1 +:4];  // equivalent to PA[3:0] = PA[7:4];
 
+reg in_data_available_flopped;
+reg [`DESIGN_SIZE*`DWIDTH-1:0] inp_data_flopped;
+
 reg [31:0] cycle_count;
 reg [7:0] i;
 always @(posedge clk) begin
@@ -2806,6 +2809,8 @@ always @(posedge clk) begin
         cycle_count <= 0;
         done_norm_internal <= 0;
         norm_in_progress <= 0;
+        in_data_available_flopped <= in_data_available;
+        inp_data_flopped <= inp_data;
     end else if (in_data_available || norm_in_progress) begin
         cycle_count = cycle_count + 1;
         //Let's apply mean and variance as the input data comes in.
@@ -3086,6 +3091,9 @@ module pool(
     input reset
 );
 
+reg in_data_available_flopped;
+reg [`DESIGN_SIZE*`DWIDTH-1:0] inp_data_flopped;
+
 reg [`DESIGN_SIZE*`DWIDTH-1:0] out_data_temp;
 reg done_pool_temp;
 reg out_data_available_temp;
@@ -3099,6 +3107,8 @@ always @(posedge clk) begin
 		done_pool_temp <= 0;
 		out_data_available_temp <= 0;
 		cycle_count <= 0;
+    in_data_available_flopped <= in_data_available;
+    inp_data_flopped <= inp_data;
 	end
 
 	else if (in_data_available) begin
@@ -3128,8 +3138,8 @@ always @(posedge clk) begin
 	end
 end
 
-assign out_data = enable_pool ? out_data_temp : inp_data; 
-assign out_data_available = enable_pool ? out_data_available_temp : in_data_available;
+assign out_data = enable_pool ? out_data_temp : inp_data_flopped; 
+assign out_data_available = enable_pool ? out_data_available_temp : in_data_available_flopped;
 assign done_pool = enable_pool ? done_pool_temp : 1'b1;
 
 //Adding a dummy signal to use validity_mask input, to make ODIN happy
@@ -3170,13 +3180,27 @@ reg activation_in_progress;
 
 reg [(`DESIGN_SIZE*4)-1:0] address;
 reg [(`DESIGN_SIZE*8)-1:0] data_slope;
+reg [(`DESIGN_SIZE*8)-1:0] data_slope_flopped;
 reg [(`DESIGN_SIZE*8)-1:0] data_intercept;
 reg [(`DESIGN_SIZE*8)-1:0] data_intercept_delayed;
 
+reg in_data_available_flopped;
+reg [`DESIGN_SIZE*`DWIDTH-1:0] inp_data_flopped;
+
+always @(posedge clk) begin
+  if (reset) begin
+    inp_data_flopped <= 0;
+    data_slope_flopped <= 0;
+  end else begin
+    inp_data_flopped <= inp_data;
+    data_slope_flopped <= data_slope;
+  end
+end
+
 // If the activation block is not enabled, just forward the input data
-assign out_data             = enable_activation ? out_data_internal : inp_data;
+assign out_data             = enable_activation ? out_data_internal : inp_data_flopped;
 assign done_activation      = enable_activation ? done_activation_internal : 1'b1;
-assign out_data_available   = enable_activation ? out_data_available_internal : in_data_available;
+assign out_data_available   = enable_activation ? out_data_available_internal : in_data_available_flopped;
 
 always @(posedge clk) begin
    if (reset || ~enable_activation) begin
@@ -3188,12 +3212,13 @@ always @(posedge clk) begin
       out_data_available_internal <= 0;
       cycle_count                 <= 0;
       activation_in_progress      <= 0;
+      in_data_available_flopped <= in_data_available;
    end else if(in_data_available || activation_in_progress) begin
       cycle_count = cycle_count + 1;
 
       for (i = 0; i < `DESIGN_SIZE; i=i+1) begin
          if(activation_type==1'b1) begin // tanH
-            slope_applied_data_internal[i*`DWIDTH +:`DWIDTH] <= data_slope[i*8 +: 8] * inp_data[i*`DWIDTH +:`DWIDTH];
+            slope_applied_data_internal[i*`DWIDTH +:`DWIDTH] <= data_slope_flopped[i*8 +: 8] * inp_data_flopped[i*`DWIDTH +:`DWIDTH];
             data_intercept_delayed[i*8 +: 8] <= data_intercept[i*8 +: 8];
             intercept_applied_data_internal[i*`DWIDTH +:`DWIDTH] <= slope_applied_data_internal[i*`DWIDTH +:`DWIDTH] + data_intercept_delayed[i*8 +: 8];
          end else begin // ReLU
@@ -3684,7 +3709,7 @@ always @(posedge clk) begin
   if (reset) begin
     if (enable_conv_mode) begin
       bram_wdata_a <= 0;
-      bram_addr_a_for_writing <= address_mat_c - (out_img_height*out_img_width);
+      bram_addr_a_for_writing <= address_mat_c;// - (out_img_height*out_img_width);
       bram_a_wdata_available <= 0;
     end
     else begin
@@ -3696,7 +3721,7 @@ always @(posedge clk) begin
   else if (activation_out_data_available) begin
     if (enable_conv_mode) begin
       bram_wdata_a <= activation_data_out;
-      bram_addr_a_for_writing <= bram_addr_a_for_writing + (out_img_height*out_img_width);
+      bram_addr_a_for_writing <= bram_addr_a_for_writing;// + (out_img_height*out_img_width);
       bram_a_wdata_available <= activation_out_data_available;
     end
     else begin
@@ -3708,7 +3733,7 @@ always @(posedge clk) begin
   else begin
     if (enable_conv_mode) begin
       bram_wdata_a <= 0;
-      bram_addr_a_for_writing <= address_mat_c - (out_img_height*out_img_width);
+      bram_addr_a_for_writing <= address_mat_c;// - (out_img_height*out_img_width);
       bram_a_wdata_available <= 0;
     end
     else begin
