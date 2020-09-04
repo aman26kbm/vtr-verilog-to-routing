@@ -17,7 +17,7 @@ class GenCommands():
     self.reruns = 3
     self.outfile = ''
     self.cmd_template = '../scripts/run_vtr_task.pl <dir> -s "--const_gen_inference comb --seed <seed> --timing_report_npaths 1000 --timing_report_detail aggregated"'
-    self.num_proc = 6
+    self.num_proc = 5
     
     #method calls in order
     self.parse_args()

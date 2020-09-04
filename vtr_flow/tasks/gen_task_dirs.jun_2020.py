@@ -94,6 +94,11 @@ class GenTaskDirs():
           design_file = "tpu_16x16.int8.fpga_with_dsp.v"
         elif "matmul" in fpga_arch:
           design_file = "tpu_16x16.int8.fpga_with_matmul.v"
+      elif "eltwise" in dirname:
+        if "dsp" in fpga_arch:
+          design_file = "eltwise_add.bb_def.v"
+        elif "matmul" in fpga_arch:
+          design_file = "eltwise_add.v"
       elif info1 is not None:
         design_size = info1.group(1)
         building_block = info1.group(2)
