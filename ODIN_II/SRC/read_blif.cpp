@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include "odin_globals.h"
 #include "odin_util.h"
+#include "ast_util.h"
 #include "read_blif.h"
 #include "string_cache.h"
 
@@ -564,10 +565,9 @@ void create_hard_block_nodes(hard_block_models* models, FILE* file, Hashtable* o
     }
 
     // Create a fake ast node.
-    new_node->related_ast_node = (ast_node_t*)vtr::calloc(1, sizeof(ast_node_t));
+    new_node->related_ast_node = create_node_w_type(HARD_BLOCK, my_location);
     new_node->related_ast_node->children = (ast_node_t**)vtr::calloc(1, sizeof(ast_node_t*));
-    new_node->related_ast_node->children[0] = (ast_node_t*)vtr::calloc(1, sizeof(ast_node_t));
-    new_node->related_ast_node->children[0]->types.identifier = vtr::strdup(subcircuit_name);
+    new_node->related_ast_node->identifier_node = create_tree_node_id(vtr::strdup(subcircuit_name), my_location);
 
     /*add this node to blif_netlist as an internal node */
     blif_netlist->internal_nodes = (nnode_t**)vtr::realloc(blif_netlist->internal_nodes, sizeof(nnode_t*) * (blif_netlist->num_internal_nodes + 1));
@@ -685,12 +685,13 @@ void create_internal_node_and_driver(FILE* file, Hashtable* output_nets_hash) {
 
         add_output_pin_to_node(new_node, new_pin, 0);
 
-        nnet_t* new_net = allocate_nnet();
-        new_net->name = new_node->name;
-
-        add_driver_pin_to_net(new_net, new_pin);
-
-        output_nets_hash->add(new_node->name, new_net);
+        nnet_t* out_net = (nnet_t*)output_nets_hash->get(names[input_count - 1]);
+        if (out_net == nullptr) {
+            out_net = allocate_nnet();
+            out_net->name = new_node->name;
+            output_nets_hash->add(new_node->name, out_net);
+        }
+        add_driver_pin_to_net(out_net, new_pin);
     }
     /* Free the char** names */
     for (int i = 0; i < input_count; i++)
@@ -999,7 +1000,7 @@ static void build_top_input_node(const char* name_str, Hashtable* output_nets_ha
 
 void add_top_input_nodes(FILE* file, Hashtable* output_nets_hash) {
     /**
-     * insert a global clock for fall back. 
+     * insert a global clock for fall back.
      * in case of undriven internal clocks, they will attach to the global clock
      * this also fix the issue of constant verilog (no input)
      * that cannot simulate due to empty input vector
@@ -1062,8 +1063,9 @@ void rb_create_top_output_nodes(FILE* file) {
 void rb_look_for_clocks() {
     int i;
     for (i = 0; i < blif_netlist->num_ff_nodes; i++) {
-        if (blif_netlist->ff_nodes[i]->input_pins[1]->net->driver_pin->node->type != CLOCK_NODE) {
-            blif_netlist->ff_nodes[i]->input_pins[1]->net->driver_pin->node->type = CLOCK_NODE;
+        oassert(blif_netlist->ff_nodes[i]->input_pins[1]->net->num_driver_pins == 1);
+        if (blif_netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->type != CLOCK_NODE) {
+            blif_netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->type = CLOCK_NODE;
         }
     }
 }

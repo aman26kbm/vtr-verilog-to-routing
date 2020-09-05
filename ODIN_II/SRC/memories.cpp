@@ -1220,26 +1220,26 @@ void pad_memory_input_port(nnode_t* node, netlist_t* netlist, t_model* model, co
 bool is_sp_ram(nnode_t* node) {
     oassert(node != NULL);
     oassert(node->type == MEMORY);
-    return !strcmp(node->related_ast_node->children[0]->types.identifier, SINGLE_PORT_RAM_string);
+    return !strcmp(node->related_ast_node->identifier_node->types.identifier, SINGLE_PORT_RAM_string);
 }
 
 bool is_dp_ram(nnode_t* node) {
     oassert(node != NULL);
     oassert(node->type == MEMORY);
-    return !strcmp(node->related_ast_node->children[0]->types.identifier, DUAL_PORT_RAM_string);
+    return !strcmp(node->related_ast_node->identifier_node->types.identifier, DUAL_PORT_RAM_string);
 }
 
 bool is_ast_sp_ram(ast_node_t* node) {
     bool is_ram;
-    ast_node_t* instance = node->children[1];
-    is_ram = (!strcmp(node->children[0]->types.identifier, SINGLE_PORT_RAM_string))
-             && (instance->children[1]->num_children == 5);
+    ast_node_t* instance = node->children[0];
+    is_ram = (!strcmp(node->identifier_node->types.identifier, SINGLE_PORT_RAM_string))
+             && (instance->children[0]->num_children == 5);
 
-    ast_node_t* connect_list = instance->children[1];
-    if (is_ram && connect_list->children[0]->children[0]) {
+    ast_node_t* connect_list = instance->children[0];
+    if (is_ram && connect_list->children[0]->identifier_node) {
         /* port connections were passed by name; verify port names */
         for (int i = 0; i < connect_list->num_children && is_ram; i++) {
-            char* id = connect_list->children[i]->children[0]->types.identifier;
+            char* id = connect_list->children[i]->identifier_node->types.identifier;
 
             if ((strcmp(id, "we") != 0) && (strcmp(id, "clk") != 0) && (strcmp(id, "addr") != 0) && (strcmp(id, "data") != 0) && (strcmp(id, "out") != 0)) {
                 is_ram = false;
@@ -1253,15 +1253,15 @@ bool is_ast_sp_ram(ast_node_t* node) {
 
 bool is_ast_dp_ram(ast_node_t* node) {
     bool is_ram;
-    ast_node_t* instance = node->children[1];
-    is_ram = (!strcmp(node->children[0]->types.identifier, DUAL_PORT_RAM_string))
-             && (instance->children[1]->num_children == 9);
+    ast_node_t* instance = node->children[0];
+    is_ram = (!strcmp(node->identifier_node->types.identifier, DUAL_PORT_RAM_string))
+             && (instance->children[0]->num_children == 9);
 
-    ast_node_t* connect_list = instance->children[1];
-    if (is_ram && connect_list->children[0]->children[0]) {
+    ast_node_t* connect_list = instance->children[0];
+    if (is_ram && connect_list->children[0]->identifier_node) {
         /* port connections were passed by name; verify port names */
         for (int i = 0; i < connect_list->num_children && is_ram; i++) {
-            char* id = connect_list->children[i]->children[0]->types.identifier;
+            char* id = connect_list->children[i]->identifier_node->types.identifier;
 
             if ((strcmp(id, "clk") != 0) && (strcmp(id, "we1") != 0) && (strcmp(id, "we2") != 0) && (strcmp(id, "addr1") != 0) && (strcmp(id, "addr2") != 0) && (strcmp(id, "data1") != 0) && (strcmp(id, "data2") != 0) && (strcmp(id, "out1") != 0) && (strcmp(id, "out2") != 0)) {
                 is_ram = false;
@@ -1431,7 +1431,7 @@ void instantiate_soft_single_port_ram(nnode_t* node, short mark, netlist_t* netl
         npin_t* address_pin = decoder->pins[i];
         /* Check that the input pin is driven */
         oassert(
-            address_pin->net->driver_pin != NULL
+            address_pin->net->num_driver_pins
             || address_pin->net == verilog_netlist->zero_net
             || address_pin->net == verilog_netlist->one_net
             || address_pin->net == verilog_netlist->pad_net);
@@ -1459,7 +1459,7 @@ void instantiate_soft_single_port_ram(nnode_t* node, short mark, netlist_t* netl
             npin_t* address_pin = decoder->pins[j];
             /* Check that the input pin is driven */
             oassert(
-                address_pin->net->driver_pin != NULL
+                address_pin->net->num_driver_pins
                 || address_pin->net == verilog_netlist->zero_net
                 || address_pin->net == verilog_netlist->one_net
                 || address_pin->net == verilog_netlist->pad_net);
@@ -1544,12 +1544,12 @@ void instantiate_soft_dual_port_ram(nnode_t* node, short mark, netlist_t* netlis
         npin_t* addr2_pin = decoder2->pins[i];
 
         oassert(
-            addr1_pin->net->driver_pin != NULL
+            addr1_pin->net->num_driver_pins
             || addr1_pin->net == verilog_netlist->zero_net
             || addr1_pin->net == verilog_netlist->one_net
             || addr1_pin->net == verilog_netlist->pad_net);
         oassert(
-            addr2_pin->net->driver_pin != NULL
+            addr2_pin->net->num_driver_pins
             || addr2_pin->net == verilog_netlist->zero_net
             || addr2_pin->net == verilog_netlist->one_net
             || addr2_pin->net == verilog_netlist->pad_net);
@@ -1597,12 +1597,12 @@ void instantiate_soft_dual_port_ram(nnode_t* node, short mark, netlist_t* netlis
             npin_t* addr2_pin = decoder2->pins[j];
 
             oassert(
-                addr1_pin->net->driver_pin != NULL
+                addr1_pin->net->num_driver_pins
                 || addr1_pin->net == verilog_netlist->zero_net
                 || addr1_pin->net == verilog_netlist->one_net
                 || addr1_pin->net == verilog_netlist->pad_net);
             oassert(
-                addr2_pin->net->driver_pin != NULL
+                addr2_pin->net->num_driver_pins
                 || addr2_pin->net == verilog_netlist->zero_net
                 || addr2_pin->net == verilog_netlist->one_net
                 || addr2_pin->net == verilog_netlist->pad_net);
@@ -1698,7 +1698,7 @@ signal_list_t* create_decoder(nnode_t* node, short mark, signal_list_t* input_li
     // Create NOT gates for all inputs and put the outputs in their own signal list.
     signal_list_t* not_gates = init_signal_list();
     for (long i = 0; i < num_inputs; i++) {
-        if (input_list->pins[i]->net->driver_pin == NULL
+        if (!input_list->pins[i]->net->num_driver_pins
             && input_list->pins[i]->net != verilog_netlist->zero_net
             && input_list->pins[i]->net != verilog_netlist->one_net
             && input_list->pins[i]->net != verilog_netlist->pad_net) {

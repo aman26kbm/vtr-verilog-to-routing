@@ -352,6 +352,9 @@ static void SetupRouterOpts(const t_options& Options, t_router_opts* RouterOpts)
     RouterOpts->fixed_channel_width = Options.RouteChanWidth;
     RouterOpts->min_channel_width_hint = Options.min_route_chan_width_hint;
     RouterOpts->read_rr_edge_metadata = Options.read_rr_edge_metadata;
+    RouterOpts->reorder_rr_graph_nodes_algorithm = Options.reorder_rr_graph_nodes_algorithm;
+    RouterOpts->reorder_rr_graph_nodes_threshold = Options.reorder_rr_graph_nodes_threshold;
+    RouterOpts->reorder_rr_graph_nodes_seed = Options.reorder_rr_graph_nodes_seed;
 
     //TODO document these?
     RouterOpts->trim_empty_channels = false; /* DEFAULT */
@@ -373,6 +376,7 @@ static void SetupRouterOpts(const t_options& Options, t_router_opts* RouterOpts)
     RouterOpts->clock_modeling = Options.clock_modeling;
     RouterOpts->two_stage_clock_routing = Options.two_stage_clock_routing;
     RouterOpts->high_fanout_threshold = Options.router_high_fanout_threshold;
+    RouterOpts->high_fanout_max_slope = Options.router_high_fanout_max_slope;
     RouterOpts->router_debug_net = Options.router_debug_net;
     RouterOpts->router_debug_sink_rr = Options.router_debug_sink_rr;
     RouterOpts->router_debug_iteration = Options.router_debug_iteration;

@@ -141,6 +141,10 @@ struct global_args_t {
     argparse::ArgValue<int> sim_random_seed;
 
     argparse::ArgValue<bool> interactive_simulation;
+
+    // Arguments for mixing hard and soft logic
+    argparse::ArgValue<int> exact_mults;
+    argparse::ArgValue<float> mults_ratio;
 };
 
 /**
@@ -421,6 +425,7 @@ struct ast_node_t {
     ids type;
     typ types;
 
+    ast_node_t* identifier_node;
     ast_node_t** children;
     long num_children;
 
@@ -492,6 +497,12 @@ struct nnode_t {
     edge_type_e edge_type; //
     bool covered = false;
 
+    // For mixing soft and hard logic optimizations
+    // a field that is used for storing weights towards the
+    // mixing optimization.
+    //  value of -1 is reserved for hardened blocks
+    long weight = 0;
+
     //Generic gate output
     unsigned char generic_output; //describes the output (1 or 0) of generic blocks
 };
@@ -524,7 +535,8 @@ struct nnet_t {
     char* name; // name for the net
     short combined;
 
-    npin_t* driver_pin; // the pin that drives the net
+    int num_driver_pins;
+    npin_t** driver_pins; // the pin that drives the net
 
     npin_t** fanout_pins; // the pins pointed to by the net
     int num_fanout_pins;  // the list size of pins

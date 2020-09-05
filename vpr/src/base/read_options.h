@@ -150,6 +150,9 @@ struct t_options {
     argparse::ArgValue<e_check_route_option> check_route;
     argparse::ArgValue<size_t> max_logged_overused_rr_nodes;
     argparse::ArgValue<bool> generate_rr_node_overuse_report;
+    argparse::ArgValue<e_rr_node_reorder_algorithm> reorder_rr_graph_nodes_algorithm;
+    argparse::ArgValue<int> reorder_rr_graph_nodes_threshold;
+    argparse::ArgValue<int> reorder_rr_graph_nodes_seed;
 
     /* Timing-driven router options only */
     argparse::ArgValue<float> astar_fac;
@@ -163,6 +166,7 @@ struct t_options {
     argparse::ArgValue<float> congested_routing_iteration_threshold_frac;
     argparse::ArgValue<e_route_bb_update> route_bb_update;
     argparse::ArgValue<int> router_high_fanout_threshold;
+    argparse::ArgValue<float> router_high_fanout_max_slope;
     argparse::ArgValue<int> router_debug_net;
     argparse::ArgValue<int> router_debug_sink_rr;
     argparse::ArgValue<int> router_debug_iteration;
