@@ -3,13 +3,13 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog/design_for_paper_jun2020/
+circuits_dir=benchmarks/verilog/
 
 # Path to directory of architectures to use
 archs_dir=arch/COFFE_22nm/arch_for_paper_jun_2020/
 
 # Add circuits to list to sweep
-circuit_list_add=LU32PEEng.modif.v
+circuit_list_add=LU32PEEng.v
 
 # Add architectures to list to sweep
 arch_list_add=agilex.matmul.6pct.for_temp_use.xml

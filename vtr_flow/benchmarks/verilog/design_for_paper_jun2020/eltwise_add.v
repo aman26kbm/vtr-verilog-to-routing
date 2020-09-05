@@ -2,7 +2,7 @@
 
 `timescale 1ns/1ns
 `define DWIDTH 8
-`define AWIDTH 16
+`define AWIDTH 10
 `define MEM_SIZE 2048
 
 `define MAT_MUL_SIZE 8
@@ -456,7 +456,7 @@ assign pe_reset = ~pe_resetn;
   wire [`AWIDTH-1:0] b_addr_0_0;
   wire [`AWIDTH-1:0] c_addr_0_0;
 
-matmul_slice u_matmul_4x4_systolic_0_0(
+matmul_int8 u_matmul_4x4_systolic_0_0(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),

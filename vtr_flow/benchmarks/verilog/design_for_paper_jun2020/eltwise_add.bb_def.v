@@ -2,7 +2,7 @@
 
 `timescale 1ns/1ns
 `define DWIDTH 8
-`define AWIDTH 16
+`define AWIDTH 10
 `define MEM_SIZE 2048
 
 `define MAT_MUL_SIZE 8
@@ -25,7 +25,7 @@
 `define REG_MATRIX_C_STRIDE_ADDR 32'h36
 
 `define BB_DWIDTH 8
-`define BB_AWIDTH 16
+`define BB_AWIDTH 10
 `define BB_MAT_MUL_SIZE 8
 `define BB_MASK_WIDTH 8
 `define BB_LOG2_MAT_MUL_SIZE 3
@@ -456,7 +456,9 @@ assign pe_reset = ~pe_resetn;
   assign bram_en_b_0_1 = 1'b1;
   assign bram_we_b_0_1 = {`MASK_WIDTH{1'b0}};
 
-  	
+  wire [3:0] flags_NC1;
+  wire [3:0] flags_NC0;
+
   /////////////////////////////////////////////////
   // ORing all done signals
   /////////////////////////////////////////////////
@@ -498,7 +500,7 @@ matmul_slice u_matmul_4x4_systolic_0_0(
   .c_data_out(bram_wdata_c_0_0),
   .a_data_out(a_data_out_0_0_NC),
   .b_data_out(b_data_out_0_0_NC),
-  .flags(),
+  .flags(flags_NC0),
   .a_addr(bram_addr_a_0_0),
   .b_addr(bram_addr_b_0_0),
   .c_addr(bram_addr_c_0_0),
@@ -549,7 +551,7 @@ matmul_slice u_matmul_4x4_systolic_0_1(
   .c_data_out(bram_wdata_c_0_1),
   .a_data_out(a_data_out_0_1_NC),
   .b_data_out(b_data_out_0_1_NC),
-  .flags(),
+  .flags(flags_NC1),
   .a_addr(bram_addr_a_0_1),
   .b_addr(bram_addr_b_0_1),
   .c_addr(bram_addr_c_0_1),
@@ -564,7 +566,7 @@ matmul_slice u_matmul_4x4_systolic_0_1(
   .preload(1'b0),
   .final_mat_mul_size(8'd8),
   .a_loc(8'd0),
-  .b_loc(8'd1)
+  .b_loc(8'd0)
 );
 
 endmodule
@@ -722,6 +724,15 @@ module matmul_slice(
  input [7:0] a_loc;
  input [7:0] b_loc;
 
+wire slice_dtype_NC;
+wire slice_mode_NC;
+wire [1:0] op_NC;
+wire preload_NC;
+
+assign slice_dtype_NC = slice_dtype;
+assign slice_mode_NC = slice_mode;
+assign op_NC = op;
+assign preload_NC = preload;
 
 //////////////////////////////////////////////////////////////////////////
 // Logic for clock counting and when to assert done

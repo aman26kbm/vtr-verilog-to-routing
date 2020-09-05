@@ -86,6 +86,7 @@ class GenTaskDirs():
         print("Arch file {} doesn't exist".format(arch_file_path))
         raise SystemExit(0)
       
+      design_dir="benchmarks/verilog/design_for_paper_jun2020/"
       #extract benchmark info from dirname
       info1 = re.search(r'(\d*x\d*)_from_(\d*x\d*)\.(.*)\.fpga_with(.*)', dirname)
       info2 = re.search(r'agilex\.(.*).fpga_with_(dsp|matmul).*', dirname)
@@ -109,19 +110,20 @@ class GenTaskDirs():
         if "matmul" in arch:
           design_file = "{}_from_{}.{}.with_ram.gen.for_combined_matmul.v".format(design_size, building_block, precision) 
       elif info2 is not None:
-        design_file = "{}.modif.v".format(info2.group(1))
+        design_file = "{}.v".format(info2.group(1))
+        #overwrite design_dir for existing VTR benchmarks
+        design_dir = "benchmarks/verilog/"
       else:
         print("Unable to extract benchmark info from " + dirname)
         raise SystemExit(0)
 
+      arch_dir = ""
+
       #check it exists
-      design_file_path = "../benchmarks/verilog/design_for_paper_jun2020/" + design_file
+      design_file_path = "../" + design_dir + "/" + design_file
       if not os.path.exists(design_file_path):
         print("Design file {} doesn't exist".format(design_file_path))
         raise SystemExit(0)
-    
-      arch_dir = ""
-      design_dir = ""
 
       #create the config file by replacing tags in the template
       config_filename = dirname + "/config/config.txt"
@@ -129,7 +131,7 @@ class GenTaskDirs():
      
       print("config_filename: ", config_filename)
       print("config_dirname: ", config_dirname)
-      #print("design_dir: ", design_dir)
+      print("design_dir: ", design_dir)
       #print("arch_dir: ", arch_dir)
       print("design_file: ", design_file)
       print("arch_file: ", arch_file)
