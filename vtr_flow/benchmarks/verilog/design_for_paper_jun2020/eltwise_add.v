@@ -434,7 +434,9 @@ assign pe_reset = ~pe_resetn;
   assign bram_en_b_0_1 = 1'b1;
   assign bram_we_b_0_1 = {`MASK_WIDTH{1'b0}};
 
-  	
+  wire [3:0] flags_NC1;
+  wire [3:0] flags_NC0;
+
   /////////////////////////////////////////////////
   // ORing all done signals
   /////////////////////////////////////////////////
@@ -476,7 +478,7 @@ matmul_int8 u_matmul_4x4_systolic_0_0(
   .c_data_out(bram_wdata_c_0_0),
   .a_data_out(a_data_out_0_0_NC),
   .b_data_out(b_data_out_0_0_NC),
-  .flags(),
+  .flags(flags_NC0),
   .a_addr(bram_addr_a_0_0),
   .b_addr(bram_addr_b_0_0),
   .c_addr(bram_addr_c_0_0),
@@ -507,7 +509,7 @@ matmul_int8 u_matmul_4x4_systolic_0_0(
   wire [`AWIDTH-1:0] b_addr_0_1;
   wire [`AWIDTH-1:0] c_addr_0_1;
 
-matmul_slice u_matmul_4x4_systolic_0_1(
+matmul_int8 u_matmul_4x4_systolic_0_1(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -527,7 +529,7 @@ matmul_slice u_matmul_4x4_systolic_0_1(
   .c_data_out(bram_wdata_c_0_1),
   .a_data_out(a_data_out_0_1_NC),
   .b_data_out(b_data_out_0_1_NC),
-  .flags(),
+  .flags(flags_NC1),
   .a_addr(bram_addr_a_0_1),
   .b_addr(bram_addr_b_0_1),
   .c_addr(bram_addr_c_0_1),
@@ -542,7 +544,7 @@ matmul_slice u_matmul_4x4_systolic_0_1(
   .preload(1'b0),
   .final_mat_mul_size(8'd8),
   .a_loc(8'd0),
-  .b_loc(8'd1)
+  .b_loc(8'd0)
 );
 
 endmodule
