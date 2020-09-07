@@ -372,7 +372,7 @@
         </pinlocations>
       </sub_tile>
     </tile>
-    <tile name="clb" height="1" width="1" area="27433">
+    <tile name="clb" height="1" width="1" area="27905">
       <sub_tile name="clb">
         <equivalent_sites>
           <site pb_type="clb" pin_mapping="direct"/>
@@ -402,7 +402,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="dsp_top" height="5" width="1" area="251033">
+    <tile name="dsp_top" height="5" width="1" area="253809">
       <sub_tile name="dsp_top">
         <equivalent_sites>
           <site pb_type="dsp_top" pin_mapping="direct"/>
@@ -444,7 +444,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="memory" height="3" width="1" area="203047">
+    <tile name="memory" height="3" width="1" area="204346">
       <sub_tile name="memory">
         <equivalent_sites>
           <site pb_type="memory" pin_mapping="direct"/>
@@ -462,7 +462,7 @@
         <pinlocations pattern="perimeter"/>
       </sub_tile>
     </tile>
-    <tile name="matmul_top" height="6" width="1" area="883740">
+    <tile name="matmul_top" height="6" width="1" area="1055073">
       <sub_tile name="matmul_top">
         <equivalent_sites>
           <site pb_type="matmul_top" pin_mapping="direct"/>
@@ -579,39 +579,63 @@
     <!--
     <auto_layout aspect_ratio="1.0">
     -->
-    <fixed_layout name="mylayout" width="178" height="62">
+    <fixed_layout name="mylayout" width="160" height="82">
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
       <perimeter type="io" priority="101"/>
       <corners type="EMPTY" priority="102"/>
 
       <col type="clb"  startx="1"  starty="1"  priority="100"/>
-      <col type="clb"  startx="2"  starty="1"  priority="100"/>
-      <col type="dsp_top"  startx="3"  starty="1"  priority="100"/>
-      <col type="clb"  startx="4"  starty="1"  priority="100"/>
+      <col type="dsp_top"  startx="2"  starty="1"  priority="100"/>
+      <col type="clb"  startx="3"  starty="1"  priority="100"/>
+      <col type="dsp_top"  startx="4"  starty="1"  priority="100"/>
       <col type="clb"  startx="5"  starty="1"  priority="100"/>
-      <col type="clb"  startx="6"  starty="1"  priority="100"/>
+      <col type="dsp_top"  startx="6"  starty="1"  priority="100"/>
+      <col type="clb"  startx="7"  starty="1"  priority="100"/>
+      <col type="dsp_top"  startx="8"  starty="1"  priority="100"/>
+      <col type="clb"  startx="9"  starty="1"  priority="100"/>
+      <col type="dsp_top"  startx="10"  starty="1"  priority="100"/>
+      <col type="clb"  startx="11"  starty="1"  priority="100"/>
 
-      <region type="clb" startx="7"   endx="86"   starty="1" incrx="4"  priority="20"/>
-      <region type="clb" startx="8"   endx="86"   starty="1" incrx="4"  priority="20"/>
-      <region type="dsp_top" startx="9"   endx="86"   starty="1" incrx="4"  priority="20"/>
-      <region type="memory" startx="10"   endx="86"   starty="1" incrx="4"  priority="20"/>
+      <region type="clb" startx="12"   endx="71"   starty="1" incrx="5"  priority="20"/>
+      <region type="clb" startx="13"   endx="71"   starty="1" incrx="5"  priority="20"/>
+      <region type="clb" startx="14"   endx="71"   starty="1" incrx="5"  priority="20"/>
+      <region type="dsp_top" startx="15"   endx="71"   starty="1" incrx="5"  priority="20"/>
+      <region type="memory" startx="16"   endx="71"   starty="1" incrx="5"  priority="20"/>
 
-      <col type="matmul_top"  startx="87"  starty="1"  priority="100"/>
-      <col type="clb"  startx="88"  starty="1"  priority="100"/>
-      <col type="clb"  startx="89"  starty="1"  priority="100"/>
-      <col type="matmul_top"  startx="90"  starty="1"  priority="100"/>
+      <col type="matmul_top"  startx="72"  starty="1"  priority="20"/>
+      <col type="clb"  startx="73"  starty="1"  priority="1"/>
+      <col type="clb"  startx="74"  starty="1"  priority="1"/>
+      <col type="matmul_top"  startx="75"  starty="1"  priority="20"/>
+      <col type="clb"  startx="76"  starty="1"  priority="1"/>
+      <col type="clb"  startx="77"  starty="1"  priority="1"/>
+      <col type="matmul_top"  startx="78"  starty="1"  priority="20"/>
+      <col type="clb"  startx="79"  starty="1"  priority="1"/>
+      <col type="clb"  startx="80"  starty="1"  priority="1"/>
+      <col type="matmul_top"  startx="81"  starty="1"  priority="20"/>
+      <col type="clb"  startx="82"  starty="1"  priority="1"/>
+      <col type="clb"  startx="83"  starty="1"  priority="1"/>
+      <col type="matmul_top"  startx="84"  starty="1"  priority="20"/>
+      <col type="clb"  startx="85"  starty="1"  priority="1"/>
+      <col type="clb"  startx="86"  starty="1"  priority="1"/>
+      <col type="matmul_top"  startx="87"  starty="1"  priority="20"/>
 
-      <region type="memory" startx="91"   endx="170"   starty="1" incrx="4"  priority="20"/>
-      <region type="dsp_top" startx="92"   endx="170"   starty="1" incrx="4"  priority="20"/>
-      <region type="clb" startx="93"   endx="170"   starty="1" incrx="4"  priority="20"/>
-      <region type="clb" startx="94"   endx="170"   starty="1" incrx="4"  priority="20"/>
+      <region type="memory" startx="88"   endx="147"   starty="1" incrx="5"  priority="20"/>
+      <region type="dsp_top" startx="89"   endx="147"   starty="1" incrx="5"  priority="20"/>
+      <region type="clb" startx="90"   endx="147"   starty="1" incrx="5"  priority="20"/>
+      <region type="clb" startx="91"   endx="147"   starty="1" incrx="5"  priority="20"/>
+      <region type="clb" startx="92"   endx="147"   starty="1" incrx="5"  priority="20"/>
 
-      <col type="clb"  startx="171"  starty="1"  priority="1"/>
-      <col type="clb"  startx="172"  starty="1"  priority="1"/>
-      <col type="clb"  startx="173"  starty="1"  priority="1"/>
-      <col type="dsp_top"  startx="174"  starty="1"  priority="20"/>
-      <col type="clb"  startx="175"  starty="1"  priority="1"/>
-      <col type="clb"  startx="176"  starty="1"  priority="1"/>
+      <col type="clb"  startx="148"  starty="1"  priority="20"/>
+      <col type="dsp_top"  startx="149"  starty="1"  priority="1"/>
+      <col type="clb"  startx="150"  starty="1"  priority="20"/>
+      <col type="dsp_top"  startx="151"  starty="1"  priority="1"/>
+      <col type="clb"  startx="152"  starty="1"  priority="20"/>
+      <col type="dsp_top"  startx="153"  starty="1"  priority="1"/>
+      <col type="clb"  startx="154"  starty="1"  priority="20"/>
+      <col type="dsp_top"  startx="155"  starty="1"  priority="1"/>
+      <col type="clb"  startx="156"  starty="1"  priority="20"/>
+      <col type="dsp_top"  startx="157"  starty="1"  priority="1"/>
+      <col type="clb"  startx="158"  starty="1"  priority="20"/>
 
     <!--
     </auto_layout>
@@ -620,7 +644,7 @@
   </layout>
   <device>
     <sizing R_minW_nmos="13090" R_minW_pmos="19086.83"/>
-    <area grid_logic_tile_area="54512"/>
+    <area grid_logic_tile_area="57228"/>
     <chan_width_distr>
       <x distr="uniform" peak="1.000000"/>
       <y distr="uniform" peak="1.000000"/>
@@ -985,36 +1009,36 @@
         <interconnect>
           <!-- 50% sparsely populated local routing -->
           <complete name="lutA" input="lab.I4 lab.I3" output="fle[9:0].in[0:0]">
-            <delay_constant max="8.571e-11" in_port="lab.I4" out_port="fle.in[0:0]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I3" out_port="fle.in[0:0]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I4" out_port="fle.in[0:0]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I3" out_port="fle.in[0:0]"/>
           </complete>
           <complete name="lutB" input="lab.I3 lab.I2" output="fle[9:0].in[1:1]">
-            <delay_constant max="8.571e-11" in_port="lab.I3" out_port="fle.in[1:1]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I2" out_port="fle.in[1:1]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I3" out_port="fle.in[1:1]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I2" out_port="fle.in[1:1]"/>
           </complete>
           <complete name="lutC" input="lab.I2 lab.I1" output="fle[9:0].in[2:2]">
-            <delay_constant max="8.571e-11" in_port="lab.I2" out_port="fle.in[2:2]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I1" out_port="fle.in[2:2]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I2" out_port="fle.in[2:2]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I1" out_port="fle.in[2:2]"/>
           </complete>
           <complete name="lutD" input="lab.I4 lab.I2" output="fle[9:0].in[3:3]">
-            <delay_constant max="8.571e-11" in_port="lab.I4" out_port="fle.in[3:3]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I2" out_port="fle.in[3:3]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I4" out_port="fle.in[3:3]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I2" out_port="fle.in[3:3]"/>
           </complete>
           <complete name="lutE" input="lab.I3 lab.I1" output="fle[9:0].in[4:4]">
-            <delay_constant max="8.571e-11" in_port="lab.I3" out_port="fle.in[4:4]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I1" out_port="fle.in[4:4]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I3" out_port="fle.in[4:4]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I1" out_port="fle.in[4:4]"/>
           </complete>
           <complete name="lutF" input="lab.I4 lab.I1" output="fle[9:0].in[5:5]">
-            <delay_constant max="8.571e-11" in_port="lab.I4" out_port="fle.in[5:5]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I1" out_port="fle.in[5:5]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I4" out_port="fle.in[5:5]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I1" out_port="fle.in[5:5]"/>
           </complete>
           <complete name="lutG" input="lab.I4 lab.I3" output="fle[9:0].in[6:6]">
-            <delay_constant max="8.571e-11" in_port="lab.I4" out_port="fle.in[6:6]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I3" out_port="fle.in[6:6]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I4" out_port="fle.in[6:6]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I3" out_port="fle.in[6:6]"/>
           </complete>
           <complete name="lutH" input="lab.I3 lab.I2" output="fle[9:0].in[7:7]">
-            <delay_constant max="8.571e-11" in_port="lab.I3" out_port="fle.in[7:7]"/>
-            <delay_constant max="8.571e-11" in_port="lab.I2" out_port="fle.in[7:7]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I3" out_port="fle.in[7:7]"/>
+            <delay_constant max="74.71e-12" in_port="lab.I2" out_port="fle.in[7:7]"/>
           </complete>
           <complete name="clks" input="lab.clk" output="fle[9:0].clk"/>
           <!-- This way of specifying direct connection to clb outputs is important because this architecture uses automatic spreading of opins.  
@@ -1101,8 +1125,8 @@
               <input name="a" num_pins="18"/>
               <input name="b" num_pins="19"/>
               <output name="out" num_pins="37"/>
-              <delay_constant max="2.16e-9" in_port="mult_18x19.a" out_port="mult_18x19.out"/>
-              <delay_constant max="2.16e-9" in_port="mult_18x19.b" out_port="mult_18x19.out"/>
+              <delay_constant max="2.15e-9" in_port="mult_18x19.a" out_port="mult_18x19.out"/>
+              <delay_constant max="2.15e-9" in_port="mult_18x19.b" out_port="mult_18x19.out"/>
             </pb_type>
             <interconnect>
               <direct name="a2a" input="two_mult_18x19.a" output="mult_18x19.a">
@@ -1144,8 +1168,8 @@
               <input name="a" num_pins="27"/>
               <input name="b" num_pins="27"/>
               <output name="out" num_pins="54"/>
-              <delay_constant max="2.16e-9" in_port="mult_27x27.a" out_port="mult_27x27.out"/>
-              <delay_constant max="2.16e-9" in_port="mult_27x27.b" out_port="mult_27x27.out"/>
+              <delay_constant max="2.15e-9" in_port="mult_27x27.a" out_port="mult_27x27.out"/>
+              <delay_constant max="2.15e-9" in_port="mult_27x27.b" out_port="mult_27x27.out"/>
             </pb_type>
             <interconnect>
               <direct name="a2a" input="one_mult_27x27.a" output="mult_27x27.a">
@@ -1183,19 +1207,19 @@
             <output name="resulta" num_pins="38"/>
             <output name="chainout" num_pins="38"/>
 
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.mode_sigs" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.resulta"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.mode_sigs" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.resulta"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.resulta"/>
 
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.mode_sigs" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.chainout"/>
-            <delay_constant max="2.16e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.mode_sigs" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.ax" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.ay" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.bx" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.by" out_port="mult_add_sum.chainout"/>
+            <delay_constant max="2.15e-9" in_port="mult_add_sum.chainin" out_port="mult_add_sum.chainout"/>
           </pb_type>
           <interconnect>
             <direct name="modesigs" input="dsp_pb.mode_sigs" output="mult_add_sum.mode_sigs">
@@ -1249,27 +1273,27 @@
             <output name="resulta" num_pins="64"/>
             <output name="chainout" num_pins="64"/>
 
-            <delay_constant max="2.16e-9" in_port="sop_4.mode_sigs" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.ax" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.ay" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.bx" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.by" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.cx" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.cy" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.dx" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.dy" out_port="sop_4.resulta"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.chainin" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.mode_sigs" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.ax" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.ay" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.bx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.by" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.cx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.cy" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.dx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.dy" out_port="sop_4.resulta"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.chainin" out_port="sop_4.resulta"/>
 
-            <delay_constant max="2.16e-9" in_port="sop_4.mode_sigs" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.ax" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.ay" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.bx" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.by" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.cx" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.cy" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.dx" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.dy" out_port="sop_4.chainout"/>
-            <delay_constant max="2.16e-9" in_port="sop_4.chainin" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.mode_sigs" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.ax" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.ay" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.bx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.by" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.cx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.cy" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.dx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.dy" out_port="sop_4.chainout"/>
+            <delay_constant max="2.15e-9" in_port="sop_4.chainin" out_port="sop_4.chainout"/>
           </pb_type>
           <interconnect>
             <direct name="mode_sigs" input="dsp_pb.mode_sigs" output="sop_4.mode_sigs">
@@ -1308,9 +1332,9 @@
             <output name="out" num_pins="38"/>
             <clock name="clk" num_pins="1"/>
 
-            <delay_constant max="2.16e-9" in_port="mac_fixed_pt.a" out_port="mac_fixed_pt.out"/>
-            <delay_constant max="2.16e-9" in_port="mac_fixed_pt.b" out_port="mac_fixed_pt.out"/>
-            <delay_constant max="2.16e-9" in_port="mac_fixed_pt.reset" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="2.15e-9" in_port="mac_fixed_pt.a" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="2.15e-9" in_port="mac_fixed_pt.b" out_port="mac_fixed_pt.out"/>
+            <delay_constant max="2.15e-9" in_port="mac_fixed_pt.reset" out_port="mac_fixed_pt.out"/>
 
             <T_setup value="18.91e-12" port="mac_fixed_pt.reset" clock="clk"/>
             <T_setup value="18.91e-12" port="mac_fixed_pt.a" clock="clk"/>
@@ -1343,8 +1367,8 @@
             <input name="b" num_pins="32"/>
             <output name="out" num_pins="32"/>
 
-            <delay_constant max="2.29e-9" in_port="mult_fp32.a" out_port="mult_fp32.out"/>
-            <delay_constant max="2.29e-9" in_port="mult_fp32.b" out_port="mult_fp32.out"/>
+            <delay_constant max="2.37e-9" in_port="mult_fp32.a" out_port="mult_fp32.out"/>
+            <delay_constant max="2.37e-9" in_port="mult_fp32.b" out_port="mult_fp32.out"/>
           </pb_type>
           <interconnect>
             <direct name="a2a" input="dsp_pb.datain[31:0]" output="mult_fp32.a">
@@ -1363,8 +1387,8 @@
             <input name="b" num_pins="32"/>
             <output name="out" num_pins="32"/>
 
-            <delay_constant max="2.29e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
-            <delay_constant max="2.29e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
+            <delay_constant max="2.37e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
+            <delay_constant max="2.37e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
           </pb_type>
           <interconnect>
             <direct name="atoa" input="dsp_pb.datain[31:0]" output="adder_pb.a">
@@ -1385,9 +1409,9 @@
             <output name="out" num_pins="32"/>
             <clock name="clk" num_pins="1"/>
 
-            <delay_constant max="2.29e-9" in_port="mac_fp32.a" out_port="mac_fp32.out"/>
-            <delay_constant max="2.29e-9" in_port="mac_fp32.b" out_port="mac_fp32.out"/>
-            <delay_constant max="2.29e-9" in_port="mac_fp32.reset" out_port="mac_fp32.out"/>
+            <delay_constant max="2.37e-9" in_port="mac_fp32.a" out_port="mac_fp32.out"/>
+            <delay_constant max="2.37e-9" in_port="mac_fp32.b" out_port="mac_fp32.out"/>
+            <delay_constant max="2.37e-9" in_port="mac_fp32.reset" out_port="mac_fp32.out"/>
 
             <T_setup value="18.91e-12" port="mac_fp32.reset" clock="clk"/>
             <T_setup value="18.91e-12" port="mac_fp32.a" clock="clk"/>
@@ -1424,21 +1448,21 @@
             <output name="result" num_pins="32"/>
             <output name="chainout" num_pins="32"/>
 
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.mode_sigs" out_port="fp16_sum_of_2_mult.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.top_a" out_port="fp16_sum_of_2_mult.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.top_b" out_port="fp16_sum_of_2_mult.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.bot_a" out_port="fp16_sum_of_2_mult.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.bot_b" out_port="fp16_sum_of_2_mult.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.chainin" out_port="fp16_sum_of_2_mult.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.fp32_in" out_port="fp16_sum_of_2_mult.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.mode_sigs" out_port="fp16_sum_of_2_mult.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.top_a" out_port="fp16_sum_of_2_mult.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.top_b" out_port="fp16_sum_of_2_mult.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.bot_a" out_port="fp16_sum_of_2_mult.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.bot_b" out_port="fp16_sum_of_2_mult.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.chainin" out_port="fp16_sum_of_2_mult.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.fp32_in" out_port="fp16_sum_of_2_mult.result"/>
 
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.mode_sigs" out_port="fp16_sum_of_2_mult.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.top_a" out_port="fp16_sum_of_2_mult.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.top_b" out_port="fp16_sum_of_2_mult.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.bot_a" out_port="fp16_sum_of_2_mult.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.bot_b" out_port="fp16_sum_of_2_mult.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.chainin" out_port="fp16_sum_of_2_mult.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_mult.fp32_in" out_port="fp16_sum_of_2_mult.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.mode_sigs" out_port="fp16_sum_of_2_mult.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.top_a" out_port="fp16_sum_of_2_mult.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.top_b" out_port="fp16_sum_of_2_mult.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.bot_a" out_port="fp16_sum_of_2_mult.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.bot_b" out_port="fp16_sum_of_2_mult.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.chainin" out_port="fp16_sum_of_2_mult.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_mult.fp32_in" out_port="fp16_sum_of_2_mult.chainout"/>
           </pb_type>
           <interconnect>
             <direct name="mode_sigs" input="dsp_pb.mode_sigs" output="fp16_sum_of_2_mult.mode_sigs">
@@ -1476,12 +1500,12 @@
             <output name="result" num_pins="32"/>
             <clock name="clk" num_pins="1"/>
 
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_accum.mode_sigs" out_port="fp16_sum_of_2_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_accum.top_a" out_port="fp16_sum_of_2_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_accum.top_b" out_port="fp16_sum_of_2_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_accum.bot_a" out_port="fp16_sum_of_2_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_accum.bot_b" out_port="fp16_sum_of_2_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_sum_of_2_accum.reset" out_port="fp16_sum_of_2_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_accum.mode_sigs" out_port="fp16_sum_of_2_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_accum.top_a" out_port="fp16_sum_of_2_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_accum.top_b" out_port="fp16_sum_of_2_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_accum.bot_a" out_port="fp16_sum_of_2_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_accum.bot_b" out_port="fp16_sum_of_2_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_sum_of_2_accum.reset" out_port="fp16_sum_of_2_accum.result"/>
 
             <T_setup value="18.91e-12" port="fp16_sum_of_2_accum.mode_sigs" clock="clk"/>
             <T_setup value="18.91e-12" port="fp16_sum_of_2_accum.top_a" clock="clk"/>
@@ -1531,21 +1555,21 @@
             <output name="result" num_pins="32"/>
             <output name="chainout" num_pins="32"/>
 
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.mode_sigs" out_port="fp16_mult_fp32_add.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.top_a" out_port="fp16_mult_fp32_add.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.top_b" out_port="fp16_mult_fp32_add.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.bot_a" out_port="fp16_mult_fp32_add.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.bot_b" out_port="fp16_mult_fp32_add.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.chainin" out_port="fp16_mult_fp32_add.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.fp32_in" out_port="fp16_mult_fp32_add.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.mode_sigs" out_port="fp16_mult_fp32_add.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.top_a" out_port="fp16_mult_fp32_add.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.top_b" out_port="fp16_mult_fp32_add.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.bot_a" out_port="fp16_mult_fp32_add.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.bot_b" out_port="fp16_mult_fp32_add.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.chainin" out_port="fp16_mult_fp32_add.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.fp32_in" out_port="fp16_mult_fp32_add.result"/>
 
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.mode_sigs" out_port="fp16_mult_fp32_add.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.top_a" out_port="fp16_mult_fp32_add.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.top_b" out_port="fp16_mult_fp32_add.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.bot_a" out_port="fp16_mult_fp32_add.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.bot_b" out_port="fp16_mult_fp32_add.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.chainin" out_port="fp16_mult_fp32_add.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_add.fp32_in" out_port="fp16_mult_fp32_add.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.mode_sigs" out_port="fp16_mult_fp32_add.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.top_a" out_port="fp16_mult_fp32_add.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.top_b" out_port="fp16_mult_fp32_add.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.bot_a" out_port="fp16_mult_fp32_add.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.bot_b" out_port="fp16_mult_fp32_add.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.chainin" out_port="fp16_mult_fp32_add.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_add.fp32_in" out_port="fp16_mult_fp32_add.chainout"/>
           </pb_type>
           <interconnect>
             <direct name="mode_sigs" input="dsp_pb.mode_sigs" output="fp16_mult_fp32_add.mode_sigs">
@@ -1586,21 +1610,21 @@
             <clock name="clk" num_pins="1"/>
             <!--TODO: Add mode signals like SUB-->
 
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.mode_sigs" out_port="fp16_mult_fp32_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.top_a" out_port="fp16_mult_fp32_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.top_b" out_port="fp16_mult_fp32_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.bot_a" out_port="fp16_mult_fp32_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.bot_b" out_port="fp16_mult_fp32_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.fp32_in" out_port="fp16_mult_fp32_accum.result"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.reset" out_port="fp16_mult_fp32_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.mode_sigs" out_port="fp16_mult_fp32_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.top_a" out_port="fp16_mult_fp32_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.top_b" out_port="fp16_mult_fp32_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.bot_a" out_port="fp16_mult_fp32_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.bot_b" out_port="fp16_mult_fp32_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.fp32_in" out_port="fp16_mult_fp32_accum.result"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.reset" out_port="fp16_mult_fp32_accum.result"/>
 
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.mode_sigs" out_port="fp16_mult_fp32_accum.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.top_a" out_port="fp16_mult_fp32_accum.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.top_b" out_port="fp16_mult_fp32_accum.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.bot_a" out_port="fp16_mult_fp32_accum.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.bot_b" out_port="fp16_mult_fp32_accum.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.fp32_in" out_port="fp16_mult_fp32_accum.chainout"/>
-            <delay_constant max="2.29e-9" in_port="fp16_mult_fp32_accum.reset" out_port="fp16_mult_fp32_accum.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.mode_sigs" out_port="fp16_mult_fp32_accum.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.top_a" out_port="fp16_mult_fp32_accum.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.top_b" out_port="fp16_mult_fp32_accum.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.bot_a" out_port="fp16_mult_fp32_accum.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.bot_b" out_port="fp16_mult_fp32_accum.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.fp32_in" out_port="fp16_mult_fp32_accum.chainout"/>
+            <delay_constant max="2.37e-9" in_port="fp16_mult_fp32_accum.reset" out_port="fp16_mult_fp32_accum.chainout"/>
 
             <T_setup value="18.91e-12" port="fp16_mult_fp32_accum.mode_sigs" clock="clk"/>
             <T_setup value="18.91e-12" port="fp16_mult_fp32_accum.reset" clock="clk"/>
@@ -1665,11 +1689,11 @@
         <!--50% sparse crossbar means 50% of the lines can reach an actual input of the matmul
         We do this by splitting inputs into two buckets and having two full crossbars-->
        <complete name="first_half" input="dsp_top.dsp_I1" output="dsp.dsp_I1">
-            <delay_constant max="351e-12" in_port="dsp_top.dsp_I1" out_port="dsp.dsp_I1"/>
+            <delay_constant max="333e-12" in_port="dsp_top.dsp_I1" out_port="dsp.dsp_I1"/>
        </complete>
 
         <complete name="second_half" input="dsp_top.dsp_I2" output="dsp.dsp_I2">
-            <delay_constant max="351e-12" in_port="dsp_top.dsp_I2" out_port="dsp.dsp_I2"/>
+            <delay_constant max="333e-12" in_port="dsp_top.dsp_I2" out_port="dsp.dsp_I2"/>
         </complete>
         <!--
         <direct name="enable" input="dsp_top.dsp_I1[0]" output ="dsp.dsp_I1[0]"/>
@@ -1686,8 +1710,12 @@
         -->
  
         <direct name="reset" input="dsp_top.reset" output="dsp.reset"></direct>
-        <direct name="chainin" input="dsp_top.chainin" output="dsp.chainin"></direct>
-        <direct name="chainout" input="dsp.chainout" output="dsp_top.chainout"></direct>
+        <direct name="chainin" input="dsp_top.chainin" output="dsp.chainin">
+            <delay_constant max="1179e-12" in_port="dsp_top.chainin" out_port="dsp.chainin"/>
+        </direct>
+        <direct name="chainout" input="dsp.chainout" output="dsp_top.chainout">
+            <delay_constant max="1179e-12" in_port="dsp.chainout" out_port="dsp_top.chainout"/>
+        </direct>
         <direct name="resulta" input="dsp.resulta" output="dsp_top.resulta"></direct>
         <direct name="resultb" input="dsp.resultb" output="dsp_top.resultb"></direct>
         <direct name="clk" input="dsp_top.clk" output="dsp.clk"></direct>
@@ -1876,255 +1904,255 @@
             <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="matmul_4x4_pb.c_data_available" clock="clk"/>
             <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="matmul_4x4_pb.flags" clock="clk"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.reset" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.pe_reset" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.start_mat_mul" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_a" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_b" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_mat_c" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_a" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_b" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.address_stride_c" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_data_in" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_data_in" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.c_data_in" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_rows" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_a_cols" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_rows" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.validity_mask_b_cols" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.final_mat_mul_size" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.a_loc" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.b_loc" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_dtype" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.slice_mode" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.op" out_port="matmul_4x4_pb.c_data_available"/>
 
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.done_mat_mul"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.a_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.b_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.c_data_out"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.flags"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.a_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.b_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.c_addr"/>
-            <delay_constant max="2.20e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.c_data_available"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.done_mat_mul"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.a_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.b_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.c_data_out"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.flags"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.a_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.b_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.c_addr"/>
+            <delay_constant max="2.27e-9" in_port="matmul_4x4_pb.preload" out_port="matmul_4x4_pb.c_data_available"/>
 
           </pb_type>
           <interconnect>
@@ -2274,255 +2302,255 @@
             <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="matmul_8x8_pb.c_addr" clock="clk"/>
             <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="matmul_8x8_pb.c_data_available" clock="clk"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.reset" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.pe_reset" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.start_mat_mul" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_a" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_b" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_mat_c" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_a" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_b" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.address_stride_c" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_data_in" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_data_in" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.c_data_in" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_rows" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_a_cols" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_rows" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.validity_mask_b_cols" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.final_mat_mul_size" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.a_loc" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.b_loc" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_dtype" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.slice_mode" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.op" out_port="matmul_8x8_pb.c_data_available"/>
 
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.done_mat_mul"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.a_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.b_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.c_data_out"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.flags"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.a_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.b_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.c_addr"/>
-            <delay_constant max="1.93e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.c_data_available"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.done_mat_mul"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.a_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.b_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.c_data_out"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.flags"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.a_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.b_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.c_addr"/>
+            <delay_constant max="1.89e-9" in_port="matmul_8x8_pb.preload" out_port="matmul_8x8_pb.c_data_available"/>
 
           </pb_type>
           <interconnect>
@@ -2587,8 +2615,8 @@
                 <input name="a" num_pins="16"/>
                 <input name="b" num_pins="16"/>
                 <output name="out" num_pins="16"/>
-                <delay_constant max="1.93e-9" in_port="indiv_pe_int8_add.a" out_port="indiv_pe_int8_add.out"/>
-                <delay_constant max="1.93e-9" in_port="indiv_pe_int8_add.b" out_port="indiv_pe_int8_add.out"/>
+                <delay_constant max="1.89e-9" in_port="indiv_pe_int8_add.a" out_port="indiv_pe_int8_add.out"/>
+                <delay_constant max="1.89e-9" in_port="indiv_pe_int8_add.b" out_port="indiv_pe_int8_add.out"/>
               </pb_type>
               <interconnect>
                 <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_int8_add.a"/>
@@ -2602,8 +2630,8 @@
                 <input name="a" num_pins="8"/>
                 <input name="b" num_pins="8"/>
                 <output name="out" num_pins="16"/>
-                <delay_constant max="1.93e-9" in_port="indiv_pe_int8_mult.a" out_port="indiv_pe_int8_mult.out"/>
-                <delay_constant max="1.93e-9" in_port="indiv_pe_int8_mult.b" out_port="indiv_pe_int8_mult.out"/>
+                <delay_constant max="1.89e-9" in_port="indiv_pe_int8_mult.a" out_port="indiv_pe_int8_mult.out"/>
+                <delay_constant max="1.89e-9" in_port="indiv_pe_int8_mult.b" out_port="indiv_pe_int8_mult.out"/>
 
               </pb_type>
               <interconnect>
@@ -2621,9 +2649,9 @@
                 <output name="out" num_pins="16"/>
                 <clock name="clk" num_pins="1"/>
 
-                <delay_constant max="1.93e-9" in_port="indiv_pe_int8_mac.a" out_port="indiv_pe_int8_mac.out"/>
-                <delay_constant max="1.93e-9" in_port="indiv_pe_int8_mac.b" out_port="indiv_pe_int8_mac.out"/>
-                <delay_constant max="1.93e-9" in_port="indiv_pe_int8_mac.reset" out_port="indiv_pe_int8_mac.out"/>
+                <delay_constant max="1.89e-9" in_port="indiv_pe_int8_mac.a" out_port="indiv_pe_int8_mac.out"/>
+                <delay_constant max="1.89e-9" in_port="indiv_pe_int8_mac.b" out_port="indiv_pe_int8_mac.out"/>
+                <delay_constant max="1.89e-9" in_port="indiv_pe_int8_mac.reset" out_port="indiv_pe_int8_mac.out"/>
 
                 <T_setup value="18.91e-12" port="indiv_pe_int8_mac.reset" clock="clk"/>
                 <T_setup value="18.91e-12" port="indiv_pe_int8_mac.a" clock="clk"/>
@@ -2728,8 +2756,8 @@
                 <input name="b" num_pins="16"/>
                 <output name="out" num_pins="16"/>
 
-                <delay_constant max="2.20e-9" in_port="indiv_pe_fp16_add.a" out_port="indiv_pe_fp16_add.out"/>
-                <delay_constant max="2.20e-9" in_port="indiv_pe_fp16_add.b" out_port="indiv_pe_fp16_add.out"/>
+                <delay_constant max="2.27e-9" in_port="indiv_pe_fp16_add.a" out_port="indiv_pe_fp16_add.out"/>
+                <delay_constant max="2.27e-9" in_port="indiv_pe_fp16_add.b" out_port="indiv_pe_fp16_add.out"/>
               </pb_type>
               <interconnect>
                 <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_add.a"/>
@@ -2744,8 +2772,8 @@
                 <input name="b" num_pins="16"/>
                 <output name="out" num_pins="16"/>
 
-                <delay_constant max="2.20e-9" in_port="indiv_pe_fp16_mult.a" out_port="indiv_pe_fp16_mult.out"/>
-                <delay_constant max="2.20e-9" in_port="indiv_pe_fp16_mult.b" out_port="indiv_pe_fp16_mult.out"/>
+                <delay_constant max="2.27e-9" in_port="indiv_pe_fp16_mult.a" out_port="indiv_pe_fp16_mult.out"/>
+                <delay_constant max="2.27e-9" in_port="indiv_pe_fp16_mult.b" out_port="indiv_pe_fp16_mult.out"/>
               </pb_type>
               <interconnect>
                 <direct name="a" input="indiv_pe_pb.direct_inputs_a" output="indiv_pe_fp16_mult.a"/>
@@ -2762,9 +2790,9 @@
                 <output name="out" num_pins="16"/>
                 <clock name="clk" num_pins="1"/>
 
-                <delay_constant max="2.20e-9" in_port="indiv_pe_fp16_mac.a" out_port="indiv_pe_fp16_mac.out"/>
-                <delay_constant max="2.20e-9" in_port="indiv_pe_fp16_mac.b" out_port="indiv_pe_fp16_mac.out"/>
-                <delay_constant max="2.20e-9" in_port="indiv_pe_fp16_mac.reset" out_port="indiv_pe_fp16_mac.out"/>
+                <delay_constant max="2.27e-9" in_port="indiv_pe_fp16_mac.a" out_port="indiv_pe_fp16_mac.out"/>
+                <delay_constant max="2.27e-9" in_port="indiv_pe_fp16_mac.b" out_port="indiv_pe_fp16_mac.out"/>
+                <delay_constant max="2.27e-9" in_port="indiv_pe_fp16_mac.reset" out_port="indiv_pe_fp16_mac.out"/>
 
                 <T_setup value="18.91e-12" port="indiv_pe_fp16_mac.reset" clock="clk"/>
                 <T_setup value="18.91e-12" port="indiv_pe_fp16_mac.a" clock="clk"/>
@@ -2933,42 +2961,42 @@
         -->
 
         <direct name="multiple1" input="matmul_top.matmul_I1[237:136]" output="matmul.matmul_I1[237:136]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[237:136]" out_port="matmul.matmul_I1[237:136]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[237:136]" out_port="matmul.matmul_I1[237:136]"/></direct>
         <direct name="address_mat_a" input="matmul_top.matmul_I1[135:120]" output="matmul.matmul_I1[135:120]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[135:120]" out_port="matmul.matmul_I1[135:120]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[135:120]" out_port="matmul.matmul_I1[135:120]"/></direct>
         <direct name="address_mat_b" input="matmul_top.matmul_I1[119:104]" output="matmul.matmul_I1[119:104]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[119:104]" out_port="matmul.matmul_I1[119:104]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[119:104]" out_port="matmul.matmul_I1[119:104]"/></direct>
         <direct name="address_mat_c" input="matmul_top.matmul_I1[103:88]" output="matmul.matmul_I1[103:88]">  
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[103:88]" out_port="matmul.matmul_I1[103:88]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[103:88]" out_port="matmul.matmul_I1[103:88]"/></direct>
         <direct name="address_stride_a" input="matmul_top.matmul_I1[87:72]" output="matmul.matmul_I1[87:72]"> 
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[87:72]" out_port="matmul.matmul_I1[87:72]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[87:72]" out_port="matmul.matmul_I1[87:72]"/></direct>
         <direct name="address_stride_b" input="matmul_top.matmul_I1[71:56]" output="matmul.matmul_I1[71:56]"> 
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[71:56]" out_port="matmul.matmul_I1[71:56]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[71:56]" out_port="matmul.matmul_I1[71:56]"/></direct>
         <direct name="address_stride_c" input="matmul_top.matmul_I1[55:40]" output="matmul.matmul_I1[55:40]"> 
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[55:40]" out_port="matmul.matmul_I1[55:40]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[55:40]" out_port="matmul.matmul_I1[55:40]"/></direct>
         <direct name="validity_mask_a1" input="matmul_top.matmul_I1[39:32]" output="matmul.matmul_I1[39:32]">  
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[39:32]" out_port="matmul.matmul_I1[39:32]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[39:32]" out_port="matmul.matmul_I1[39:32]"/></direct>
         <direct name="validity_mask_a2" input="matmul_top.matmul_I1[31:24]" output="matmul.matmul_I1[31:24]"> 
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[31:24]" out_port="matmul.matmul_I1[31:24]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[31:24]" out_port="matmul.matmul_I1[31:24]"/></direct>
         <direct name="validity_mask_b1" input="matmul_top.matmul_I1[23:16]" output="matmul.matmul_I1[23:16]">  
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[23:16]" out_port="matmul.matmul_I1[23:16]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[23:16]" out_port="matmul.matmul_I1[23:16]"/></direct>
         <direct name="a_loc" input="matmul_top.matmul_I1[15:8]" output="matmul.matmul_I1[15:8]">              
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[15:8]" out_port="matmul.matmul_I1[15:8]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[15:8]" out_port="matmul.matmul_I1[15:8]"/></direct>
         <direct name="b_loc" input="matmul_top.matmul_I1[7:0]" output="matmul.matmul_I1[7:0]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I1[7:0]" out_port="matmul.matmul_I1[7:0]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I1[7:0]" out_port="matmul.matmul_I1[7:0]"/></direct>
 
         <direct name="multiple2" input="matmul_top.matmul_I2[238:138]" output="matmul.matmul_I2[238:138]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[238:138]" out_port="matmul.matmul_I2[238:138]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I2[238:138]" out_port="matmul.matmul_I2[238:138]"/></direct>
         <direct name="a_data" input="matmul_top.matmul_I2[137:74]" output="matmul.matmul_I2[137:74]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[137:74]" out_port="matmul.matmul_I2[137:74]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I2[137:74]" out_port="matmul.matmul_I2[137:74]"/></direct>
         <direct name="b_data" input="matmul_top.matmul_I2[73:10]" output="matmul.matmul_I2[73:10]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[73:10]" out_port="matmul.matmul_I2[73:10]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I2[73:10]" out_port="matmul.matmul_I2[73:10]"/></direct>
         <direct name="slice_dtype" input="matmul_top.matmul_I2[9]" output="matmul.matmul_I2[9]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[9]" out_port="matmul.matmul_I2[9]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I2[9]" out_port="matmul.matmul_I2[9]"/></direct>
         <direct name="slice_mode" input="matmul_top.matmul_I2[8]" output="matmul.matmul_I2[8]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[8]" out_port="matmul.matmul_I2[8]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I2[8]" out_port="matmul.matmul_I2[8]"/></direct>
         <direct name="final_mat_mul_size" input="matmul_top.matmul_I2[7:0]" output="matmul.matmul_I2[7:0]">
-          <delay_constant max="929e-12" in_port="matmul_top.matmul_I2[7:0]" out_port="matmul.matmul_I2[7:0]"/></direct>
+          <delay_constant max="722e-12" in_port="matmul_top.matmul_I2[7:0]" out_port="matmul.matmul_I2[7:0]"/></direct>
 
         <direct name="reset" input="matmul_top.reset" output="matmul.reset"></direct>
         <direct name="pe_reset" input="matmul_top.pe_reset" output="matmul.pe_reset"></direct>

@@ -12,7 +12,7 @@ archs_dir=arch/COFFE_22nm/arch_for_paper_jun_2020/
 circuit_list_add=arm_core.v
 
 # Add architectures to list to sweep
-arch_list_add=agilex.matmul.6pct.for_temp_use.xml
+arch_list_add=agilex.matmul.5.0pct.sep.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
