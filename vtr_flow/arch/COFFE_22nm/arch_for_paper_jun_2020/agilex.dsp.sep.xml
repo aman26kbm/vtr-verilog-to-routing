@@ -402,7 +402,7 @@
         -->
       </sub_tile>
     </tile>
-    <tile name="dsp_top" height="5" width="1" area="253809">
+    <tile name="dsp_top" height="5" width="1" area="253779">
       <sub_tile name="dsp_top">
         <equivalent_sites>
           <site pb_type="dsp_top" pin_mapping="direct"/>
@@ -462,7 +462,7 @@
         <pinlocations pattern="perimeter"/>
       </sub_tile>
     </tile>
-    <tile name="matmul_top" height="6" width="1" area="1055073">
+    <tile name="matmul_top" height="6" width="1" area="1243179">
       <sub_tile name="matmul_top">
         <equivalent_sites>
           <site pb_type="matmul_top" pin_mapping="direct"/>
@@ -1347,6 +1347,53 @@
           </interconnect>
         </mode>
 
+        <!-- Fixed point mac mode (result = a*b +/- accumulated value-->
+        <mode name="mac_8bitfixed_pt_mode">
+          <pb_type name="mac_8bitfixed_pt" blif_model=".subckt mac_int" num_pb="4">
+            <input name="reset" num_pins="1"/>
+            <input name="a" num_pins="8"/>
+            <input name="b" num_pins="8"/>
+            <output name="out" num_pins="16"/>
+            <clock name="clk" num_pins="1"/>
+
+            <delay_constant max="2.15e-9" in_port="mac_8bitfixed_pt.a" out_port="mac_8bitfixed_pt.out"/>
+            <delay_constant max="2.15e-9" in_port="mac_8bitfixed_pt.b" out_port="mac_8bitfixed_pt.out"/>
+            <delay_constant max="2.15e-9" in_port="mac_8bitfixed_pt.reset" out_port="mac_8bitfixed_pt.out"/>
+
+            <T_setup value="18.91e-12" port="mac_8bitfixed_pt.reset" clock="clk"/>
+            <T_setup value="18.91e-12" port="mac_8bitfixed_pt.a" clock="clk"/>
+            <T_setup value="18.91e-12" port="mac_8bitfixed_pt.b" clock="clk"/>
+            <T_setup value="18.91e-12" port="mac_8bitfixed_pt.out" clock="clk"/>
+
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_8bitfixed_pt.reset" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_8bitfixed_pt.a" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_8bitfixed_pt.b" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_8bitfixed_pt.out" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="reset0" input="dsp_pb.reset" output="mac_8bitfixed_pt[0].reset"/>
+            <direct name="reset1" input="dsp_pb.reset" output="mac_8bitfixed_pt[1].reset"/>
+            <direct name="reset2" input="dsp_pb.reset" output="mac_8bitfixed_pt[2].reset"/>
+            <direct name="reset3" input="dsp_pb.reset" output="mac_8bitfixed_pt[3].reset"/>
+            <direct name="clk0" input="dsp_pb.clk" output="mac_8bitfixed_pt[0].clk"/>
+            <direct name="clk1" input="dsp_pb.clk" output="mac_8bitfixed_pt[1].clk"/>
+            <direct name="clk2" input="dsp_pb.clk" output="mac_8bitfixed_pt[2].clk"/>
+            <direct name="clk3" input="dsp_pb.clk" output="mac_8bitfixed_pt[3].clk"/>
+            <direct name="atoa0" input="dsp_pb.datain[7:0]" output="mac_8bitfixed_pt[0].a"/>
+            <direct name="btob0" input="dsp_pb.datain[15:8]" output="mac_8bitfixed_pt[0].b"/>
+            <direct name="atoa1" input="dsp_pb.datain[23:16]" output="mac_8bitfixed_pt[1].a"/>
+            <direct name="btob1" input="dsp_pb.datain[31:24]" output="mac_8bitfixed_pt[1].b"/>
+            <direct name="atoa2" input="dsp_pb.datain[39:32]" output="mac_8bitfixed_pt[2].a"/>
+            <direct name="btob2" input="dsp_pb.datain[47:40]" output="mac_8bitfixed_pt[2].b"/>
+            <direct name="atoa3" input="dsp_pb.datain[55:48]" output="mac_8bitfixed_pt[3].a"/>
+            <direct name="btob3" input="dsp_pb.datain[63:56]" output="mac_8bitfixed_pt[3].b"/>
+            <direct name="sumouttosumout0" input="mac_8bitfixed_pt[0].out" output="dsp_pb.resulta[15:0]"/>
+            <direct name="sumouttosumout1" input="mac_8bitfixed_pt[1].out" output="dsp_pb.resulta[31:16]"/>
+            <direct name="sumouttosumout2" input="mac_8bitfixed_pt[2].out" output="dsp_pb.resulta[47:32]"/>
+            <direct name="sumouttosumout3" input="mac_8bitfixed_pt[3].out" output="dsp_pb.resulta[63:48]"/>
+          </interconnect>
+        </mode>
+
         <!-- floating point multiplier mode (result = a * b)-->
         <mode name="mult_fp32_mode">
           <pb_type name="mult_fp32" blif_model=".subckt multiply_fp" num_pb="1">
@@ -1364,6 +1411,26 @@
             </direct>
             <direct name="out2out" input="mult_fp32.out" output="dsp_pb.resulta[31:0]">
             </direct>
+          </interconnect>
+        </mode>
+
+        <!-- floating point multiplier mode (result = a * b)-->
+        <mode name="mult_fp16_mode">
+          <pb_type name="mult_fp16" blif_model=".subckt multiply_fp" num_pb="2">
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <output name="out" num_pins="16"/>
+
+            <delay_constant max="2.37e-9" in_port="mult_fp16.a" out_port="mult_fp16.out"/>
+            <delay_constant max="2.37e-9" in_port="mult_fp16.b" out_port="mult_fp16.out"/>
+          </pb_type>
+          <interconnect>
+            <direct name="a2a0" input="dsp_pb.datain[15:0]" output="mult_fp16[0].a"></direct>
+            <direct name="a2a1" input="dsp_pb.datain[31:16]" output="mult_fp16[1].a"></direct>
+            <direct name="b2b0" input="dsp_pb.datain[47:32]" output="mult_fp16[0].b"></direct>
+            <direct name="b2b1" input="dsp_pb.datain[63:48]" output="mult_fp16[1].b"></direct>
+            <direct name="out2out0" input="mult_fp16[0].out" output="dsp_pb.resulta[15:0]"></direct>
+            <direct name="out2out1" input="mult_fp16[1].out" output="dsp_pb.resulta[31:16]"></direct>
           </interconnect>
         </mode>
 
@@ -1419,6 +1486,44 @@
             </direct>
             <direct name="sumouttosumout" input="mac_fp32.out" output="dsp_pb.resulta[31:0]">
             </direct>
+          </interconnect>
+        </mode>
+
+
+        <!-- floating point 16-bit mac mode (result = a*b +/- accumulated value-->
+        <mode name="mac_fp16_mode">
+          <pb_type name="mac_fp16" blif_model=".subckt mac_fp" num_pb="2">
+            <input name="reset" num_pins="1"/>
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <output name="out" num_pins="16"/>
+            <clock name="clk" num_pins="1"/>
+
+            <delay_constant max="2.37e-9" in_port="mac_fp16.a" out_port="mac_fp16.out"/>
+            <delay_constant max="2.37e-9" in_port="mac_fp16.b" out_port="mac_fp16.out"/>
+            <delay_constant max="2.37e-9" in_port="mac_fp16.reset" out_port="mac_fp16.out"/>
+
+            <T_setup value="18.91e-12" port="mac_fp16.reset" clock="clk"/>
+            <T_setup value="18.91e-12" port="mac_fp16.a" clock="clk"/>
+            <T_setup value="18.91e-12" port="mac_fp16.b" clock="clk"/>
+            <T_setup value="18.91e-12" port="mac_fp16.out" clock="clk"/>
+
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_fp16.reset" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_fp16.a" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_fp16.b" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mac_fp16.out" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="reset0" input="dsp_pb.reset" output="mac_fp16[0].reset"></direct>
+            <direct name="reset1" input="dsp_pb.reset" output="mac_fp16[1].reset"></direct>
+            <direct name="clk0" input="dsp_pb.clk" output="mac_fp16[0].clk"></direct>
+            <direct name="clk1" input="dsp_pb.clk" output="mac_fp16[1].clk"></direct>
+            <direct name="atoa0" input="dsp_pb.datain[15:0]"  output="mac_fp16[0].a"></direct>
+            <direct name="atoa1" input="dsp_pb.datain[31:16]" output="mac_fp16[1].a"></direct>
+            <direct name="btob0" input="dsp_pb.datain[47:32]" output="mac_fp16[0].b"></direct>
+            <direct name="btob1" input="dsp_pb.datain[63:48]" output="mac_fp16[1].b"></direct>
+            <direct name="sumouttosumout0" input="mac_fp16[0].out" output="dsp_pb.resulta[15:0]"></direct>
+            <direct name="sumouttosumout1" input="mac_fp16[1].out" output="dsp_pb.resulta[31:16]"></direct>
           </interconnect>
         </mode>
 
