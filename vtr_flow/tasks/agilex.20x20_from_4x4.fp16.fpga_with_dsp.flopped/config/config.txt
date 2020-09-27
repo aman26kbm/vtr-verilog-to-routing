@@ -3,16 +3,16 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog/
+circuits_dir=benchmarks/verilog/design_for_paper_jun2020/
 
 # Path to directory of architectures to use
 archs_dir=arch/COFFE_22nm/arch_for_paper_jun_2020/
 
 # Add circuits to list to sweep
-circuit_list_add=arm_core.v
+circuit_list_add=20x20_from_4x4.fp16.with_ram.gen.with_bb_def.everything_flopped.v
 
 # Add architectures to list to sweep
-arch_list_add=agilex.matmul.7.5pct.sep.upd_layout.xml
+arch_list_add=agilex.dsp.sep.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt

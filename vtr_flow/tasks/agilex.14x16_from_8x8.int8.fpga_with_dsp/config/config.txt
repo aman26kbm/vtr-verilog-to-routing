@@ -1,0 +1,21 @@
+##############################################
+# Configuration file for running experiments
+##############################################
+
+# Path to directory of circuits to use
+circuits_dir=benchmarks/verilog/design_for_paper_jun2020/
+
+# Path to directory of architectures to use
+archs_dir=arch/COFFE_22nm/arch_for_paper_jun_2020/
+
+# Add circuits to list to sweep
+circuit_list_add=14x16_from_8x8.int8.with_ram.gen.with_bb_def.v
+
+# Add architectures to list to sweep
+arch_list_add=agilex.dsp.sep.xml
+
+# Parse info and how to parse
+parse_file=vpr_standard.txt
+
+# Pass requirements
+pass_requirements_file=pass_requirements.txt
