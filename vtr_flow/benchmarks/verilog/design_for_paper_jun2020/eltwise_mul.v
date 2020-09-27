@@ -958,7 +958,6 @@ matmul_fp16 u_matmul_4x4_systolic_0_0(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_1_NC;
   assign a_data_0_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out_0_1_NC;
-  assign b_data_0_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_1_NC;
   assign b_data_in_0_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in_0_1_NC;

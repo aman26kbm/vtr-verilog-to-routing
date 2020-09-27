@@ -945,7 +945,6 @@ matmul_4x4_systolic u_matmul_4x4_systolic_0_0(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_1_NC;
   assign a_data_0_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_out_0_1_NC;
-  assign b_data_0_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_1_NC;
   assign b_data_in_0_1_NC = 0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_in_0_1_NC;
@@ -2214,7 +2213,8 @@ always @(posedge clk) begin
 end
 
 //assign mul_out = a * b;
-qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
+//qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
+multiply_fp mult_u1(.a(a_flopped), .b(b_flopped), .out(mul_out_temp));
 
 always @(posedge clk) begin
   if (reset) begin
@@ -2228,7 +2228,7 @@ assign out = mul_out_temp_reg;
 
 endmodule
 
-
+/*
 //////////////////////////////////////////////////////////////////////////
 // Multiplier
 //////////////////////////////////////////////////////////////////////////
@@ -2257,6 +2257,7 @@ wire [4:0] fpmult_16_flags;
  assign o_result = fpmult_16_result;
 
 endmodule
+*/
 
 
 

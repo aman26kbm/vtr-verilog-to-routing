@@ -17,12 +17,11 @@
 `define REG_MATRIX_B_ADDR 32'h12
 `define REG_MATRIX_C_ADDR 32'h16
 `define REG_VALID_MASK_A_ROWS_ADDR 32'h20
-`define REG_VALID_MASK_A_COLS_ADDR 32'h54
-`define REG_VALID_MASK_B_ROWS_ADDR 32'h5c
-`define REG_VALID_MASK_B_COLS_ADDR 32'h58
+`define REG_VALID_MASK_A_COLS_B_ROWS_ADDR 32'h20
+`define REG_VALID_MASK_B_COLS_ADDR 32'h20
 `define REG_MATRIX_A_STRIDE_ADDR 32'h28
 `define REG_MATRIX_B_STRIDE_ADDR 32'h32
-`define REG_MATRIX_C_STRIDE_ADDR 32'h36
+`define REG_MATRIX_C_STRIDE_ADDR 32'h3
   module matrix_multiplication(
   input clk,
   input clk_mem,
@@ -43,7 +42,6 @@
   input  [`MAT_MUL_SIZE-1:0] bram_we_ext
 );
 
-
   wire PCLK;
   assign PCLK = clk;
   reg start_reg;
@@ -52,32 +50,32 @@
   reg [`REG_DATAWIDTH-1:0] reg_dummy;
   
   reg [`AWIDTH-1:0] bram_addr_a_0_0_ext;
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_a_0_0_ext;
+  reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_a_0_0_ext;
   reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_wdata_a_0_0_ext;
   reg [`MASK_WIDTH-1:0] bram_we_a_0_0_ext;
     
   reg [`AWIDTH-1:0] bram_addr_a_1_0_ext;
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_a_1_0_ext;
+  reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_a_1_0_ext;
   reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_wdata_a_1_0_ext;
   reg [`MASK_WIDTH-1:0] bram_we_a_1_0_ext;
     
   reg [`AWIDTH-1:0] bram_addr_b_0_0_ext;
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_b_0_0_ext;
+  reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_b_0_0_ext;
   reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_wdata_b_0_0_ext;
   reg [`MASK_WIDTH-1:0] bram_we_b_0_0_ext;
     
   reg [`AWIDTH-1:0] bram_addr_b_0_1_ext;
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_b_0_1_ext;
+  reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_b_0_1_ext;
   reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_wdata_b_0_1_ext;
   reg [`MASK_WIDTH-1:0] bram_we_b_0_1_ext;
     
   reg [`AWIDTH-1:0] bram_addr_c_0_1_ext;
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_c_0_1_ext;
+  reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_c_0_1_ext;
   reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_wdata_c_0_1_ext;
   reg [`MASK_WIDTH-1:0] bram_we_c_0_1_ext;
     
   reg [`AWIDTH-1:0] bram_addr_c_1_1_ext;
-  wire [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_c_1_1_ext;
+  reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_rdata_c_1_1_ext;
   reg [`MAT_MUL_SIZE*`DWIDTH-1:0] bram_wdata_c_1_1_ext;
   reg [`MASK_WIDTH-1:0] bram_we_c_1_1_ext;
     
@@ -127,35 +125,35 @@
       bram_rdata_ext = bram_rdata_a_0_0_ext;
       end
     
-      1: begin
+      0: begin
       bram_addr_a_1_0_ext = bram_addr_ext;
       bram_wdata_a_1_0_ext = bram_wdata_ext;
       bram_we_a_1_0_ext = bram_we_ext;
       bram_rdata_ext = bram_rdata_a_1_0_ext;
       end
     
-      2: begin
+      1: begin
       bram_addr_b_0_0_ext = bram_addr_ext;
       bram_wdata_b_0_0_ext = bram_wdata_ext;
       bram_we_b_0_0_ext = bram_we_ext;
       bram_rdata_ext = bram_rdata_b_0_0_ext;
       end
     
-      3: begin
+      1: begin
       bram_addr_b_0_1_ext = bram_addr_ext;
       bram_wdata_b_0_1_ext = bram_wdata_ext;
       bram_we_b_0_1_ext = bram_we_ext;
       bram_rdata_ext = bram_rdata_b_0_1_ext;
       end
     
-      4: begin
+      2: begin
       bram_addr_c_0_1_ext = bram_addr_ext;
       bram_wdata_c_0_1_ext = bram_wdata_ext;
       bram_we_c_0_1_ext = bram_we_ext;
       bram_rdata_ext = bram_rdata_c_0_1_ext;
       end
     
-      5: begin
+      2: begin
       bram_addr_c_1_1_ext = bram_addr_ext;
       bram_wdata_c_1_1_ext = bram_wdata_ext;
       bram_we_c_1_1_ext = bram_we_ext;
@@ -314,12 +312,18 @@ reg [`AWIDTH-1:0] address_mat_a;
 reg [`AWIDTH-1:0] address_mat_b;
 reg [`AWIDTH-1:0] address_mat_c;
 reg [`MASK_WIDTH-1:0] validity_mask_a_rows;
-reg [`MASK_WIDTH-1:0] validity_mask_a_cols;
-reg [`MASK_WIDTH-1:0] validity_mask_b_rows;
+reg [`MASK_WIDTH-1:0] validity_mask_a_cols_b_rows;
 reg [`MASK_WIDTH-1:0] validity_mask_b_cols;
 reg [`ADDR_STRIDE_WIDTH-1:0] address_stride_a;
 reg [`ADDR_STRIDE_WIDTH-1:0] address_stride_b;
 reg [`ADDR_STRIDE_WIDTH-1:0] address_stride_c;
+
+//Fake use of a DSP block
+wire [15:0] temp;
+wire [37:0] resulta;
+wire [37:0] chainout;
+mult_add_sum_int u1(.ax(PWDATA[`ADDR_STRIDE_WIDTH-1:0]), .by(19'd2), .bx(18'd3), .by(19'd4), .chainin(38'd0), .resulta(resulta), .chainout(chainout));
+assign temp = resulta[15:0];
 
 ////////////////////////////////////////////////////////////////
 // Configuration logic
@@ -333,8 +337,7 @@ always @(posedge PCLK) begin
     address_mat_b <= 0;
     address_mat_c <= 0;
     validity_mask_a_rows <= {`MASK_WIDTH{1'b1}};
-    validity_mask_a_cols <= {`MASK_WIDTH{1'b1}};
-    validity_mask_b_rows <= {`MASK_WIDTH{1'b1}};
+    validity_mask_a_cols_b_rows <= {`MASK_WIDTH{1'b1}};
     validity_mask_b_cols <= {`MASK_WIDTH{1'b1}};
     address_stride_a <= `MAT_MUL_SIZE;
     address_stride_b <= `MAT_MUL_SIZE;
@@ -369,16 +372,14 @@ always @(posedge PCLK) begin
           `REG_VALID_MASK_A_ROWS_ADDR: begin
                                 validity_mask_a_rows <= PWDATA[`MASK_WIDTH-1:0];
                                 end
-          `REG_VALID_MASK_A_COLS_ADDR: begin
-                                validity_mask_a_cols <= PWDATA[`MASK_WIDTH-1:0];
-                                end
-          `REG_VALID_MASK_B_ROWS_ADDR: begin
-                                validity_mask_b_rows <= PWDATA[`MASK_WIDTH-1:0];
+          `REG_VALID_MASK_A_COLS_B_ROWS_ADDR: begin
+                                validity_mask_a_cols_b_rows <= PWDATA[`MASK_WIDTH-1:0];
                                 end
           `REG_VALID_MASK_B_COLS_ADDR: begin
                                 validity_mask_b_cols <= PWDATA[`MASK_WIDTH-1:0];
                                 end
-          `REG_MATRIX_A_STRIDE_ADDR : address_stride_a <= PWDATA[`ADDR_STRIDE_WIDTH-1:0];
+          //`REG_MATRIX_A_STRIDE_ADDR : address_stride_a <= PWDATA[`ADDR_STRIDE_WIDTH-1:0];
+          `REG_MATRIX_A_STRIDE_ADDR : address_stride_a <= temp;
           `REG_MATRIX_B_STRIDE_ADDR : address_stride_b <= PWDATA[`ADDR_STRIDE_WIDTH-1:0];
           `REG_MATRIX_C_STRIDE_ADDR : address_stride_c <= PWDATA[`ADDR_STRIDE_WIDTH-1:0];
           default : reg_dummy <= PWDATA; //sink writes to a dummy register
@@ -397,8 +398,7 @@ always @(posedge PCLK) begin
           `REG_MATRIX_B_ADDR    : PRDATA <= address_mat_b;
           `REG_MATRIX_C_ADDR    : PRDATA <= address_mat_c;
           `REG_VALID_MASK_A_ROWS_ADDR: PRDATA <= validity_mask_a_rows;
-          `REG_VALID_MASK_A_COLS_ADDR: PRDATA <= validity_mask_a_cols;
-          `REG_VALID_MASK_B_ROWS_ADDR: PRDATA <= validity_mask_b_rows;
+          `REG_VALID_MASK_A_COLS_B_ROWS_ADDR: PRDATA <= validity_mask_a_cols_b_rows;
           `REG_VALID_MASK_B_COLS_ADDR: PRDATA <= validity_mask_b_cols;
           `REG_MATRIX_A_STRIDE_ADDR : PRDATA <= address_stride_a;
           `REG_MATRIX_B_STRIDE_ADDR : PRDATA <= address_stride_b;
@@ -483,8 +483,7 @@ assign pe_reset = ~pe_resetn;
   .c_data_1_1_available(c_data_1_1_available),
    		
   .validity_mask_a_rows(validity_mask_a_rows),
-  .validity_mask_a_cols(validity_mask_a_cols),
-  .validity_mask_b_rows(validity_mask_b_rows),
+  .validity_mask_a_cols_b_rows(validity_mask_a_cols_b_rows),
   .validity_mask_b_cols(validity_mask_b_cols)
 );
 endmodule
@@ -527,8 +526,7 @@ module matmul_16x16_systolic(
   output c_data_1_1_available,
     
   input [`MASK_WIDTH-1:0] validity_mask_a_rows,
-  input [`MASK_WIDTH-1:0] validity_mask_a_cols,
-  input [`MASK_WIDTH-1:0] validity_mask_b_rows,
+  input [`MASK_WIDTH-1:0] validity_mask_a_cols_b_rows,
   input [`MASK_WIDTH-1:0] validity_mask_b_cols
 );
     /////////////////////////////////////////////////
@@ -547,7 +545,6 @@ module matmul_16x16_systolic(
   // Matmul 0_0
   /////////////////////////////////////////////////
 
-  wire [3:0] flags_NC_0_0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_0_to_0_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_0_to_1_0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_in_0_0_NC;
@@ -561,7 +558,7 @@ module matmul_16x16_systolic(
   wire [`AWIDTH-1:0] c_addr_0_0_NC;
   wire c_data_0_0_available_NC;
 
-matmul_slice u_matmul_8x8_systolic_0_0(
+matmul_int8 u_matmul_8x8_systolic_0_0(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -578,26 +575,22 @@ matmul_slice u_matmul_8x8_systolic_0_0(
   .a_data_in(a_data_in_0_0_NC),
   .b_data_in(b_data_in_0_0_NC),
   .c_data_in(c_data_in_0_0_NC),
-  .c_data_out(c_data_0_0_to_0_1_NC),
+  .c_data_out(c_data_0_0_to_0_1),
+  .c_data_out_dir_int(c_data_0_0_to_0_1_NC),
   .a_data_out(a_data_0_0_to_0_1),
   .b_data_out(b_data_0_0_to_1_0),
   .a_addr(a_addr_0_0),
   .b_addr(b_addr_0_0),
   .c_addr(c_addr_0_0_NC),
   .c_data_available(c_data_0_0_available_NC),
-  .flags(flags_NC_0_0),
 
   .validity_mask_a_rows(validity_mask_a_rows),
-  .validity_mask_a_cols(validity_mask_a_cols),
-  .validity_mask_b_rows(validity_mask_b_rows),
+  .validity_mask_a_cols_b_rows(validity_mask_a_cols_b_rows),
   .validity_mask_b_cols(validity_mask_b_cols),
         
   .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
   .slice_dtype(1'b0), //0 is INT8      
         
-  .op(2'b00), //matmul mode
-  .preload(1'b0),
-      
   .final_mat_mul_size(8'd16),
   .a_loc(8'd0),
   .b_loc(8'd0)
@@ -607,7 +600,6 @@ matmul_slice u_matmul_8x8_systolic_0_0(
   // Matmul 0_1
   /////////////////////////////////////////////////
 
-  wire [3:0] flags_NC_0_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_0_1_to_0_2;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_0_1_to_1_1;
   wire [`AWIDTH-1:0] a_addr_0_1_NC;
@@ -616,7 +608,7 @@ matmul_slice u_matmul_8x8_systolic_0_0(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_in_0_1_NC;
   assign b_data_in_0_1_NC = 0;
 
-matmul_slice u_matmul_8x8_systolic_0_1(
+matmul_int8 u_matmul_8x8_systolic_0_1(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -634,25 +626,21 @@ matmul_slice u_matmul_8x8_systolic_0_1(
   .b_data_in(b_data_in_0_1_NC),
   .c_data_in(c_data_0_0_to_0_1),
   .c_data_out(c_data_0_1),
+  .c_data_out_dir_int(c_data_0_1_NC),
   .a_data_out(a_data_0_1_to_0_2),
   .b_data_out(b_data_0_1_to_1_1),
   .a_addr(a_addr_0_1_NC),
   .b_addr(b_addr_0_1),
   .c_addr(c_addr_0_1),
   .c_data_available(c_data_0_1_available),
-  .flags(flags_NC_0_1),
 
   .validity_mask_a_rows(validity_mask_a_rows),
-  .validity_mask_a_cols(validity_mask_a_cols),
-  .validity_mask_b_rows(validity_mask_b_rows),
+  .validity_mask_a_cols_b_rows(validity_mask_a_cols_b_rows),
   .validity_mask_b_cols(validity_mask_b_cols),
         
   .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
   .slice_dtype(1'b0), //0 is INT8      
         
-  .op(2'b00), //matmul mode
-  .preload(1'b0),
-      
   .final_mat_mul_size(8'd16),
   .a_loc(8'd0),
   .b_loc(8'd1)
@@ -662,7 +650,6 @@ matmul_slice u_matmul_8x8_systolic_0_1(
   // Matmul 1_0
   /////////////////////////////////////////////////
 
-  wire [3:0] flags_NC_1_0;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_0_to_1_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_0_to_2_0;
   wire [`AWIDTH-1:0] b_addr_1_0_NC;
@@ -677,7 +664,7 @@ matmul_slice u_matmul_8x8_systolic_0_1(
   wire [`AWIDTH-1:0] c_addr_1_0_NC;
   wire c_data_1_0_available_NC;
 
-matmul_slice u_matmul_8x8_systolic_1_0(
+matmul_int8 u_matmul_8x8_systolic_1_0(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -694,26 +681,22 @@ matmul_slice u_matmul_8x8_systolic_1_0(
   .a_data_in(a_data_in_1_0_NC),
   .b_data_in(b_data_0_0_to_1_0),
   .c_data_in(c_data_in_1_0_NC),
-  .c_data_out(c_data_1_0_to_1_1_NC),
+  .c_data_out(c_data_1_0_to_1_1),
+  .c_data_out_dir_int(c_data_1_0_to_1_1_NC),
   .a_data_out(a_data_1_0_to_1_1),
   .b_data_out(b_data_1_0_to_2_0),
   .a_addr(a_addr_1_0),
   .b_addr(b_addr_1_0_NC),
   .c_addr(c_addr_1_0_NC),
   .c_data_available(c_data_1_0_available_NC),
-  .flags(flags_NC_1_0),
 
   .validity_mask_a_rows(validity_mask_a_rows),
-  .validity_mask_a_cols(validity_mask_a_cols),
-  .validity_mask_b_rows(validity_mask_b_rows),
+  .validity_mask_a_cols_b_rows(validity_mask_a_cols_b_rows),
   .validity_mask_b_cols(validity_mask_b_cols),
         
   .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
   .slice_dtype(1'b0), //0 is INT8      
         
-  .op(2'b00), //matmul mode
-  .preload(1'b0),
-      
   .final_mat_mul_size(8'd16),
   .a_loc(8'd1),
   .b_loc(8'd0)
@@ -723,7 +706,6 @@ matmul_slice u_matmul_8x8_systolic_1_0(
   // Matmul 1_1
   /////////////////////////////////////////////////
 
-  wire [3:0] flags_NC_1_1;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] a_data_1_1_to_1_2;
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_1_to_2_1;
   wire [`AWIDTH-1:0] a_addr_1_1_NC;
@@ -733,7 +715,7 @@ matmul_slice u_matmul_8x8_systolic_1_0(
   wire [`MAT_MUL_SIZE*`DWIDTH-1:0] b_data_1_1_NC;
   assign b_data_1_1_NC = 0;
 
-matmul_slice u_matmul_8x8_systolic_1_1(
+matmul_int8 u_matmul_8x8_systolic_1_1(
   .clk(clk),
   .reset(reset),
   .pe_reset(pe_reset),
@@ -751,25 +733,21 @@ matmul_slice u_matmul_8x8_systolic_1_1(
   .b_data_in(b_data_0_1_to_1_1),
   .c_data_in(c_data_1_0_to_1_1),
   .c_data_out(c_data_1_1),
+  .c_data_out_dir_int(c_data_1_1_NC),
   .a_data_out(a_data_1_1_to_1_2),
   .b_data_out(b_data_1_1_to_2_1),
   .a_addr(a_addr_1_1_NC),
   .b_addr(b_addr_1_1_NC),
   .c_addr(c_addr_1_1),
   .c_data_available(c_data_1_1_available),
-  .flags(flags_NC_1_1),
 
   .validity_mask_a_rows(validity_mask_a_rows),
-  .validity_mask_a_cols(validity_mask_a_cols),
-  .validity_mask_b_rows(validity_mask_b_rows),
+  .validity_mask_a_cols_b_rows(validity_mask_a_cols_b_rows),
   .validity_mask_b_cols(validity_mask_b_cols),
         
   .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
   .slice_dtype(1'b0), //0 is INT8      
         
-  .op(2'b00), //matmul mode
-  .preload(1'b0),
-      
   .final_mat_mul_size(8'd16),
   .a_loc(8'd1),
   .b_loc(8'd1)
@@ -798,13 +776,11 @@ input [`MAT_MUL_SIZE*`DWIDTH-1:0] d0;
 input [`MAT_MUL_SIZE*`DWIDTH-1:0] d1;
 input [`MAT_MUL_SIZE-1:0] we0;
 input [`MAT_MUL_SIZE-1:0] we1;
-output [`MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-output [`MAT_MUL_SIZE*`DWIDTH-1:0] q1;
+output reg [`MAT_MUL_SIZE*`DWIDTH-1:0] q0;
+output reg [`MAT_MUL_SIZE*`DWIDTH-1:0] q1;
 input clk;
 
 `ifdef VCS
-reg [`MAT_MUL_SIZE*`DWIDTH-1:0] q0;
-reg [`MAT_MUL_SIZE*`DWIDTH-1:0] q1;
 reg [7:0] ram[((1<<`AWIDTH)-1):0];
 integer i;
 
@@ -853,5 +829,3 @@ dual_port_ram u_dual_port_ram(
 
 
 endmodule
-
-  
