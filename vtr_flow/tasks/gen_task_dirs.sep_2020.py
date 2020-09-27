@@ -70,11 +70,11 @@ class GenTaskDirs():
 
       #generate the value of 4 fields in the template file
       if fpga_arch == "matmul.pct3":
-        arch_file = "agilex.matmul.2.5pct.sep.xml"
+        arch_file = "agilex.matmul.2.5pct.sep.upd_layout.xml"
       elif fpga_arch == "matmul.pct6":
-        arch_file = "agilex.matmul.5.0pct.sep.xml"
+        arch_file = "agilex.matmul.5.0pct.sep.upd_layout.xml"
       elif fpga_arch == "matmul.pct9":
-        arch_file = "agilex.matmul.7.5pct.sep.xml"
+        arch_file = "agilex.matmul.7.5pct.sep.upd_layout.xml"
       elif fpga_arch == "matmul.pct12":
         arch_file = "agilex.matmul.10.0pct.sep.xml"
       elif fpga_arch == "dsp":
@@ -97,11 +97,21 @@ class GenTaskDirs():
           design_file = "tpu_32x32.int8.fpga_with_dsp.v"
         elif "matmul" in fpga_arch:
           design_file = "tpu_32x32.int8.fpga_with_matmul.v"
-      elif "eltwise" in dirname:
+      elif "conv" in dirname:
+        if "dsp" in fpga_arch:
+          design_file = "conv.fpga_with_dsp.v"
+        elif "matmul" in fpga_arch:
+          design_file = "conv.fpga_with_matmul.v"
+      elif "eltwise_add" in dirname:
         if "dsp" in fpga_arch:
           design_file = "eltwise_add.bb_def.v"
         elif "matmul" in fpga_arch:
           design_file = "eltwise_add.v"
+      elif "eltwise_mul" in dirname:
+        if "dsp" in fpga_arch:
+          design_file = "eltwise_mul.bb_def.v"
+        elif "matmul" in fpga_arch:
+          design_file = "eltwise_mul.v"
       elif info1 is not None:
         design_size = info1.group(1)
         building_block = info1.group(2)

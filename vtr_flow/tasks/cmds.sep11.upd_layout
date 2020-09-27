@@ -1,0 +1,168 @@
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed 9698 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 9599 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 3032 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 7060 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 5736 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 7016 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 7623 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 1475 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 1116 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5680 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 205 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 1072 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_dsp -s "--const_gen_inference comb --seed 8960 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5357 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 6550 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3760 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_dsp -s "--const_gen_inference comb --seed 8128 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 7656 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 6508 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3974 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_dsp -s "--const_gen_inference comb --seed 4765 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 715 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 7829 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2194 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_dsp -s "--const_gen_inference comb --seed 3716 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5242 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 1558 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 5494 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_dsp -s "--const_gen_inference comb --seed 4077 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 3 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 9662 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3296 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_dsp -s "--const_gen_inference comb --seed 2370 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 7556 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 6966 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 5920 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_dsp -s "--const_gen_inference comb --seed 6274 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 8628 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 4149 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 6650 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_dsp -s "--const_gen_inference comb --seed 4778 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 7299 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 2391 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 1756 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_dsp -s "--const_gen_inference comb --seed 3234 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 7417 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 7159 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2456 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_dsp -s "--const_gen_inference comb --seed 9088 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 7749 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 8037 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 5484 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_dsp -s "--const_gen_inference comb --seed 6141 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 2448 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 6791 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 4221 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed 7740 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 1535 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 1986 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 7174 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 6309 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 9623 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 9857 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 647 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 9932 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5220 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 4976 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 4400 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_dsp -s "--const_gen_inference comb --seed 6660 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 6686 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 1568 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3115 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_dsp -s "--const_gen_inference comb --seed 7468 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 3103 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 4893 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 4544 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_dsp -s "--const_gen_inference comb --seed 3007 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 9454 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 3438 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 5877 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_dsp -s "--const_gen_inference comb --seed 3970 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 6810 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 532 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3277 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_dsp -s "--const_gen_inference comb --seed 2654 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 6915 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 8260 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 5277 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_dsp -s "--const_gen_inference comb --seed 8164 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 786 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 5397 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 670 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_dsp -s "--const_gen_inference comb --seed 373 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 9810 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 4676 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 6173 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_dsp -s "--const_gen_inference comb --seed 6775 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 8026 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 1397 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 4869 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_dsp -s "--const_gen_inference comb --seed 8599 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 8117 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 4013 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3953 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_dsp -s "--const_gen_inference comb --seed 9715 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 9424 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 3168 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 8181 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_dsp -s "--const_gen_inference comb --seed 6759 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 4074 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 8299 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2039 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_dsp -s "--const_gen_inference comb --seed 3749 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 7506 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 9405 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.20x20_from_4x4.fp16.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 4490 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 9344 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5192 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 1712 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.14x16_from_8x8.int8.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 558 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_dsp -s "--const_gen_inference comb --seed 4293 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 1407 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 2861 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.tpu_32x32.int8.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2152 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_dsp -s "--const_gen_inference comb --seed 7601 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5865 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 1008 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.arm_core.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 6969 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_dsp -s "--const_gen_inference comb --seed 7918 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 6449 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 463 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.bgm.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3824 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_dsp -s "--const_gen_inference comb --seed 1117 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5650 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 8163 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.diffeq1.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2533 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_dsp -s "--const_gen_inference comb --seed 8188 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 1032 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 1375 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision0.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2674 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_dsp -s "--const_gen_inference comb --seed 1476 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 5286 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 360 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision1.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2519 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_dsp -s "--const_gen_inference comb --seed 4130 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 1706 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 9991 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.stereovision2.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 9450 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_dsp -s "--const_gen_inference comb --seed 5538 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 4389 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 3876 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU32PEEng.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 388 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_dsp -s "--const_gen_inference comb --seed 1502 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 1302 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 5082 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.LU8PEEng.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 6396 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_dsp -s "--const_gen_inference comb --seed 996 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 9248 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 21 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.mcml.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 3297 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_dsp -s "--const_gen_inference comb --seed 8799 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 1579 --timing_report_npaths 1000 --timing_report_detail aggregated"
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 38 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_add.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 2273 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_dsp -s "--const_gen_inference comb --seed 536 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct3 -s "--const_gen_inference comb --seed 3012 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct6 -s "--const_gen_inference comb --seed 639 --timing_report_npaths 1000 --timing_report_detail aggregated" &
+../scripts/run_vtr_task.pl agilex.eltwise_mul.fpga_with_matmul.pct9 -s "--const_gen_inference comb --seed 9396 --timing_report_npaths 1000 --timing_report_detail aggregated"
