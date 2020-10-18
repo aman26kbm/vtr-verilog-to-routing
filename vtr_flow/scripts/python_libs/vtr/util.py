@@ -1,21 +1,19 @@
 """
     Module to utilize many of the tools needed for VTR.
 """
-import os
 from pathlib import PurePath
 from pathlib import Path
 import sys
 import re
 import time
 import subprocess
-import distutils.spawn as distutils_spawn
 import argparse
 import csv
 from collections import OrderedDict
+from prettytable import PrettyTable
 import vtr.error
-from vtr.error import VtrError, CommandError
-
-VERBOSITY_CHOICES = range(5)
+from vtr.error import CommandError
+from vtr import paths
 
 
 class RawDefaultHelpFormatter(
@@ -57,6 +55,7 @@ class CommandRunner:
         indent="\t",
         show_failures=False,
         valgrind=False,
+        expect_fail=None,
     ):
         if echo_cmd is None:
             echo_cmd = verbose
@@ -69,6 +68,7 @@ class CommandRunner:
         self._indent = indent
         self._show_failures = show_failures
         self._valgrind = valgrind
+        self._expect_fail = expect_fail
 
     def run_system_command(
         self, cmd, temp_dir, log_filename=None, expected_return_code=0, indent_depth=0
@@ -108,7 +108,7 @@ class CommandRunner:
                 + [
                     "valgrind",
                     "--leak-check=full",
-                    "--suppressions={}".format(find_vtr_file("valgrind.supp")),
+                    "--suppressions=" + str(paths.valgrind_supp),
                     "--error-exitcode=1",
                     "--errors-for-leak-kinds=none",
                     "--track-origins=yes",
@@ -192,19 +192,13 @@ class CommandRunner:
             for line in cmd_output:
                 print(indent_depth * self._indent + line, end="")
 
-        if self._show_failures and cmd_errored:
+        if self._show_failures and cmd_errored and not self._expect_fail:
             print("\nFailed log file follows({}):".format(str((temp_dir / log_filename).resolve())))
             for line in cmd_output:
                 print(indent_depth * self._indent + "<" + line, end="")
-            raise CommandError(
-                "Executable {exec_name} failed".format(exec_name=PurePath(orig_cmd[0]).name),
-                cmd=cmd,
-                log=str(temp_dir / log_filename),
-                returncode=cmd_returncode,
-            )
         if cmd_errored:
             raise CommandError(
-                "{}".format(PurePath(orig_cmd[0]).name),
+                "Executable {} failed".format(PurePath(orig_cmd[0]).name),
                 cmd=cmd,
                 log=str(temp_dir / log_filename),
                 returncode=cmd_returncode,
@@ -220,6 +214,29 @@ def check_cmd(command):
     """
 
     return Path(command).exists()
+
+
+def pretty_print_table(file, border=False):
+    """ Convert file to a pretty, easily read table """
+    table = PrettyTable()
+    table.border = border
+    reader = None
+    with open(file, "r") as csv_file:
+        reader = csv.reader(csv_file, delimiter="\t")
+        first = True
+        for row in reader:
+            row = [row_item.strip() + "\t" for row_item in row]
+            while row[-1] == "\t":
+                row = row[:-1]
+            if first:
+                table.field_names = list(row)
+                for head in list(row):
+                    table.align[head] = "l"
+                first = False
+            else:
+                table.add_row(row)
+    with open(file, "w+") as out_file:
+        print(table, file=out_file)
 
 
 def write_tab_delimitted_csv(filepath, rows):
@@ -291,90 +308,6 @@ def print_verbose(min_verbosity, curr_verbosity, string, endl=True):
             print(string)
         else:
             print(string,)
-
-
-def find_vtr_file(filename, is_executable=False):
-    """
-    Attempts to find a VTR related file by searching the environment.
-
-    Checking the following places:
-        1) System path (if is_executable=True)
-        2) The inferred vtr root from environment variables or the script file location
-
-    """
-    # We assume exectuables are specified in the unix style (no .exe),
-    # if it was specified with .exe, strip it off
-    file_path = PurePath(filename)
-    if file_path.suffix == ".exe":
-        filename = file_path.name
-
-    #
-    # Check if it is on the path (provided it is executable)
-    #
-    if is_executable:
-        # Search first for the non-exe version
-        result = distutils_spawn.find_executable(filename)
-        if result:
-            return result
-
-        # If not found try the .exe version
-        result = distutils_spawn.find_executable(filename + ".exe")
-        if result:
-            return result
-
-    vtr_root = find_vtr_root()
-
-    # Check the inferred VTR root
-    result = find_file_from_vtr_root(filename, vtr_root, is_executable=is_executable)
-    if result:
-        return result
-
-    # Since we stripped off the .exe, try looking for the .exe version
-    # as a last resort (i.e. on Windows/cygwin)
-    if is_executable:
-        result = find_file_from_vtr_root(filename + ".exe", vtr_root, is_executable=is_executable)
-        if result:
-            return result
-
-    raise ValueError(
-        "Could not find {type} {file}".format(
-            type="executable" if is_executable else "file", file=filename
-        )
-    )
-
-
-def find_file_from_vtr_root(filename, vtr_root, is_executable=False):
-    """
-    Given a vtr_root and a filename searches for the file recursively
-    under some common VTR directories
-    """
-    for subdir in ["vpr", "abc", "abc_with_bb_support", "ODIN_II", "vtr_flow", "ace2"]:
-        directory_path = Path(vtr_root) / subdir
-        for file_path in directory_path.glob("**/*"):
-            if file_path.name == filename:
-                if file_path.is_file():
-                    if is_executable and os.access(str(file_path), os.X_OK):
-                        # Found an executable file as required
-                        return str(file_path)
-                    # Found a file as required
-                    return str(file_path)
-    return None
-
-
-def find_vtr_root():
-    """
-        finds the root directory of VTR
-    """
-    for env_var in ["VTR_ROOT"]:
-        if env_var in os.environ:
-            return os.environ[env_var]
-
-    # We assume that this file is in <vtr_root>/vtr_flow/python_libs/verilogtorouting
-    inferred_vtr_root = Path(__file__).parent.parent.parent.parent.parent
-
-    if inferred_vtr_root.is_dir():
-        return str(inferred_vtr_root)
-    raise VtrError("Could not find VTR root directory. Try setting VTR_ROOT environment variable.")
 
 
 def file_replace(filename, search_replace_dict):
@@ -462,9 +395,7 @@ def load_config_lines(filepath, allow_includes=True):
                             include_file_abs, allow_includes=allow_includes
                         )
                     else:
-                        raise vtr.error.InspectError(
-                            "@include not allowed in this file", filepath
-                        )
+                        raise vtr.error.InspectError("@include not allowed in this file", filepath)
                 else:
                     config_lines.append(line)
     except IOError as error:
@@ -517,6 +448,18 @@ def get_next_run_dir(base_dir):
     return str(PurePath(base_dir) / run_dir_name(get_next_run_number(base_dir)))
 
 
+def find_task_dir(config):
+    """
+    find the task directory
+    """
+    task_dir = None
+    # Task dir is just above the config directory
+    task_dir = Path(config.config_dir).parent
+    assert task_dir.is_dir
+
+    return str(task_dir)
+
+
 def get_latest_run_dir(base_dir):
     """
     Returns the run directory with the highest run number in base_dir
@@ -536,7 +479,7 @@ def get_next_run_number(base_dir):
     latest_run_number = get_latest_run_number(base_dir)
 
     if latest_run_number is None:
-        next_run_number = 0
+        next_run_number = 1
     else:
         next_run_number = latest_run_number + 1
 
@@ -547,14 +490,14 @@ def get_latest_run_number(base_dir):
     """
     Returns the highest run number of all run directories with in base_dir
     """
-    run_number = 0
+    run_number = 1
     run_dir = Path(base_dir) / run_dir_name(run_number)
 
-    if not run_dir.exists:
+    if not run_dir.exists():
         # No existing run directories
         return None
 
-    while run_dir.exists:
+    while run_dir.exists():
         run_number += 1
         run_dir = Path(base_dir) / run_dir_name(run_number)
 
