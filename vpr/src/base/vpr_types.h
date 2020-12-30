@@ -325,10 +325,16 @@ class t_pb {
     t_mode* get_mode() const;
 
     /**
-     * @brief Returns the t_pb associated with the specified gnode which is contained
+     * @brief Returns the read-only t_pb associated with the specified gnode which is contained
      *        within the current pb
      */
     const t_pb* find_pb(const t_pb_graph_node* gnode) const;
+
+    /**
+     * @brief Returns the mutable t_pb associated with the specified gnode which is contained
+     *        within the current pb
+     */
+    t_pb* find_mutable_pb(const t_pb_graph_node* gnode);
 
     const t_pb* find_pb_for_model(const std::string& blif_model) const;
 
@@ -740,6 +746,7 @@ struct t_file_name_opts {
     std::string PowerFile;
     std::string CmosTechFile;
     std::string out_file_prefix;
+    std::string read_vpr_constraints_file;
     bool verify_file_digests;
 };
 
@@ -1179,11 +1186,10 @@ struct t_router_opts {
     enum e_route_type route_type;
     int fixed_channel_width;
     int min_channel_width_hint; ///<Hint to binary search of what the minimum channel width is
-    bool trim_empty_channels;
-    bool trim_obs_channels;
     enum e_router_algorithm router_algorithm;
     enum e_base_cost_type base_cost_type;
     float astar_fac;
+    float router_profiler_astar_fac;
     float max_criticality;
     float criticality_exp;
     float init_wirelength_abort_threshold;

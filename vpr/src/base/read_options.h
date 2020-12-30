@@ -26,6 +26,7 @@ struct t_options {
     argparse::ArgValue<std::string> constraints_file;
     argparse::ArgValue<std::string> write_rr_graph_file;
     argparse::ArgValue<std::string> read_rr_graph_file;
+    argparse::ArgValue<std::string> read_vpr_constraints_file;
 
     argparse::ArgValue<std::string> write_placement_delay_lookup;
     argparse::ArgValue<std::string> read_placement_delay_lookup;
@@ -158,6 +159,7 @@ struct t_options {
 
     /* Timing-driven router options only */
     argparse::ArgValue<float> astar_fac;
+    argparse::ArgValue<float> router_profiler_astar_fac;
     argparse::ArgValue<float> max_criticality;
     argparse::ArgValue<float> criticality_exp;
     argparse::ArgValue<float> router_init_wirelength_abort_threshold;
