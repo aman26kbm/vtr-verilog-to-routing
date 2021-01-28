@@ -6217,34 +6217,41 @@ assign q_b = (clken) ? q_b_reg[1] : 0;
 
 
 //There are 13 bits of address. We have RAMs that can take 10 bits.
-//We need to instantiate 16 memories. Each of the 4 bits of address will
-//be decoded to select one of the 16 memories.
+//We need to instantiate 8 memories. Each of the 3 bits of address will
+//be decoded to select one of the 8 memories.
 
 
-wire [3:0] high_addr_a;
-wire [3:0] high_addr_b;
-assign high_addr_a = address_a[3:0];
-assign high_addr_b = address_b[3:0];
+wire [2:0] high_addr_a;
+wire [2:0] high_addr_b;
+assign high_addr_a = address_a[12:10];
+assign high_addr_b = address_b[12:10];
 
-wire [15:0] gen_wren_a;
-wire [15:0] gen_wren_b;
+wire [7:0] gen_wren_a;
+wire [7:0] gen_wren_b;
+wire [7:0] actual_wren_a;
+wire [7:0] actual_wren_b;
 
 //Generate write enables for each ram
-assign gen_wren_a = (16'h0001 << high_addr_a);
-assign gen_wren_b = (16'h0001 << high_addr_b);
+assign gen_wren_a = (8'h001 << high_addr_a);
+assign gen_wren_b = (8'h001 << high_addr_b);
 
+assign actual_wren_a = gen_wren_a & {8{wren_a}};
+assign actual_wren_b = gen_wren_b & {8{wren_b}};
+
+//The address bus for each of the instances
 wire [9:0] low_addr_a;
 wire [9:0] low_addr_b;
+
 assign low_addr_a = address_a[9:0];
 assign low_addr_b = address_b[9:0];
 
-wire [32*16-1:0] q_a_long;
-wire [32*16-1:0] q_b_long;
+wire [32*8-1:0] q_a_long;
+wire [32*8-1:0] q_b_long;
 
 /*
 genvar iter;
 generate
-	for (iter=0; iter<16; iter=iter+1) begin: U
+	for (iter=0; iter<8; iter=iter+1) begin: U
 		dual_port_ram u_dual_port_ram(
         .addr1(low_addr_a),
         .we1(gen_wren_a[iter]),
@@ -6262,11 +6269,11 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_0(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[0]),
+           .we1(actual_wren_a[0]),
            .data1(data_a),
            .out1(q_a_long[31:0]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[0]),
+           .we2(actual_wren_b[0]),
            .data2(data_b),
            .out2(q_b_long[31:0]),
            .clk(clk)
@@ -6275,11 +6282,11 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_1(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[1]),
+           .we1(actual_wren_a[1]),
            .data1(data_a),
            .out1(q_a_long[63:32]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[1]),
+           .we2(actual_wren_b[1]),
            .data2(data_b),
            .out2(q_b_long[63:32]),
            .clk(clk)
@@ -6288,11 +6295,11 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_2(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[2]),
+           .we1(actual_wren_a[2]),
            .data1(data_a),
            .out1(q_a_long[95:64]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[2]),
+           .we2(actual_wren_b[2]),
            .data2(data_b),
            .out2(q_b_long[95:64]),
            .clk(clk)
@@ -6301,11 +6308,11 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_3(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[3]),
+           .we1(actual_wren_a[3]),
            .data1(data_a),
            .out1(q_a_long[127:96]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[3]),
+           .we2(actual_wren_b[3]),
            .data2(data_b),
            .out2(q_b_long[127:96]),
            .clk(clk)
@@ -6314,11 +6321,11 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_4(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[4]),
+           .we1(actual_wren_a[4]),
            .data1(data_a),
            .out1(q_a_long[159:128]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[4]),
+           .we2(actual_wren_b[4]),
            .data2(data_b),
            .out2(q_b_long[159:128]),
            .clk(clk)
@@ -6327,11 +6334,11 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_5(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[5]),
+           .we1(actual_wren_a[5]),
            .data1(data_a),
            .out1(q_a_long[191:160]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[5]),
+           .we2(actual_wren_b[5]),
            .data2(data_b),
            .out2(q_b_long[191:160]),
            .clk(clk)
@@ -6340,11 +6347,11 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_6(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[6]),
+           .we1(actual_wren_a[6]),
            .data1(data_a),
            .out1(q_a_long[223:192]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[6]),
+           .we2(actual_wren_b[6]),
            .data2(data_b),
            .out2(q_b_long[223:192]),
            .clk(clk)
@@ -6353,117 +6360,13 @@ endgenerate
 
     	dual_port_ram u_dual_port_ram_7(
            .addr1(low_addr_a),
-           .we1(gen_wren_a[7]),
+           .we1(actual_wren_a[7]),
            .data1(data_a),
            .out1(q_a_long[255:224]),
            .addr2(low_addr_b),
-           .we2(gen_wren_b[7]),
+           .we2(actual_wren_b[7]),
            .data2(data_b),
            .out2(q_b_long[255:224]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_8(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[8]),
-           .data1(data_a),
-           .out1(q_a_long[287:256]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[8]),
-           .data2(data_b),
-           .out2(q_b_long[287:256]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_9(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[9]),
-           .data1(data_a),
-           .out1(q_a_long[319:288]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[9]),
-           .data2(data_b),
-           .out2(q_b_long[319:288]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_10(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[10]),
-           .data1(data_a),
-           .out1(q_a_long[351:320]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[10]),
-           .data2(data_b),
-           .out2(q_b_long[351:320]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_11(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[11]),
-           .data1(data_a),
-           .out1(q_a_long[383:352]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[11]),
-           .data2(data_b),
-           .out2(q_b_long[383:352]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_12(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[12]),
-           .data1(data_a),
-           .out1(q_a_long[415:384]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[12]),
-           .data2(data_b),
-           .out2(q_b_long[415:384]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_13(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[13]),
-           .data1(data_a),
-           .out1(q_a_long[447:416]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[13]),
-           .data2(data_b),
-           .out2(q_b_long[447:416]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_14(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[14]),
-           .data1(data_a),
-           .out1(q_a_long[479:448]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[14]),
-           .data2(data_b),
-           .out2(q_b_long[479:448]),
-           .clk(clk)
-           );
-    
-
-    	dual_port_ram u_dual_port_ram_15(
-           .addr1(low_addr_a),
-           .we1(gen_wren_a[15]),
-           .data1(data_a),
-           .out1(q_a_long[511:480]),
-           .addr2(low_addr_b),
-           .we2(gen_wren_b[15]),
-           .data2(data_b),
-           .out2(q_b_long[511:480]),
            .clk(clk)
            );
     
@@ -6475,44 +6378,28 @@ endgenerate
 
 always @(high_addr_a, q_a) begin
 	case (high_addr_a)
-	    4'b0000: q_a = q_a_long[32*1-1 : 32*0];
-	    4'b0001: q_a = q_a_long[32*2-1 : 32*1];
-	    4'b0010: q_a = q_a_long[32*3-1 : 32*2];
-	    4'b0011: q_a = q_a_long[32*4-1 : 32*3];
-	    4'b0100: q_a = q_a_long[32*5-1 : 32*4];
-	    4'b0101: q_a = q_a_long[32*6-1 : 32*5];
-	    4'b0110: q_a = q_a_long[32*7-1 : 32*6];
-	    4'b0111: q_a = q_a_long[32*8-1 : 32*7];
-	    4'b1000: q_a = q_a_long[32*9-1 : 32*8];
-	    4'b1001: q_a = q_a_long[32*10-1 : 32*9];
-	    4'b1010: q_a = q_a_long[32*11-1 : 32*10];
-	    4'b1011: q_a = q_a_long[32*12-1 : 32*11];
-	    4'b1100: q_a = q_a_long[32*13-1 : 32*12];
-	    4'b1101: q_a = q_a_long[32*14-1 : 32*13];
-	    4'b1110: q_a = q_a_long[32*15-1 : 32*14];
-	    4'b1111: q_a = q_a_long[32*16-1 : 32*15];
+	    3'b000: q_a = q_a_long[32*1-1 : 32*0];
+	    3'b001: q_a = q_a_long[32*2-1 : 32*1];
+	    3'b010: q_a = q_a_long[32*3-1 : 32*2];
+	    3'b011: q_a = q_a_long[32*4-1 : 32*3];
+	    3'b100: q_a = q_a_long[32*5-1 : 32*4];
+	    3'b101: q_a = q_a_long[32*6-1 : 32*5];
+	    3'b110: q_a = q_a_long[32*7-1 : 32*6];
+	    3'b111: q_a = q_a_long[32*8-1 : 32*7];
 		default: q_a = 0;
 	endcase
 end
 
 always @(high_addr_b, q_b) begin
 	case (high_addr_b)
-	    4'b0000: q_b = q_b_long[32*1-1 : 32*0];
-	    4'b0001: q_b = q_b_long[32*2-1 : 32*1];
-	    4'b0010: q_b = q_b_long[32*3-1 : 32*2];
-	    4'b0011: q_b = q_b_long[32*4-1 : 32*3];
-	    4'b0100: q_b = q_b_long[32*5-1 : 32*4];
-	    4'b0101: q_b = q_b_long[32*6-1 : 32*5];
-	    4'b0110: q_b = q_b_long[32*7-1 : 32*6];
-	    4'b0111: q_b = q_b_long[32*8-1 : 32*7];
-	    4'b1000: q_b = q_b_long[32*9-1 : 32*8];
-	    4'b1001: q_b = q_b_long[32*10-1 : 32*9];
-	    4'b1010: q_b = q_b_long[32*11-1 : 32*10];
-	    4'b1011: q_b = q_b_long[32*12-1 : 32*11];
-	    4'b1100: q_b = q_b_long[32*13-1 : 32*12];
-	    4'b1101: q_b = q_b_long[32*14-1 : 32*13];
-	    4'b1110: q_b = q_b_long[32*15-1 : 32*14];
-	    4'b1111: q_b = q_b_long[32*16-1 : 32*15];
+	    3'b0000: q_b = q_b_long[32*1-1 : 32*0];
+	    3'b0001: q_b = q_b_long[32*2-1 : 32*1];
+	    3'b0010: q_b = q_b_long[32*3-1 : 32*2];
+	    3'b0011: q_b = q_b_long[32*4-1 : 32*3];
+	    3'b0100: q_b = q_b_long[32*5-1 : 32*4];
+	    3'b0101: q_b = q_b_long[32*6-1 : 32*5];
+	    3'b0110: q_b = q_b_long[32*7-1 : 32*6];
+	    3'b0111: q_b = q_b_long[32*8-1 : 32*7];
 		default: q_b = 0;
 	endcase
 end
