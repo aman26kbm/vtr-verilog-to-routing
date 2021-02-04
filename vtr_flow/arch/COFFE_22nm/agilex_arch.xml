@@ -2,6 +2,9 @@
     This is the architecture file for an Agilex-like Architecture, based off
     the Stratix-10-like Architecture discussed in [1].
 
+    The delays and areas of various components in this arch come from COFFE [2]
+    runs using a 22nm technology node [3].
+
     ##############################
     Parameters
     ##############################
@@ -34,8 +37,6 @@
     The LAB (or Logic Cluster or CLB) has 60 inputs and 40 outputs. Two outputs of each ALM are fed 
     to the right and left LAB using direct links and are also fed back to the LAB as feedback connections 
     sharing the 60 input ports with the signals coming from the routing channels.
-
-    Delays and area for Logic Cluster come from COFFE runs on a 20 nm technology node.
 
     The LAB has a 50% sparsely populated input crossbar.
     
@@ -70,9 +71,18 @@
     10. floating point fp16 mult, fp32 add mode (result = fp16_mult_top_a * fp_mult_top_b + fp16_mult_bot_a * fp16_mult_bot_b. chainout = chainin + third_inp) (fp16_mult_fp32_add/fp16_mult_fp32_add)
     11. floating point fp16 mult, fp32 accum mode (chainout = fp16_mult_top_a * fp_mult_top_b + fp16_mult_bot_a * fp16_mult_bot_b. result = third_inp + accumulator) (fp16_mult_fp32_accum/fp16_mult_fp32_accum)
 
-    Delays and area for DSP slice also come from COFFE runs on 20nm. 
+    Modes with mac or accum in their name have registered inputs and outputs.
+    All other modes (raw multiply, raw adder, sum-of-products, mult-add, etc) are combinational in nature.
 
-    The DSP slice has a 50% sparsely populated input crossbar.
+    The DSP block was designed in Verilog and COFFE's [2] hybrid flow was used to generate
+    area and delay results. The standard cell library used was Cadence GPDK 45nm (gsclib045_svt_v4.4)
+    and area/delay scaling euqations from [4] were used.
+
+    A 50% sparsely populated input crossbar was added to the DSP block but is commented out.
+    It was leading to a failure in in VPR. See the discussion on this commit: 
+    https://github.com/verilog-to-routing/vtr-verilog-to-routing/commit/ea7acf1582ece35e892c26b756aa302d2e12ddb2
+
+    Once this is fixed, the input crossbar code can be enabled.
 
     ##############################
     Memory Blocks
@@ -81,10 +91,8 @@
     In simple dual port mode the memory can be configured in the following modes: 512x40, 1024x20 and 2048x10,
     while in true dual port mode it can be configured as: 1024x20 and 2048x10.
 
-    BRAM (M20k) delays and area come from COFFE runs on 20nm. (See details in the comments before the 
-    specification of the BRAM towards the end of this file)
-
-    The BRAM has registered inputs and outputs. 
+    The BRAM has registered inputs and outputs. See details on how the delays for this block were 
+    obtained, in the comments before the specification of the BRAM primitive, towards the end of this file.
 
     The BRAM doesn't have an input crossbar. Adding an input crossbar was leading to a 
     seg fault in VPR, likely because of https://github.com/verilog-to-routing/vtr-verilog-to-routing/issues/1475
@@ -96,13 +104,10 @@
     ##############################
     This architecture uses Wilton type switches with Fs=3. The channel width is 320.
 
-    Delays for routing elements come from COFFE runs for a 20nm technology node.
-
     ##############################
     Misc
     ##############################
-    Tile grid area come from COFFE (20 nm). 
-    No area values area provided for the IOs.
+    No area values provided for the IOs.
 
     ##############################
     What makes this architecture Agilex-like?
@@ -120,8 +125,13 @@
     feature in the Stratix10 and Agilex families of Intel FPGA (it's called HyperFlex by Intel)
 
     [1] M. Eldafrawy, A. Boutros, S. Yazdanshenas, and V. Betz, "FPGA Logic Block Architectures for
-        Efficient Deep Learning Inference," in Transactions on Reconfigurable Technology and Systems
-        (TRETS), 2020
+        Efficient Deep Learning Inference" in ACM TRETS, 2020
+    [2] S. Yazdanshenas, and V. Betz, "COFFE 2: Automatic Modelling and Optimization of
+        Complex and Heterogeneous FPGA Architectures" in ACM TRETS, 2019. 
+    [3] PTM High Performance 22nm Metal Gate / High-K / Strained-Si 22NM_BULK_HP, from http://ptm.asu.edu/
+        See: https://github.com/vaughnbetz/COFFE/blob/master/spice_models/ptm_22nm_bulk_hp.l
+    [4] A. Stillmaker and B. Baas, "Scaling equations for the accurate prediction of CMOS device 
+        performance from 180 nm to 7 nm" in Integration, the VLSI Journal (2017)
 -->
 
 <architecture>
@@ -137,11 +147,11 @@
   <models>
     <model name="single_port_ram">
       <input_ports>
-        <port name="we" clock="clk"/>
+        <port name="we" clock="clk" combinational_sink_ports="out"/>
         <!-- control -->
-        <port name="addr" clock="clk"/>
+        <port name="addr" clock="clk" combinational_sink_ports="out"/>
         <!-- address lines -->
-        <port name="data" clock="clk"/>
+        <port name="data" clock="clk" combinational_sink_ports="out"/>
         <!-- data lines can be broken down into smaller bit widths minimum size 1 -->
         <port name="clk" is_clock="1"/>
         <!-- memories are often clocked -->
@@ -153,17 +163,17 @@
     </model>
     <model name="dual_port_ram">
       <input_ports>
-        <port name="we1" clock="clk"/>
+        <port name="we1" clock="clk" combinational_sink_ports="out1"/>
         <!-- write enable -->
-        <port name="we2" clock="clk"/>
+        <port name="we2" clock="clk" combinational_sink_ports="out2"/>
         <!-- write enable -->
-        <port name="addr1" clock="clk"/>
+        <port name="addr1" clock="clk" combinational_sink_ports="out1"/>
         <!-- address lines -->
-        <port name="addr2" clock="clk"/>
+        <port name="addr2" clock="clk" combinational_sink_ports="out2"/>
         <!-- address lines -->
-        <port name="data1" clock="clk"/>
+        <port name="data1" clock="clk" combinational_sink_ports="out1"/>
         <!-- data lines can be broken down into smaller bit widths minimum size 1 -->
-        <port name="data2" clock="clk"/>
+        <port name="data2" clock="clk" combinational_sink_ports="out2"/>
         <!-- data lines can be broken down into smaller bit widths minimum size 1 -->
         <port name="clk" is_clock="1"/>
         <!-- memories are often clocked -->
@@ -418,20 +428,18 @@
           <site pb_type="dsp_top" pin_mapping="direct"/>
         </equivalent_sites>
         <input name="reset" num_pins="1" is_non_clock_global="true"/>
-        <input name="dsp_I1" num_pins="64" equivalent="full"/>
-        <input name="dsp_I2" num_pins="63" equivalent="full"/>
+        <input name="dsp_I1" num_pins="64" />
+        <input name="dsp_I2" num_pins="63" />
         <input name="chainin" num_pins="64"/>
         <output name="resulta" num_pins="64"/>
         <output name="resultb" num_pins="37"/>
         <output name="chainout" num_pins="64"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
-          <!-- clock pins do not connect to local routing -->
-          <fc_override fc_type="frac" fc_val="0" port_name="clk"/>
-        <!--
+          <!-- clock pins and chain ports do not connect to local routing -->
+          <fc_override port_name="clk" fc_type="frac" fc_val="0"/>
           <fc_override port_name="chainin" fc_type="frac" fc_val="0"/>
           <fc_override port_name="chainout" fc_type="frac" fc_val="0"/>
-        -->
         </fc>
         <pinlocations pattern="perimeter"/>
       </sub_tile>
@@ -465,7 +473,7 @@
       <!--Perimeter of 'io' blocks with 'EMPTY' blocks at corners-->
       <perimeter type="io" priority="101"/>
       <corners type="EMPTY" priority="102"/>
-
+      
       <col type="dsp_top"  startx="1"  starty="1"  priority="100"/>
       <col type="clb"  startx="2"  starty="1"  priority="100"/>
       <col type="clb"  startx="3"  starty="1"  priority="100"/>
@@ -505,7 +513,6 @@
       <col type="clb"  startx="174"  starty="1"  priority="1"/>
       <col type="clb"  startx="175"  starty="1"  priority="1"/>
       <col type="dsp_top"  startx="176"  starty="1"  priority="20"/>
-
     <!--
     </auto_layout>
     -->
@@ -547,7 +554,6 @@
   </directlist>
   <complexblocklist>
     <!-- Define I/O pads begin -->
-    <!-- Capacity is a unique property of I/Os, it is the maximum number of I/Os that can be placed at the same (X,Y) location on the FPGA -->
     <!-- Not sure of the area of an I/O (varies widely), and it's not relevant to the design of the FPGA core, so we're setting it to 0. -->
     <pb_type name="io">
       <input name="outpad" num_pins="1"/>
@@ -868,6 +874,12 @@
         </pb_type>
         <interconnect>
           <!-- 50% sparsely populated local routing -->
+          <!-- This 50% sparsity pattern divides the cluster inputs and local feedbacks into four groups, 
+               and then selects two of the four groups to feed each LUT input. This means half of the cluster 
+               inputs and local feedbacks can feed each LUT input. There is partial overlap in the inputs that 
+               feed the various LUT inputs, which helps routability vs. simply having half the cluster inputs 
+               feed one set of half the LUT inputs and the other half of cluster inputs feed the other set of 
+               LUT inputs. This pattern is used by Stratix (I - 10) architectures. -->
           <complete name="lutA" input="lab.I4 lab.I3" output="fle[9:0].in[0:0]">
             <delay_constant max="74.71e-12" in_port="lab.I4" out_port="fle.in[0:0]"/>
             <delay_constant max="74.71e-12" in_port="lab.I3" out_port="fle.in[0:0]"/>
@@ -946,8 +958,8 @@
     <!-- Define DSP slice begin -->
     <pb_type name="dsp_top">
       <input name="reset" num_pins="1" is_non_clock_global="true"/>
-      <input name="dsp_I1" num_pins="64" equivalent="full"/>
-      <input name="dsp_I2" num_pins="63" equivalent="full"/>
+      <input name="dsp_I1" num_pins="64" />
+      <input name="dsp_I2" num_pins="63" />
       <input name="chainin" num_pins="64"/>
       <output name="resulta" num_pins="64"/>
       <output name="resultb" num_pins="37"/>
@@ -1775,6 +1787,7 @@
     <interconnect>
         <!--50% sparse crossbar means 50% of the lines can reach an actual input of the dsp 
         We do this by splitting inputs into two buckets and having two full crossbars-->
+        <!--
        <complete name="first_half" input="dsp_top.dsp_I1" output="dsp.dsp_I1">
             <delay_constant max="333e-12" in_port="dsp_top.dsp_I1" out_port="dsp.dsp_I1"/>
        </complete>
@@ -1782,7 +1795,7 @@
         <complete name="second_half" input="dsp_top.dsp_I2" output="dsp.dsp_I2">
             <delay_constant max="333e-12" in_port="dsp_top.dsp_I2" out_port="dsp.dsp_I2"/>
         </complete>
-        <!--
+        -->
         <direct name="enable" input="dsp_top.dsp_I1[0]" output ="dsp.dsp_I1[0]"/>
         <direct name="loadconst" input="dsp_top.dsp_I1[1]" output ="dsp.dsp_I1[1]"/>
         <direct name="accumulate" input="dsp_top.dsp_I1[2]" output ="dsp.dsp_I1[2]"/>
@@ -1794,7 +1807,6 @@
         <direct name="internal_coeffb" input="dsp_top.dsp_I1[10]" output ="dsp.dsp_I1[10]"/>
         <direct name="datain1" input="dsp_top.dsp_I1[63:11]" output ="dsp.dsp_I1[63:11]"/>
         <direct name="datain2" input="dsp_top.dsp_I2" output ="dsp.dsp_I2"/>
-        -->
  
         <direct name="reset" input="dsp_top.reset" output="dsp.reset"></direct>
         <direct name="chainin" input="dsp_top.chainin" output="dsp.chainin">
@@ -1867,14 +1879,21 @@
           <input name="we" num_pins="1" port_class="write_en"/>
           <output name="out" num_pins="40" port_class="data_out"/>
           <clock name="clk" num_pins="1" port_class="clock"/>
+
           <T_setup value="51.12e-12" port="mem_512x40_sp.addr" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_512x40_sp.data" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_512x40_sp.we" clock="clk"/>
           <T_setup value="18.91e-12" port="mem_512x40_sp.out" clock="clk"/>
+
           <T_clock_to_Q max="60.32e-12" port="mem_512x40_sp.addr" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_512x40_sp.data" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_512x40_sp.we" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_512x40_sp.out" clock="clk"/>
+
+          <delay_constant max="0.973e-9" in_port="mem_512x40_sp.addr" out_port="mem_512x40_sp.out"/>
+          <delay_constant max="0.973e-9" in_port="mem_512x40_sp.data" out_port="mem_512x40_sp.out"/>
+          <delay_constant max="0.973e-9" in_port="mem_512x40_sp.we"   out_port="mem_512x40_sp.out"/>
+
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="9.0e-12"/>
             <static_power power_per_instance="0.0"/>
@@ -1882,19 +1901,15 @@
         </pb_type>
         <interconnect>
           <direct name="address1" input="memory.addr1[8:0]" output="mem_512x40_sp.addr">
-            <delay_constant max="0.973e-9" in_port="memory.addr1[8:0]" out_port="mem_512x40_sp.addr"/>
           </direct>
           <direct name="data1" input="memory.data" output="mem_512x40_sp.data">
-            <delay_constant max="0.973e-9" in_port="memory.data" out_port="mem_512x40_sp.data"/>
           </direct>
           <direct name="writeen1" input="memory.we1" output="mem_512x40_sp.we">
-            <delay_constant max="0.973e-9" in_port="memory.we1" out_port="mem_512x40_sp.we"/>
           </direct>
           <direct name="dataout1" input="mem_512x40_sp.out" output="memory.out">
-            <delay_constant max="0.973e-9" in_port="mem_512x40_sp.out" out_port="memory.out"/>
           </direct>
           <direct name="clk" input="memory.clk" output="mem_512x40_sp.clk">
-             </direct>
+          </direct>
         </interconnect>
       </mode>
 
@@ -1905,14 +1920,21 @@
           <input name="we" num_pins="1" port_class="write_en"/>
           <output name="out" num_pins="20" port_class="data_out"/>
           <clock name="clk" num_pins="1" port_class="clock"/>
+
           <T_setup value="51.12e-12" port="mem_1024x20_sp.addr" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_1024x20_sp.data" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_1024x20_sp.we" clock="clk"/>
           <T_setup value="18.91e-12" port="mem_1024x20_sp.out" clock="clk"/>
+
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_sp.addr" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_sp.data" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_sp.we" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_sp.out" clock="clk"/>
+
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_sp.addr" out_port="mem_1024x20_sp.out"/>
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_sp.data" out_port="mem_1024x20_sp.out"/>
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_sp.we"   out_port="mem_1024x20_sp.out"/>
+
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="9.0e-12"/>
             <static_power power_per_instance="0.0"/>
@@ -1920,19 +1942,15 @@
         </pb_type>
         <interconnect>
           <direct name="address1" input="memory.addr1[9:0]" output="mem_1024x20_sp.addr">
-            <delay_constant max="0.973e-9" in_port="memory.addr1[9:0]" out_port="mem_1024x20_sp.addr"/>
           </direct>
           <direct name="data1" input="memory.data[19:0]" output="mem_1024x20_sp.data">
-            <delay_constant max="0.973e-9" in_port="memory.data[19:0]" out_port="mem_1024x20_sp.data"/>
           </direct>
           <direct name="writeen1" input="memory.we1" output="mem_1024x20_sp.we">
-            <delay_constant max="0.973e-9" in_port="memory.we1" out_port="mem_1024x20_sp.we"/>
           </direct>
           <direct name="dataout1" input="mem_1024x20_sp.out" output="memory.out[19:0]">
-            <delay_constant max="0.973e-9" in_port="mem_1024x20_sp.out" out_port="memory.out[19:0]"/>
           </direct>
           <direct name="clk" input="memory.clk" output="mem_1024x20_sp.clk">
-             </direct>
+          </direct>
         </interconnect>
       </mode>
 
@@ -1943,14 +1961,21 @@
           <input name="we" num_pins="1" port_class="write_en"/>
           <output name="out" num_pins="10" port_class="data_out"/>
           <clock name="clk" num_pins="1" port_class="clock"/>
+
           <T_setup value="51.12e-12" port="mem_2048x10_sp.addr" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_2048x10_sp.data" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_2048x10_sp.we" clock="clk"/>
           <T_setup value="18.91e-12" port="mem_2048x10_sp.out" clock="clk"/>
+
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_sp.addr" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_sp.data" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_sp.we" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_sp.out" clock="clk"/>
+
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_sp.addr" out_port="mem_2048x10_sp.out"/>
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_sp.data" out_port="mem_2048x10_sp.out"/>
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_sp.we"   out_port="mem_2048x10_sp.out"/>
+
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="9.0e-12"/>
             <static_power power_per_instance="0.0"/>
@@ -1958,19 +1983,15 @@
         </pb_type>
         <interconnect>
           <direct name="address1" input="memory.addr1[10:0]" output="mem_2048x10_sp.addr">
-            <delay_constant max="0.973e-9" in_port="memory.addr1[10:0]" out_port="mem_2048x10_sp.addr"/>
           </direct>
           <direct name="data1" input="memory.data[9:0]" output="mem_2048x10_sp.data">
-            <delay_constant max="0.973e-9" in_port="memory.data[9:0]" out_port="mem_2048x10_sp.data"/>
           </direct>
           <direct name="writeen1" input="memory.we1" output="mem_2048x10_sp.we">
-            <delay_constant max="0.973e-9" in_port="memory.we1" out_port="mem_2048x10_sp.we"/>
           </direct>
           <direct name="dataout1" input="mem_2048x10_sp.out" output="memory.out[9:0]">
-            <delay_constant max="0.973e-9" in_port="mem_2048x10_sp.out" out_port="memory.out[9:0]"/>
           </direct>
           <direct name="clk" input="memory.clk" output="mem_2048x10_sp.clk">
-             </direct>
+          </direct>
         </interconnect>
       </mode>
 
@@ -1986,6 +2007,7 @@
           <output name="out1" num_pins="20" port_class="data_out1"/>
           <output name="out2" num_pins="20" port_class="data_out2"/>
           <clock name="clk" num_pins="1" port_class="clock"/>
+
           <T_setup value="51.12e-12" port="mem_1024x20_dp.addr1" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_1024x20_dp.data1" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_1024x20_dp.we1" clock="clk"/>
@@ -1994,6 +2016,7 @@
           <T_setup value="51.12e-12" port="mem_1024x20_dp.we2" clock="clk"/>
           <T_setup value="18.91e-12" port="mem_1024x20_dp.out1" clock="clk"/>
           <T_setup value="18.91e-12" port="mem_1024x20_dp.out2" clock="clk"/>
+
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.addr1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.data1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.we1" clock="clk"/>
@@ -2002,6 +2025,14 @@
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.we2" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.out1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.out2" clock="clk"/>
+
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.addr1" out_port="mem_1024x20_dp.out1"/>
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.data1" out_port="mem_1024x20_dp.out1"/>
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.we1" out_port="mem_1024x20_dp.out1"/>
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.addr2" out_port="mem_1024x20_dp.out2"/>
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.data2" out_port="mem_1024x20_dp.out2"/>
+          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.we2" out_port="mem_1024x20_dp.out2"/>
+
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="17.9e-12"/>
             <static_power power_per_instance="0.0"/>
@@ -2009,31 +2040,23 @@
         </pb_type>
         <interconnect>
           <direct name="address1" input="memory.addr1[9:0]" output="mem_1024x20_dp.addr1">
-            <delay_constant max="0.973e-9" in_port="memory.addr1[9:0]" out_port="mem_1024x20_dp.addr1"/>
           </direct>
           <direct name="address2" input="memory.addr2[9:0]" output="mem_1024x20_dp.addr2">
-            <delay_constant max="0.973e-9" in_port="memory.addr2[9:0]" out_port="mem_1024x20_dp.addr2"/>
           </direct>
           <direct name="data1" input="memory.data[19:0]" output="mem_1024x20_dp.data1">
-            <delay_constant max="0.973e-9" in_port="memory.data[19:0]" out_port="mem_1024x20_dp.data1"/>
           </direct>
           <direct name="data2" input="memory.data[39:20]" output="mem_1024x20_dp.data2">
-            <delay_constant max="0.973e-9" in_port="memory.data[39:20]" out_port="mem_1024x20_dp.data2"/>
           </direct>
           <direct name="writeen1" input="memory.we1" output="mem_1024x20_dp.we1">
-            <delay_constant max="0.973e-9" in_port="memory.we1" out_port="mem_1024x20_dp.we1"/>
           </direct>
           <direct name="writeen2" input="memory.we2" output="mem_1024x20_dp.we2">
-            <delay_constant max="0.973e-9" in_port="memory.we2" out_port="mem_1024x20_dp.we2"/>
           </direct>
           <direct name="dataout1" input="mem_1024x20_dp.out1" output="memory.out[19:0]">
-            <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.out1" out_port="memory.out[19:0]"/>
           </direct>
           <direct name="dataout2" input="mem_1024x20_dp.out2" output="memory.out[39:20]">
-            <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.out2" out_port="memory.out[39:20]"/>
           </direct>
           <direct name="clk" input="memory.clk" output="mem_1024x20_dp.clk">
-             </direct>
+          </direct>
         </interconnect>
       </mode>
 
@@ -2048,6 +2071,7 @@
           <output name="out1" num_pins="10" port_class="data_out1"/>
           <output name="out2" num_pins="10" port_class="data_out2"/>
           <clock name="clk" num_pins="1" port_class="clock"/>
+
           <T_setup value="51.12e-12" port="mem_2048x10_dp.addr1" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_2048x10_dp.data1" clock="clk"/>
           <T_setup value="51.12e-12" port="mem_2048x10_dp.we1" clock="clk"/>
@@ -2056,6 +2080,7 @@
           <T_setup value="51.12e-12" port="mem_2048x10_dp.we2" clock="clk"/>
           <T_setup value="18.91e-12" port="mem_2048x10_dp.out1" clock="clk"/>
           <T_setup value="18.91e-12" port="mem_2048x10_dp.out2" clock="clk"/>
+
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.addr1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.data1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.we1" clock="clk"/>
@@ -2064,6 +2089,14 @@
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.we2" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.out1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.out2" clock="clk"/>
+
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.addr1" out_port="mem_2048x10_dp.out1"/>
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.data1" out_port="mem_2048x10_dp.out1"/>
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.we1" out_port="mem_2048x10_dp.out1"/>
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.addr2" out_port="mem_2048x10_dp.out2"/>
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.data2" out_port="mem_2048x10_dp.out2"/>
+          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.we2" out_port="mem_2048x10_dp.out2"/>
+
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="17.9e-12"/>
             <static_power power_per_instance="0.0"/>
@@ -2071,31 +2104,23 @@
         </pb_type>
         <interconnect>
           <direct name="address1" input="memory.addr1[10:0]" output="mem_2048x10_dp.addr1">
-            <delay_constant max="0.973e-9" in_port="memory.addr1[10:0]" out_port="mem_2048x10_dp.addr1"/>
           </direct>
           <direct name="address2" input="memory.addr2[10:0]" output="mem_2048x10_dp.addr2">
-            <delay_constant max="0.973e-9" in_port="memory.addr2[10:0]" out_port="mem_2048x10_dp.addr2"/>
           </direct>
           <direct name="data1" input="memory.data[9:0]" output="mem_2048x10_dp.data1">
-            <delay_constant max="0.973e-9" in_port="memory.data[9:0]" out_port="mem_2048x10_dp.data1"/>
           </direct>
           <direct name="data2" input="memory.data[19:10]" output="mem_2048x10_dp.data2">
-            <delay_constant max="0.973e-9" in_port="memory.data[19:10]" out_port="mem_2048x10_dp.data2"/>
           </direct>
           <direct name="writeen1" input="memory.we1" output="mem_2048x10_dp.we1">
-            <delay_constant max="0.973e-9" in_port="memory.we1" out_port="mem_2048x10_dp.we1"/>
           </direct>
           <direct name="writeen2" input="memory.we2" output="mem_2048x10_dp.we2">
-            <delay_constant max="0.973e-9" in_port="memory.we2" out_port="mem_2048x10_dp.we2"/>
           </direct>
           <direct name="dataout1" input="mem_2048x10_dp.out1" output="memory.out[9:0]">
-            <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.out1" out_port="memory.out[9:0]"/>
           </direct>
           <direct name="dataout2" input="mem_2048x10_dp.out2" output="memory.out[19:10]">
-            <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.out2" out_port="memory.out[19:10]"/>
           </direct>
           <direct name="clk" input="memory.clk" output="mem_2048x10_dp.clk">
-             </direct>
+          </direct>
         </interconnect>
       </mode>
       <power method="sum-of-children"/>
