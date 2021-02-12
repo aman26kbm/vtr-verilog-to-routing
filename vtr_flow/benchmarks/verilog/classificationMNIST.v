@@ -46,6 +46,7 @@
 module top
 	(
 		clk,
+    clk2x,
 		reset,
 		start,
 		finish,
@@ -53,6 +54,7 @@ module top
 		return_val
 	);
 input clk;
+input clk2x;
 input reset;
 input start;
 output wire finish;
@@ -94,7 +96,6 @@ memory_controller memory_controller_inst (
 	.memory_controller_out_reg_b( memory_controller_out_b )
 );
 
-wire clk2x;
 wire clk1x_follower;
 main main_inst(
 	.clk( clk ),
@@ -1469,9 +1470,9 @@ reg [`MEMORY_CONTROLLER_ADDR_SIZE-1:0] main_dotloop_bodyreduction_scevgep19;
 reg [`MEMORY_CONTROLLER_ADDR_SIZE-1:0] main_dotloop_bodyreduction_scevgep20;
 reg [31:0] main_dotloop_bodyreduction_1;
 reg [31:0] main_dotloop_bodyreduction_2;
-wire [31:0] main_dotloop_bodyreduction_3;
+reg [31:0] main_dotloop_bodyreduction_3;
 reg [31:0] main_dotloop_bodyreduction_3_reg;
-wire [31:0] main_dotloop_bodyreduction_4;
+reg [31:0] main_dotloop_bodyreduction_4;
 reg [31:0] main_dotloop_bodyreduction_4_reg;
 reg [63:0] main_dotloop_bodyreduction_5;
 reg [63:0] main_dotloop_bodyreduction_5_reg;
@@ -1524,7 +1525,7 @@ reg [`MEMORY_CONTROLLER_ADDR_SIZE-1:0] main_fusion1loop_bodydim1_scevgep7;
 reg [31:0] main_fusion1loop_bodydim1_18;
 reg [31:0] main_fusion1loop_bodydim1_19;
 reg [31:0] main_fusion1loop_bodydim1_20;
-wire [31:0] main_fusion1loop_bodydim1_21;
+reg [31:0] main_fusion1loop_bodydim1_21;
 reg [31:0] main_fusion1loop_bodydim1_21_reg;
 reg [31:0] main_fusion1loop_bodydim1_22;
 reg [31:0] main_fusion1loop_bodydim1_22_reg;
@@ -1557,9 +1558,9 @@ reg [`MEMORY_CONTROLLER_ADDR_SIZE-1:0] main_48_51;
 reg [31:0] main_48_52;
 reg [31:0] main_48_52_reg;
 reg [31:0] main_48_53;
-wire [31:0] main_48_54;
+reg [31:0] main_48_54;
 reg [31:0] main_48_54_reg;
-wire [31:0] main_48_55;
+reg [31:0] main_48_55;
 reg [31:0] main_48_55_reg;
 reg [31:0] main_48_56;
 reg [31:0] main_48_56_reg;
@@ -1607,7 +1608,7 @@ reg  main_66_78_reg;
 reg [31:0] main_66_79;
 reg [31:0] main_66_79_reg;
 reg [31:0] main_80_81;
-wire [31:0] main_80_82;
+reg [31:0] main_80_82;
 reg [31:0] main_80_83;
 reg [31:0] main_80_84;
 reg [31:0] main_85_86;
@@ -1759,7 +1760,7 @@ altfp_divider_33 altfp_divider_33_main_fusionloop_bodydim0_108 (
 	.result (altfp_divider_main_fusionloop_bodydim0_108_out),
 	.dataa (main_altfp_divide_32_0_op0),
 	.datab (main_altfp_divide_32_0_op1),
-	.clock (clk),
+	.clock (clk2x),
 	.clk_en (altfp_main_fusionloop_bodydim0_108_en)
 );
 
@@ -1845,6 +1846,8 @@ case(cur_state)  // synthesis parallel_case
 LEGUP_0:
 	if ((start == 1'd1))
 		next_state = LEGUP_F_main_BB_dotloop_bodyreductionlrph_1;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__26_100:
 		next_state = LEGUP_F_main_BB__26_101;
 LEGUP_F_main_BB__26_101:
@@ -1880,6 +1883,8 @@ LEGUP_F_main_BB__28_103:
 		next_state = LEGUP_F_main_BB__30_104;
 	else if ((main_28_29 == 1'd0))
 		next_state = LEGUP_F_main_BB__32_105;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__30_104:
 		next_state = LEGUP_F_main_BB_expfexit_549;
 LEGUP_F_main_BB__32_105:
@@ -1887,16 +1892,22 @@ LEGUP_F_main_BB__32_105:
 		next_state = LEGUP_F_main_BB_expfexit_549;
 	else if ((main_32_33 == 1'd0))
 		next_state = LEGUP_F_main_BB__34_106;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__34_106:
 	if ((main_34_orcond == 1'd1))
 		next_state = LEGUP_F_main_BB_expfexit_549;
 	else if ((main_34_orcond == 1'd0))
 		next_state = LEGUP_F_main_BB_threadpresplit_107;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__38_108:
 	if ((main_38_39 == 1'd1))
 		next_state = LEGUP_F_main_BB__40_109;
 	else if ((main_38_39 == 1'd0))
 		next_state = LEGUP_F_main_BB__48_112;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__40_109:
 		next_state = LEGUP_F_main_BB__40_110;
 LEGUP_F_main_BB__40_110:
@@ -2096,6 +2107,8 @@ LEGUP_F_main_BB__60_206:
 		next_state = LEGUP_F_main_BB__64_207;
 	else if ((main_60_orcond54 == 1'd0))
 		next_state = LEGUP_F_main_BB__66_222;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__64_207:
 		next_state = LEGUP_F_main_BB__64_208;
 LEGUP_F_main_BB__64_208:
@@ -2425,6 +2438,8 @@ LEGUP_F_main_BB__66_369:
 		next_state = LEGUP_F_main_BB__80_370;
 	else if ((main_66_78_reg == 1'd0))
 		next_state = LEGUP_F_main_BB__85_446;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__80_370:
 		next_state = LEGUP_F_main_BB__80_371;
 LEGUP_F_main_BB__80_371:
@@ -2760,6 +2775,8 @@ LEGUP_F_main_BB__85_535:
 		next_state = LEGUP_F_main_BB__94_536;
 	else if ((main_85_91_reg == 1'd0))
 		next_state = LEGUP_F_main_BB__97_537;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB__94_536:
 		next_state = LEGUP_F_main_BB_expfexit_549;
 LEGUP_F_main_BB__97_537:
@@ -2831,6 +2848,8 @@ LEGUP_F_main_BB_dotloop_bodyreduction_29:
 		next_state = LEGUP_F_main_BB_dotloop_exitreduction_30;
 	else if ((main_dotloop_bodyreduction_exitcond18_reg == 1'd0))
 		next_state = LEGUP_F_main_BB_dotloop_bodyreduction_2;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_dotloop_bodyreduction_3:
 		next_state = LEGUP_F_main_BB_dotloop_bodyreduction_4;
 LEGUP_F_main_BB_dotloop_bodyreduction_4:
@@ -2854,6 +2873,8 @@ LEGUP_F_main_BB_dotloop_exitreduction_31:
 		next_state = LEGUP_F_main_BB_fusion2loop_bodydim1preheader_32;
 	else if ((main_dotloop_exitreduction_exitcond21_reg == 1'd0))
 		next_state = LEGUP_F_main_BB_dotloop_bodyreductionlrph_1;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_expfexit_549:
 		next_state = LEGUP_F_main_BB_expfexit_550;
 LEGUP_F_main_BB_expfexit_550:
@@ -2861,6 +2882,8 @@ LEGUP_F_main_BB_expfexit_550:
 		next_state = LEGUP_F_main_BB_reduce1innerloop_bodyreduction_dim1preheader_551;
 	else if ((main_expfexit_exitcond4_reg == 1'd0))
 		next_state = LEGUP_F_main_BB_fusion1loop_bodydim1_57;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_fusion1loop_bodydim1_57:
 		next_state = LEGUP_F_main_BB_fusion1loop_bodydim1_58;
 LEGUP_F_main_BB_fusion1loop_bodydim1_58:
@@ -2926,6 +2949,8 @@ LEGUP_F_main_BB_fusion1loop_bodydim1_87:
 		next_state = LEGUP_F_main_BB__26_88;
 	else if ((main_fusion1loop_bodydim1_25 == 1'd0))
 		next_state = LEGUP_F_main_BB__28_103;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_fusion1loop_bodydim1preheader_56:
 		next_state = LEGUP_F_main_BB_fusion1loop_bodydim1_57;
 LEGUP_F_main_BB_fusion2loop_bodydim1_33:
@@ -2967,6 +2992,8 @@ LEGUP_F_main_BB_fusion2loop_bodydim1_50:
 		next_state = LEGUP_F_main_BB_reduceinnerloop_bodyreduction_dim1preheader_51;
 	else if ((main_fusion2loop_bodydim1_exitcond14_reg == 1'd0))
 		next_state = LEGUP_F_main_BB_fusion2loop_bodydim1_33;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_fusion2loop_bodydim1preheader_32:
 		next_state = LEGUP_F_main_BB_fusion2loop_bodydim1_33;
 LEGUP_F_main_BB_fusionloop_bodydim0_570:
@@ -3046,6 +3073,8 @@ LEGUP_F_main_BB_fusionloop_bodydim0_606:
 		next_state = LEGUP_F_main_BB_fusionloop_exitdim0_607;
 	else if ((main_fusionloop_bodydim0_exitcond1_reg == 1'd0))
 		next_state = LEGUP_F_main_BB_fusionloop_bodydim0_570;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_fusionloop_bodydim0preheader_569:
 		next_state = LEGUP_F_main_BB_fusionloop_bodydim0_570;
 LEGUP_F_main_BB_fusionloop_exitdim0_607:
@@ -3091,6 +3120,8 @@ LEGUP_F_main_BB_reduce1innerloop_bodyreduction_dim1_568:
 		next_state = LEGUP_F_main_BB_fusionloop_bodydim0preheader_569;
 	else if ((main_reduce1innerloop_bodyreduction_dim1_exitcond_reg == 1'd0))
 		next_state = LEGUP_F_main_BB_reduce1innerloop_bodyreduction_dim1_552;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_reduce1innerloop_bodyreduction_dim1preheader_551:
 		next_state = LEGUP_F_main_BB_reduce1innerloop_bodyreduction_dim1_552;
 LEGUP_F_main_BB_reduceinnerloop_bodyreduction_dim1_52:
@@ -3104,6 +3135,8 @@ LEGUP_F_main_BB_reduceinnerloop_bodyreduction_dim1_55:
 		next_state = LEGUP_F_main_BB_fusion1loop_bodydim1preheader_56;
 	else if ((main_reduceinnerloop_bodyreduction_dim1_exitcond12_reg == 1'd0))
 		next_state = LEGUP_F_main_BB_reduceinnerloop_bodyreduction_dim1_52;
+  else
+    next_state = cur_state;
 LEGUP_F_main_BB_reduceinnerloop_bodyreduction_dim1preheader_51:
 		next_state = LEGUP_F_main_BB_reduceinnerloop_bodyreduction_dim1_52;
 LEGUP_F_main_BB_threadpresplit_107:
@@ -3111,8 +3144,10 @@ LEGUP_F_main_BB_threadpresplit_107:
 		next_state = LEGUP_F_main_BB__38_108;
 	else if ((main_threadpresplit_37 == 1'd0))
 		next_state = LEGUP_F_main_BB__60_191;
+  else
+    next_state = cur_state;
 default:
-	next_state = 9'b0;
+	next_state = cur_state;
 endcase
 
 end
@@ -5923,7 +5958,6 @@ begin // Port A
 if (wren_a)
 begin
     ram[address_a] <= data_a;
-    q_a_wire <= {32{1'bX}};
 end
 else
     q_a_wire <= ram[address_a];
@@ -5934,7 +5968,6 @@ begin // Port b
 if (wren_b)
 begin
     ram[address_b] <= data_b;
-    q_b_wire <= {32{1'bX}};
 end
 else
     q_b_wire <= ram[address_b];
@@ -6051,7 +6084,6 @@ begin // Port A
 if (wren_a)
 begin
     ram[address_a] <= data_a;
-    q_a_wire <= {32{1'bX}};
 end
 else
     q_a_wire <= ram[address_a];
@@ -6062,7 +6094,6 @@ begin // Port b
 if (wren_b)
 begin
     ram[address_b] <= data_b;
-    q_b_wire <= {32{1'bX}};
 end
 else
     q_b_wire <= ram[address_b];
@@ -6173,7 +6204,6 @@ begin // Port A
 if (wren_a)
 begin
     ram[address_a] <= data_a;
-    q_a_wire <= {32{1'bX}};
 end
 else
     q_a_wire <= ram[address_a];
@@ -6184,7 +6214,6 @@ begin // Port b
 if (wren_b)
 begin
     ram[address_b] <= data_b;
-    q_b_wire <= {32{1'bX}};
 end
 else
     q_b_wire <= ram[address_b];
@@ -6886,12 +6915,21 @@ input  [31:0] datab;
 input  clock;
 input  clk_en;
 
+reg [31:0] a;
+reg [31:0] b;
 reg [31:0] result;
+wire [31:0] out;
 
 always @(posedge clock) begin
- if (clk_en)
-	result <= dataa * datab;
+  if (clk_en) begin
+	a <= dataa;
+	b <= datab;
+	result <= out;
+  end
 end
+
+//A mode in the DSP slice
+multiply_fp u_mult_fp(.a(a), .b(b), .out(out));
 
 endmodule
 
@@ -6910,12 +6948,21 @@ input  [31:0] datab;
 input  clock;
 input  clk_en;
 
+reg [31:0] a;
+reg [31:0] b;
 reg [31:0] result;
+wire [31:0] out;
 
 always @(posedge clock) begin
- if (clk_en)
-	result <= dataa + datab;
+  if (clk_en) begin
+	a <= dataa;
+	b <= datab;
+	result <= out;
+  end
 end
+
+//A mode in the DSP slice
+adder_fp u_add_fp(.a(a), .b(b), .out(out));
 
 endmodule
 
@@ -6933,12 +6980,21 @@ input  [31:0] datab;
 input  clock;
 input  clk_en;
 
+reg [31:0] a;
+reg [31:0] b;
 reg [31:0] result;
+wire [31:0] out;
 
 always @(posedge clock) begin
- if (clk_en)
-	result <= dataa - datab;
+  if (clk_en) begin
+	a <= dataa;
+	b <= datab;
+	result <= out;
+  end
 end
+
+//A mode in the DSP slice
+adder_fp u_add_fp(.a(a), .b(b), .out(out));
 
 endmodule
 
@@ -6956,12 +7012,10 @@ input  [31:0] datab;
 input  clock;
 input  clk_en;
 
-reg [31:0] result;
+wire rst;
+assign rst = ~clk_en;
 
-always @(posedge clock) begin
- if (clk_en)
-	result <= dataa * datab;
-end
+divider u_div(.input_a(dataa), .input_b(datab), .clk(clock), .rst(rst), .output_z(result));
 
 endmodule
 
@@ -7057,3 +7111,288 @@ end
 
 endmodule
 
+module divider(
+        input_a,
+        input_b,
+        clk,
+        rst,
+        output_z);
+
+  input     clk;
+  input     rst;
+
+  input     [31:0] input_a;
+
+  input     [31:0] input_b;
+
+  output    [31:0] output_z;
+
+  reg       [31:0] s_output_z;
+
+
+  reg       [3:0] state;
+  parameter get_a         = 4'd0,
+            get_b         = 4'd1,
+            unpack        = 4'd2,
+            special_cases = 4'd3,
+            normalise_a   = 4'd4,
+            normalise_b   = 4'd5,
+            divide_0      = 4'd6,
+            divide_1      = 4'd7,
+            divide_2      = 4'd8,
+            divide_3      = 4'd9,
+            normalise_1   = 4'd10,
+            normalise_2   = 4'd11,
+            round         = 4'd12,
+            pack          = 4'd13,
+            put_z         = 4'd14;
+
+  reg       [31:0] a, b, z;
+  reg       [23:0] a_m, b_m, z_m;
+  reg       [9:0] a_e, b_e, z_e;
+  reg       a_s, b_s, z_s;
+  reg       guard, round_bit, sticky;
+  reg       [50:0] quotient, divisor, dividend, remainder;
+  reg       [5:0] count;
+
+  always @(posedge clk)
+  begin
+    if (rst == 1) begin
+      state <= get_a;
+    end
+    else begin
+    case(state)
+
+      get_a:
+      begin
+          a <= input_a;
+          state <= get_b;
+      end
+
+      get_b:
+      begin
+          b <= input_b;
+          state <= unpack;
+      end
+
+      unpack:
+      begin
+        a_m <= a[22 : 0];
+        b_m <= b[22 : 0];
+        a_e <= a[30 : 23] - 127;
+        b_e <= b[30 : 23] - 127;
+        a_s <= a[31];
+        b_s <= b[31];
+        state <= special_cases;
+      end
+
+      special_cases:
+      begin
+        //if a is NaN or b is NaN return NaN 
+        if ((a_e == 128 && a_m != 0) || (b_e == 128 && b_m != 0)) begin
+          z[31] <= 1;
+          z[30:23] <= 255;
+          z[22] <= 1;
+          z[21:0] <= 0;
+          state <= put_z;
+          //if a is inf and b is inf return NaN 
+        end else if ((a_e == 128) && (b_e == 128)) begin
+          z[31] <= 1;
+          z[30:23] <= 255;
+          z[22] <= 1;
+          z[21:0] <= 0;
+          state <= put_z;
+        //if a is inf return inf
+        end else if (a_e == 128) begin
+          z[31] <= a_s ^ b_s;
+          z[30:23] <= 255;
+          z[22:0] <= 0;
+          state <= put_z;
+           //if b is zero return NaN
+          if (((b_e) == -127) && (b_m == 0)) begin
+            z[31] <= 1;
+            z[30:23] <= 255;
+            z[22] <= 1;
+            z[21:0] <= 0;
+            state <= put_z;
+          end
+        //if b is inf return zero
+        end else if (b_e == 128) begin
+          z[31] <= a_s ^ b_s;
+          z[30:23] <= 0;
+          z[22:0] <= 0;
+          state <= put_z;
+        //if a is zero return zero
+        end else if (((a_e) == -127) && (a_m == 0)) begin
+          z[31] <= a_s ^ b_s;
+          z[30:23] <= 0;
+          z[22:0] <= 0;
+          state <= put_z;
+           //if b is zero return NaN
+          if (((b_e) == -127) && (b_m == 0)) begin
+            z[31] <= 1;
+            z[30:23] <= 255;
+            z[22] <= 1;
+            z[21:0] <= 0;
+            state <= put_z;
+          end
+        //if b is zero return inf
+        end else if (((b_e) == -127) && (b_m == 0)) begin
+          z[31] <= a_s ^ b_s;
+          z[30:23] <= 255;
+          z[22:0] <= 0;
+          state <= put_z;
+        end else begin
+          //Denormalised Number
+          if ((a_e) == -127) begin
+            a_e <= -126;
+          end else begin
+            a_m[23] <= 1;
+          end
+          //Denormalised Number
+          if ((b_e) == -127) begin
+            b_e <= -126;
+          end else begin
+            b_m[23] <= 1;
+          end
+          state <= normalise_a;
+        end
+      end
+
+      normalise_a:
+      begin
+        if (a_m[23]) begin
+          state <= normalise_b;
+        end else begin
+          a_m <= a_m << 1;
+          a_e <= a_e - 1;
+        end
+      end
+
+      normalise_b:
+      begin
+        if (b_m[23]) begin
+          state <= divide_0;
+        end else begin
+          b_m <= b_m << 1;
+          b_e <= b_e - 1;
+        end
+      end
+
+      divide_0:
+      begin
+        z_s <= a_s ^ b_s;
+        z_e <= a_e - b_e;
+        quotient <= 0;
+        remainder <= 0;
+        count <= 0;
+        dividend <= a_m << 27 ;
+        divisor <= b_m;
+        state <= divide_1;
+      end
+
+      divide_1:
+      begin
+        quotient <= quotient << 1;
+        remainder <= remainder << 1;
+        remainder[0] <= dividend[50];
+        dividend <= dividend << 1;
+        state <= divide_2;
+      end
+
+      divide_2:
+      begin
+	if (remainder >= divisor) begin
+      	quotient[0] = 1;
+        remainder = remainder - divisor;
+        end
+
+        if (count == 49) begin
+	state <= divide_3;
+        end else begin
+	count <= count + 1;
+	quotient <= quotient << 1;
+        remainder <= remainder << 1;
+        remainder[0] = dividend[50];
+        dividend <= dividend << 1;
+	state<= divide_2;
+        end
+      end
+
+      divide_3:
+      begin
+        z_m <= quotient[26:3];
+        guard <= quotient[2];
+        round_bit <= quotient[1];
+        sticky <= quotient[0] | (remainder != 0);
+        state <= normalise_1;
+      end
+
+      normalise_1:
+      begin
+        if (z_m[23] == 0 && (z_e) > -126) begin
+          z_e <= z_e - 1;
+          z_m <= z_m << 1;
+          z_m[0] <= guard;
+          guard <= round_bit;
+          round_bit <= 0;
+        end else begin
+          state <= normalise_2;
+        end
+      end
+
+      normalise_2:
+      begin
+        if ((z_e) < -126) begin
+          z_e <= z_e + 1;
+          z_m <= z_m >> 1;
+          guard <= z_m[0];
+          round_bit <= guard;
+          sticky <= sticky | round_bit;
+        end else begin
+          state <= round;
+        end
+      end
+
+      round:
+      begin
+        if (guard && (round_bit | sticky | z_m[0])) begin
+          z_m <= z_m + 1;
+          if (z_m == 24'hffffff) begin
+            z_e <=z_e + 1;
+          end
+        end
+        state <= pack;
+      end
+
+      pack:
+      begin
+        z[22 : 0] <= z_m[22:0];
+        z[30 : 23] <= z_e[7:0] + 127;
+        z[31] <= z_s;
+        if ((z_e) == -126 && z_m[23] == 0) begin
+          z[30 : 23] <= 0;
+        end
+        //if overflow occurs, return inf
+        if ((z_e) > 127) begin
+          z[22 : 0] <= 0;
+          z[30 : 23] <= 255;
+          z[31] <= z_s;
+        end
+        state <= put_z;
+      end
+
+      put_z:
+      begin
+        s_output_z <= z;
+        state <= get_a;
+      end
+
+    endcase
+
+   end
+  end
+
+  assign output_z = s_output_z;
+
+endmodule
