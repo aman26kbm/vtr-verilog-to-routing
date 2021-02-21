@@ -75,7 +75,7 @@ wire equal;
 wire greater_than;
 
 //Actual conversion module
-compareRecFN compare(
+  compareRecFN #(exp+1, man) compare(
 .a(a_RecFN),
 .b(b_RecFN),
 .signaling(1'b0),
@@ -121,31 +121,6 @@ module
 endmodule
 
 module
-    countLeadingZeros#(parameter inWidth = 1, parameter countWidth = 1) (
-        input [(inWidth - 1):0] in, output [(countWidth - 1):0] count
-    );
-
-    wire [(inWidth - 1):0] reverseIn;
-    reverse#(inWidth) reverse_in(in, reverseIn);
-    wire [inWidth:0] oneLeastReverseIn =
-        {1'b1, reverseIn} & ({1'b0, ~reverseIn} + 1);
-    genvar ix;
-    generate
-        for (ix = 0; ix <= inWidth; ix = ix + 1) begin :Bit
-            wire [(countWidth - 1):0] countSoFar;
-            if (ix == 0) begin
-                assign countSoFar = 0;
-            end else begin
-                assign countSoFar =
-                    Bit[ix - 1].countSoFar | (oneLeastReverseIn[ix] ? ix : 0);
-                if (ix == inWidth) assign count = countSoFar;
-            end
-        end
-    endgenerate
-
-endmodule
-
-module
     fNToRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
         input [(expWidth + sigWidth - 1):0] in,
         output [(expWidth + sigWidth):0] out
@@ -168,8 +143,8 @@ module
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     wire [(normDistWidth - 1):0] normDist;
-    countLeadingZeros#(sigWidth - 1, normDistWidth)
-        countLeadingZeros(fractIn, normDist);
+    countLeadingZerosfp32 #(sigWidth - 1, normDistWidth) //sigwidth = 24, normDistWidth=5
+    countLeadingZeros(fractIn, normDist); 
     wire [(sigWidth - 2):0] subnormFract = (fractIn<<normDist)<<1;
     wire [expWidth:0] adjustedExp =
         (isZeroExpIn ? normDist ^ ((1<<(expWidth + 1)) - 1) : expIn)
@@ -329,3 +304,114 @@ parameter sigWidth = 3;
 
 endmodule
 
+module
+    countLeadingZerosfp32 #(parameter inWidth = 23, parameter countWidth = 5) (
+      input [(inWidth - 1):0] in, output reg [(countWidth - 1):0] count
+    );
+
+    wire [(inWidth - 1):0] reverseIn;
+    reverse#(inWidth) reverse_in(in, reverseIn);
+    wire [inWidth:0] oneLeastReverseIn =
+        {1'b1, reverseIn} & ({1'b0, ~reverseIn} + 1);
+		
+  always@(oneLeastReverseIn)
+    begin
+      if (oneLeastReverseIn[23] == 1)
+        begin
+          count = 5'd23;
+        end
+      else if (oneLeastReverseIn[22] == 1)
+        begin
+          count = 5'd22;
+        end
+      else if (oneLeastReverseIn[21] == 1)
+        begin
+          count = 5'd21;
+        end
+      else if (oneLeastReverseIn[20] == 1)
+        begin
+          count = 5'd20;
+        end
+      else if (oneLeastReverseIn[19] == 1)
+        begin
+          count = 5'd19;
+        end
+      else if (oneLeastReverseIn[18] == 1)
+        begin
+          count = 5'd18;
+        end
+      else if (oneLeastReverseIn[17] == 1)
+        begin
+          count = 5'd17;
+        end
+      else if (oneLeastReverseIn[16] == 1)
+        begin
+          count = 5'd16;
+        end
+      else if (oneLeastReverseIn[15] == 1)
+        begin
+          count = 5'd15;
+        end
+      else if (oneLeastReverseIn[14] == 1)
+        begin
+          count = 5'd14;
+        end
+      else if (oneLeastReverseIn[13] == 1)
+        begin
+          count = 5'd13;
+        end
+      else if (oneLeastReverseIn[12] == 1)
+        begin
+          count = 5'd12;
+        end
+      else if (oneLeastReverseIn[11] == 1)
+        begin
+          count = 5'd11;
+        end
+      else if (oneLeastReverseIn[10] == 1)
+        begin
+          count = 5'd10;
+        end
+      else if (oneLeastReverseIn[9] == 1)
+        begin
+          count = 5'd9;
+        end
+      else if (oneLeastReverseIn[8] == 1)
+        begin
+          count= 5'd8;
+        end
+      else if (oneLeastReverseIn[7] == 1)
+        begin
+          count = 5'd7;
+        end
+      else if (oneLeastReverseIn[6] == 1)
+        begin
+          count = 5'd6;
+        end
+      else if (oneLeastReverseIn[5] == 1)
+        begin
+          count = 5'd5;
+        end
+      else if (oneLeastReverseIn[4] == 1)
+        begin
+          count = 5'd4;
+        end
+      else if (oneLeastReverseIn[3] == 1)
+        begin
+          count = 5'd3;
+        end
+      else if (oneLeastReverseIn[2] == 1)
+        begin
+          count = 5'd2;
+        end
+      else if (oneLeastReverseIn[1] == 1)
+        begin
+          count = 5'd1;
+        end
+      else
+        begin
+          count = 5'd0;
+        end
+      end
+  
+endmodule
