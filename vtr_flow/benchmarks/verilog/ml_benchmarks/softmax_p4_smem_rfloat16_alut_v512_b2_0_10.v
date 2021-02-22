@@ -519,12 +519,56 @@ module mode1_max_tree(
 
   end
 
-DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage2(.a(inp0),       .b(inp1),      .z1(cmp0_out_stage2), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
-DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp1_stage2(.a(inp2),       .b(inp3),      .z1(cmp1_out_stage2), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+wire cmp0_stage2_aeb;
+wire cmp0_stage2_aneb;
+wire cmp0_stage2_alb;
+wire cmp0_stage2_aleb;
+wire cmp0_stage2_agb;
+wire cmp0_stage2_ageb;
+wire cmp0_stage2_unordered;
 
-DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage1(.a(cmp0_out_stage2),       .b(cmp1_out_stage2),      .z1(cmp0_out_stage1), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+wire cmp1_stage2_aeb;
+wire cmp1_stage2_aneb;
+wire cmp1_stage2_alb;
+wire cmp1_stage2_aleb;
+wire cmp1_stage2_agb;
+wire cmp1_stage2_ageb;
+wire cmp1_stage2_unordered;
 
-DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage0(.a(outp),       .b(cmp0_out_stage1),      .z1(cmp0_out_stage0), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+wire cmp0_stage1_aeb;
+wire cmp0_stage1_aneb;
+wire cmp0_stage1_alb;
+wire cmp0_stage1_aleb;
+wire cmp0_stage1_agb;
+wire cmp0_stage1_ageb;
+wire cmp0_stage1_unordered;
+
+wire cmp0_stage0_aeb;
+wire cmp0_stage0_aneb;
+wire cmp0_stage0_alb;
+wire cmp0_stage0_aleb;
+wire cmp0_stage0_agb;
+wire cmp0_stage0_ageb;
+wire cmp0_stage0_unordered;
+
+comparator cmp0_stage2(.a(inp0),       .b(inp1),        .aeb(cmp0_stage2), .aneb(cmp0_stage2_aneb), .alb(cmp0_stage2_alb), .aleb(cmp0_stage2_aleb), .agb(cmp0_stage2_agb), .ageb(cmp0_stage2_ageb), .unordered(cmp0_stage2_unordered));
+assign cmp0_out_stage2 = (cmp0_stage2_ageb==1'b1) ? inp0 : inp1;
+
+comparator cmp1_stage2(.a(inp2),       .b(inp3),         .aeb(cmp1_stage2), .aneb(cmp1_stage2_aneb), .alb(cmp1_stage2_alb), .aleb(cmp1_stage2_aleb), .agb(cmp1_stage2_agb), .ageb(cmp1_stage2_ageb), .unordered(cmp1_stage2_unordered));   
+assign cmp1_out_stage2 = (cmp1_stage2_ageb==1'b1) ? inp2 : inp3;
+
+comparator cmp0_stage1(.a(cmp0_out_stage2),       .b(cmp1_out_stage2),          .aeb(cmp0_stage1), .aneb(cmp0_stage1_aneb), .alb(cmp0_stage1_alb), .aleb(cmp0_stage1_aleb), .agb(cmp0_stage1_agb), .ageb(cmp0_stage1_ageb), .unordered(cmp0_stage1_unordered));
+assign cmp0_out_stage1 = (cmp0_stage1_ageb==1'b1) ? cmp0_out_stage2: cmp1_out_stage2;
+
+comparator cmp0_stage0(.a(outp),       .b(cmp0_out_stage1),         .aeb(cmp0_stage0), .aneb(cmp0_stage0_aneb), .alb(cmp0_stage0_alb), .aleb(cmp0_stage0_aleb), .agb(cmp0_stage0_agb), .ageb(cmp0_stage0_ageb), .unordered(cmp0_stage0_unordered));
+assign cmp0_out_stage0 = (cmp0_stage0_ageb==1'b1) ? outp : cmp0_out_stage1;
+
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage2(.a(inp0),       .b(inp1),      .z1(cmp0_out_stage2), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp1_stage2(.a(inp2),       .b(inp3),      .z1(cmp1_out_stage2), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+//
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage1(.a(cmp0_out_stage2),       .b(cmp1_out_stage2),      .z1(cmp0_out_stage1), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+//
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage0(.a(outp),       .b(cmp0_out_stage1),      .z1(cmp0_out_stage0), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
 
 endmodule
 
