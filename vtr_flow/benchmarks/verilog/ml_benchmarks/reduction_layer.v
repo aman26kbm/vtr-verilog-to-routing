@@ -76,12 +76,14 @@ assign bram_in_wdata = {`NUM_INPUTS{bram_in_wdata_ext}};
 //Input matrix data is stored in this RAM
 //The design reads 16 elements in one clock
 ////////////////////////////////////////////////////////////////
+
 spram in_data(
   .addr(bram_in_addr_muxed),
   .d(bram_in_wdata), 
   .we(bram_in_we), 
   .q(bram_in_rdata), 
   .clk(clk));
+
 
 reg [3:0] state;
 reg [3:0] count;
@@ -140,12 +142,14 @@ reg reset_reduction_unit;
           //(and data fed to the reduction unit) and initiation interval
           //(latency) has passed. So, let's count for the initiation interval
           //and then assert done and go back to the initial state.
-          count <= count + 1;
           if (count==5) begin
             state <= 4'b0000;
             count <= 0;
             done <= 1;
             reset_reduction_unit <= 1;
+          end 
+          else begin
+            count <= count + 1;
           end
         end
       endcase  
@@ -156,6 +160,7 @@ reg reset_reduction_unit;
 ////////////////////////////////////////////////////////////////
 // Let's instantiate the unit that actually performs the reduction
 ////////////////////////////////////////////////////////////////
+
 reduction_unit ucu(
   .clk(clk),
   .reset(reset_reduction_unit),
@@ -205,68 +210,6 @@ assign reduced_out = (reduction_type==2'b0) ? reduced_out_add : reduced_out_unro
 
 endmodule
 
-/*
-//////////////////////////////////
-//Dual port RAM
-//////////////////////////////////
-module dpram (
-        addr1, 
-        d1, 
-        we1, 
-        q1,  
-        addr2,
-        d2,
-        we2,
-        q2,
-        clk);
-
-input [`AWIDTH-1:0] addr1;
-input [`AWIDTH-1:0] addr2;
-input [`DWIDTH-1:0] d1;
-input [`DWIDTH-1:0] d2;
-input we1;
-input we2;
-output reg [`DWIDTH-1:0] q1;
-output reg [`DWIDTH-1:0] q2;
-input clk;
-
-`ifdef VCS
-reg [7:0] ram[((1<<`AWIDTH)-1):0];
-
-always @(posedge clk)  
-begin 
-    if (we1) 
-      ram[addr1] <= d1;
-    else 
-      q1 <= ram[addr1];
-end
-
-always @(posedge clk)  
-begin 
-    if (we2)
-      ram[addr2] <= d2;
-    else
-      q2 <= ram[addr2];
-end
-
-`else
-
-dual_port_ram u_dual_port_ram(
-.addr1(addr1),
-.we1(we1_coalesced),
-.data1(d1),
-.out1(q1),
-.addr2(addr2),
-.we2(we2_coalesced),
-.data2(d2),
-.out2(q2),
-.clk(clk)
-);
-
-`endif
-
-endmodule
-*/
 
 //////////////////////////////////
 //Single port RAM. Stores the inputs.
@@ -309,6 +252,7 @@ single_port_ram u_single_port_ram(
 `endif
 
 endmodule
+
 
 ///////////////////////////////////////////////////////
 // Reduction unit. It's a tree of processing elements.
@@ -618,6 +562,7 @@ assign OUT = (MODE==0) ? sum :
 
 endmodule
 
+
 ///////////////////////////////////////////////////////
 //Rounding logic based on convergent rounding described 
 //here: https://zipcpu.com/dsp/2017/07/22/rounding.html
@@ -638,3 +583,4 @@ assign	w_convergent = i_data[(IWID-1):0]
 assign o_data = w_convergent[(IWID-1):(IWID-OWID)];
 
 endmodule
+
