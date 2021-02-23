@@ -34,8 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
 
 module comparator(
 a,
@@ -49,11 +47,11 @@ ageb,
 unordered
 );
 //Default for FP32
-parameter exp = 8;
-parameter man = 23;
+//parameter exp = 8;
+//parameter man = 23;
 
-input [(exp+man+1-1):0] a;
-input [(exp+man+1-1):0] b;
+input [31:0] a;
+input [31:0] b;
 output aeb;
 output aneb;
 output alb;
@@ -62,23 +60,26 @@ output agb;
 output ageb;
 output unordered;
 
-wire [exp+man+1:0] a_RecFN;
-wire [exp+man+1:0] b_RecFN;
+wire [32:0] a_RecFN;
+wire [32:0] b_RecFN;
 
 //Convert to Recoded representation
-fNToRecFN#(exp, man+1) convert_a(.in(a), .out(a_RecFN));  
-fNToRecFN#(exp, man+1) convert_b(.in(b), .out(b_RecFN));  
+fNToRecFN#(8,24) convert_a(.in(a), .out(a_RecFN));  
+fNToRecFN#(8,24) convert_b(.in(b), .out(b_RecFN));  
 
 wire [4:0] except_flags;
 wire less_than;
 wire equal;
 wire greater_than;
 
+wire signaling;
+assign signaling = 1'b0;
+
 //Actual conversion module
-  compareRecFN #(exp+1, man) compare(
+compareRecFN_Fp32 compare(
 .a(a_RecFN),
 .b(b_RecFN),
-.signaling(1'b0),
+.signaling(signaling),
 .lt(less_than),
 .eq(equal),
 .gt(greater_than),
@@ -86,6 +87,8 @@ wire greater_than;
 .exceptionFlags(except_flags)
 );
 
+
+//Result flags
 assign aeb = equal;
 assign aneb = ~equal;
 assign alb = less_than;
@@ -95,64 +98,68 @@ assign ageb = greater_than | equal;
 
 endmodule
 
-//function integer clog2;
-//    input integer a;
-//
-//    begin
-//        a = a - 1;
-//        for (clog2 = 0; a > 0; clog2 = clog2 + 1) a = a>>1;
-//				printf("returning %d", clog2);
-//    end
-//
-//endfunction
+module  reverseFp32 (input [22:0] in, output [22:0] out);
 
-module
-    reverse#(parameter width = 1) (
-        input [(width - 1):0] in, output [(width - 1):0] out
-    );
-
-    genvar ix;
-    generate
-        for (ix = 0; ix < width; ix = ix + 1) begin :Bit
-            assign out[ix] = in[width - 1 - ix];
-        end
-    endgenerate
+   assign out[0] = in[22];
+   assign out[1] = in[21];
+   assign out[2] = in[20];
+   assign out[3] = in[19];
+   assign out[4] = in[18];
+   assign out[5] = in[17];
+   assign out[6] = in[16];
+   assign out[7] = in[15];
+   assign out[8] = in[14];
+   assign out[9] = in[13];
+   assign out[10] = in[12];
+   assign out[11] = in[11];
+   assign out[12] = in[10];
+   assign out[13] = in[9];
+   assign out[14] = in[8];
+   assign out[15] = in[7];
+   assign out[16] = in[6];
+   assign out[17] = in[5];
+   assign out[18] = in[4];
+   assign out[19] = in[3];
+   assign out[20] = in[2];
+   assign out[21] = in[1];
+   assign out[22] = in[0];
+   // genvar ix;
+   // generate
+   //     for (ix = 0; ix < width; ix = ix + 1) begin :Bit
+   //         assign out[ix] = in[width - 1 - ix];
+   //     end
+   // endgenerate
 
 endmodule
 
-module
-    fNToRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
+module fNToRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
         input [(expWidth + sigWidth - 1):0] in,
         output [(expWidth + sigWidth):0] out
     );
 
     //`include "HardFloat_localFuncs.vi"
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     //localparam normDistWidth = clog2(sigWidth);
-    localparam normDistWidth = 5; //FIXME TODO. Hardcoding for FP32 for now.
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    localparam normDistWidth = 5;  //Hardcoding for FP32
+
     wire sign;
     wire [(expWidth - 1):0] expIn;
     wire [(sigWidth - 2):0] fractIn;
     assign {sign, expIn, fractIn} = in;
     wire isZeroExpIn = (expIn == 0);
     wire isZeroFractIn = (fractIn == 0);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
+
     wire [(normDistWidth - 1):0] normDist;
-    countLeadingZerosfp32 #(sigWidth - 1, normDistWidth) //sigwidth = 24, normDistWidth=5
-    countLeadingZeros(fractIn, normDist); 
+    //sigwidth = 24, normDistWidth=5
+    countLeadingZerosfp32 #(sigWidth - 1, normDistWidth) countLeadingZeros(.in(fractIn), .count(normDist)); 
     wire [(sigWidth - 2):0] subnormFract = (fractIn<<normDist)<<1;
     wire [expWidth:0] adjustedExp =
         (isZeroExpIn ? normDist ^ ((1<<(expWidth + 1)) - 1) : expIn)
             + ((1<<(expWidth - 1)) | (isZeroExpIn ? 2 : 1));
     wire isZero = isZeroExpIn && isZeroFractIn;
     wire isSpecial = (adjustedExp[expWidth:(expWidth - 1)] == 'b11);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
+
     wire [expWidth:0] exp;
     assign exp[expWidth:(expWidth - 2)] =
         isSpecial ? {2'b11, !isZeroFractIn}
@@ -163,63 +170,58 @@ module
 endmodule
 
 
-module
-    compareRecFN(
-a,
-b,
-signaling,
-lt,
-eq,
-gt,
-unordered,
-exceptionFlags
-);
-parameter expWidth = 3;
-parameter sigWidth = 3;
-        input [(expWidth + sigWidth):0] a;
-        input [(expWidth + sigWidth):0] b;
-        input signaling;
-        output lt;
-        output eq;
-        output gt;
-        output unordered;
-        output [4:0] exceptionFlags;
+module compareRecFN_Fp32(
+  a,
+  b,
+  signaling,
+  lt,
+  eq,
+  gt,
+  unordered,
+  exceptionFlags
+  );
+  //parameter expWidth = 3;
+  //parameter sigWidth = 3;
+
+  input [(8 + 24):0] a;
+  input [(8 + 24):0] b;
+  input signaling;
+  output lt;
+  output eq;
+  output gt;
+  output unordered;
+  output [4:0] exceptionFlags;
    
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     wire isNaNA, isInfA, isZeroA, signA;
-    wire [(expWidth + 1):0] sExpA;
-    wire [sigWidth:0] sigA;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_a(
-.in(a), 
-.isNaN(isNaNA), 
-.isInf(isInfA), 
-.isZero(isZeroA), 
-.sign(signA), 
-.sExp(sExpA), 
-.sig(sigA)
-);
+    wire [(8 + 1):0] sExpA;
+    wire [24:0] sigA;
+    recFNToRawFN#(8, 24)  recFNToRawFN_a(
+      .in(a), 
+      .isNaN(isNaNA), 
+      .isInf(isInfA), 
+      .isZero(isZeroA), 
+      .sign(signA), 
+      .sExp(sExpA), 
+      .sig(sigA)
+      );
     wire isSigNaNA;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(.in(a), .isSigNaN(isSigNaNA));
+    isSigNaNRecFN#(8, 24) isSigNaN_a(.in(a), .isSigNaN(isSigNaNA));
     wire isNaNB, isInfB, isZeroB, signB;
-    wire [(expWidth + 1):0] sExpB;
-    wire [sigWidth:0] sigB;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_b(
-.in(b), 
-.isNaN(isNaNB), 
-.isInf(isInfB), 
-.isZero(isZeroB), 
-.sign(signB), 
-.sExp(sExpB), 
-.sig(sigB)
-);
+    wire [(8 + 1):0] sExpB;
+    wire [24:0] sigB;
+    recFNToRawFN#(8, 24)  recFNToRawFN_b(
+      .in(b), 
+      .isNaN(isNaNB), 
+      .isInf(isInfB), 
+      .isZero(isZeroB), 
+      .sign(signB), 
+      .sExp(sExpB), 
+      .sig(sigB)
+      );
     wire isSigNaNB;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(.in(b), .isSigNaN(isSigNaNB));
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    isSigNaNRecFN#(8, 24) isSigNaN_b(.in(b), .isSigNaN(isSigNaNB));
+
     wire ordered = !isNaNA && !isNaNB;
     wire bothInfs  = isInfA  && isInfB;
     wire bothZeros = isZeroA && isZeroB;
@@ -234,8 +236,8 @@ parameter sigWidth = 3;
                                     || (!signB && common_ltMags))));
     wire ordered_eq =
         bothZeros || ((signA == signB) && (bothInfs || common_eqMags));
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
+
     wire invalid = isSigNaNA || isSigNaNB || (signaling && !ordered);
     assign lt = ordered && ordered_lt;
     assign eq = ordered && ordered_eq;
@@ -247,36 +249,34 @@ endmodule
 
 
 
-module
-    recFNToRawFN(
-in,
-isNaN,
-isInf,
-isZero,
-sign,
-sExp,
-sig
-);
+module recFNToRawFN(
+  in,
+  isNaN,
+  isInf,
+  isZero,
+  sign,
+  sExp,
+  sig
+  );
 
-parameter expWidth = 3;
-parameter sigWidth = 3;
+  parameter expWidth = 3;
+  parameter sigWidth = 3;
 
-        input [(expWidth + sigWidth):0] in;
-        output isNaN;
-        output isInf;
-        output isZero;
-        output sign;
-        output [(expWidth + 1):0] sExp;
-        output [sigWidth:0] sig;
+  input [(expWidth + sigWidth):0] in;
+  output isNaN;
+  output isInf;
+  output isZero;
+  output sign;
+  output [(expWidth + 1):0] sExp;
+  output [sigWidth:0] sig;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     wire [expWidth:0] exp;
     wire [(sigWidth - 2):0] fract;
     assign {sign, exp, fract} = in;
     wire isSpecial = (exp>>(expWidth - 1) == 'b11);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
+
     assign isNaN = isSpecial &&  exp[expWidth - 2];
     assign isInf = isSpecial && !exp[expWidth - 2];
     assign isZero = (exp>>(expWidth - 2) == 'b000);
@@ -286,17 +286,14 @@ parameter sigWidth = 3;
 endmodule
 
 
-module
-    isSigNaNRecFN(
-in,
-isSigNaN
-);
 
-parameter expWidth = 3;
-parameter sigWidth = 3;
+module  isSigNaNRecFN(in, isSigNaN);
 
-        input [(expWidth + sigWidth):0] in;
-        output isSigNaN;
+  parameter expWidth = 3;
+  parameter sigWidth = 3;
+
+  input [(expWidth + sigWidth):0] in;
+  output isSigNaN;
 
     wire isNaN =
         (in[(expWidth + sigWidth - 1):(expWidth + sigWidth - 3)] == 'b111);
@@ -304,13 +301,12 @@ parameter sigWidth = 3;
 
 endmodule
 
-module
-    countLeadingZerosfp32 #(parameter inWidth = 23, parameter countWidth = 5) (
+module countLeadingZerosfp32 #(parameter inWidth = 23, parameter countWidth = 5) (
       input [(inWidth - 1):0] in, output reg [(countWidth - 1):0] count
     );
 
     wire [(inWidth - 1):0] reverseIn;
-    reverse#(inWidth) reverse_in(in, reverseIn);
+    reverseFp32 reverse_in(in, reverseIn);
     wire [inWidth:0] oneLeastReverseIn =
         {1'b1, reverseIn} & ({1'b0, ~reverseIn} + 1);
 		

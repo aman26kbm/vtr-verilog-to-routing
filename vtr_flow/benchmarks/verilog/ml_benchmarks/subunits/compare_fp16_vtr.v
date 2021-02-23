@@ -46,7 +46,9 @@ agb,
 ageb,
 unordered
 );
-
+//Default for FP16
+//parameter exp = 5;
+//parameter man = 10;
 
 input [15:0] a;
 input [15:0] b;
@@ -70,11 +72,14 @@ wire less_than;
 wire equal;
 wire greater_than;
 
+wire signaling;
+assign signaling = 1'b0;
+
 //Actual conversion module
-compareRecFN #(5, 11) compare(
+compareRecFN_Fp16 compare(
 .a(a_RecFN),
 .b(b_RecFN),
-.signaling(1'b0),
+.signaling(signaling),
 .lt(less_than),
 .eq(equal),
 .gt(greater_than),
@@ -82,15 +87,17 @@ compareRecFN #(5, 11) compare(
 .exceptionFlags(except_flags)
 );
 
+
 //Result flags
 assign aeb = equal;
-assign aneb = (~equal);
+assign aneb = ~equal;
 assign alb = less_than;
-assign aleb = (less_than | equal);
+assign aleb = less_than | equal;
 assign agb = greater_than;
-assign ageb = (greater_than | equal);
+assign ageb = greater_than | equal;
 
 endmodule
+
 
 
 module reverseFp16 (input [9:0] in, output [9:0] out);
@@ -119,8 +126,9 @@ module fNToRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
         output [(expWidth + sigWidth):0] out
     );
 
+    //`include "HardFloat_localFuncs.vi"
     //localparam normDistWidth = clog2(sigWidth);
-    localparam normDistWidth = 4; //Hardcoding for FP16 for now.
+    localparam normDistWidth = 4; //Hardcoding for FP16
 
     wire sign;
     wire [(expWidth - 1):0] expIn;
@@ -151,7 +159,7 @@ module fNToRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
 endmodule
 
 
-module compareRecFN(
+module compareRecFN_Fp16(
   a,
   b,
   signaling,
@@ -161,11 +169,11 @@ module compareRecFN(
   unordered,
   exceptionFlags
   );
-  parameter expWidth = 3;
-  parameter sigWidth = 3;
+  //parameter expWidth = 5;
+  //parameter sigWidth = 11;
   
-  input [(expWidth + sigWidth):0] a;
-  input [(expWidth + sigWidth):0] b;
+  input [(5 + 11):0] a;
+  input [(5 + 11):0] b;
   input signaling;
   output lt;
   output eq;
@@ -175,9 +183,9 @@ module compareRecFN(
    
 
     wire isNaNA, isInfA, isZeroA, signA;
-    wire [(expWidth + 1):0] sExpA;
-    wire [sigWidth:0] sigA;
-    recFNToRawFN#(expWidth, sigWidth)  recFNToRawFN_a(
+    wire [(5 + 1):0] sExpA;
+    wire [11:0] sigA;
+    recFNToRawFN#(5, 11)  recFNToRawFN_a(
       .in(a), 
       .isNaN(isNaNA), 
       .isInf(isInfA), 
@@ -187,11 +195,11 @@ module compareRecFN(
       .sig(sigA)
       );
     wire isSigNaNA;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(.in(a), .isSigNaN(isSigNaNA));
+    isSigNaNRecFN#(5, 11) isSigNaN_a(.in(a), .isSigNaN(isSigNaNA));
     wire isNaNB, isInfB, isZeroB, signB;
-    wire [(expWidth + 1):0] sExpB;
-    wire [sigWidth:0] sigB;
-    recFNToRawFN#(expWidth, sigWidth) recFNToRawFN_b(
+    wire [(5 + 1):0] sExpB;
+    wire [11:0] sigB;
+    recFNToRawFN#(5, 11) recFNToRawFN_b(
       .in(b), 
       .isNaN(isNaNB), 
       .isInf(isInfB), 
@@ -201,7 +209,7 @@ module compareRecFN(
       .sig(sigB)
       );
     wire isSigNaNB;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(.in(b), .isSigNaN(isSigNaNB));
+    isSigNaNRecFN#(5, 11) isSigNaN_b(.in(b), .isSigNaN(isSigNaNB));
    
     wire ordered = !isNaNA && !isNaNB;
     wire bothInfs  = isInfA  && isInfB;
@@ -281,7 +289,6 @@ module  isSigNaNRecFN(in, isSigNaN);
     assign isSigNaN = isNaN && !in[sigWidth - 2];
 
 endmodule
-
 
 module countLeadingZerosfp16 #(parameter inWidth = 10, parameter countWidth = 4) (
     input [(inWidth - 1):0] in, output reg [(countWidth - 1):0] count
