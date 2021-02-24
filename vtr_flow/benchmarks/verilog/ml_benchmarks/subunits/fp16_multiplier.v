@@ -105,7 +105,7 @@ module FPMult_16(
 				[63:32] A
 				[31:0] B
 			*/
-                       pipe_0 = {a, b} ;
+      pipe_0 = {a, b} ;
 
 			/* PIPE 1
 				[70] Sa

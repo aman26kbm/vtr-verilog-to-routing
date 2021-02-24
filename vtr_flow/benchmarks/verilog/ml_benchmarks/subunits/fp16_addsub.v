@@ -196,15 +196,15 @@ module FPAddSub(
 	
 	always @ (*) begin	
 		if(rst) begin
-			pipe_1 <= 0;
-			pipe_2 <= 0;
-			pipe_3 <= 0;
-			pipe_4 <= 0;
-			pipe_5 <= 0;
-			pipe_6 <= 0;
-			pipe_7 <= 0;
-			pipe_8 <= 0;
-			pipe_9 <= 0;
+			pipe_1 = 0;
+			pipe_2 = 0;
+			pipe_3 = 0;
+			pipe_4 = 0;
+			pipe_5 = 0;
+			pipe_6 = 0;
+			pipe_7 = 0;
+			pipe_8 = 0;
+			pipe_9 = 0;
 		end 
 		else begin
 		

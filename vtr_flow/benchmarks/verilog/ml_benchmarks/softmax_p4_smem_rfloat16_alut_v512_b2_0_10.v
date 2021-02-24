@@ -551,16 +551,16 @@ wire cmp0_stage0_agb;
 wire cmp0_stage0_ageb;
 wire cmp0_stage0_unordered;
 
-comparator cmp0_stage2(.a(inp0),       .b(inp1),        .aeb(cmp0_stage2), .aneb(cmp0_stage2_aneb), .alb(cmp0_stage2_alb), .aleb(cmp0_stage2_aleb), .agb(cmp0_stage2_agb), .ageb(cmp0_stage2_ageb), .unordered(cmp0_stage2_unordered));
+comparator cmp0_stage2(.a(inp0),       .b(inp1),        .aeb(cmp0_stage2_aeb), .aneb(cmp0_stage2_aneb), .alb(cmp0_stage2_alb), .aleb(cmp0_stage2_aleb), .agb(cmp0_stage2_agb), .ageb(cmp0_stage2_ageb), .unordered(cmp0_stage2_unordered));
 assign cmp0_out_stage2 = (cmp0_stage2_ageb==1'b1) ? inp0 : inp1;
 
-comparator cmp1_stage2(.a(inp2),       .b(inp3),         .aeb(cmp1_stage2), .aneb(cmp1_stage2_aneb), .alb(cmp1_stage2_alb), .aleb(cmp1_stage2_aleb), .agb(cmp1_stage2_agb), .ageb(cmp1_stage2_ageb), .unordered(cmp1_stage2_unordered));   
+comparator cmp1_stage2(.a(inp2),       .b(inp3),         .aeb(cmp1_stage2_aeb), .aneb(cmp1_stage2_aneb), .alb(cmp1_stage2_alb), .aleb(cmp1_stage2_aleb), .agb(cmp1_stage2_agb), .ageb(cmp1_stage2_ageb), .unordered(cmp1_stage2_unordered));   
 assign cmp1_out_stage2 = (cmp1_stage2_ageb==1'b1) ? inp2 : inp3;
 
-comparator cmp0_stage1(.a(cmp0_out_stage2),       .b(cmp1_out_stage2),          .aeb(cmp0_stage1), .aneb(cmp0_stage1_aneb), .alb(cmp0_stage1_alb), .aleb(cmp0_stage1_aleb), .agb(cmp0_stage1_agb), .ageb(cmp0_stage1_ageb), .unordered(cmp0_stage1_unordered));
+comparator cmp0_stage1(.a(cmp0_out_stage2),       .b(cmp1_out_stage2),          .aeb(cmp0_stage1_aeb), .aneb(cmp0_stage1_aneb), .alb(cmp0_stage1_alb), .aleb(cmp0_stage1_aleb), .agb(cmp0_stage1_agb), .ageb(cmp0_stage1_ageb), .unordered(cmp0_stage1_unordered));
 assign cmp0_out_stage1 = (cmp0_stage1_ageb==1'b1) ? cmp0_out_stage2: cmp1_out_stage2;
 
-comparator cmp0_stage0(.a(outp),       .b(cmp0_out_stage1),         .aeb(cmp0_stage0), .aneb(cmp0_stage0_aneb), .alb(cmp0_stage0_alb), .aleb(cmp0_stage0_aleb), .agb(cmp0_stage0_agb), .ageb(cmp0_stage0_ageb), .unordered(cmp0_stage0_unordered));
+comparator cmp0_stage0(.a(outp),       .b(cmp0_out_stage1),         .aeb(cmp0_stage0_aeb), .aneb(cmp0_stage0_aneb), .alb(cmp0_stage0_alb), .aleb(cmp0_stage0_aleb), .agb(cmp0_stage0_agb), .ageb(cmp0_stage0_ageb), .unordered(cmp0_stage0_unordered));
 assign cmp0_out_stage0 = (cmp0_stage0_ageb==1'b1) ? outp : cmp0_out_stage1;
 
 //DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage2(.a(inp0),       .b(inp1),      .z1(cmp0_out_stage2), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
@@ -980,15 +980,15 @@ module FPAddSub(
 	
 	always @ (*) begin	
 		if(rst) begin
-			pipe_1 <= 0;
-			pipe_2 <= 0;
-			pipe_3 <= 0;
-			pipe_4 <= 0;
-			pipe_5 <= 0;
-			pipe_6 <= 0;
-			pipe_7 <= 0;
-			pipe_8 <= 0;
-			pipe_9 <= 0;
+			pipe_1 = 0;
+			pipe_2 = 0;
+			pipe_3 = 0;
+			pipe_4 = 0;
+			pipe_5 = 0;
+			pipe_6 = 0;
+			pipe_7 = 0;
+			pipe_8 = 0;
+			pipe_9 = 0;
 		end 
 		else begin
 		
@@ -2069,3 +2069,649 @@ module countLeadingZerosfp16 #(parameter inWidth = 10, parameter countWidth = 4)
 
 endmodule
 
+
+//////////////////////////////////////////////////////
+// Log unit
+//////////////////////////////////////////////////////
+
+module logunit (a, z, status);
+
+	
+	input [15:0] a;
+	output [15:0] z;
+	output [4:0] status;
+
+	wire [15: 0] fxout1;
+	wire [15: 0] fxout2;
+
+
+	LUT1 lut1 (.addr(a[14:10]),.log(fxout1)); 
+	LUT2 lut2 (.addr(a[9:4]),.log(fxout2));  
+
+  wire clk_NC;
+  wire rst_NC;
+
+	//DW_fp_addsub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add(.a(fxout1), .b(fxout2), .rnd(3'b0), .op(1'b0), .z(z), .status(status[7:0]));
+  FPAddSub add (.clk(clk_NC), .rst(rst_NC), .a(fxout1),	.b(fxout2), .operation(1'b1),	.result(z), .flags());
+endmodule
+
+module LUT1(addr, log);
+    input [4:0] addr;
+    output reg [15:0] log;
+
+    always @(addr) begin
+        case (addr)
+			5'b0 		: log = 16'b1111110000000000;
+			5'b1 		: log = 16'b1100100011011010;
+			5'b10 		: log = 16'b1100100010000001;
+			5'b11 		: log = 16'b1100100000101001;
+			5'b100 		: log = 16'b1100011110100000;
+			5'b101 		: log = 16'b1100011011101110;
+			5'b110 		: log = 16'b1100011000111101;
+			5'b111 		: log = 16'b1100010110001100;
+			5'b1000 		: log = 16'b1100010011011010;
+			5'b1001 		: log = 16'b1100010000101001;
+			5'b1010 		: log = 16'b1100001011101110;
+			5'b1011 		: log = 16'b1100000110001100;
+			5'b1100 		: log = 16'b1100000000101001;
+			5'b1101 		: log = 16'b1011110110001100;
+			5'b1110 		: log = 16'b1011100110001100;
+			5'b1111 		: log = 16'b0000000000000000;
+			5'b10000 		: log = 16'b0011100110001100;
+			5'b10001 		: log = 16'b0011110110001100;
+			5'b10010 		: log = 16'b0100000000101001;
+			5'b10011 		: log = 16'b0100000110001100;
+			5'b10100 		: log = 16'b0100001011101110;
+			5'b10101 		: log = 16'b0100010000101001;
+			5'b10110 		: log = 16'b0100010011011010;
+			5'b10111 		: log = 16'b0100010110001100;
+			5'b11000 		: log = 16'b0100011000111101;
+			5'b11001 		: log = 16'b0100011011101110;
+			5'b11010 		: log = 16'b0100011110100000;
+			5'b11011 		: log = 16'b0100100000101001;
+			5'b11100 		: log = 16'b0100100010000001;
+			5'b11101 		: log = 16'b0100100011011010;
+			5'b11110 		: log = 16'b0100100100110011;
+			5'b11111 		: log = 16'b0111110000000000;
+        endcase
+    end
+endmodule
+
+module LUT2(addr, log);
+    input [5:0] addr;
+    output reg [15:0] log;
+
+    always @(addr) begin
+        case (addr)
+			6'b0 		: log = 16'b0000000000000000;
+			6'b1 		: log = 16'b0010001111110000;
+			6'b10 		: log = 16'b0010011111100001;
+			6'b11 		: log = 16'b0010100111011101;
+			6'b100 		: log = 16'b0010101111000011;
+			6'b101 		: log = 16'b0010110011010000;
+			6'b110 		: log = 16'b0010110110111100;
+			6'b111 		: log = 16'b0010111010100101;
+			6'b1000 		: log = 16'b0010111110001010;
+			6'b1001 		: log = 16'b0011000000110110;
+			6'b1010 		: log = 16'b0011000010100101;
+			6'b1011 		: log = 16'b0011000100010011;
+			6'b1100 		: log = 16'b0011000110000000;
+			6'b1101 		: log = 16'b0011000111101011;
+			6'b1110 		: log = 16'b0011001001010101;
+			6'b1111 		: log = 16'b0011001010111101;
+			6'b10000 		: log = 16'b0011001100100100;
+			6'b10001 		: log = 16'b0011001110001010;
+			6'b10010 		: log = 16'b0011001111101110;
+			6'b10011 		: log = 16'b0011010000101001;
+			6'b10100 		: log = 16'b0011010001011010;
+			6'b10101 		: log = 16'b0011010010001010;
+			6'b10110 		: log = 16'b0011010010111010;
+			6'b10111 		: log = 16'b0011010011101010;
+			6'b11000 		: log = 16'b0011010100011000;
+			6'b11001 		: log = 16'b0011010101000111;
+			6'b11010 		: log = 16'b0011010101110100;
+			6'b11011 		: log = 16'b0011010110100010;
+			6'b11100 		: log = 16'b0011010111001110;
+			6'b11101 		: log = 16'b0011010111111011;
+			6'b11110 		: log = 16'b0011011000100111;
+			6'b11111 		: log = 16'b0011011001010010;
+			6'b100000 		: log = 16'b0011011001111101;
+			6'b100001 		: log = 16'b0011011010100111;
+			6'b100010 		: log = 16'b0011011011010001;
+			6'b100011 		: log = 16'b0011011011111011;
+			6'b100100 		: log = 16'b0011011100100100;
+			6'b100101 		: log = 16'b0011011101001101;
+			6'b100110 		: log = 16'b0011011101110101;
+			6'b100111 		: log = 16'b0011011110011101;
+			6'b101000 		: log = 16'b0011011111000101;
+			6'b101001 		: log = 16'b0011011111101100;
+			6'b101010 		: log = 16'b0011100000001001;
+			6'b101011 		: log = 16'b0011100000011101;
+			6'b101100 		: log = 16'b0011100000110000;
+			6'b101101 		: log = 16'b0011100001000010;
+			6'b101110 		: log = 16'b0011100001010101;
+			6'b101111 		: log = 16'b0011100001101000;
+			6'b110000 		: log = 16'b0011100001111010;
+			6'b110001 		: log = 16'b0011100010001100;
+			6'b110010 		: log = 16'b0011100010011110;
+			6'b110011 		: log = 16'b0011100010110000;
+			6'b110100 		: log = 16'b0011100011000010;
+			6'b110101 		: log = 16'b0011100011010100;
+			6'b110110 		: log = 16'b0011100011100101;
+			6'b110111 		: log = 16'b0011100011110110;
+			6'b111000 		: log = 16'b0011100100000111;
+			6'b111001 		: log = 16'b0011100100011000;
+			6'b111010 		: log = 16'b0011100100101001;
+			6'b111011 		: log = 16'b0011100100111010;
+			6'b111100 		: log = 16'b0011100101001011;
+			6'b111101 		: log = 16'b0011100101011011;
+			6'b111110 		: log = 16'b0011100101101011;
+			6'b111111 		: log = 16'b0011100101111100;
+        endcase
+    end
+endmodule
+
+
+//////////////////////////////////////////////////////
+// Exponential unit
+//////////////////////////////////////////////////////
+
+module expunit (a, z, status, stage_run, clk, reset);
+
+  parameter int_width = 3; // fixed point integer length
+  parameter frac_width = 3; // fixed point fraction length
+  	
+  input [15:0] a;
+  input stage_run;
+  input clk;
+  input reset;
+  output [15:0] z;
+  output [7:0] status;
+  
+  wire [int_width + frac_width - 1: 0] fxout;
+  wire [31:0] LUTout;
+  reg  [31:0] LUTout_reg;
+  wire [15:0] Mult_out;
+  reg  [15:0] Mult_out_reg;
+
+  always @(posedge clk) begin
+    if(reset) begin
+      Mult_out_reg <= 0;
+      LUTout_reg <= 0;
+    end else if(stage_run) begin
+      Mult_out_reg <= Mult_out;
+      LUTout_reg <= LUTout;
+    end
+  end
+
+  wire clk_NC, rst_NC;
+        
+  fptofixed_para fpfx (.fp(a), .fx(fxout));
+  LUT lut(.addr(fxout[int_width + frac_width - 1 : 0]), .exp(LUTout)); 
+  //DW_fp_mult #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) fpmult (.a(a), .b(LUTout[31:16]), .rnd(3'b000), .z(Mult_out), .status());
+  FPMult_16 fpmult (.clk(clk_NC), .rst(rst_NC), .a(a), .b(LUTout[31:16]), .result(Mult_out), .flags());
+
+
+
+  //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) fpsub (.a(Mult_out_reg), .b(LUTout_reg[15:0]), .rnd(3'b000), .z(z), .status(status[7:0]));
+  FPAddSub fpsub (.clk(clk_NC), .rst(rst_NC), .a(Mult_out_reg),	.b(LUTout_reg[15:0]), .operation(1'b0),	.result(z), .flags());
+endmodule
+
+module fptofixed_para (
+	fp,
+	fx
+	);
+	
+	parameter int_width = 3; // fixed point integer length
+	parameter frac_width = 3; // fixed point fraction length
+
+	input [15:0] fp; // Half Precision fp
+	output [int_width + frac_width - 1:0] fx;  
+	
+	wire [15:0] Mant; // mantissa of fp
+	wire signed [4:0] Ea; // non biased exponent
+	wire [4:0] Exp; // biased exponent
+	wire [15:0] sftfx; // output of shifter block
+	reg [15:0] temp;
+	
+	assign Mant = {6'b000001, fp[9:0]};
+	assign Exp = fp[14:10];
+	assign Ea = Exp - 15;
+
+	assign fx = temp[9+int_width:10-frac_width];
+	
+
+always @(sftfx)
+begin
+// only negetive numbers as inputs after sorting and subtraction from max
+	if (Ea > int_width - 1)
+		begin
+			temp <= 16'hFFFF; // if there is an overflow
+			
+		end
+	else if ( fp[14:0] == 15'b0)
+		begin 
+			temp <= 16'b0;
+			
+		end	
+	else // underflow automatically becomes zero
+		begin
+			temp <= sftfx;
+		end
+end	
+
+DW01_ash  #(`DATAWIDTH, 5) ash( .A(Mant[15:0]), .DATA_TC(1'b0), .SH(Ea[4:0]), .SH_TC(1'b1), .B(sftfx));
+
+endmodule
+
+module LUT(addr, exp);
+    input [5:0] addr;
+    output reg [31:0] exp;
+
+    always @(addr) begin
+        case (addr)
+			6'b0 		: exp = 32'b00111011110000010011110000000000;
+			6'b1 		: exp = 32'b00111010110110000011101111101010;
+			6'b10 		: exp = 32'b00111010000010100011101110111110;
+			6'b11 		: exp = 32'b00111001010101000011101101111111;
+			6'b100 		: exp = 32'b00111000101101000011101100110100;
+			6'b101 		: exp = 32'b00111000001001110011101011100000;
+			6'b110 		: exp = 32'b00110111010101000011101010000111;
+			6'b111 		: exp = 32'b00110110011101110011101000101010;
+			6'b1000 		: exp = 32'b00110101101101010011100111001100;
+			6'b1001 		: exp = 32'b00110101000010010011100101101110;
+			6'b1010 		: exp = 32'b00110100011100100011100100010010;
+			6'b1011 		: exp = 32'b00110011110110000011100010111000;
+			6'b1100 		: exp = 32'b00110010111011000011100001100001;
+			6'b1101 		: exp = 32'b00110010000111000011100000001111;
+			6'b1110 		: exp = 32'b00110001011001000011011101111111;
+			6'b1111 		: exp = 32'b00110000110000100011011011101010;
+			6'b10000 		: exp = 32'b00110000001100110011011001011101;
+			6'b10001 		: exp = 32'b00101111011010010011010111011001;
+			6'b10010 		: exp = 32'b00101110100010100011010101011101;
+			6'b10011 		: exp = 32'b00101101110001010011010011101010;
+			6'b10100 		: exp = 32'b00101101000110000011010001111111;
+			6'b10101 		: exp = 32'b00101100011111110011010000011100;
+			6'b10110 		: exp = 32'b00101011111011110011001110000000;
+			6'b10111 		: exp = 32'b00101011000000000011001011010110;
+			6'b11000 		: exp = 32'b00101010001011010011001000111010;
+			6'b11001 		: exp = 32'b00101001011101000011000110101010;
+			6'b11010 		: exp = 32'b00101000110100000011000100100110;
+			6'b11011 		: exp = 32'b00101000001111110011000010101101;
+			6'b11100 		: exp = 32'b00100111011111100011000000111111;
+			6'b11101 		: exp = 32'b00100110100111010010111110110011;
+			6'b11110 		: exp = 32'b00100101110101100010111011111010;
+			6'b11111 		: exp = 32'b00100101001001110010111001010001;
+			6'b100000 		: exp = 32'b00100100100011000010110110111000;
+			6'b100001 		: exp = 32'b00100100000000110010110100101100;
+			6'b100010 		: exp = 32'b00100011000101000010110010101101;
+			6'b100011 		: exp = 32'b00100010001111110010110000111001;
+			6'b100100 		: exp = 32'b00100001100001000010101110100000;
+			6'b100101 		: exp = 32'b00100000110111100010101011100010;
+			6'b100110 		: exp = 32'b00100000010010110010101000110101;
+			6'b100111 		: exp = 32'b00011111100101000010100110011001;
+			6'b101000 		: exp = 32'b00011110101100000010100100001011;
+			6'b101001 		: exp = 32'b00011101111001110010100010001011;
+			6'b101010 		: exp = 32'b00011101001101010010100000010111;
+			6'b101011 		: exp = 32'b00011100100110010010011101011101;
+			6'b101100 		: exp = 32'b00011100000011110010011010100000;
+			6'b101101 		: exp = 32'b00011011001010010010010111110101;
+			6'b101110 		: exp = 32'b00011010010100100010010101011011;
+			6'b101111 		: exp = 32'b00011001100101000010010011010000;
+			6'b110000 		: exp = 32'b00011000111011000010010001010011;
+			6'b110001 		: exp = 32'b00011000010110000010001111000101;
+			6'b110010 		: exp = 32'b00010111101010100010001011111010;
+			6'b110011 		: exp = 32'b00010110110001000010001001000011;
+			6'b110100 		: exp = 32'b00010101111110000010000110011111;
+			6'b110101 		: exp = 32'b00010101010001010010000100001011;
+			6'b110110 		: exp = 32'b00010100101001100010000010000110;
+			6'b110111 		: exp = 32'b00010100000110100010000000001110;
+			6'b111000 		: exp = 32'b00010011001111100001111101000101;
+			6'b111001 		: exp = 32'b00010010011001000001111010000100;
+			6'b111010 		: exp = 32'b00010001101001000001110111010111;
+			6'b111011 		: exp = 32'b00010000111110100001110100111011;
+			6'b111100 		: exp = 32'b00010000011001000001110010101111;
+			6'b111101 		: exp = 32'b00001111110000010001110000110010;
+			6'b111110 		: exp = 32'b00001110110101110001101110000010;
+			6'b111111 		: exp = 32'b00001110000010100001101010111001;
+        endcase
+    end
+endmodule
+
+//////////////////////////////////////////////////////////////////////
+// Floating point multiplier
+//////////////////////////////////////////////////////////////////////
+
+
+`define EXPONENT 5
+`define MANTISSA 10
+`define ACTUAL_MANTISSA 11
+`define EXPONENT_LSB 10
+`define EXPONENT_MSB 14
+`define MANTISSA_LSB 0
+`define MANTISSA_MSB 9
+`define MANTISSA_MUL_SPLIT_LSB 3
+`define MANTISSA_MUL_SPLIT_MSB 9
+`define SIGN 1
+`define SIGN_LOC 15
+`define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
+`define IEEE_COMPLIANCE 1
+//////////////////////////////////////////////////////////////////////////////////
+//
+// Create Date:    08:40:21 09/19/2012 
+// Module Name:    FPMult
+// Project Name: 	 Floating Point Project
+// Author:			 Fredrik Brosser
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+module FPMult_16(
+		clk,
+		rst,
+		a,
+		b,
+		result,
+		flags
+    );
+	
+	// Input Ports
+	input clk ;							// Clock
+	input rst ;							// Reset signal
+	input [`DWIDTH-1:0] a;					// Input A, a 32-bit floating point number
+	input [`DWIDTH-1:0] b;					// Input B, a 32-bit floating point number
+	
+	// Output ports
+	output [`DWIDTH-1:0] result ;					// Product, result of the operation, 32-bit FP number
+	output [4:0] flags ;				// Flags indicating exceptions according to IEEE754
+	
+	// Internal signals
+	wire [31:0] Z_int ;				// Product, result of the operation, 32-bit FP number
+	wire [4:0] Flags_int ;			// Flags indicating exceptions according to IEEE754
+	
+	wire Sa ;							// A's sign
+	wire Sb ;							// B's sign
+	wire Sp ;							// Product sign
+	wire [`EXPONENT-1:0] Ea ;					// A's exponent
+	wire [`EXPONENT-1:0] Eb ;					// B's exponent
+	wire [2*`MANTISSA+1:0] Mp ;					// Product mantissa
+	wire [4:0] InputExc ;			// Exceptions in inputs
+	wire [`MANTISSA-1:0] NormM ;				// Normalized mantissa
+	wire [`EXPONENT:0] NormE ;				// Normalized exponent
+	wire [`MANTISSA:0] RoundM ;				// Normalized mantissa
+	wire [`EXPONENT:0] RoundE ;				// Normalized exponent
+	wire [`MANTISSA:0] RoundMP ;				// Normalized mantissa
+	wire [`EXPONENT:0] RoundEP ;				// Normalized exponent
+	wire GRS ;
+
+	//reg [63:0] pipe_0;			// Pipeline register Input->Prep
+	reg [2*`DWIDTH-1:0] pipe_0;			// Pipeline register Input->Prep
+
+	//reg [92:0] pipe_1;			// Pipeline register Prep->Execute
+	reg [3*`MANTISSA+2*`EXPONENT+7:0] pipe_1;			// Pipeline register Prep->Execute
+
+	//reg [38:0] pipe_2;			// Pipeline register Execute->Normalize
+	reg [`MANTISSA+`EXPONENT+7:0] pipe_2;			// Pipeline register Execute->Normalize
+	
+	//reg [72:0] pipe_3;			// Pipeline register Normalize->Round
+	reg [2*`MANTISSA+2*`EXPONENT+10:0] pipe_3;			// Pipeline register Normalize->Round
+
+	//reg [36:0] pipe_4;			// Pipeline register Round->Output
+	reg [`DWIDTH+4:0] pipe_4;			// Pipeline register Round->Output
+	
+	assign result = pipe_4[`DWIDTH+4:5] ;
+	assign flags = pipe_4[4:0] ;
+	
+	// Prepare the operands for alignment and check for exceptions
+	FPMult_PrepModule PrepModule(clk, rst, pipe_0[2*`DWIDTH-1:`DWIDTH], pipe_0[`DWIDTH-1:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]) ;
+
+	// Perform (unsigned) mantissa multiplication
+	FPMult_ExecuteModule ExecuteModule(pipe_1[3*`MANTISSA+`EXPONENT*2+7:2*`MANTISSA+2*`EXPONENT+8], pipe_1[2*`MANTISSA+2*`EXPONENT+7:2*`MANTISSA+7], pipe_1[2*`MANTISSA+6:5], pipe_1[2*`MANTISSA+2*`EXPONENT+6:2*`MANTISSA+`EXPONENT+7], pipe_1[2*`MANTISSA+`EXPONENT+6:2*`MANTISSA+7], pipe_1[2*`MANTISSA+2*`EXPONENT+8], pipe_1[2*`MANTISSA+2*`EXPONENT+7], Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0], GRS) ;
+
+	// Round result and if necessary, perform a second (post-rounding) normalization step
+	FPMult_NormalizeModule NormalizeModule(pipe_2[`MANTISSA-1:0], pipe_2[`MANTISSA+`EXPONENT:`MANTISSA], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]) ;		
+
+	// Round result and if necessary, perform a second (post-rounding) normalization step
+	//FPMult_RoundModule RoundModule(pipe_3[47:24], pipe_3[23:0], pipe_3[65:57], pipe_3[56:48], pipe_3[66], pipe_3[67], pipe_3[72:68], Z_int[31:0], Flags_int[4:0]) ;		
+	FPMult_RoundModule RoundModule(pipe_3[2*`MANTISSA+1:`MANTISSA+1], pipe_3[`MANTISSA:0], pipe_3[2*`MANTISSA+2*`EXPONENT+3:2*`MANTISSA+`EXPONENT+3], pipe_3[2*`MANTISSA+`EXPONENT+2:2*`MANTISSA+2], pipe_3[2*`MANTISSA+2*`EXPONENT+4], pipe_3[2*`MANTISSA+2*`EXPONENT+5], pipe_3[2*`MANTISSA+2*`EXPONENT+10:2*`MANTISSA+2*`EXPONENT+6], Z_int[`DWIDTH-1:0], Flags_int[4:0]) ;		
+
+	always @ (*) begin	
+		if(rst) begin
+			pipe_0 = 0;
+			pipe_1 = 0;
+			pipe_2 = 0; 
+			pipe_3 = 0;
+			pipe_4 = 0;
+		end 
+		else begin		
+			/* PIPE 0
+				[63:32] A
+				[31:0] B
+			*/
+      pipe_0 = {a, b} ;
+
+			/* PIPE 1
+				[70] Sa
+				[69] Sb
+				[68:61] Ea
+				[60:53] Eb
+				[52:5] Mp
+				[4:0] InputExc
+			*/
+			//pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[`MANTISSA_MUL_SPLIT_LSB-1:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA-1:0], InputExc[4:0]} ;
+			pipe_1 = {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[8:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]} ;
+			/* PIPE 2
+				[38:34] InputExc
+				[33] GRS
+				[32] Sp
+				[31:23] NormE
+				[22:0] NormM
+			*/
+			pipe_2 = {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
+			/* PIPE 3
+				[72:68] InputExc
+				[67] GRS
+				[66] Sp	
+				[65:57] RoundE
+				[56:48] RoundEP
+				[47:24] RoundM
+				[23:0] RoundMP
+			*/
+			pipe_3 = {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
+			/* PIPE 4
+				[36:5] Z
+				[4:0] Flags
+			*/				
+			pipe_4 = {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
+		end
+	end
+		
+endmodule
+
+
+module FPMult_PrepModule (
+		clk,
+		rst,
+		a,
+		b,
+		Sa,
+		Sb,
+		Ea,
+		Eb,
+		Mp,
+		InputExc
+	);
+	
+	// Input ports
+	input clk ;
+	input rst ;
+	input [`DWIDTH-1:0] a ;								// Input A, a 32-bit floating point number
+	input [`DWIDTH-1:0] b ;								// Input B, a 32-bit floating point number
+	
+	// Output ports
+	output Sa ;										// A's sign
+	output Sb ;										// B's sign
+	output [`EXPONENT-1:0] Ea ;								// A's exponent
+	output [`EXPONENT-1:0] Eb ;								// B's exponent
+	output [2*`MANTISSA+1:0] Mp ;							// Mantissa product
+	output [4:0] InputExc ;						// Input numbers are exceptions
+	
+	// Internal signals							// If signal is high...
+	wire ANaN ;										// A is a signalling NaN
+	wire BNaN ;										// B is a signalling NaN
+	wire AInf ;										// A is infinity
+	wire BInf ;										// B is infinity
+    wire [`MANTISSA-1:0] Ma;
+    wire [`MANTISSA-1:0] Mb;
+	
+	assign ANaN = &(a[`DWIDTH-2:`MANTISSA]) &  |(a[`DWIDTH-2:`MANTISSA]) ;			// All one exponent and not all zero mantissa - NaN
+	assign BNaN = &(b[`DWIDTH-2:`MANTISSA]) &  |(b[`MANTISSA-1:0]);			// All one exponent and not all zero mantissa - NaN
+	assign AInf = &(a[`DWIDTH-2:`MANTISSA]) & ~|(a[`DWIDTH-2:`MANTISSA]) ;		// All one exponent and all zero mantissa - Infinity
+	assign BInf = &(b[`DWIDTH-2:`MANTISSA]) & ~|(b[`DWIDTH-2:`MANTISSA]) ;		// All one exponent and all zero mantissa - Infinity
+	
+	// Check for any exceptions and put all flags into exception vector
+	assign InputExc = {(ANaN | BNaN | AInf | BInf), ANaN, BNaN, AInf, BInf} ;
+	//assign InputExc = {(ANaN | ANaN | BNaN |BNaN), ANaN, ANaN, BNaN,BNaN} ;
+	
+	// Take input numbers apart
+	assign Sa = a[`DWIDTH-1] ;							// A's sign
+	assign Sb = b[`DWIDTH-1] ;							// B's sign
+	assign Ea = a[`DWIDTH-2:`MANTISSA];						// Store A's exponent in Ea, unless A is an exception
+	assign Eb = b[`DWIDTH-2:`MANTISSA];						// Store B's exponent in Eb, unless B is an exception	
+//    assign Ma = a[`MANTISSA_MSB:`MANTISSA_LSB];
+  //  assign Mb = b[`MANTISSA_MSB:`MANTISSA_LSB];
+	
+
+
+	//assign Mp = ({4'b0001, a[`MANTISSA-1:0]}*{4'b0001, b[`MANTISSA-1:9]}) ;
+	assign Mp = ({1'b1,a[`MANTISSA-1:0]}*{1'b1, b[`MANTISSA-1:0]}) ;
+
+	
+    //We multiply part of the mantissa here
+    //Full mantissa of A
+    //Bits MANTISSA_MUL_SPLIT_MSB:MANTISSA_MUL_SPLIT_LSB of B
+   // wire [`ACTUAL_MANTISSA-1:0] inp_A;
+   // wire [`ACTUAL_MANTISSA-1:0] inp_B;
+   // assign inp_A = {1'b1, Ma};
+   // assign inp_B = {{(`MANTISSA-(`MANTISSA_MUL_SPLIT_MSB-`MANTISSA_MUL_SPLIT_LSB+1)){1'b0}}, 1'b1, Mb[`MANTISSA_MUL_SPLIT_MSB:`MANTISSA_MUL_SPLIT_LSB]};
+   // DW02_mult #(`ACTUAL_MANTISSA,`ACTUAL_MANTISSA) u_mult(.A(inp_A), .B(inp_B), .TC(1'b0), .PRODUCT(Mp));
+endmodule
+
+
+module FPMult_ExecuteModule(
+		a,
+		b,
+		MpC,
+		Ea,
+		Eb,
+		Sa,
+		Sb,
+		Sp,
+		NormE,
+		NormM,
+		GRS
+    );
+
+	// Input ports
+	input [`MANTISSA-1:0] a ;
+	input [2*`EXPONENT:0] b ;
+	input [2*`MANTISSA+1:0] MpC ;
+	input [`EXPONENT-1:0] Ea ;						// A's exponent
+	input [`EXPONENT-1:0] Eb ;						// B's exponent
+	input Sa ;								// A's sign
+	input Sb ;								// B's sign
+	
+	// Output ports
+	output Sp ;								// Product sign
+	output [`EXPONENT:0] NormE ;													// Normalized exponent
+	output [`MANTISSA-1:0] NormM ;												// Normalized mantissa
+	output GRS ;
+	
+	wire [2*`MANTISSA+1:0] Mp ;
+	
+	assign Sp = (Sa ^ Sb) ;												// Equal signs give a positive product
+	
+   // wire [`ACTUAL_MANTISSA-1:0] inp_a;
+   // wire [`ACTUAL_MANTISSA-1:0] inp_b;
+   // assign inp_a = {1'b1, a};
+   // assign inp_b = {{(`MANTISSA-`MANTISSA_MUL_SPLIT_LSB){1'b0}}, 1'b0, b};
+   // DW02_mult #(`ACTUAL_MANTISSA,`ACTUAL_MANTISSA) u_mult(.A(inp_a), .B(inp_b), .TC(1'b0), .PRODUCT(Mp_temp));
+   // DW01_add #(2*`ACTUAL_MANTISSA) u_add(.A(Mp_temp), .B(MpC<<`MANTISSA_MUL_SPLIT_LSB), .CI(1'b0), .SUM(Mp), .CO());
+
+	//assign Mp = (MpC<<(2*`EXPONENT+1)) + ({4'b0001, a[`MANTISSA-1:0]}*{1'b0, b[2*`EXPONENT:0]}) ;
+	assign Mp = MpC;
+
+
+	assign NormM = (Mp[2*`MANTISSA+1] ? Mp[2*`MANTISSA:`MANTISSA+1] : Mp[2*`MANTISSA-1:`MANTISSA]); 	// Check for overflow
+	assign NormE = (Ea + Eb + Mp[2*`MANTISSA+1]);								// If so, increment exponent
+	
+	assign GRS = ((Mp[`MANTISSA]&(Mp[`MANTISSA+1]))|(|Mp[`MANTISSA-1:0])) ;
+	
+endmodule
+
+module FPMult_NormalizeModule(
+		NormM,
+		NormE,
+		RoundE,
+		RoundEP,
+		RoundM,
+		RoundMP
+    );
+
+	// Input Ports
+	input [`MANTISSA-1:0] NormM ;									// Normalized mantissa
+	input [`EXPONENT:0] NormE ;									// Normalized exponent
+
+	// Output Ports
+	output [`EXPONENT:0] RoundE ;
+	output [`EXPONENT:0] RoundEP ;
+	output [`MANTISSA:0] RoundM ;
+	output [`MANTISSA:0] RoundMP ; 
+	
+	assign RoundE = NormE - 15 ;
+	assign RoundEP = NormE - 14 ;
+	assign RoundM = NormM ;
+	assign RoundMP = NormM ;
+
+endmodule
+
+module FPMult_RoundModule(
+		RoundM,
+		RoundMP,
+		RoundE,
+		RoundEP,
+		Sp,
+		GRS,
+		InputExc,
+		Z,
+		Flags
+    );
+
+	// Input Ports
+	input [`MANTISSA:0] RoundM ;									// Normalized mantissa
+	input [`MANTISSA:0] RoundMP ;									// Normalized exponent
+	input [`EXPONENT:0] RoundE ;									// Normalized mantissa + 1
+	input [`EXPONENT:0] RoundEP ;									// Normalized exponent + 1
+	input Sp ;												// Product sign
+	input GRS ;
+	input [4:0] InputExc ;
+	
+	// Output Ports
+	output [`DWIDTH-1:0] Z ;										// Final product
+	output [4:0] Flags ;
+	
+	// Internal Signals
+	wire [`EXPONENT:0] FinalE ;									// Rounded exponent
+	wire [`MANTISSA:0] FinalM;
+	wire [`MANTISSA:0] PreShiftM;
+	
+	assign PreShiftM = GRS ? RoundMP : RoundM ;	// Round up if R and (G or S)
+	
+	// Post rounding normalization (potential one bit shift> use shifted mantissa if there is overflow)
+	assign FinalM = (PreShiftM[`MANTISSA] ? {1'b0, PreShiftM[`MANTISSA:1]} : PreShiftM[`MANTISSA:0]) ;
+	
+	assign FinalE = (PreShiftM[`MANTISSA] ? RoundEP : RoundE) ; // Increment exponent if a shift was done
+	
+	assign Z = {Sp, FinalE[`EXPONENT-1:0], FinalM[`MANTISSA-1:0]} ;   // Putting the pieces together
+	assign Flags = InputExc[4:0];
+
+endmodule
