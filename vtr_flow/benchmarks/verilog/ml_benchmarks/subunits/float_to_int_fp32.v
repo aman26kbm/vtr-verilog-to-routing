@@ -41,7 +41,7 @@ module float_to_int(
 		pipe_3 <= 51'h0;
 		pipe_4 <= 41'h0;
 		pipe_5 <= 32'h0;
-		
+		pipe_6 <= 32'h0;
 	end
 	else begin
         pipe_in <= input_a;
@@ -113,10 +113,10 @@ input [31:0] z,
   output reg [31:0] output_z);
 
 always@(a_e or z) begin
-	if ((a_e) == -127) begin
+	if (a_e[8] == 1'b1 && a_e[7:0] == 8'd127) begin
 		output_z = 32'b0;
 	end
-	else if ((a_e) > 31) begin
+	else if (a_e[8] == 0 && a_e[7:0] > 8'd31) begin
 		output_z = 32'hFFFFFFFF;
 	end
 	else begin
