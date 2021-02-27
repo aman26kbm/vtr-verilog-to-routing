@@ -27,11 +27,11 @@ module float_to_int(
   reg [31:0] pipe_6;
   
   
-  align dut_align (pipe_in,a_m,a_e,a_s);
-  sub dut_sub (pipe_1[40:32],sub_a_e);
-  am_shift dut_am_shift (pipe_2[40:32],pipe_2[50:42],pipe_2[31:0],a_m_shift);
-  two_comp dut_two_comp (pipe_3[50:19], pipe_3[9],z);
-  final_out dut_final_out (pipe_4[40:9], pipe_4[8:0], temp_z);
+  align_ftoi dut_align (pipe_in,a_m,a_e,a_s);
+  sub_ftoi dut_sub (pipe_1[40:32],sub_a_e);
+  am_shift_ftoi dut_am_shift (pipe_2[40:32],pipe_2[50:42],pipe_2[31:0],a_m_shift);
+  two_comp_ftoi dut_two_comp (pipe_3[50:19], pipe_3[9],z);
+  final_out_ftoi dut_final_out (pipe_4[40:9], pipe_4[8:0], temp_z);
   
   always@(posedge clk) begin
 	if (rst) begin
@@ -57,7 +57,7 @@ module float_to_int(
   
 endmodule
 
-module align (
+module align_ftoi (
 input [31:0] input_a,
 output [31:0] a_m,
 output [8:0] a_e,
@@ -73,7 +73,7 @@ wire [31:0] a;
 
 endmodule
 
-module sub (
+module sub_ftoi (
 input [8:0] a_e,
   output [8:0] sub_a_e);
 
@@ -81,7 +81,7 @@ assign sub_a_e = 31 - a_e;
 
 endmodule
 
-module am_shift (
+module am_shift_ftoi (
 input [8:0] a_e,
 input [8:0] sub_a_e,
 input [31:0] a_m,
@@ -98,7 +98,7 @@ always@(a_e or sub_a_e or a_m) begin
   
 endmodule
 
-module two_comp (
+module two_comp_ftoi (
 input [31:0] a_m_shift,
 input a_s,
   output [31:0] z);
@@ -107,7 +107,7 @@ assign z = a_s ? -a_m_shift : a_m_shift; // 2's complement
 
 endmodule
 
-module final_out (
+module final_out_ftoi (
 input [31:0] z,
   input [8:0] a_e,
   output reg [31:0] output_z);
