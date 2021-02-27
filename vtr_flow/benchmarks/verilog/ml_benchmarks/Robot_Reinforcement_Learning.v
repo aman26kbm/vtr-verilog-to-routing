@@ -4,7 +4,7 @@
  command used to run on vtr:
 go to //vtr-verilog-to-routing/vtr_flow/tasks
 ../scripts/run_vtr_task.py robot_RL
-XML file used: k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml
+Architecture file used: k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml
 ////////////////////////////////////////////////////////////////////////////////////////
 /*
 
