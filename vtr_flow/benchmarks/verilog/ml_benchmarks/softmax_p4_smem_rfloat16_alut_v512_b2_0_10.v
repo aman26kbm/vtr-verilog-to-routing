@@ -479,29 +479,32 @@ module softmax(
 endmodule
 
 
+
 module mode1_max_tree(
   inp0, 
   inp1, 
   inp2, 
   inp3, 
-
-  outp,
-
+ 
   mode1_stage0_run,
   clk,
-  reset
+  reset,
+  outp
+
 );
-  input clk;
-  input reset;
-  input mode1_stage0_run;
 
   input  [`DATAWIDTH-1 : 0] inp0; 
   input  [`DATAWIDTH-1 : 0] inp1; 
   input  [`DATAWIDTH-1 : 0] inp2; 
   input  [`DATAWIDTH-1 : 0] inp3; 
 
-  output [`DATAWIDTH-1 : 0] outp;
-  reg    [`DATAWIDTH-1 : 0] outp;
+  input mode1_stage0_run;
+  input clk;
+  input reset;
+
+  output reg [`DATAWIDTH-1 : 0] outp;
+      // [`DATAWIDTH-1 : 0] outp;
+
 
   wire   [`DATAWIDTH-1 : 0] cmp0_out_stage2;
   wire   [`DATAWIDTH-1 : 0] cmp1_out_stage2;
@@ -513,7 +516,7 @@ module mode1_max_tree(
       outp <= 0;
     end
 
-    if(~reset && mode1_stage0_run) begin
+    else if(~reset && mode1_stage0_run) begin
       outp <= cmp0_out_stage0;
     end
 
@@ -572,33 +575,33 @@ assign cmp0_out_stage0 = (cmp0_stage0_ageb==1'b1) ? outp : cmp0_out_stage1;
 
 endmodule
 
-
+	  
 module mode2_sub(
   a_inp0,
   a_inp1,
   a_inp2,
   a_inp3,
-  b_inp,
   outp0,
   outp1,
   outp2,
-  outp3
+  outp3,
+  b_inp
 );
 
   input  [`DATAWIDTH-1 : 0] a_inp0;
   input  [`DATAWIDTH-1 : 0] a_inp1;
   input  [`DATAWIDTH-1 : 0] a_inp2;
   input  [`DATAWIDTH-1 : 0] a_inp3;
-  input  [`DATAWIDTH-1 : 0] b_inp;
   output  [`DATAWIDTH-1 : 0] outp0;
   output  [`DATAWIDTH-1 : 0] outp1;
   output  [`DATAWIDTH-1 : 0] outp2;
   output  [`DATAWIDTH-1 : 0] outp3;
+  input  [`DATAWIDTH-1 : 0] b_inp;
 
 
   wire clk_NC;
   wire rst_NC;
-  wire [4:0] flags0_NC, flags1_NC, flags2_NC, flags3_NC;
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
 
   // 0 add, 1 sub
   FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
@@ -684,7 +687,7 @@ module mode4_adder_tree(
 
   wire   [`DATAWIDTH-1 : 0] add0_out_stage0;
   reg    [`DATAWIDTH-1 : 0] outp;
-
+/*
   always @(posedge clk) begin
     if (reset) begin
       outp <= 0;
@@ -706,10 +709,41 @@ module mode4_adder_tree(
       outp <= add0_out_stage0;
     end
   end
+*/
+always @ (posedge clk) begin
+	if(~reset && mode4_stage2_run) begin
+      add0_out_stage2_reg <= add0_out_stage2;
+      add1_out_stage2_reg <= add1_out_stage2;
+    end
+	
+	else if (reset) begin
+		add0_out_stage2_reg <= 0;
+		add1_out_stage2_reg <= 0;
+	end
+end		
 
+always @ (posedge clk) begin
+	if(~reset && mode4_stage1_run) begin
+      add0_out_stage1_reg <= add0_out_stage1;
+    end
+	else if (reset) begin
+	add0_out_stage1_reg <= 0;
+	end
+end
+
+always @ (posedge clk) begin
+	if(~reset && mode4_stage0_run) begin
+		outp <= add0_out_stage0;
+    end
+	else if (reset) begin
+		outp <= 0;
+	end
+end	
+		
+	
   wire clk_NC;
   wire rst_NC;
-  wire [4:0] flags0_NC, flags1_NC, flags2_NC, flags3_NC;
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
 
   // 0 add, 1 sub
   FPAddSub add0_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp0),	.b(inp1), .operation(1'b0),	.result(add0_out_stage2), .flags(flags_NC0));
@@ -725,7 +759,6 @@ module mode4_adder_tree(
   //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add0_stage0(.a(outp),       .b(add0_out_stage1_reg),      .z(add0_out_stage0), .rnd(3'b000),    .status());
 
 endmodule
-
 
 module mode5_ln(
 inp,
@@ -759,6 +792,7 @@ module mode6_sub(
   output  [`DATAWIDTH-1 : 0] outp2;
   output  [`DATAWIDTH-1 : 0] outp3;
 
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
   // 0 add, 1 sub
   FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
   FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
@@ -824,6 +858,7 @@ endmodule
 `define SIGN_LOC 15
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
+
 
 module FPAddSub(
 		clk,
@@ -1271,9 +1306,9 @@ module FPAddSub_AlignShift1(
 			// Rotate by 0	
 			2'b00:  Lvl2 <= Stage1[`MANTISSA:0];       			
 			// Rotate by 4	
-			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end Lvl2[`MANTISSA:`MANTISSA-3] <= 0; end
+			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end /*Lvl2[`MANTISSA:`MANTISSA-3] <= 0;*/ end
 			// Rotate by 8
-			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end Lvl2[`MANTISSA:`MANTISSA-7] <= 0; end
+			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end /*Lvl2[`MANTISSA:`MANTISSA-7] <= 0;*/ end
 			// Rotate by 12	
 			2'b11: Lvl2[`MANTISSA: 0] <= 0; 
 			//2'b11:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+12]; end Lvl2[`MANTISSA:`MANTISSA-12] <= 0; end
@@ -1321,11 +1356,11 @@ module FPAddSub_AlignShift2(
 			// Rotate by 0
 			2'b00:  Lvl3 <= Stage2[`MANTISSA:0];   
 			// Rotate by 1
-			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end Lvl3[`MANTISSA] <= 0; end 
+			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end /*Lvl3[`MANTISSA] <= 0; */end 
 			// Rotate by 2
-			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end Lvl3[`MANTISSA:`MANTISSA-1] <= 0; end 
+			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end /*Lvl3[`MANTISSA:`MANTISSA-1] <= 0;*/ end 
 			// Rotate by 3
-			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end Lvl3[`MANTISSA:`MANTISSA-2] <= 0; end 	  
+			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end /*Lvl3[`MANTISSA:`MANTISSA-2] <= 0;*/ end 	  
 	  endcase
 	end
 	
