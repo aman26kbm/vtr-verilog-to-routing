@@ -99,53 +99,27 @@ module softmax(
     mode4_stage2_run_a <= mode4_stage2_run;
   end
 
-  always @(posedge clk)
-  begin
+  always @(posedge clk) begin
     if(reset) begin
       inp_reg <= 0;
       addr <= 0;
       sub0_inp_addr <= 0;
-      sub1_inp_addr <= 0;
-      sub0_inp_reg <= 0;
-      sub1_inp_reg <= 0;
       mode1_start <= 0;
       mode1_run <= 0;
-
-      mode3_stage_run <= 0;
-      mode7_stage_run <= 0;
-      mode2_start <= 0;
-      mode2_run <= 0;
-      mode3_run <= 0;
-      mode4_stage0_run <= 0;
-      mode4_stage1_run <= 0;
-      mode4_stage2_run <= 0;
-      mode5_run <= 0;
-      mode6_run <= 0;
-      mode7_run <= 0;
-      presub_start <= 0;
-      presub_run <= 0;
-      done <= 0;
     end
-
     //init latch the input address
-    if(init) begin
+    else if(init) begin
       addr <= start_addr;
     end
-
     //start the mode1 max calculation
-    if(start)begin
+    else if(start)begin
       mode1_start <= 1;
     end
-
     //logic when to finish mode1 and trigger mode2 to latch the mode2 address
-    if(~reset && mode1_start && addr < end_addr) begin
+    else if(mode1_start && addr < end_addr) begin
       addr <= addr + 1;
       inp_reg <= inp;
       mode1_run <= 1;
-      if(addr == end_addr - 1) begin
-        mode2_start <= 1;
-        sub0_inp_addr <= start_addr;
-      end
     end else if(addr == end_addr)begin
       addr <= 0;
       mode1_run <= 0;
@@ -153,102 +127,172 @@ module softmax(
     end else begin
       mode1_run <= 0;
     end
+  end
 
-
+  always @(posedge clk) begin
+    if(reset) begin
+      sub0_inp_addr <= 0;
+      sub0_inp_reg <= 0;
+      mode2_start <= 0;
+      mode2_run <= 0;
+    end
+    else if ((mode1_start) && (addr == (end_addr - 1))) begin
+        mode2_start <= 1;
+        sub0_inp_addr <= start_addr;
+	end
     //logic when to finish mode2
-    if(~reset && mode2_start && sub0_inp_addr < end_addr)begin
+    else if(mode2_start && sub0_inp_addr < end_addr) begin
       sub0_inp_addr <= sub0_inp_addr + 1;
       sub0_inp_reg <= sub0_inp;
       mode2_run <= 1;
-    end else if(sub0_inp_addr == end_addr)begin
+    end 
+	else if(sub0_inp_addr == end_addr)begin
       sub0_inp_addr <= 0;
       sub0_inp_reg <= 0;
       mode2_run <= 0;
       mode2_start <= 0;
     end
+  end	
 
+  always @(posedge clk) begin
+    if(reset) begin
+      mode3_stage_run <= 0;
+    end
     //logic when to trigger mode3
-    if(mode2_run == 1) begin
+    else if(mode2_run == 1) begin
       mode3_stage_run <= 1;
     end else begin
       mode3_stage_run <= 0;
     end
+  end	
 
-    if(mode3_stage_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode3_run <= 0;
+    end
+    else if(mode3_stage_run == 1) begin
       mode3_run <= 1;
     end else begin
       mode3_run <= 0;
     end
+  end
 
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage2_run <= 0;
+    end
     //logic when to trigger mode4 last stage adderTree, since the final results of adderTree
     //is always ready 1 cycle after mode3 finishes, so there is no need on extra
     //logic to control the adderTree outputs
-    if (mode3_run == 1) begin
+    else if (mode3_run == 1) begin
       mode4_stage2_run <= 1;
     end else begin
       mode4_stage2_run <= 0;
     end
-    if (mode4_stage2_run == 1) begin
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage1_run <= 0;
+    end
+    else if (mode4_stage2_run == 1) begin
       mode4_stage1_run <= 1;
     end else begin
       mode4_stage1_run <= 0;
     end
+  end
 
-    if (mode4_stage1_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage0_run <= 0;
+    end
+    else if (mode4_stage1_run == 1) begin
       mode4_stage0_run <= 1;
     end else begin
       mode4_stage0_run <= 0;
     end
+  end
 
-
-    //mode5 should be triggered right at the falling edge of mode4_stage1_run
-    if(mode4_stage1_run_a & ~mode4_stage1_run) begin
-      mode5_run <= 1;
-    end else if(mode4_stage1_run == 0) begin
+  always @(posedge clk) begin
+    if(reset) begin
       mode5_run <= 0;
     end
+    //mode5 should be triggered right at the falling edge of mode4_stage1_run
+    else if(mode4_stage1_run_a & ~mode4_stage1_run) begin
+      mode5_run <= 1;
+    end 
+	else if(mode4_stage1_run == 0) begin
+      mode5_run <= 0;
+    end
+  end
 
-    if(mode4_stage2_run_a & ~mode4_stage2_run) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      presub_start <= 0;
+      sub1_inp_addr <= 0;
+      sub1_inp_reg <= 0;
+      presub_run <= 0;
+    end
+    else if(mode4_stage2_run_a & ~mode4_stage2_run) begin
       presub_start <= 1;
       sub1_inp_addr <= start_addr;
       sub1_inp_reg <= sub1_inp;
     end
-
-    if(~reset && presub_start && sub1_inp_addr < end_addr)begin
+    else if(~reset && presub_start && sub1_inp_addr < end_addr)begin
       sub1_inp_addr <= sub1_inp_addr + 1;
       sub1_inp_reg <= sub1_inp;
       presub_run <= 1;
-    end else if(sub1_inp_addr == end_addr) begin
+    end 
+	else if(sub1_inp_addr == end_addr) begin
       presub_run <= 0;
       presub_start <= 0;
       sub1_inp_addr <= 0;
       sub1_inp_reg <= 0;
     end
+  end
 
-    if(presub_run) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode6_run <= 0;
+	end  
+    else if(presub_run) begin
       mode6_run <= 1;
     end else begin
       mode6_run <= 0;
     end
+  end
 
-    if(mode6_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode7_stage_run <= 0;
+	end
+    else if(mode6_run == 1) begin
       mode7_stage_run <= 1;
     end else begin
       mode7_stage_run <= 0;
     end
+  end
 
-    if(mode7_stage_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode7_run <= 0;
+	end
+	else if(mode7_stage_run == 1) begin
       mode7_run <= 1;
     end else begin
       mode7_run <= 0;
     end
+  end
 
-    if(mode7_run) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      done <= 0;
+	end  
+    else if(mode7_run) begin
       done <= 1;
     end else begin
       done <= 0;
     end
-
   end
 
   ////------mode1 max block---------///////
@@ -2312,7 +2356,7 @@ module fptofixed_para (
 	output [int_width + frac_width - 1:0] fx;  
 	
 	wire [15:0] Mant; // mantissa of fp
-	wire signed [4:0] Ea; // non biased exponent
+	wire [4:0] Ea; // non biased exponent
 	wire [4:0] Exp; // biased exponent
 	wire [15:0] sftfx; // output of shifter block
 	reg [15:0] temp;
