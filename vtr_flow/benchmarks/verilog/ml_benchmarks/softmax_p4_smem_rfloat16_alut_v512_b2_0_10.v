@@ -103,7 +103,6 @@ module softmax(
     if(reset) begin
       inp_reg <= 0;
       addr <= 0;
-      sub0_inp_addr <= 0;
       mode1_start <= 0;
       mode1_run <= 0;
     end
@@ -1564,13 +1563,13 @@ module FPAddSub_NormalizeShift1(
       begin Lvl2 = Stage1[`DWIDTH:0];  end
 			// Rotate by 4
 			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-4)] = Stage1[3:0]; Lvl2[`DWIDTH-4-1:0] <= Stage1[`DWIDTH-4]; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-4)] = Stage1[3:0]; Lvl2[`DWIDTH-4-1:0] = Stage1[`DWIDTH-4]; end
 			// Rotate by 8
 			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-8)] = Stage1[3:0]; Lvl2[`DWIDTH-8-1:0] <= Stage1[`DWIDTH-8]; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-8)] = Stage1[3:0]; Lvl2[`DWIDTH-8-1:0] = Stage1[`DWIDTH-8]; end
 			// Rotate by 12
 			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-12)] = Stage1[3:0]; Lvl2[`DWIDTH-12-1:0] <= Stage1[`DWIDTH-12]; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-12)] = Stage1[3:0]; Lvl2[`DWIDTH-12-1:0] = Stage1[`DWIDTH-12]; end
 	  endcase
 	end
 	
@@ -1583,13 +1582,13 @@ module FPAddSub_NormalizeShift1(
       begin Lvl3 = Stage2[`DWIDTH:0]; end
 			// Rotate by 1
 			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
-      begin Lvl3[`DWIDTH: (`DWIDTH-1)] = Stage2[3:0]; Lvl3[`DWIDTH-1-1:0] <= Stage2[`DWIDTH-1]; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-1)] = Stage2[3:0]; Lvl3[`DWIDTH-1-1:0] = Stage2[`DWIDTH-1]; end
 			// Rotate by 2
 			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
-      begin Lvl3[`DWIDTH: (`DWIDTH-2)] = Stage2[3:0]; Lvl3[`DWIDTH-2-1:0] <= Stage2[`DWIDTH-2]; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-2)] = Stage2[3:0]; Lvl3[`DWIDTH-2-1:0] = Stage2[`DWIDTH-2]; end
 			// Rotate by 3
 			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
-      begin Lvl3[`DWIDTH: (`DWIDTH-3)] = Stage2[3:0]; Lvl3[`DWIDTH-3-1:0] <= Stage2[`DWIDTH-3]; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-3)] = Stage2[3:0]; Lvl3[`DWIDTH-3-1:0] = Stage2[`DWIDTH-3]; end
 	  endcase
 	end
 	
@@ -2358,7 +2357,7 @@ module fptofixed_para (
 	wire [15:0] Mant; // mantissa of fp
 	wire [4:0] Ea; // non biased exponent
 	wire [4:0] Exp; // biased exponent
-	wire [15:0] sftfx; // output of shifter block
+	reg [15:0] sftfx; // output of shifter block
 	reg [15:0] temp;
 	
 	assign Mant = {6'b000001, fp[9:0]};
