@@ -42,16 +42,20 @@ wire [`DATA_WIDTH-1:0] bo_in;
 wire [`DATA_WIDTH-1:0] bc_in;
 reg [`DATA_WIDTH-1:0] C_in;
 
+
+
 wire [`varraysize-1:0] data_b_ext;
-reg [5:0] inaddr; 
-reg [5:0] waddr;
+//keeping an additional bit so that the counters don't get reset to 0 automatically after 63 
+//and start repeating access to elements prematurely
+reg [6:0] inaddr; 
+reg [6:0] waddr;
 reg wren_a;
-reg [5:0] c_count;
-reg [5:0] b_count;
-reg [5:0] ct_count;
+reg [6:0] c_count;
+reg [6:0] b_count;
+reg [6:0] ct_count;
 reg cycle_complete;
 reg [6:0] count;
-reg [5:0] i,j;
+reg [6:0] i,j;
 reg [5:0] h_count;
 
 wire [`DATA_WIDTH-1:0] ht;
@@ -106,11 +110,8 @@ always @(posedge clk) begin
 	   wren_a_ct <= 1;
 	   wren_b_cin <= 0;
 	   cycle_complete <=0;
-
-         for(j = 0; j < `ARRAY_DEPTH; j=j+1)
-    		begin
-		   Ct[j] <= 0;
-	     end
+		
+	    Ct <= 0;
 	    C_in <=0;
 
 	   //dummy ports initialize
@@ -128,11 +129,13 @@ always @(posedge clk) begin
 		b_count <= 0;
 		ct_count <=0;
 		c_count <= 0;
+		h_count <= 0;
+		inaddr <= inaddr+1;
 	 end
 	 else begin
 		cycle_complete <= 0;
-    	waddr <= waddr+1;
-	    count <= count+1;
+    		waddr <= waddr+1;
+	  	  count <= count+1;
 	 
 		if(count>5)     //delay before bias add
 			b_count <= b_count+1; 
@@ -352,11 +355,7 @@ always @(posedge clk) begin
 			
 	end
 		
-//        ht_prev[h_count] <= ht;    //storing ht outputs
 
-	if(h_count == `ARRAY_DEPTH-2) begin //to fetch next input,ram needs 1 extra cycle to give op
-		inaddr <= inaddr+1;
-	end
 
 	if(cycle_complete==1) begin
 		  h_in <= ht_prev; 
@@ -365,16 +364,18 @@ always @(posedge clk) begin
   end
  end
  
-  
+
 
 endmodule
 
 
 
+
+
 module dpram_v(	
 input clk,
-input [(6-1):0] address_a,
-input [(6-1):0] address_b,
+input [(7-1):0] address_a,
+input [(7-1):0] address_b,
 input  wren_a,
 input  wren_b,
 input [(`varraysize-1):0] data_a,
@@ -426,8 +427,8 @@ endmodule
 
 module dpram_u (	
 input clk,
-input [(6-1):0] address_a,
-input [(6-1):0] address_b,
+input [(7-1):0] address_a,
+input [(7-1):0] address_b,
 input  wren_a,
 input  wren_b,
 input [(`uarraysize-1):0] data_a,
@@ -479,8 +480,8 @@ endmodule
 
 module dpram_b (	
 input clk,
-input [(6-1):0] address_a,
-input [(6-1):0] address_b,
+input [(7-1):0] address_a,
+input [(7-1):0] address_b,
 input  wren_a,
 input  wren_b,
 input [(`DATA_WIDTH-1):0] data_a,
@@ -1205,11 +1206,7 @@ module vecmat_mul_x #(parameter varraysize=1600,vectwidth=100) //,matsize=64)   
 
 			qadd2 Add_u97(.a(tmp93),.b(tmp95),.c(tmp97));
 			
-			
-			/* qadd #(12,16) Add_u1(.a(tmp0),.b(tmp2),.c(tmp1));
-			 qadd #(12,16) Add_u3(.a(tmp4),.b(tmp6),.c(tmp3));
-			 qadd #(12,16) Add_u5(.a(tmp8),.b(tmp1),.c(tmp5));
- 			 qadd #(12,16) Add_u7(.a(tmp5),.b(tmp3),.c(tmp7));*/
+		
 									
 	   
 endmodule
