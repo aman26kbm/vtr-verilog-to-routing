@@ -32,17 +32,16 @@
 // 	0 )
 
 // `define SIMULATION
-// `define ROW_LEN_BITS 8
 `define COL_ID_BITS 8
 `define ROW_ID_BITS 8
 `define MAT_VAL_BITS 8
 `define VEC_VAL_BITS 8
 `define MULT_BITS (`VEC_VAL_BITS + `MAT_VAL_BITS)
 `define NUM_CHANNEL 32
-`define NUM_CHANNEL_BITS 5 //$clog2(`NUM_CHANNEL)
+`define NUM_CHANNEL_BITS $clog2(`NUM_CHANNEL)
 `define LANE_NUM (3 * `NUM_CHANNEL)
 // `define LANE_NUM_BITS $clog2(`LANE_NUM)
-`define NUM_MAT_VALS 9088
+`define NUM_MAT_VALS 8672
 `define NUM_COL_IDS `NUM_MAT_VALS
 `define NUM_ROW_IDS `NUM_MAT_VALS
 `define NUM_VEC_VALS 128
@@ -68,6 +67,8 @@
 module spmv(
 	input clk,
 	input rst,
+
+	output [`MULT_BITS-1:0] dout_nc,
 
 	output reg done_reg
 );
@@ -106,19 +107,26 @@ module spmv(
 	reg start;
 
 	// Output data
-	wire [(`MULT_BITS*`NUM_CHANNEL)-1:0] wr_data;
+	wire [(`MULT_BITS*`NUM_CHANNEL)-1:0] data_out;
+	// output fifo empty signals
+	wire [`NUM_CHANNEL-1:0] data_out_empty;
 	// Address to store output data
-	wire [(`ROW_ID_BITS*`NUM_CHANNEL)-1:0] wr_addr;
+	wire [(`ROW_ID_BITS*`NUM_CHANNEL)-1:0] addr_out;
+	// output fifo read enable signal
+	wire [`NUM_CHANNEL-1:0] out_rd_en;
+	// reg [`NUM_CHANNEL-1:0] out_rd_en_reg;
+	wire [`NUM_CHANNEL-1:0] out_rd_en_shifted;
 	// Memory to write the output data
-	reg [`MULT_BITS-1:0] write_mem [(1<<`ROW_ID_BITS)-1:0];
 
-	reg [(`MULT_BITS*`NUM_CHANNEL)-1:0] wr_data_reg;
-	reg [(`ROW_ID_BITS*`NUM_CHANNEL)-1:0] wr_addr_reg;
-	wire [`NUM_CHANNEL-1:0] wr_en;
+	wire [`MULT_BITS-1:0] data_out_shifted;
+	wire [`ROW_ID_BITS-1:0] addr_out_shifted;
+	wire [`MULT_BITS-1:0] wr_data;
+	wire [`ROW_ID_BITS-1:0] wr_addr;
+	reg wr_en;
 
 	// Signals to indicate that the computation is complete
 	wire [`NUM_CHANNEL-1:0] done;
-	reg done_all, done_delay1, done_delay2;
+	reg done_all, last;
 
 	wire fetcher_done;
 
@@ -135,211 +143,56 @@ module spmv(
 		end
 	end
 
-	always@(posedge clk) begin
-		wr_data_reg <= wr_data;
-		wr_addr_reg <= wr_addr;
-		done_all <= &done;
-		done_delay1 <= done_all;
-		done_delay2 <= done_delay1;
-		done_reg <= done_delay2;
-	`ifdef SIMULATION
-		if(done_delay2) begin
-			$writememh("/home/aatman/Desktop/SpMV/src/coe/out.txt", write_mem);
+	reg [`NUM_CHANNEL_BITS-1:0] counter;
+	reg [`NUM_CHANNEL_BITS-1:0] counter_delay;
+	reg [`NUM_CHANNEL_BITS-1:0] counter_store;
+
+	assign out_rd_en = (({`NUM_CHANNEL{1'b0}})|(1<<counter)) & ~data_out_empty;
+	assign out_rd_en_shifted = out_rd_en >> counter;
+
+	assign data_out_shifted = data_out >> (counter_delay*`MULT_BITS);
+	assign addr_out_shifted = addr_out >> (counter_delay*`ROW_ID_BITS);
+
+	assign wr_data = data_out_shifted;
+	assign wr_addr = addr_out_shifted;
+
+	always @ (posedge clk or posedge rst) begin
+		if(rst) begin
+			counter <= 0;
+			counter_delay <= 0;
+			last <= 0;
 		end
-	`endif
+		else if(start) begin
+			done_all <= &done;
+			counter <= counter + 1;
+			counter_delay <= counter;
+			if(out_rd_en_shifted[0]) begin
+				wr_en <= 1;
+			end
+			else begin
+				wr_en <= 0;
+			end
+			if(done_all & !last) begin
+				counter_store <= counter_delay;
+				last <= 1;
+			end
+			else if (last) begin
+				done_reg <= (counter_store==counter_delay);
+			end
+		end
 	end
 
-	// always@(posedge clk) begin 
-	// 	if(wr_en[0]) begin 
-	// 		write_mem[wr_addr_reg[(0+1)*`ROW_ID_BITS-1: 0*`ROW_ID_BITS]] <= wr_data_reg[(0+1)*`MULT_BITS-1: 0*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[1]) begin 
-	// 		write_mem[wr_addr_reg[(1+1)*`ROW_ID_BITS-1: 1*`ROW_ID_BITS]] <= wr_data_reg[(1+1)*`MULT_BITS-1: 1*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[2]) begin 
-	// 		write_mem[wr_addr_reg[(2+1)*`ROW_ID_BITS-1: 2*`ROW_ID_BITS]] <= wr_data_reg[(2+1)*`MULT_BITS-1: 2*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[3]) begin 
-	// 		write_mem[wr_addr_reg[(3+1)*`ROW_ID_BITS-1: 3*`ROW_ID_BITS]] <= wr_data_reg[(3+1)*`MULT_BITS-1: 3*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[4]) begin 
-	// 		write_mem[wr_addr_reg[(4+1)*`ROW_ID_BITS-1: 4*`ROW_ID_BITS]] <= wr_data_reg[(4+1)*`MULT_BITS-1: 4*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[5]) begin 
-	// 		write_mem[wr_addr_reg[(5+1)*`ROW_ID_BITS-1: 5*`ROW_ID_BITS]] <= wr_data_reg[(5+1)*`MULT_BITS-1: 5*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[6]) begin 
-	// 		write_mem[wr_addr_reg[(6+1)*`ROW_ID_BITS-1: 6*`ROW_ID_BITS]] <= wr_data_reg[(6+1)*`MULT_BITS-1: 6*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[7]) begin 
-	// 		write_mem[wr_addr_reg[(7+1)*`ROW_ID_BITS-1: 7*`ROW_ID_BITS]] <= wr_data_reg[(7+1)*`MULT_BITS-1: 7*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[8]) begin 
-	// 		write_mem[wr_addr_reg[(8+1)*`ROW_ID_BITS-1: 8*`ROW_ID_BITS]] <= wr_data_reg[(8+1)*`MULT_BITS-1: 8*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[9]) begin 
-	// 		write_mem[wr_addr_reg[(9+1)*`ROW_ID_BITS-1: 9*`ROW_ID_BITS]] <= wr_data_reg[(9+1)*`MULT_BITS-1: 9*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[10]) begin 
-	// 		write_mem[wr_addr_reg[(10+1)*`ROW_ID_BITS-1: 10*`ROW_ID_BITS]] <= wr_data_reg[(10+1)*`MULT_BITS-1: 10*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[11]) begin 
-	// 		write_mem[wr_addr_reg[(11+1)*`ROW_ID_BITS-1: 11*`ROW_ID_BITS]] <= wr_data_reg[(11+1)*`MULT_BITS-1: 11*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[12]) begin 
-	// 		write_mem[wr_addr_reg[(12+1)*`ROW_ID_BITS-1: 12*`ROW_ID_BITS]] <= wr_data_reg[(12+1)*`MULT_BITS-1: 12*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[13]) begin 
-	// 		write_mem[wr_addr_reg[(13+1)*`ROW_ID_BITS-1: 13*`ROW_ID_BITS]] <= wr_data_reg[(13+1)*`MULT_BITS-1: 13*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[14]) begin 
-	// 		write_mem[wr_addr_reg[(14+1)*`ROW_ID_BITS-1: 14*`ROW_ID_BITS]] <= wr_data_reg[(14+1)*`MULT_BITS-1: 14*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[15]) begin 
-	// 		write_mem[wr_addr_reg[(15+1)*`ROW_ID_BITS-1: 15*`ROW_ID_BITS]] <= wr_data_reg[(15+1)*`MULT_BITS-1: 15*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[16]) begin 
-	// 		write_mem[wr_addr_reg[(16+1)*`ROW_ID_BITS-1: 16*`ROW_ID_BITS]] <= wr_data_reg[(16+1)*`MULT_BITS-1: 16*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[17]) begin 
-	// 		write_mem[wr_addr_reg[(17+1)*`ROW_ID_BITS-1: 17*`ROW_ID_BITS]] <= wr_data_reg[(17+1)*`MULT_BITS-1: 17*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[18]) begin 
-	// 		write_mem[wr_addr_reg[(18+1)*`ROW_ID_BITS-1: 18*`ROW_ID_BITS]] <= wr_data_reg[(18+1)*`MULT_BITS-1: 18*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[19]) begin 
-	// 		write_mem[wr_addr_reg[(19+1)*`ROW_ID_BITS-1: 19*`ROW_ID_BITS]] <= wr_data_reg[(19+1)*`MULT_BITS-1: 19*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[20]) begin 
-	// 		write_mem[wr_addr_reg[(20+1)*`ROW_ID_BITS-1: 20*`ROW_ID_BITS]] <= wr_data_reg[(20+1)*`MULT_BITS-1: 20*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[21]) begin 
-	// 		write_mem[wr_addr_reg[(21+1)*`ROW_ID_BITS-1: 21*`ROW_ID_BITS]] <= wr_data_reg[(21+1)*`MULT_BITS-1: 21*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[22]) begin 
-	// 		write_mem[wr_addr_reg[(22+1)*`ROW_ID_BITS-1: 22*`ROW_ID_BITS]] <= wr_data_reg[(22+1)*`MULT_BITS-1: 22*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[23]) begin 
-	// 		write_mem[wr_addr_reg[(23+1)*`ROW_ID_BITS-1: 23*`ROW_ID_BITS]] <= wr_data_reg[(23+1)*`MULT_BITS-1: 23*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[24]) begin 
-	// 		write_mem[wr_addr_reg[(24+1)*`ROW_ID_BITS-1: 24*`ROW_ID_BITS]] <= wr_data_reg[(24+1)*`MULT_BITS-1: 24*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[25]) begin 
-	// 		write_mem[wr_addr_reg[(25+1)*`ROW_ID_BITS-1: 25*`ROW_ID_BITS]] <= wr_data_reg[(25+1)*`MULT_BITS-1: 25*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[26]) begin 
-	// 		write_mem[wr_addr_reg[(26+1)*`ROW_ID_BITS-1: 26*`ROW_ID_BITS]] <= wr_data_reg[(26+1)*`MULT_BITS-1: 26*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[27]) begin 
-	// 		write_mem[wr_addr_reg[(27+1)*`ROW_ID_BITS-1: 27*`ROW_ID_BITS]] <= wr_data_reg[(27+1)*`MULT_BITS-1: 27*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[28]) begin 
-	// 		write_mem[wr_addr_reg[(28+1)*`ROW_ID_BITS-1: 28*`ROW_ID_BITS]] <= wr_data_reg[(28+1)*`MULT_BITS-1: 28*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[29]) begin 
-	// 		write_mem[wr_addr_reg[(29+1)*`ROW_ID_BITS-1: 29*`ROW_ID_BITS]] <= wr_data_reg[(29+1)*`MULT_BITS-1: 29*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[30]) begin 
-	// 		write_mem[wr_addr_reg[(30+1)*`ROW_ID_BITS-1: 30*`ROW_ID_BITS]] <= wr_data_reg[(30+1)*`MULT_BITS-1: 30*`MULT_BITS]; 
-	// 	end 
-	// end
-
-	// always@(posedge clk) begin 
-	// 	if(wr_en[31]) begin 
-	// 		write_mem[wr_addr_reg[(31+1)*`ROW_ID_BITS-1: 31*`ROW_ID_BITS]] <= wr_data_reg[(31+1)*`MULT_BITS-1: 31*`MULT_BITS]; 
-	// 	end 
-	// end
+	spram #(
+		.AWIDTH(`ROW_ID_BITS),
+		.NUM_WORDS(`NUM_VEC_VALS),
+		.DWIDTH(`MULT_BITS)
+	) write_mem (
+		.clk(clk),
+		.address(wr_addr),
+		.wren(wr_en),
+		.din(wr_data),
+		.dout(dout_nc)
+	);
 
 	// Assign FIFOs' read enables to the respective wires of fetcher read enable.
 	assign fetcher_rd_en[3*`NUM_CHANNEL-1: 2*`NUM_CHANNEL] = row_id_rd_en;
@@ -401,9 +254,10 @@ module spmv(
 		.row_id(row_id), 
 		.row_id_empty(row_id_empty), 
 		.row_id_rd_en(row_id_rd_en), 
-		.wr_data(wr_data), 
-		.wr_addr(wr_addr), 
-		.wr_en(wr_en),
+		.data_out(data_out),
+		.data_out_empty(data_out_empty),
+		.addr_out(addr_out),
+		.out_rd_en(out_rd_en),
 		.done(done)
 	);
 endmodule
@@ -443,21 +297,18 @@ module fetcher(
 	// parameter ROW_LEN_ROM_NUM_ADDR = `NUM_ROW_LENS/`NUM_CHANNEL;
 	parameter ROW_ID_ROM_DWIDTH = `ROW_ID_BITS;
 	parameter ROW_ID_ROM_NUM_ADDR = `NUM_ROW_IDS;
-	// parameter ROW_ID_AWIDTH = $clog2(ROW_ID_ROM_NUM_ADDR);
 	parameter ROW_ID_AWIDTH = $clog2(`NUM_ROW_IDS);
 
 	// parameter MAT_VAL_ROM_DWIDTH = `MAT_VAL_BITS * `NUM_CHANNEL;
 	// parameter MAT_VAL_ROM_NUM_ADDR = `NUM_MAT_VALS/`NUM_CHANNEL;
 	parameter MAT_VAL_ROM_DWIDTH = `MAT_VAL_BITS;
 	parameter MAT_VAL_ROM_NUM_ADDR = `NUM_MAT_VALS;
-	// parameter MAT_VAL_AWIDTH = $clog2(MAT_VAL_ROM_NUM_ADDR);
 	parameter MAT_VAL_AWIDTH = $clog2(`NUM_MAT_VALS);
 
 	// parameter COL_ID_ROM_DWIDTH = `COL_ID_BITS * `NUM_CHANNEL;
 	// parameter COL_ID_ROM_NUM_ADDR = `NUM_COL_IDS/`NUM_CHANNEL;
 	parameter COL_ID_ROM_DWIDTH = `COL_ID_BITS;
 	parameter COL_ID_ROM_NUM_ADDR = `NUM_COL_IDS;
-	// parameter COL_ID_AWIDTH = $clog2(COL_ID_ROM_NUM_ADDR);
 	parameter COL_ID_AWIDTH = $clog2(`NUM_COL_IDS);
 
 	parameter NUM_CHANNEL_BITS = $clog2(`NUM_CHANNEL);
@@ -2046,37 +1897,14 @@ module bvb(
 	output [`NUM_CHANNEL-1:0]   val_empty,
 	// input to vector value FIFO
 	input  [`NUM_CHANNEL-1:0]   val_rd_en
-	// output reg [`NUM_CHANNEL-1:0] id_rd_en_reg
 );
 
-	// parameter MAX_COLS = (1<<`COL_ID_BITS);
-
-	// parameter FIFO_DEPTH = 8;
-	// parameter FIFO_DEPTH_BITS = `LOG2(FIFO_DEPTH);
 	parameter FIFO_DEPTH_BITS = $clog2(`FIFO_DEPTH);
 
-	// parameter BYTES_PER_ADDR_PER_BRAM = 4;
-	// parameter VEC_VAL_BYTES = `VEC_VAL_BITS/8;
-	// // parameter VEC_VAL_OFFSET = `LOG2(`VEC_VAL_BITS);
-	// parameter VEC_VAL_OFFSET = $clog2(`VEC_VAL_BITS);
-	// parameter NUM_VEC_VALS_PER_ADDR_PER_BRAM = BYTES_PER_ADDR_PER_BRAM/VEC_VAL_BYTES;
-	// parameter NUM_VEC_VALS_PER_ADDR = `NUM_VEC_VALS;
-	// // parameter NUM_VEC_VALS_PER_ADDR_BITS = `LOG2(NUM_VEC_VALS_PER_ADDR);
-	// parameter NUM_VEC_VALS_PER_ADDR_BITS = $clog2(`NUM_VEC_VALS);
-	// parameter NUM_BRAMS = NUM_VEC_VALS_PER_ADDR/NUM_VEC_VALS_PER_ADDR_PER_BRAM;
-	// parameter NUM_ADDR_VEC_RAM = `NUM_VEC_VALS/NUM_VEC_VALS_PER_ADDR;
-	// // parameter AWIDTH = `LOG2(NUM_ADDR);
-	// parameter AWIDTH_VEC_RAM = 1; //$clog2(1);
-	// parameter DWIDTH_VEC_RAM = NUM_VEC_VALS_PER_ADDR*`VEC_VAL_BITS;
-
-	// parameter COUNTER_BITS = AWIDTH_VEC_RAM;
 	parameter COUNTER_MAX  = ((1 << `COUNTER_BITS) - 1) & (`NUM_VEC_VALS_PER_ADDR!=`NUM_VEC_VALS);
-
-	// parameter LOCAL_ID_BITS = NUM_VEC_VALS_PER_ADDR_BITS;
 
 	reg [`COUNTER_BITS-1:0] counter;
 	reg [`COUNTER_BITS-1:0] counter_delay;
-	// // reg counter_wait;
 
 	reg [`NUM_CHANNEL-1:0] val_wr_en;
 	wire [`NUM_CHANNEL-1:0] val_full;
@@ -2586,7 +2414,6 @@ module bvb(
 		.full(val_full[31]), // output full 
 		.empty(val_empty[31]) // output empty 
 	);
-
  
 	always @ (posedge clk) begin
 		id_rd_en_reg <= id_rd_en;
@@ -2966,7 +2793,7 @@ endmodule
 
 module Switch_Matrix
 	(
-		input [`BVB_AWIDTH-1:0] in,
+		input [`BVB_DWIDTH-1:0] in,
 		input [`NUM_CHANNEL*`LOCAL_ID_BITS-1:0] addr,
 		output [(`NUM_CHANNEL*`VEC_VAL_BITS)-1:0] out
 	);
@@ -3194,6 +3021,7 @@ module Switch_Matrix
 		.sel(addr[(31+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:31*`NUM_VEC_VALS_PER_ADDR_BITS]), 
 		.out(out[(31+1)*`VEC_VAL_BITS-1:31*`VEC_VAL_BITS]) 
 	);
+
 endmodule
 
 module mux_2to1 
@@ -3419,9 +3247,10 @@ module Big_Channel(
 	input [`NUM_CHANNEL-1:0] row_id_empty,
 	output [`NUM_CHANNEL-1:0] row_id_rd_en,
 
-	output [`MULT_BITS * `NUM_CHANNEL -1:0] wr_data,
-	output [`ROW_ID_BITS * `NUM_CHANNEL -1:0] wr_addr,
-	output [`NUM_CHANNEL-1:0] wr_en,
+	output [`MULT_BITS * `NUM_CHANNEL -1:0] data_out,
+	output [`NUM_CHANNEL-1:0] data_out_empty,
+	output [`ROW_ID_BITS * `NUM_CHANNEL -1:0] addr_out,
+	input [`NUM_CHANNEL-1:0] out_rd_en,
 
 	output [`NUM_CHANNEL-1:0] done
 );
@@ -3440,9 +3269,10 @@ module Big_Channel(
 		.row_id(row_id[(0+1)*`ROW_ID_BITS-1:0*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[0]), 
 		.row_id_rd_en(row_id_rd_en[0]), 
-		.wr_data(wr_data[(0+1)*`MULT_BITS-1:0*`MULT_BITS]), 
-		.wr_addr(wr_addr[(0+1)*`ROW_ID_BITS-1:0*`ROW_ID_BITS]), 
-		.wr_en(wr_en[0]), 
+		.data_out(data_out[(0+1)*`MULT_BITS-1:0*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[0]), 
+		.addr_out(addr_out[(0+1)*`ROW_ID_BITS-1:0*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[0]), 
 		.done(done[0]) 
 	);
 
@@ -3460,9 +3290,10 @@ module Big_Channel(
 		.row_id(row_id[(1+1)*`ROW_ID_BITS-1:1*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[1]), 
 		.row_id_rd_en(row_id_rd_en[1]), 
-		.wr_data(wr_data[(1+1)*`MULT_BITS-1:1*`MULT_BITS]), 
-		.wr_addr(wr_addr[(1+1)*`ROW_ID_BITS-1:1*`ROW_ID_BITS]), 
-		.wr_en(wr_en[1]), 
+		.data_out(data_out[(1+1)*`MULT_BITS-1:1*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[1]), 
+		.addr_out(addr_out[(1+1)*`ROW_ID_BITS-1:1*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[1]), 
 		.done(done[1]) 
 	);
 
@@ -3480,9 +3311,10 @@ module Big_Channel(
 		.row_id(row_id[(2+1)*`ROW_ID_BITS-1:2*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[2]), 
 		.row_id_rd_en(row_id_rd_en[2]), 
-		.wr_data(wr_data[(2+1)*`MULT_BITS-1:2*`MULT_BITS]), 
-		.wr_addr(wr_addr[(2+1)*`ROW_ID_BITS-1:2*`ROW_ID_BITS]), 
-		.wr_en(wr_en[2]), 
+		.data_out(data_out[(2+1)*`MULT_BITS-1:2*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[2]), 
+		.addr_out(addr_out[(2+1)*`ROW_ID_BITS-1:2*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[2]), 
 		.done(done[2]) 
 	);
 
@@ -3500,9 +3332,10 @@ module Big_Channel(
 		.row_id(row_id[(3+1)*`ROW_ID_BITS-1:3*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[3]), 
 		.row_id_rd_en(row_id_rd_en[3]), 
-		.wr_data(wr_data[(3+1)*`MULT_BITS-1:3*`MULT_BITS]), 
-		.wr_addr(wr_addr[(3+1)*`ROW_ID_BITS-1:3*`ROW_ID_BITS]), 
-		.wr_en(wr_en[3]), 
+		.data_out(data_out[(3+1)*`MULT_BITS-1:3*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[3]), 
+		.addr_out(addr_out[(3+1)*`ROW_ID_BITS-1:3*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[3]), 
 		.done(done[3]) 
 	);
 
@@ -3520,9 +3353,10 @@ module Big_Channel(
 		.row_id(row_id[(4+1)*`ROW_ID_BITS-1:4*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[4]), 
 		.row_id_rd_en(row_id_rd_en[4]), 
-		.wr_data(wr_data[(4+1)*`MULT_BITS-1:4*`MULT_BITS]), 
-		.wr_addr(wr_addr[(4+1)*`ROW_ID_BITS-1:4*`ROW_ID_BITS]), 
-		.wr_en(wr_en[4]), 
+		.data_out(data_out[(4+1)*`MULT_BITS-1:4*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[4]), 
+		.addr_out(addr_out[(4+1)*`ROW_ID_BITS-1:4*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[4]), 
 		.done(done[4]) 
 	);
 
@@ -3540,9 +3374,10 @@ module Big_Channel(
 		.row_id(row_id[(5+1)*`ROW_ID_BITS-1:5*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[5]), 
 		.row_id_rd_en(row_id_rd_en[5]), 
-		.wr_data(wr_data[(5+1)*`MULT_BITS-1:5*`MULT_BITS]), 
-		.wr_addr(wr_addr[(5+1)*`ROW_ID_BITS-1:5*`ROW_ID_BITS]), 
-		.wr_en(wr_en[5]), 
+		.data_out(data_out[(5+1)*`MULT_BITS-1:5*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[5]), 
+		.addr_out(addr_out[(5+1)*`ROW_ID_BITS-1:5*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[5]), 
 		.done(done[5]) 
 	);
 
@@ -3560,9 +3395,10 @@ module Big_Channel(
 		.row_id(row_id[(6+1)*`ROW_ID_BITS-1:6*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[6]), 
 		.row_id_rd_en(row_id_rd_en[6]), 
-		.wr_data(wr_data[(6+1)*`MULT_BITS-1:6*`MULT_BITS]), 
-		.wr_addr(wr_addr[(6+1)*`ROW_ID_BITS-1:6*`ROW_ID_BITS]), 
-		.wr_en(wr_en[6]), 
+		.data_out(data_out[(6+1)*`MULT_BITS-1:6*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[6]), 
+		.addr_out(addr_out[(6+1)*`ROW_ID_BITS-1:6*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[6]), 
 		.done(done[6]) 
 	);
 
@@ -3580,9 +3416,10 @@ module Big_Channel(
 		.row_id(row_id[(7+1)*`ROW_ID_BITS-1:7*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[7]), 
 		.row_id_rd_en(row_id_rd_en[7]), 
-		.wr_data(wr_data[(7+1)*`MULT_BITS-1:7*`MULT_BITS]), 
-		.wr_addr(wr_addr[(7+1)*`ROW_ID_BITS-1:7*`ROW_ID_BITS]), 
-		.wr_en(wr_en[7]), 
+		.data_out(data_out[(7+1)*`MULT_BITS-1:7*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[7]), 
+		.addr_out(addr_out[(7+1)*`ROW_ID_BITS-1:7*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[7]), 
 		.done(done[7]) 
 	);
 
@@ -3600,9 +3437,10 @@ module Big_Channel(
 		.row_id(row_id[(8+1)*`ROW_ID_BITS-1:8*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[8]), 
 		.row_id_rd_en(row_id_rd_en[8]), 
-		.wr_data(wr_data[(8+1)*`MULT_BITS-1:8*`MULT_BITS]), 
-		.wr_addr(wr_addr[(8+1)*`ROW_ID_BITS-1:8*`ROW_ID_BITS]), 
-		.wr_en(wr_en[8]), 
+		.data_out(data_out[(8+1)*`MULT_BITS-1:8*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[8]), 
+		.addr_out(addr_out[(8+1)*`ROW_ID_BITS-1:8*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[8]), 
 		.done(done[8]) 
 	);
 
@@ -3620,9 +3458,10 @@ module Big_Channel(
 		.row_id(row_id[(9+1)*`ROW_ID_BITS-1:9*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[9]), 
 		.row_id_rd_en(row_id_rd_en[9]), 
-		.wr_data(wr_data[(9+1)*`MULT_BITS-1:9*`MULT_BITS]), 
-		.wr_addr(wr_addr[(9+1)*`ROW_ID_BITS-1:9*`ROW_ID_BITS]), 
-		.wr_en(wr_en[9]), 
+		.data_out(data_out[(9+1)*`MULT_BITS-1:9*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[9]), 
+		.addr_out(addr_out[(9+1)*`ROW_ID_BITS-1:9*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[9]), 
 		.done(done[9]) 
 	);
 
@@ -3640,9 +3479,10 @@ module Big_Channel(
 		.row_id(row_id[(10+1)*`ROW_ID_BITS-1:10*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[10]), 
 		.row_id_rd_en(row_id_rd_en[10]), 
-		.wr_data(wr_data[(10+1)*`MULT_BITS-1:10*`MULT_BITS]), 
-		.wr_addr(wr_addr[(10+1)*`ROW_ID_BITS-1:10*`ROW_ID_BITS]), 
-		.wr_en(wr_en[10]), 
+		.data_out(data_out[(10+1)*`MULT_BITS-1:10*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[10]), 
+		.addr_out(addr_out[(10+1)*`ROW_ID_BITS-1:10*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[10]), 
 		.done(done[10]) 
 	);
 
@@ -3660,9 +3500,10 @@ module Big_Channel(
 		.row_id(row_id[(11+1)*`ROW_ID_BITS-1:11*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[11]), 
 		.row_id_rd_en(row_id_rd_en[11]), 
-		.wr_data(wr_data[(11+1)*`MULT_BITS-1:11*`MULT_BITS]), 
-		.wr_addr(wr_addr[(11+1)*`ROW_ID_BITS-1:11*`ROW_ID_BITS]), 
-		.wr_en(wr_en[11]), 
+		.data_out(data_out[(11+1)*`MULT_BITS-1:11*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[11]), 
+		.addr_out(addr_out[(11+1)*`ROW_ID_BITS-1:11*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[11]), 
 		.done(done[11]) 
 	);
 
@@ -3680,9 +3521,10 @@ module Big_Channel(
 		.row_id(row_id[(12+1)*`ROW_ID_BITS-1:12*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[12]), 
 		.row_id_rd_en(row_id_rd_en[12]), 
-		.wr_data(wr_data[(12+1)*`MULT_BITS-1:12*`MULT_BITS]), 
-		.wr_addr(wr_addr[(12+1)*`ROW_ID_BITS-1:12*`ROW_ID_BITS]), 
-		.wr_en(wr_en[12]), 
+		.data_out(data_out[(12+1)*`MULT_BITS-1:12*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[12]), 
+		.addr_out(addr_out[(12+1)*`ROW_ID_BITS-1:12*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[12]), 
 		.done(done[12]) 
 	);
 
@@ -3700,9 +3542,10 @@ module Big_Channel(
 		.row_id(row_id[(13+1)*`ROW_ID_BITS-1:13*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[13]), 
 		.row_id_rd_en(row_id_rd_en[13]), 
-		.wr_data(wr_data[(13+1)*`MULT_BITS-1:13*`MULT_BITS]), 
-		.wr_addr(wr_addr[(13+1)*`ROW_ID_BITS-1:13*`ROW_ID_BITS]), 
-		.wr_en(wr_en[13]), 
+		.data_out(data_out[(13+1)*`MULT_BITS-1:13*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[13]), 
+		.addr_out(addr_out[(13+1)*`ROW_ID_BITS-1:13*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[13]), 
 		.done(done[13]) 
 	);
 
@@ -3720,9 +3563,10 @@ module Big_Channel(
 		.row_id(row_id[(14+1)*`ROW_ID_BITS-1:14*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[14]), 
 		.row_id_rd_en(row_id_rd_en[14]), 
-		.wr_data(wr_data[(14+1)*`MULT_BITS-1:14*`MULT_BITS]), 
-		.wr_addr(wr_addr[(14+1)*`ROW_ID_BITS-1:14*`ROW_ID_BITS]), 
-		.wr_en(wr_en[14]), 
+		.data_out(data_out[(14+1)*`MULT_BITS-1:14*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[14]), 
+		.addr_out(addr_out[(14+1)*`ROW_ID_BITS-1:14*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[14]), 
 		.done(done[14]) 
 	);
 
@@ -3740,9 +3584,10 @@ module Big_Channel(
 		.row_id(row_id[(15+1)*`ROW_ID_BITS-1:15*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[15]), 
 		.row_id_rd_en(row_id_rd_en[15]), 
-		.wr_data(wr_data[(15+1)*`MULT_BITS-1:15*`MULT_BITS]), 
-		.wr_addr(wr_addr[(15+1)*`ROW_ID_BITS-1:15*`ROW_ID_BITS]), 
-		.wr_en(wr_en[15]), 
+		.data_out(data_out[(15+1)*`MULT_BITS-1:15*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[15]), 
+		.addr_out(addr_out[(15+1)*`ROW_ID_BITS-1:15*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[15]), 
 		.done(done[15]) 
 	);
 
@@ -3760,9 +3605,10 @@ module Big_Channel(
 		.row_id(row_id[(16+1)*`ROW_ID_BITS-1:16*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[16]), 
 		.row_id_rd_en(row_id_rd_en[16]), 
-		.wr_data(wr_data[(16+1)*`MULT_BITS-1:16*`MULT_BITS]), 
-		.wr_addr(wr_addr[(16+1)*`ROW_ID_BITS-1:16*`ROW_ID_BITS]), 
-		.wr_en(wr_en[16]), 
+		.data_out(data_out[(16+1)*`MULT_BITS-1:16*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[16]), 
+		.addr_out(addr_out[(16+1)*`ROW_ID_BITS-1:16*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[16]), 
 		.done(done[16]) 
 	);
 
@@ -3780,9 +3626,10 @@ module Big_Channel(
 		.row_id(row_id[(17+1)*`ROW_ID_BITS-1:17*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[17]), 
 		.row_id_rd_en(row_id_rd_en[17]), 
-		.wr_data(wr_data[(17+1)*`MULT_BITS-1:17*`MULT_BITS]), 
-		.wr_addr(wr_addr[(17+1)*`ROW_ID_BITS-1:17*`ROW_ID_BITS]), 
-		.wr_en(wr_en[17]), 
+		.data_out(data_out[(17+1)*`MULT_BITS-1:17*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[17]), 
+		.addr_out(addr_out[(17+1)*`ROW_ID_BITS-1:17*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[17]), 
 		.done(done[17]) 
 	);
 
@@ -3800,9 +3647,10 @@ module Big_Channel(
 		.row_id(row_id[(18+1)*`ROW_ID_BITS-1:18*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[18]), 
 		.row_id_rd_en(row_id_rd_en[18]), 
-		.wr_data(wr_data[(18+1)*`MULT_BITS-1:18*`MULT_BITS]), 
-		.wr_addr(wr_addr[(18+1)*`ROW_ID_BITS-1:18*`ROW_ID_BITS]), 
-		.wr_en(wr_en[18]), 
+		.data_out(data_out[(18+1)*`MULT_BITS-1:18*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[18]), 
+		.addr_out(addr_out[(18+1)*`ROW_ID_BITS-1:18*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[18]), 
 		.done(done[18]) 
 	);
 
@@ -3820,9 +3668,10 @@ module Big_Channel(
 		.row_id(row_id[(19+1)*`ROW_ID_BITS-1:19*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[19]), 
 		.row_id_rd_en(row_id_rd_en[19]), 
-		.wr_data(wr_data[(19+1)*`MULT_BITS-1:19*`MULT_BITS]), 
-		.wr_addr(wr_addr[(19+1)*`ROW_ID_BITS-1:19*`ROW_ID_BITS]), 
-		.wr_en(wr_en[19]), 
+		.data_out(data_out[(19+1)*`MULT_BITS-1:19*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[19]), 
+		.addr_out(addr_out[(19+1)*`ROW_ID_BITS-1:19*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[19]), 
 		.done(done[19]) 
 	);
 
@@ -3840,9 +3689,10 @@ module Big_Channel(
 		.row_id(row_id[(20+1)*`ROW_ID_BITS-1:20*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[20]), 
 		.row_id_rd_en(row_id_rd_en[20]), 
-		.wr_data(wr_data[(20+1)*`MULT_BITS-1:20*`MULT_BITS]), 
-		.wr_addr(wr_addr[(20+1)*`ROW_ID_BITS-1:20*`ROW_ID_BITS]), 
-		.wr_en(wr_en[20]), 
+		.data_out(data_out[(20+1)*`MULT_BITS-1:20*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[20]), 
+		.addr_out(addr_out[(20+1)*`ROW_ID_BITS-1:20*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[20]), 
 		.done(done[20]) 
 	);
 
@@ -3860,9 +3710,10 @@ module Big_Channel(
 		.row_id(row_id[(21+1)*`ROW_ID_BITS-1:21*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[21]), 
 		.row_id_rd_en(row_id_rd_en[21]), 
-		.wr_data(wr_data[(21+1)*`MULT_BITS-1:21*`MULT_BITS]), 
-		.wr_addr(wr_addr[(21+1)*`ROW_ID_BITS-1:21*`ROW_ID_BITS]), 
-		.wr_en(wr_en[21]), 
+		.data_out(data_out[(21+1)*`MULT_BITS-1:21*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[21]), 
+		.addr_out(addr_out[(21+1)*`ROW_ID_BITS-1:21*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[21]), 
 		.done(done[21]) 
 	);
 
@@ -3880,9 +3731,10 @@ module Big_Channel(
 		.row_id(row_id[(22+1)*`ROW_ID_BITS-1:22*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[22]), 
 		.row_id_rd_en(row_id_rd_en[22]), 
-		.wr_data(wr_data[(22+1)*`MULT_BITS-1:22*`MULT_BITS]), 
-		.wr_addr(wr_addr[(22+1)*`ROW_ID_BITS-1:22*`ROW_ID_BITS]), 
-		.wr_en(wr_en[22]), 
+		.data_out(data_out[(22+1)*`MULT_BITS-1:22*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[22]), 
+		.addr_out(addr_out[(22+1)*`ROW_ID_BITS-1:22*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[22]), 
 		.done(done[22]) 
 	);
 
@@ -3900,9 +3752,10 @@ module Big_Channel(
 		.row_id(row_id[(23+1)*`ROW_ID_BITS-1:23*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[23]), 
 		.row_id_rd_en(row_id_rd_en[23]), 
-		.wr_data(wr_data[(23+1)*`MULT_BITS-1:23*`MULT_BITS]), 
-		.wr_addr(wr_addr[(23+1)*`ROW_ID_BITS-1:23*`ROW_ID_BITS]), 
-		.wr_en(wr_en[23]), 
+		.data_out(data_out[(23+1)*`MULT_BITS-1:23*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[23]), 
+		.addr_out(addr_out[(23+1)*`ROW_ID_BITS-1:23*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[23]), 
 		.done(done[23]) 
 	);
 
@@ -3920,9 +3773,10 @@ module Big_Channel(
 		.row_id(row_id[(24+1)*`ROW_ID_BITS-1:24*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[24]), 
 		.row_id_rd_en(row_id_rd_en[24]), 
-		.wr_data(wr_data[(24+1)*`MULT_BITS-1:24*`MULT_BITS]), 
-		.wr_addr(wr_addr[(24+1)*`ROW_ID_BITS-1:24*`ROW_ID_BITS]), 
-		.wr_en(wr_en[24]), 
+		.data_out(data_out[(24+1)*`MULT_BITS-1:24*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[24]), 
+		.addr_out(addr_out[(24+1)*`ROW_ID_BITS-1:24*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[24]), 
 		.done(done[24]) 
 	);
 
@@ -3940,9 +3794,10 @@ module Big_Channel(
 		.row_id(row_id[(25+1)*`ROW_ID_BITS-1:25*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[25]), 
 		.row_id_rd_en(row_id_rd_en[25]), 
-		.wr_data(wr_data[(25+1)*`MULT_BITS-1:25*`MULT_BITS]), 
-		.wr_addr(wr_addr[(25+1)*`ROW_ID_BITS-1:25*`ROW_ID_BITS]), 
-		.wr_en(wr_en[25]), 
+		.data_out(data_out[(25+1)*`MULT_BITS-1:25*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[25]), 
+		.addr_out(addr_out[(25+1)*`ROW_ID_BITS-1:25*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[25]), 
 		.done(done[25]) 
 	);
 
@@ -3960,9 +3815,10 @@ module Big_Channel(
 		.row_id(row_id[(26+1)*`ROW_ID_BITS-1:26*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[26]), 
 		.row_id_rd_en(row_id_rd_en[26]), 
-		.wr_data(wr_data[(26+1)*`MULT_BITS-1:26*`MULT_BITS]), 
-		.wr_addr(wr_addr[(26+1)*`ROW_ID_BITS-1:26*`ROW_ID_BITS]), 
-		.wr_en(wr_en[26]), 
+		.data_out(data_out[(26+1)*`MULT_BITS-1:26*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[26]), 
+		.addr_out(addr_out[(26+1)*`ROW_ID_BITS-1:26*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[26]), 
 		.done(done[26]) 
 	);
 
@@ -3980,9 +3836,10 @@ module Big_Channel(
 		.row_id(row_id[(27+1)*`ROW_ID_BITS-1:27*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[27]), 
 		.row_id_rd_en(row_id_rd_en[27]), 
-		.wr_data(wr_data[(27+1)*`MULT_BITS-1:27*`MULT_BITS]), 
-		.wr_addr(wr_addr[(27+1)*`ROW_ID_BITS-1:27*`ROW_ID_BITS]), 
-		.wr_en(wr_en[27]), 
+		.data_out(data_out[(27+1)*`MULT_BITS-1:27*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[27]), 
+		.addr_out(addr_out[(27+1)*`ROW_ID_BITS-1:27*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[27]), 
 		.done(done[27]) 
 	);
 
@@ -4000,9 +3857,10 @@ module Big_Channel(
 		.row_id(row_id[(28+1)*`ROW_ID_BITS-1:28*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[28]), 
 		.row_id_rd_en(row_id_rd_en[28]), 
-		.wr_data(wr_data[(28+1)*`MULT_BITS-1:28*`MULT_BITS]), 
-		.wr_addr(wr_addr[(28+1)*`ROW_ID_BITS-1:28*`ROW_ID_BITS]), 
-		.wr_en(wr_en[28]), 
+		.data_out(data_out[(28+1)*`MULT_BITS-1:28*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[28]), 
+		.addr_out(addr_out[(28+1)*`ROW_ID_BITS-1:28*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[28]), 
 		.done(done[28]) 
 	);
 
@@ -4020,9 +3878,10 @@ module Big_Channel(
 		.row_id(row_id[(29+1)*`ROW_ID_BITS-1:29*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[29]), 
 		.row_id_rd_en(row_id_rd_en[29]), 
-		.wr_data(wr_data[(29+1)*`MULT_BITS-1:29*`MULT_BITS]), 
-		.wr_addr(wr_addr[(29+1)*`ROW_ID_BITS-1:29*`ROW_ID_BITS]), 
-		.wr_en(wr_en[29]), 
+		.data_out(data_out[(29+1)*`MULT_BITS-1:29*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[29]), 
+		.addr_out(addr_out[(29+1)*`ROW_ID_BITS-1:29*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[29]), 
 		.done(done[29]) 
 	);
 
@@ -4040,9 +3899,10 @@ module Big_Channel(
 		.row_id(row_id[(30+1)*`ROW_ID_BITS-1:30*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[30]), 
 		.row_id_rd_en(row_id_rd_en[30]), 
-		.wr_data(wr_data[(30+1)*`MULT_BITS-1:30*`MULT_BITS]), 
-		.wr_addr(wr_addr[(30+1)*`ROW_ID_BITS-1:30*`ROW_ID_BITS]), 
-		.wr_en(wr_en[30]), 
+		.data_out(data_out[(30+1)*`MULT_BITS-1:30*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[30]), 
+		.addr_out(addr_out[(30+1)*`ROW_ID_BITS-1:30*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[30]), 
 		.done(done[30]) 
 	);
 
@@ -4060,9 +3920,10 @@ module Big_Channel(
 		.row_id(row_id[(31+1)*`ROW_ID_BITS-1:31*`ROW_ID_BITS]), 
 		.row_id_empty(row_id_empty[31]), 
 		.row_id_rd_en(row_id_rd_en[31]), 
-		.wr_data(wr_data[(31+1)*`MULT_BITS-1:31*`MULT_BITS]), 
-		.wr_addr(wr_addr[(31+1)*`ROW_ID_BITS-1:31*`ROW_ID_BITS]), 
-		.wr_en(wr_en[31]), 
+		.data_out(data_out[(31+1)*`MULT_BITS-1:31*`MULT_BITS]), 
+		.data_out_empty(data_out_empty[31]), 
+		.addr_out(addr_out[(31+1)*`ROW_ID_BITS-1:31*`ROW_ID_BITS]),
+		.out_rd_en(out_rd_en[31]), 
 		.done(done[31]) 
 	);
 endmodule
@@ -4085,10 +3946,10 @@ module Channel_Accumulator(
 	input row_id_empty,
 	output row_id_rd_en,
 
-	  
-	output [`MULT_BITS-1:0] wr_data,
-	output [`ROW_ID_BITS-1:0] wr_addr,
-	output wr_en,
+	output [`MULT_BITS-1:0] data_out,
+	output data_out_empty,
+	output [`ROW_ID_BITS-1:0] addr_out,
+	input out_rd_en,
 
 	output done
 	);
@@ -4124,9 +3985,10 @@ module Channel_Accumulator(
 					.mult_out(mult_out),
 					.mult_empty(mult_empty), 
 					.mult_rd_en(mult_rd_en), 
-					.wr_addr(wr_addr), 
-					.wr_data(wr_data),
-					.wr_en(wr_en),
+					.data_out(data_out),
+					.data_out_empty(data_out_empty),
+					.addr_out(addr_out),
+					.out_rd_en(out_rd_en),
 					.done(done)			
 	);
 
@@ -4212,9 +4074,10 @@ module Accumulator(
 	input mult_empty,
 	output mult_rd_en,
 
-	output reg [`ROW_ID_BITS-1:0] wr_addr,
-	output reg [`MULT_BITS-1:0] wr_data,
-	output reg wr_en,
+	output [`MULT_BITS-1:0] data_out,
+	output data_out_empty,
+	output [`ROW_ID_BITS-1:0] addr_out,
+	input out_rd_en,
 
 	output reg done
 	);
@@ -4224,8 +4087,54 @@ module Accumulator(
 	reg row_id_rd_en_reg;
 	reg mult_rd_en_reg;
 
-	assign row_id_rd_en = start & (~row_id_empty) & (~mult_empty);
-	assign mult_rd_en = start & (~row_id_empty) & (~mult_empty);
+	wire data_out_full;
+	wire addr_out_full_nc;
+
+	wire addr_out_empty_nc;
+
+	reg [`MULT_BITS-1:0] wr_data;
+	reg [`ROW_ID_BITS-1:0] wr_addr;
+	reg wr_en;
+
+	reg [`MULT_BITS-1:0] wr_data_delay;
+	reg [`ROW_ID_BITS-1:0] wr_addr_delay;
+
+	reg last;
+
+	parameter FIFO_DEPTH_BITS = $clog2(`FIFO_DEPTH);
+
+	generic_fifo_sc_a #(
+		.aw(FIFO_DEPTH_BITS),
+		.dw(`MULT_BITS)
+	) fifo_data_out (
+		.clk(clk),
+		.rst(rst),
+		.clr(0),
+		.din(wr_data_delay),
+		.we(wr_en),
+		.re(out_rd_en),
+		.dout(data_out),
+		.full(data_out_full),
+		.empty(data_out_empty)
+	);
+
+	generic_fifo_sc_a #(
+		.aw(FIFO_DEPTH_BITS),
+		.dw(`ROW_ID_BITS)
+	) fifo_addr_out (
+		.clk(clk),
+		.rst(rst),
+		.clr(0),
+		.din(wr_addr_delay),
+		.we(wr_en),
+		.re(out_rd_en),
+		.dout(addr_out),
+		.full(addr_out_full_nc),
+		.empty(addr_out_empty_nc)
+	);
+
+	assign row_id_rd_en = start & (~row_id_empty) & (~mult_empty) & (~data_out_full);
+	assign mult_rd_en = start & (~row_id_empty) & (~mult_empty) & (~data_out_full);
 
 	always@(posedge clk or posedge rst) begin
 		if(rst) begin
@@ -4235,13 +4144,16 @@ module Accumulator(
 			done <= 0;
 		end 
 		else if(start) begin
-			done <= mult_done & row_id_empty;
+			last <= mult_done & row_id_empty;
 			row_id_rd_en_reg <= row_id_rd_en;
 			mult_rd_en_reg <= mult_rd_en;
+			wr_addr_delay <= wr_addr;
+			wr_data_delay <= wr_data;
+
 			if(~first_read) begin
 				wr_addr <= row_id;
 				first_read <= 1;
-			end 	
+			end 		
 			else if(row_id_rd_en_reg & mult_rd_en_reg) begin
 				if(row_id!=wr_addr) begin
 					wr_en <= 1;
@@ -4253,8 +4165,9 @@ module Accumulator(
 					wr_data <= wr_data + mult_out;
 				end
 			end
-			else if (done) begin
+			else if (last) begin
 				wr_en <= 1;
+				done <= 1;
 			end
 			else begin
 				wr_en <= 0;
