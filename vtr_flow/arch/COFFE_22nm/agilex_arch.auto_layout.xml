@@ -1352,7 +1352,7 @@
             <direct name="atoa1" input="dsp_pb.datain[54:37]" output="mac_fixed_pt[1].a"/>
             <direct name="btob1" input="dsp_pb.datain[73:55]" output="mac_fixed_pt[1].b"/>
             <direct name="sumouttosumout0" input="mac_fixed_pt[0].out" output="dsp_pb.resulta[37:0]"/>
-            <direct name="sumouttosumout1" input="mac_fixed_pt[1].out" output="dsp_pb.chainout[37:0]"/>
+            <direct name="sumouttosumout1" input="mac_fixed_pt[1].out" output="dsp_pb.resultb[37:0]"/>
           </interconnect>
         </mode>
 
