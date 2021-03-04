@@ -99,53 +99,26 @@ module softmax(
     mode4_stage2_run_a <= mode4_stage2_run;
   end
 
-  always @(posedge clk)
-  begin
+  always @(posedge clk) begin
     if(reset) begin
       inp_reg <= 0;
       addr <= 0;
-      sub0_inp_addr <= 0;
-      sub1_inp_addr <= 0;
-      sub0_inp_reg <= 0;
-      sub1_inp_reg <= 0;
       mode1_start <= 0;
       mode1_run <= 0;
-
-      mode3_stage_run <= 0;
-      mode7_stage_run <= 0;
-      mode2_start <= 0;
-      mode2_run <= 0;
-      mode3_run <= 0;
-      mode4_stage0_run <= 0;
-      mode4_stage1_run <= 0;
-      mode4_stage2_run <= 0;
-      mode5_run <= 0;
-      mode6_run <= 0;
-      mode7_run <= 0;
-      presub_start <= 0;
-      presub_run <= 0;
-      done <= 0;
     end
-
     //init latch the input address
-    if(init) begin
+    else if(init) begin
       addr <= start_addr;
     end
-
     //start the mode1 max calculation
-    if(start)begin
+    else if(start)begin
       mode1_start <= 1;
     end
-
     //logic when to finish mode1 and trigger mode2 to latch the mode2 address
-    if(~reset && mode1_start && addr < end_addr) begin
+    else if(mode1_start && addr < end_addr) begin
       addr <= addr + 1;
       inp_reg <= inp;
       mode1_run <= 1;
-      if(addr == end_addr - 1) begin
-        mode2_start <= 1;
-        sub0_inp_addr <= start_addr;
-      end
     end else if(addr == end_addr)begin
       addr <= 0;
       mode1_run <= 0;
@@ -153,102 +126,172 @@ module softmax(
     end else begin
       mode1_run <= 0;
     end
+  end
 
-
+  always @(posedge clk) begin
+    if(reset) begin
+      sub0_inp_addr <= 0;
+      sub0_inp_reg <= 0;
+      mode2_start <= 0;
+      mode2_run <= 0;
+    end
+    else if ((mode1_start) && (addr == (end_addr - 1))) begin
+        mode2_start <= 1;
+        sub0_inp_addr <= start_addr;
+	end
     //logic when to finish mode2
-    if(~reset && mode2_start && sub0_inp_addr < end_addr)begin
+    else if(mode2_start && sub0_inp_addr < end_addr) begin
       sub0_inp_addr <= sub0_inp_addr + 1;
       sub0_inp_reg <= sub0_inp;
       mode2_run <= 1;
-    end else if(sub0_inp_addr == end_addr)begin
+    end 
+	else if(sub0_inp_addr == end_addr)begin
       sub0_inp_addr <= 0;
       sub0_inp_reg <= 0;
       mode2_run <= 0;
       mode2_start <= 0;
     end
+  end	
 
+  always @(posedge clk) begin
+    if(reset) begin
+      mode3_stage_run <= 0;
+    end
     //logic when to trigger mode3
-    if(mode2_run == 1) begin
+    else if(mode2_run == 1) begin
       mode3_stage_run <= 1;
     end else begin
       mode3_stage_run <= 0;
     end
+  end	
 
-    if(mode3_stage_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode3_run <= 0;
+    end
+    else if(mode3_stage_run == 1) begin
       mode3_run <= 1;
     end else begin
       mode3_run <= 0;
     end
+  end
 
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage2_run <= 0;
+    end
     //logic when to trigger mode4 last stage adderTree, since the final results of adderTree
     //is always ready 1 cycle after mode3 finishes, so there is no need on extra
     //logic to control the adderTree outputs
-    if (mode3_run == 1) begin
+    else if (mode3_run == 1) begin
       mode4_stage2_run <= 1;
     end else begin
       mode4_stage2_run <= 0;
     end
-    if (mode4_stage2_run == 1) begin
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage1_run <= 0;
+    end
+    else if (mode4_stage2_run == 1) begin
       mode4_stage1_run <= 1;
     end else begin
       mode4_stage1_run <= 0;
     end
+  end
 
-    if (mode4_stage1_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage0_run <= 0;
+    end
+    else if (mode4_stage1_run == 1) begin
       mode4_stage0_run <= 1;
     end else begin
       mode4_stage0_run <= 0;
     end
+  end
 
-
-    //mode5 should be triggered right at the falling edge of mode4_stage1_run
-    if(mode4_stage1_run_a & ~mode4_stage1_run) begin
-      mode5_run <= 1;
-    end else if(mode4_stage1_run == 0) begin
+  always @(posedge clk) begin
+    if(reset) begin
       mode5_run <= 0;
     end
+    //mode5 should be triggered right at the falling edge of mode4_stage1_run
+    else if(mode4_stage1_run_a & ~mode4_stage1_run) begin
+      mode5_run <= 1;
+    end 
+	else if(mode4_stage1_run == 0) begin
+      mode5_run <= 0;
+    end
+  end
 
-    if(mode4_stage2_run_a & ~mode4_stage2_run) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      presub_start <= 0;
+      sub1_inp_addr <= 0;
+      sub1_inp_reg <= 0;
+      presub_run <= 0;
+    end
+    else if(mode4_stage2_run_a & ~mode4_stage2_run) begin
       presub_start <= 1;
       sub1_inp_addr <= start_addr;
       sub1_inp_reg <= sub1_inp;
     end
-
-    if(~reset && presub_start && sub1_inp_addr < end_addr)begin
+    else if(~reset && presub_start && sub1_inp_addr < end_addr)begin
       sub1_inp_addr <= sub1_inp_addr + 1;
       sub1_inp_reg <= sub1_inp;
       presub_run <= 1;
-    end else if(sub1_inp_addr == end_addr) begin
+    end 
+	else if(sub1_inp_addr == end_addr) begin
       presub_run <= 0;
       presub_start <= 0;
       sub1_inp_addr <= 0;
       sub1_inp_reg <= 0;
     end
+  end
 
-    if(presub_run) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode6_run <= 0;
+	end  
+    else if(presub_run) begin
       mode6_run <= 1;
     end else begin
       mode6_run <= 0;
     end
+  end
 
-    if(mode6_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode7_stage_run <= 0;
+	end
+    else if(mode6_run == 1) begin
       mode7_stage_run <= 1;
     end else begin
       mode7_stage_run <= 0;
     end
+  end
 
-    if(mode7_stage_run == 1) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      mode7_run <= 0;
+	end
+	else if(mode7_stage_run == 1) begin
       mode7_run <= 1;
     end else begin
       mode7_run <= 0;
     end
+  end
 
-    if(mode7_run) begin
+  always @(posedge clk) begin
+    if(reset) begin
+      done <= 0;
+	end  
+    else if(mode7_run) begin
       done <= 1;
     end else begin
       done <= 0;
     end
-
   end
 
   ////------mode1 max block---------///////
@@ -479,29 +522,32 @@ module softmax(
 endmodule
 
 
+
 module mode1_max_tree(
   inp0, 
   inp1, 
   inp2, 
   inp3, 
-
-  outp,
-
+ 
   mode1_stage0_run,
   clk,
-  reset
+  reset,
+  outp
+
 );
-  input clk;
-  input reset;
-  input mode1_stage0_run;
 
   input  [`DATAWIDTH-1 : 0] inp0; 
   input  [`DATAWIDTH-1 : 0] inp1; 
   input  [`DATAWIDTH-1 : 0] inp2; 
   input  [`DATAWIDTH-1 : 0] inp3; 
 
-  output [`DATAWIDTH-1 : 0] outp;
-  reg    [`DATAWIDTH-1 : 0] outp;
+  input mode1_stage0_run;
+  input clk;
+  input reset;
+
+  output reg [`DATAWIDTH-1 : 0] outp;
+      // [`DATAWIDTH-1 : 0] outp;
+
 
   wire   [`DATAWIDTH-1 : 0] cmp0_out_stage2;
   wire   [`DATAWIDTH-1 : 0] cmp1_out_stage2;
@@ -513,7 +559,7 @@ module mode1_max_tree(
       outp <= 0;
     end
 
-    if(~reset && mode1_stage0_run) begin
+    else if(~reset && mode1_stage0_run) begin
       outp <= cmp0_out_stage0;
     end
 
@@ -572,33 +618,33 @@ assign cmp0_out_stage0 = (cmp0_stage0_ageb==1'b1) ? outp : cmp0_out_stage1;
 
 endmodule
 
-
+	  
 module mode2_sub(
   a_inp0,
   a_inp1,
   a_inp2,
   a_inp3,
-  b_inp,
   outp0,
   outp1,
   outp2,
-  outp3
+  outp3,
+  b_inp
 );
 
   input  [`DATAWIDTH-1 : 0] a_inp0;
   input  [`DATAWIDTH-1 : 0] a_inp1;
   input  [`DATAWIDTH-1 : 0] a_inp2;
   input  [`DATAWIDTH-1 : 0] a_inp3;
-  input  [`DATAWIDTH-1 : 0] b_inp;
   output  [`DATAWIDTH-1 : 0] outp0;
   output  [`DATAWIDTH-1 : 0] outp1;
   output  [`DATAWIDTH-1 : 0] outp2;
   output  [`DATAWIDTH-1 : 0] outp3;
+  input  [`DATAWIDTH-1 : 0] b_inp;
 
 
   wire clk_NC;
   wire rst_NC;
-  wire [4:0] flags0_NC, flags1_NC, flags2_NC, flags3_NC;
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
 
   // 0 add, 1 sub
   FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
@@ -684,7 +730,7 @@ module mode4_adder_tree(
 
   wire   [`DATAWIDTH-1 : 0] add0_out_stage0;
   reg    [`DATAWIDTH-1 : 0] outp;
-
+/*
   always @(posedge clk) begin
     if (reset) begin
       outp <= 0;
@@ -706,10 +752,41 @@ module mode4_adder_tree(
       outp <= add0_out_stage0;
     end
   end
+*/
+always @ (posedge clk) begin
+	if(~reset && mode4_stage2_run) begin
+      add0_out_stage2_reg <= add0_out_stage2;
+      add1_out_stage2_reg <= add1_out_stage2;
+    end
+	
+	else if (reset) begin
+		add0_out_stage2_reg <= 0;
+		add1_out_stage2_reg <= 0;
+	end
+end		
 
+always @ (posedge clk) begin
+	if(~reset && mode4_stage1_run) begin
+      add0_out_stage1_reg <= add0_out_stage1;
+    end
+	else if (reset) begin
+	add0_out_stage1_reg <= 0;
+	end
+end
+
+always @ (posedge clk) begin
+	if(~reset && mode4_stage0_run) begin
+		outp <= add0_out_stage0;
+    end
+	else if (reset) begin
+		outp <= 0;
+	end
+end	
+		
+	
   wire clk_NC;
   wire rst_NC;
-  wire [4:0] flags0_NC, flags1_NC, flags2_NC, flags3_NC;
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
 
   // 0 add, 1 sub
   FPAddSub add0_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp0),	.b(inp1), .operation(1'b0),	.result(add0_out_stage2), .flags(flags_NC0));
@@ -725,7 +802,6 @@ module mode4_adder_tree(
   //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add0_stage0(.a(outp),       .b(add0_out_stage1_reg),      .z(add0_out_stage0), .rnd(3'b000),    .status());
 
 endmodule
-
 
 module mode5_ln(
 inp,
@@ -759,6 +835,7 @@ module mode6_sub(
   output  [`DATAWIDTH-1 : 0] outp2;
   output  [`DATAWIDTH-1 : 0] outp3;
 
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
   // 0 add, 1 sub
   FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
   FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
@@ -824,6 +901,7 @@ endmodule
 `define SIGN_LOC 15
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
+
 
 module FPAddSub(
 		clk,
@@ -993,105 +1071,105 @@ module FPAddSub(
 		else begin
 		
 			pipe_1 = {Opout_0, Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Sa_0, Sb_0, ShiftDet_0[9:0], InputExc_0[4:0]} ;	
-			/* PIPE_2 :
-				[67] operation
-				[66] Sa_0
-				[65] Sb_0
-				[64] MaxAB_0
-				[63:56] CExp_0
-				[55:51] Shift_0
-				[50:28] Mmax_0
-				[27:23] InputExc_0
-				[22:0] MminS_1
-			*/
+			// PIPE_2 :
+			//[67] operation
+			//[66] Sa_0
+			//[65] Sb_0
+			//[64] MaxAB_0
+			//[63:56] CExp_0
+			//[55:51] Shift_0
+			//[50:28] Mmax_0
+			//[27:23] InputExc_0
+			//[22:0] MminS_1
+			//
 			pipe_2 = {pipe_1[`DWIDTH*2+15], pipe_1[16:15], MaxAB_1, CExp_1[`EXPONENT-1:0], Shift_1[4:0], Mmax_1[`MANTISSA-1:0], pipe_1[4:0], MminS_1[`MANTISSA-1:0]} ;	
-			/* PIPE_3 :
-				[68] operation
-				[67] Sa_0
-				[66] Sb_0
-				[65] MaxAB_0
-				[64:57] CExp_0
-				[56:52] Shift_0
-				[51:29] Mmax_0
-				[28:24] InputExc_0
-				[23:0] MminS_1
-			*/
+			// PIPE_3 :
+			//[68] operation
+			//[67] Sa_0
+			//[66] Sb_0
+			//[65] MaxAB_0
+			//[64:57] CExp_0
+			//[56:52] Shift_0
+			//[51:29] Mmax_0
+			//[28:24] InputExc_0
+			//[23:0] MminS_1
+			//
 			pipe_3 = {pipe_2[`MANTISSA*2+`EXPONENT+13:`MANTISSA], MminS_2[`MANTISSA:0]} ;	
-			/* PIPE_4 :
-				[68] operation
-				[67] Sa_0
-				[66] Sb_0
-				[65] MaxAB_0
-				[64:57] CExp_0
-				[56:52] Shift_0
-				[51:29] Mmax_0
-				[28:24] InputExc_0
-				[23:0] Mmin_3
-			*/					
+			// PIPE_4 :
+			//[68] operation
+			//[67] Sa_0
+			//[66] Sb_0
+			//[65] MaxAB_0
+			//[64:57] CExp_0
+			//[56:52] Shift_0
+			//[51:29] Mmax_0
+			//[28:24] InputExc_0
+			//[23:0] Mmin_3
+			//					
 			pipe_4 = {pipe_3[`MANTISSA*2+`EXPONENT+14:`MANTISSA+1], Mmin_3[`MANTISSA:0]} ;	
-			/* PIPE_5 :
-				[51] operation
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/					
+			// PIPE_5 :
+			//[51] operation
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//					
 			pipe_5 = {pipe_4[2*`MANTISSA+`EXPONENT+14], PSgn_4, Opr_4, pipe_4[2*`MANTISSA+`EXPONENT+13:2*`MANTISSA+11], pipe_4[`MANTISSA+5:`MANTISSA+1], Sum_4[`DWIDTH:0]} ;
-			/* PIPE_6 :
-				[56] operation
-				[55:51] Shift_5
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/					
+			// PIPE_6 :
+			//[56] operation
+			//[55:51] Shift_5
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//					
 			pipe_6 = {pipe_5[`EXPONENT+`EXPONENT+11], Shift_5[4:0], pipe_5[`DWIDTH+`EXPONENT+10:`DWIDTH+1], SumS_5[`DWIDTH:0]} ;	
-			/* pipe_7 :
-				[56] operation
-				[55:51] Shift_5
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/						
+			// pipe_7 :
+			//[56] operation
+			//[55:51] Shift_5
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//						
 			pipe_7 = {pipe_6[`DWIDTH+`EXPONENT+16:`DWIDTH+1], SumS_7[`DWIDTH:0]} ;	
-			/* pipe_8:
-				[54] FG_8 
-				[53] operation
-				[52] PSgn_4
-				[51] Sa_0
-				[50] Sb_0
-				[49] MaxAB_0
-				[48:41] CExp_0
-				[40:36] InputExc_8
-				[35:13] NormM_8 
-				[12:4] NormE_8
-				[3] ZeroSum_8
-				[2] NegE_8
-				[1] R_8
-				[0] S_8
-			*/				
+			// pipe_8:
+			//[54] FG_8 
+			//[53] operation
+			//[52] PSgn_4
+			//[51] Sa_0
+			//[50] Sb_0
+			//[49] MaxAB_0
+			//[48:41] CExp_0
+			//[40:36] InputExc_8
+			//[35:13] NormM_8 
+			//[12:4] NormE_8
+			//[3] ZeroSum_8
+			//[2] NegE_8
+			//[1] R_8
+			//[0] S_8
+			//				
 			pipe_8 = {FG_8, pipe_7[`DWIDTH+`EXPONENT+16], pipe_7[`DWIDTH+`EXPONENT+10], pipe_7[`DWIDTH+`EXPONENT+8:`DWIDTH+1], NormM_8[`MANTISSA-1:0], NormE_8[`EXPONENT:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
-			/* pipe_9:
-				[40:9] P_int
-				[8] NegE_8
-				[7] R_8
-				[6] S_8
-				[5:1] InputExc_8
-				[0] EOF
-			*/				
+			// pipe_9:
+			//[40:9] P_int
+			//[8] NegE_8
+			//[7] R_8
+			//[6] S_8
+			//[5:1] InputExc_8
+			//[0] EOF
+			//				
 			pipe_9 = {P_int[`DWIDTH-1:0], pipe_8[2], pipe_8[1], pipe_8[0], pipe_8[`EXPONENT+`MANTISSA+9:`EXPONENT+`MANTISSA+5], EOF} ;	
 		end
 	end		
@@ -1271,9 +1349,9 @@ module FPAddSub_AlignShift1(
 			// Rotate by 0	
 			2'b00:  Lvl2 <= Stage1[`MANTISSA:0];       			
 			// Rotate by 4	
-			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end Lvl2[`MANTISSA:`MANTISSA-3] <= 0; end
+			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end /*Lvl2[`MANTISSA:`MANTISSA-3] <= 0;*/ end
 			// Rotate by 8
-			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end Lvl2[`MANTISSA:`MANTISSA-7] <= 0; end
+			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end /*Lvl2[`MANTISSA:`MANTISSA-7] <= 0;*/ end
 			// Rotate by 12	
 			2'b11: Lvl2[`MANTISSA: 0] <= 0; 
 			//2'b11:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+12]; end Lvl2[`MANTISSA:`MANTISSA-12] <= 0; end
@@ -1321,11 +1399,11 @@ module FPAddSub_AlignShift2(
 			// Rotate by 0
 			2'b00:  Lvl3 <= Stage2[`MANTISSA:0];   
 			// Rotate by 1
-			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end Lvl3[`MANTISSA] <= 0; end 
+			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end /*Lvl3[`MANTISSA] <= 0; */end 
 			// Rotate by 2
-			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end Lvl3[`MANTISSA:`MANTISSA-1] <= 0; end 
+			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end /*Lvl3[`MANTISSA:`MANTISSA-1] <= 0;*/ end 
 			// Rotate by 3
-			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end Lvl3[`MANTISSA:`MANTISSA-2] <= 0; end 	  
+			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end /*Lvl3[`MANTISSA:`MANTISSA-2] <= 0;*/ end 	  
 	  endcase
 	end
 	
@@ -1485,13 +1563,13 @@ module FPAddSub_NormalizeShift1(
       begin Lvl2 = Stage1[`DWIDTH:0];  end
 			// Rotate by 4
 			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-4)] = Stage1[3:0]; Lvl2[`DWIDTH-4-1:0] <= Stage1[`DWIDTH-4]; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-4)] = Stage1[3:0]; Lvl2[`DWIDTH-4-1:0] = Stage1[`DWIDTH-4]; end
 			// Rotate by 8
 			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-8)] = Stage1[3:0]; Lvl2[`DWIDTH-8-1:0] <= Stage1[`DWIDTH-8]; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-8)] = Stage1[3:0]; Lvl2[`DWIDTH-8-1:0] = Stage1[`DWIDTH-8]; end
 			// Rotate by 12
 			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-12)] = Stage1[3:0]; Lvl2[`DWIDTH-12-1:0] <= Stage1[`DWIDTH-12]; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-12)] = Stage1[3:0]; Lvl2[`DWIDTH-12-1:0] = Stage1[`DWIDTH-12]; end
 	  endcase
 	end
 	
@@ -1504,13 +1582,13 @@ module FPAddSub_NormalizeShift1(
       begin Lvl3 = Stage2[`DWIDTH:0]; end
 			// Rotate by 1
 			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
-      begin Lvl3[`DWIDTH: (`DWIDTH-1)] = Stage2[3:0]; Lvl3[`DWIDTH-1-1:0] <= Stage2[`DWIDTH-1]; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-1)] = Stage2[3:0]; Lvl3[`DWIDTH-1-1:0] = Stage2[`DWIDTH-1]; end
 			// Rotate by 2
 			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
-      begin Lvl3[`DWIDTH: (`DWIDTH-2)] = Stage2[3:0]; Lvl3[`DWIDTH-2-1:0] <= Stage2[`DWIDTH-2]; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-2)] = Stage2[3:0]; Lvl3[`DWIDTH-2-1:0] = Stage2[`DWIDTH-2]; end
 			// Rotate by 3
 			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
-      begin Lvl3[`DWIDTH: (`DWIDTH-3)] = Stage2[3:0]; Lvl3[`DWIDTH-3-1:0] <= Stage2[`DWIDTH-3]; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-3)] = Stage2[3:0]; Lvl3[`DWIDTH-3-1:0] = Stage2[`DWIDTH-3]; end
 	  endcase
 	end
 	
@@ -1727,40 +1805,40 @@ endmodule
 // Comparator module
 //============================================================================
 
-/*============================================================================
-
-This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
-Arithmetic Package, Release 1, by John R. Hauser.
-
-Copyright 2019 The Regents of the University of California.  All rights
-reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
+//============================================================================
+//
+//This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
+//Arithmetic Package, Release 1, by John R. Hauser.
+//
+//Copyright 2019 The Regents of the University of California.  All rights
+//reserved.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+//    this list of conditions, and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions, and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the University nor the names of its contributors may
+//    be used to endorse or promote products derived from this software without
+//    specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+//EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+//DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//=============================================================================
 
 
 module comparator(
@@ -2277,9 +2355,9 @@ module fptofixed_para (
 	output [int_width + frac_width - 1:0] fx;  
 	
 	wire [15:0] Mant; // mantissa of fp
-	wire signed [4:0] Ea; // non biased exponent
+	wire [4:0] Ea; // non biased exponent
 	wire [4:0] Exp; // biased exponent
-	wire [15:0] sftfx; // output of shifter block
+	reg [15:0] sftfx; // output of shifter block
 	reg [15:0] temp;
 	
 	assign Mant = {6'b000001, fp[9:0]};
@@ -2394,6 +2472,7 @@ module LUT(addr, exp);
     end
 endmodule
 
+
 //////////////////////////////////////////////////////////////////////
 // Floating point multiplier
 //////////////////////////////////////////////////////////////////////
@@ -2499,44 +2578,44 @@ module FPMult_16(
 			pipe_4 = 0;
 		end 
 		else begin		
-			/* PIPE 0
-				[63:32] A
-				[31:0] B
-			*/
+			// PIPE 0
+			//[63:32] A
+			//[31:0] B
+			//
       pipe_0 = {a, b} ;
 
-			/* PIPE 1
-				[70] Sa
-				[69] Sb
-				[68:61] Ea
-				[60:53] Eb
-				[52:5] Mp
-				[4:0] InputExc
-			*/
+			// PIPE 1
+			//[70] Sa
+			//[69] Sb
+			//[68:61] Ea
+			//[60:53] Eb
+			//[52:5] Mp
+			//[4:0] InputExc
+			//
 			//pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[`MANTISSA_MUL_SPLIT_LSB-1:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA-1:0], InputExc[4:0]} ;
 			pipe_1 = {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[8:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]} ;
-			/* PIPE 2
-				[38:34] InputExc
-				[33] GRS
-				[32] Sp
-				[31:23] NormE
-				[22:0] NormM
-			*/
+			// PIPE 2
+			//[38:34] InputExc
+			//[33] GRS
+			//[32] Sp
+			//[31:23] NormE
+			//[22:0] NormM
+			//
 			pipe_2 = {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
-			/* PIPE 3
-				[72:68] InputExc
-				[67] GRS
-				[66] Sp	
-				[65:57] RoundE
-				[56:48] RoundEP
-				[47:24] RoundM
-				[23:0] RoundMP
-			*/
+			// PIPE 3
+			//[72:68] InputExc
+			//[67] GRS
+			//[66] Sp	
+			//[65:57] RoundE
+			//[56:48] RoundEP
+			//[47:24] RoundM
+			//[23:0] RoundMP
+			//
 			pipe_3 = {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
-			/* PIPE 4
-				[36:5] Z
-				[4:0] Flags
-			*/				
+			// PIPE 4
+			//[36:5] Z
+			//[4:0] Flags
+			//				
 			pipe_4 = {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
 		end
 	end
@@ -2731,3 +2810,4 @@ module FPMult_RoundModule(
 	assign Flags = InputExc[4:0];
 
 endmodule
+

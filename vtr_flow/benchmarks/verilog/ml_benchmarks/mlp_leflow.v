@@ -5893,6 +5893,9 @@ end
 
 endmodule 
 
+/////////////////////////////////////////////////////////////////////
+// RAM models
+/////////////////////////////////////////////////////////////////////
 module ram_dual_port_4
 (
 	clk,
@@ -6535,372 +6538,374 @@ dual_port_ram u_dual_port_ram(
 `endif
 endmodule
 
-/*
-// Adding code from verilog file: /home/legup/legup-4.0/examples//../boards/Virtex6/ML605/top.v
 
-
-module ML605 (
-       USER_CLOCK,
-	    KEY,
-	    SW,	    
-       LED,
-       LEDG,
-		UART_RXD,
-		UART_TXD
-
-	    );
-
-   input USER_CLOCK;
-   input [4:0] KEY;
-   input [7:0] SW;
-   output [7:0] LED;
-   output [7:0] LEDG;
-   wire CLOCK_50;
-
-    input UART_RXD;
-    output UART_TXD;    
-	wire clk = CLOCK_50;
-	wire go = ~KEY[1];
-
-
-
-   wire 	reset = ~KEY[0];
-   wire 	start;
-   wire [31:0] 	return_val;
-   reg  [31:0] 	return_val_reg;
-   wire 	finish;
-   wire [3:0]	state;
-   
-   reg [6:0]   hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7;
-
-   assign CLOCK_50 = USER_CLOCK;
-   assign LED = 0;
-   
-	always @ (*) begin
-		hex7 <= return_val_reg[31:28];
-		hex6 <= return_val_reg[27:24];
-		hex5 <= return_val_reg[23:20];
-		hex4 <= return_val_reg[19:16];
-		hex3 <= return_val_reg[15:12];
-		hex2 <= return_val_reg[11:8];
-		hex1 <= return_val_reg[7:4];
-		hex0 <= return_val_reg[3:0];
-	end
-assign UART_TXD = 1'b0;
-
-    parameter s_WAIT = 3'b001, s_START = 3'b010, s_EXE = 3'b011,
-                s_DONE = 3'b100;
-
-    // state registers
-    reg [3:0] y_Q, Y_D;
-
-    assign LEDG[3:0] = y_Q;
-
-    // next state
-    always @(*)
-    begin
-        case (y_Q)
-            s_WAIT: if (go) Y_D = s_START; else Y_D = y_Q;
-
-            s_START: Y_D = s_EXE;
-
-            s_EXE: if (!finish) Y_D = s_EXE; else Y_D = s_DONE;
-
-            s_DONE: Y_D = s_DONE;
-
-            default: Y_D = 3'bxxx;
-        endcase
-    end
-
-    // current state
-    always @(posedge clk)
-    begin
-        if (reset) // synchronous clear
-            y_Q <= s_WAIT;
-        else
-            y_Q <= Y_D;
-    end
-
-    always @(posedge clk)
-        if (y_Q == s_EXE && finish)
-            return_val_reg <= return_val;
-        else if (y_Q == s_DONE)
-            return_val_reg <= return_val_reg;
-        else
-            return_val_reg <= 0;
-
-
-    assign start = (y_Q == s_START) ? 1'b1 : 1'b0;
-
-   wire wait_request_c;
-   assign wait_request_c = 0;
-   top top_inst (
-      .clk (clk),
-      .reset (reset),
-      .finish (finish),
-      .return_val (return_val),
-      .start (start),
-      .waitrequest(wait_request_c)  
-    );
-
-   
-
-endmodule
-
-// Adding code from verilog file: /home/legup/legup-4.0/examples//../boards/StratixIV/DE4/top.v
-
-
-module de4 ( 
-    	     OSC_50_BANK2, 
-             BUTTON, 
-             LED, 
-    	     SEG0_D, 
-    	     SEG1_D 
-	     ); 
-   input OSC_50_BANK2; 
-   input [1:0] BUTTON; 
-   output [6:0] SEG0_D; 
-   output [6:0] SEG1_D; 
-   output [7:0] LED; 
-   
-   de2 de2_inst ( 
-		  .CLOCK_50 (OSC_50_BANK2), 
-		  .LEDG (LED), 
-		  .KEY (BUTTON), 
-		  .SW (), 
-		  .HEX0 (SEG0_D), 
-		  .HEX1 (SEG1_D), 
-		  .HEX2 (), 
-		  .HEX3 (), 
-		  .HEX4 (), 
-		  .HEX5 (), 
-		  .HEX6 (), 
-		  .HEX7 () 
-		  ); 
-   
-endmodule
-// Adding code from verilog file: /home/legup/legup-4.0/examples//../boards/CycloneII/DE2/top.v
-
-
-module de2 (
-	    CLOCK_50,
-	    KEY,
-	    SW,
-	    HEX0,
-	    HEX1,
-	    HEX2,
-	    HEX3,
-	    HEX4,
-	    HEX5,
-	    HEX6,
-	    HEX7,
-	    LEDG,
-		UART_RXD,
-		UART_TXD
-
-	    );
-
-   input CLOCK_50;
-   input [3:0] KEY;
-   input [17:0] SW;
-   output [6:0] HEX0, HEX1,  HEX2,  HEX3,  HEX4,  HEX5,  HEX6,  HEX7;
-   reg [6:0] 	hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7;
-   
-
-   output [7:0] LEDG;
-    input UART_RXD;
-    output UART_TXD;    
-	wire clk = CLOCK_50;
-	wire go = ~KEY[1];
-
-
-
-   wire 	reset = ~KEY[0];
-   wire 	start;
-   wire [31:0] 	return_val;
-   reg  [31:0] 	return_val_reg;
-   wire 	finish;
-   wire [3:0]	state;
-
-   hex_digits h7( .x(hex7), .hex_LEDs(HEX7));
-   hex_digits h6( .x(hex6), .hex_LEDs(HEX6));
-   hex_digits h5( .x(hex5), .hex_LEDs(HEX5));
-   hex_digits h4( .x(hex4), .hex_LEDs(HEX4));
-   hex_digits h3( .x(hex3), .hex_LEDs(HEX3));
-   hex_digits h2( .x(hex2), .hex_LEDs(HEX2));
-   hex_digits h1( .x(hex1), .hex_LEDs(HEX1));
-   hex_digits h0( .x(hex0), .hex_LEDs(HEX0));
-   
-	always @ (*) begin
-		hex7 <= return_val_reg[31:28];
-		hex6 <= return_val_reg[27:24];
-		hex5 <= return_val_reg[23:20];
-		hex4 <= return_val_reg[19:16];
-		hex3 <= return_val_reg[15:12];
-		hex2 <= return_val_reg[11:8];
-		hex1 <= return_val_reg[7:4];
-		hex0 <= return_val_reg[3:0];
-	end
-assign UART_TXD = 1'b0;
-
-    parameter s_WAIT = 3'b001, s_START = 3'b010, s_EXE = 3'b011,
-                s_DONE = 3'b100;
-
-    // state registers
-    reg [3:0] y_Q, Y_D;
-
-    assign LEDG[3:0] = y_Q;
-
-    // next state
-    always @(*)
-    begin
-        case (y_Q)
-            s_WAIT: if (go) Y_D = s_START; else Y_D = y_Q;
-
-            s_START: Y_D = s_EXE;
-
-            s_EXE: if (!finish) Y_D = s_EXE; else Y_D = s_DONE;
-
-            s_DONE: Y_D = s_DONE;
-
-            default: Y_D = 3'bxxx;
-        endcase
-    end
-
-    // current state
-    always @(posedge clk)
-    begin
-        if (reset) // synchronous clear
-            y_Q <= s_WAIT;
-        else
-            y_Q <= Y_D;
-    end
-
-    always @(posedge clk)
-        if (y_Q == s_EXE && finish)
-            return_val_reg <= return_val;
-        else if (y_Q == s_DONE)
-            return_val_reg <= return_val_reg;
-        else
-            return_val_reg <= 0;
-
-
-    assign start = (y_Q == s_START) ? 1'b1 : 1'b0;
-
-   
-   top top_inst (
-      .clk (clk),
-      .reset (reset),
-      .finish (finish),
-      .return_val (return_val),
-        .start (start)
-
-    );
-
-endmodule
-
-module circuit_start_control (
-    go,
-    control_key
-);
-    input control_key;
-    output go;
-    assign go = control_key;
-endmodule
-module hex_digits(x, hex_LEDs);
-    input [3:0] x;
-    output [6:0] hex_LEDs;
-    
-    assign hex_LEDs[0] = (~x[3] & ~x[2] & ~x[1] & x[0]) |
-                            (~x[3] & x[2] & ~x[1] & ~x[0]) |
-                            (x[3] & x[2] & ~x[1] & x[0]) |
-                            (x[3] & ~x[2] & x[1] & x[0]);
-    assign hex_LEDs[1] = (~x[3] & x[2] & ~x[1] & x[0]) |
-                            (x[3] & x[1] & x[0]) |
-                            (x[3] & x[2] & ~x[0]) |
-                            (x[2] & x[1] & ~x[0]);
-    assign hex_LEDs[2] = (x[3] & x[2] & ~x[0]) |
-                            (x[3] & x[2] & x[1]) |
-                            (~x[3] & ~x[2] & x[1] & ~x[0]);
-    assign hex_LEDs[3] = (~x[3] & ~x[2] & ~x[1] & x[0]) | 
-                            (~x[3] & x[2] & ~x[1] & ~x[0]) | 
-                            (x[2] & x[1] & x[0]) | 
-                            (x[3] & ~x[2] & x[1] & ~x[0]);
-    assign hex_LEDs[4] = (~x[3] & x[0]) |
-                            (~x[3] & x[2] & ~x[1]) |
-                            (~x[2] & ~x[1] & x[0]);
-    assign hex_LEDs[5] = (~x[3] & ~x[2] & x[0]) | 
-                            (~x[3] & ~x[2] & x[1]) | 
-                            (~x[3] & x[1] & x[0]) | 
-                            (x[3] & x[2] & ~x[1] & x[0]);
-    assign hex_LEDs[6] = (~x[3] & ~x[2] & ~x[1]) | 
-                            (x[3] & x[2] & ~x[1] & ~x[0]) | 
-                            (~x[3] & x[2] & x[1] & x[0]);
-    
-endmodule
-
-`timescale 1 ns / 1 ns
-module main_tb
-(
-);
-
-reg  clk;
-reg  reset;
-reg  start;
-reg  waitrequest;
-wire [31:0] return_val;
-wire  finish;
-
-
-top top_inst (
-	.clk (clk),
-	.reset (reset),
-	.start (start),
-	.waitrequest (waitrequest),
-	.finish (finish),
-	.return_val (return_val)
-);
-
-
-
-
-initial 
-    clk = 0;
-always @(clk)
-    clk <= #10 ~clk;
-
-initial begin
-//$monitor("At t=%t clk=%b %b %b %b %d", $time, clk, reset, start, finish, return_val);
-@(negedge clk);
-reset <= 1;
-@(negedge clk);
-reset <= 0;
-start <= 1;
-@(negedge clk);
-start <= 0;
-end
-
-always@(finish) begin
-    if (finish == 1) begin
-        $writememh("memory_dump.txt",top_inst.memory_controller_inst.temp3.ram);
-        $display("At t=%t clk=%b finish=%b return_val=%d", $time, clk, finish, return_val);
-        $display("Cycles: %d", ($time-50)/20);
-        
-    end
-end
-
-initial begin
-waitrequest <= 1;
-@(negedge clk);
-@(negedge clk);
-waitrequest <= 0;
-end
-
-
-endmodule 
-
-*/
-
+///// Adding code from verilog file: /home/legup/legup-4.0/examples//../boards/Virtex6/ML605/top.v
+///
+///
+///module ML605 (
+///       USER_CLOCK,
+///	    KEY,
+///	    SW,	    
+///       LED,
+///       LEDG,
+///		UART_RXD,
+///		UART_TXD
+///
+///	    );
+///
+///   input USER_CLOCK;
+///   input [4:0] KEY;
+///   input [7:0] SW;
+///   output [7:0] LED;
+///   output [7:0] LEDG;
+///   wire CLOCK_50;
+///
+///    input UART_RXD;
+///    output UART_TXD;    
+///	wire clk = CLOCK_50;
+///	wire go = ~KEY[1];
+///
+///
+///
+///   wire 	reset = ~KEY[0];
+///   wire 	start;
+///   wire [31:0] 	return_val;
+///   reg  [31:0] 	return_val_reg;
+///   wire 	finish;
+///   wire [3:0]	state;
+///   
+///   reg [6:0]   hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7;
+///
+///   assign CLOCK_50 = USER_CLOCK;
+///   assign LED = 0;
+///   
+///	always @ (*) begin
+///		hex7 <= return_val_reg[31:28];
+///		hex6 <= return_val_reg[27:24];
+///		hex5 <= return_val_reg[23:20];
+///		hex4 <= return_val_reg[19:16];
+///		hex3 <= return_val_reg[15:12];
+///		hex2 <= return_val_reg[11:8];
+///		hex1 <= return_val_reg[7:4];
+///		hex0 <= return_val_reg[3:0];
+///	end
+///assign UART_TXD = 1'b0;
+///
+///    parameter s_WAIT = 3'b001, s_START = 3'b010, s_EXE = 3'b011,
+///                s_DONE = 3'b100;
+///
+///    // state registers
+///    reg [3:0] y_Q, Y_D;
+///
+///    assign LEDG[3:0] = y_Q;
+///
+///    // next state
+///    always @(*)
+///    begin
+///        case (y_Q)
+///            s_WAIT: if (go) Y_D = s_START; else Y_D = y_Q;
+///
+///            s_START: Y_D = s_EXE;
+///
+///            s_EXE: if (!finish) Y_D = s_EXE; else Y_D = s_DONE;
+///
+///            s_DONE: Y_D = s_DONE;
+///
+///            default: Y_D = 3'bxxx;
+///        endcase
+///    end
+///
+///    // current state
+///    always @(posedge clk)
+///    begin
+///        if (reset) // synchronous clear
+///            y_Q <= s_WAIT;
+///        else
+///            y_Q <= Y_D;
+///    end
+///
+///    always @(posedge clk)
+///        if (y_Q == s_EXE && finish)
+///            return_val_reg <= return_val;
+///        else if (y_Q == s_DONE)
+///            return_val_reg <= return_val_reg;
+///        else
+///            return_val_reg <= 0;
+///
+///
+///    assign start = (y_Q == s_START) ? 1'b1 : 1'b0;
+///
+///   wire wait_request_c;
+///   assign wait_request_c = 0;
+///   top top_inst (
+///      .clk (clk),
+///      .reset (reset),
+///      .finish (finish),
+///      .return_val (return_val),
+///      .start (start),
+///      .waitrequest(wait_request_c)  
+///    );
+///
+///   
+///
+///endmodule
+///
+///// Adding code from verilog file: /home/legup/legup-4.0/examples//../boards/StratixIV/DE4/top.v
+///
+///
+///module de4 ( 
+///    	     OSC_50_BANK2, 
+///             BUTTON, 
+///             LED, 
+///    	     SEG0_D, 
+///    	     SEG1_D 
+///	     ); 
+///   input OSC_50_BANK2; 
+///   input [1:0] BUTTON; 
+///   output [6:0] SEG0_D; 
+///   output [6:0] SEG1_D; 
+///   output [7:0] LED; 
+///   
+///   de2 de2_inst ( 
+///		  .CLOCK_50 (OSC_50_BANK2), 
+///		  .LEDG (LED), 
+///		  .KEY (BUTTON), 
+///		  .SW (), 
+///		  .HEX0 (SEG0_D), 
+///		  .HEX1 (SEG1_D), 
+///		  .HEX2 (), 
+///		  .HEX3 (), 
+///		  .HEX4 (), 
+///		  .HEX5 (), 
+///		  .HEX6 (), 
+///		  .HEX7 () 
+///		  ); 
+///   
+///endmodule
+///// Adding code from verilog file: /home/legup/legup-4.0/examples//../boards/CycloneII/DE2/top.v
+///
+///
+///module de2 (
+///	    CLOCK_50,
+///	    KEY,
+///	    SW,
+///	    HEX0,
+///	    HEX1,
+///	    HEX2,
+///	    HEX3,
+///	    HEX4,
+///	    HEX5,
+///	    HEX6,
+///	    HEX7,
+///	    LEDG,
+///		UART_RXD,
+///		UART_TXD
+///
+///	    );
+///
+///   input CLOCK_50;
+///   input [3:0] KEY;
+///   input [17:0] SW;
+///   output [6:0] HEX0, HEX1,  HEX2,  HEX3,  HEX4,  HEX5,  HEX6,  HEX7;
+///   reg [6:0] 	hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7;
+///   
+///
+///   output [7:0] LEDG;
+///    input UART_RXD;
+///    output UART_TXD;    
+///	wire clk = CLOCK_50;
+///	wire go = ~KEY[1];
+///
+///
+///
+///   wire 	reset = ~KEY[0];
+///   wire 	start;
+///   wire [31:0] 	return_val;
+///   reg  [31:0] 	return_val_reg;
+///   wire 	finish;
+///   wire [3:0]	state;
+///
+///   hex_digits h7( .x(hex7), .hex_LEDs(HEX7));
+///   hex_digits h6( .x(hex6), .hex_LEDs(HEX6));
+///   hex_digits h5( .x(hex5), .hex_LEDs(HEX5));
+///   hex_digits h4( .x(hex4), .hex_LEDs(HEX4));
+///   hex_digits h3( .x(hex3), .hex_LEDs(HEX3));
+///   hex_digits h2( .x(hex2), .hex_LEDs(HEX2));
+///   hex_digits h1( .x(hex1), .hex_LEDs(HEX1));
+///   hex_digits h0( .x(hex0), .hex_LEDs(HEX0));
+///   
+///	always @ (*) begin
+///		hex7 <= return_val_reg[31:28];
+///		hex6 <= return_val_reg[27:24];
+///		hex5 <= return_val_reg[23:20];
+///		hex4 <= return_val_reg[19:16];
+///		hex3 <= return_val_reg[15:12];
+///		hex2 <= return_val_reg[11:8];
+///		hex1 <= return_val_reg[7:4];
+///		hex0 <= return_val_reg[3:0];
+///	end
+///assign UART_TXD = 1'b0;
+///
+///    parameter s_WAIT = 3'b001, s_START = 3'b010, s_EXE = 3'b011,
+///                s_DONE = 3'b100;
+///
+///    // state registers
+///    reg [3:0] y_Q, Y_D;
+///
+///    assign LEDG[3:0] = y_Q;
+///
+///    // next state
+///    always @(*)
+///    begin
+///        case (y_Q)
+///            s_WAIT: if (go) Y_D = s_START; else Y_D = y_Q;
+///
+///            s_START: Y_D = s_EXE;
+///
+///            s_EXE: if (!finish) Y_D = s_EXE; else Y_D = s_DONE;
+///
+///            s_DONE: Y_D = s_DONE;
+///
+///            default: Y_D = 3'bxxx;
+///        endcase
+///    end
+///
+///    // current state
+///    always @(posedge clk)
+///    begin
+///        if (reset) // synchronous clear
+///            y_Q <= s_WAIT;
+///        else
+///            y_Q <= Y_D;
+///    end
+///
+///    always @(posedge clk)
+///        if (y_Q == s_EXE && finish)
+///            return_val_reg <= return_val;
+///        else if (y_Q == s_DONE)
+///            return_val_reg <= return_val_reg;
+///        else
+///            return_val_reg <= 0;
+///
+///
+///    assign start = (y_Q == s_START) ? 1'b1 : 1'b0;
+///
+///   
+///   top top_inst (
+///      .clk (clk),
+///      .reset (reset),
+///      .finish (finish),
+///      .return_val (return_val),
+///        .start (start)
+///
+///    );
+///
+///endmodule
+///
+///module circuit_start_control (
+///    go,
+///    control_key
+///);
+///    input control_key;
+///    output go;
+///    assign go = control_key;
+///endmodule
+///module hex_digits(x, hex_LEDs);
+///    input [3:0] x;
+///    output [6:0] hex_LEDs;
+///    
+///    assign hex_LEDs[0] = (~x[3] & ~x[2] & ~x[1] & x[0]) |
+///                            (~x[3] & x[2] & ~x[1] & ~x[0]) |
+///                            (x[3] & x[2] & ~x[1] & x[0]) |
+///                            (x[3] & ~x[2] & x[1] & x[0]);
+///    assign hex_LEDs[1] = (~x[3] & x[2] & ~x[1] & x[0]) |
+///                            (x[3] & x[1] & x[0]) |
+///                            (x[3] & x[2] & ~x[0]) |
+///                            (x[2] & x[1] & ~x[0]);
+///    assign hex_LEDs[2] = (x[3] & x[2] & ~x[0]) |
+///                            (x[3] & x[2] & x[1]) |
+///                            (~x[3] & ~x[2] & x[1] & ~x[0]);
+///    assign hex_LEDs[3] = (~x[3] & ~x[2] & ~x[1] & x[0]) | 
+///                            (~x[3] & x[2] & ~x[1] & ~x[0]) | 
+///                            (x[2] & x[1] & x[0]) | 
+///                            (x[3] & ~x[2] & x[1] & ~x[0]);
+///    assign hex_LEDs[4] = (~x[3] & x[0]) |
+///                            (~x[3] & x[2] & ~x[1]) |
+///                            (~x[2] & ~x[1] & x[0]);
+///    assign hex_LEDs[5] = (~x[3] & ~x[2] & x[0]) | 
+///                            (~x[3] & ~x[2] & x[1]) | 
+///                            (~x[3] & x[1] & x[0]) | 
+///                            (x[3] & x[2] & ~x[1] & x[0]);
+///    assign hex_LEDs[6] = (~x[3] & ~x[2] & ~x[1]) | 
+///                            (x[3] & x[2] & ~x[1] & ~x[0]) | 
+///                            (~x[3] & x[2] & x[1] & x[0]);
+///    
+///endmodule
+///
+///`timescale 1 ns / 1 ns
+///module main_tb
+///(
+///);
+///
+///reg  clk;
+///reg  reset;
+///reg  start;
+///reg  waitrequest;
+///wire [31:0] return_val;
+///wire  finish;
+///
+///
+///top top_inst (
+///	.clk (clk),
+///	.reset (reset),
+///	.start (start),
+///	.waitrequest (waitrequest),
+///	.finish (finish),
+///	.return_val (return_val)
+///);
+///
+///
+///
+///
+///initial 
+///    clk = 0;
+///always @(clk)
+///    clk <= #10 ~clk;
+///
+///initial begin
+/////$monitor("At t=%t clk=%b %b %b %b %d", $time, clk, reset, start, finish, return_val);
+///@(negedge clk);
+///reset <= 1;
+///@(negedge clk);
+///reset <= 0;
+///start <= 1;
+///@(negedge clk);
+///start <= 0;
+///end
+///
+///always@(finish) begin
+///    if (finish == 1) begin
+///        $writememh("memory_dump.txt",top_inst.memory_controller_inst.temp3.ram);
+///        $display("At t=%t clk=%b finish=%b return_val=%d", $time, clk, finish, return_val);
+///        $display("Cycles: %d", ($time-50)/20);
+///        
+///    end
+///end
+///
+///initial begin
+///waitrequest <= 1;
+///@(negedge clk);
+///@(negedge clk);
+///waitrequest <= 0;
+///end
+///
+///
+///endmodule 
+
+
+/////////////////////////////////////////////////////////////////////
+//FP32 Multiplier wrapper
+/////////////////////////////////////////////////////////////////////
 module altfp_multiplier_11 (
 	result, 
 	dataa,
@@ -6934,6 +6939,9 @@ multiply_fp u_mult_fp(.a(a), .b(b), .out(out));
 endmodule
 
 
+/////////////////////////////////////////////////////////////////////
+//FP32 Adder wrapper
+/////////////////////////////////////////////////////////////////////
 module altfp_adder_14 ( 
 	result, 
 	dataa, 
@@ -6966,6 +6974,9 @@ adder_fp u_add_fp(.a(a), .b(b), .out(out));
 
 endmodule
 
+/////////////////////////////////////////////////////////////////////
+//FP32 Subtractor wrapper
+/////////////////////////////////////////////////////////////////////
 module altfp_subtractor_14 (
 	result, 
 	dataa,
@@ -6993,11 +7004,14 @@ always @(posedge clock) begin
   end
 end
 
-//A mode in the DSP slice
+//A mode in the DSP slice. Addition and subtraction are both supported by adder_fp
 adder_fp u_add_fp(.a(a), .b(b), .out(out));
 
 endmodule
 
+/////////////////////////////////////////////////////////////////////
+//FP32 Divider wrapper
+/////////////////////////////////////////////////////////////////////
 module altfp_divider_33 (
 	result,
 	dataa,
@@ -7020,6 +7034,9 @@ divider u_div(.input_a(dataa), .input_b(datab), .clk(clock), .rst(rst), .output_
 endmodule
 
 
+/////////////////////////////////////////////////////////////////////
+//FP32 to Int32 Converter wrapper
+/////////////////////////////////////////////////////////////////////
 module altfp_fptosi32_6 (
 	result, 
 	dataa, 
@@ -7032,16 +7049,22 @@ input  [31:0] dataa;
 input  clock;
 input  clk_en;
 
-reg [31:0] result;
+wire rst;
+assign rst = ~clk_en;
 
-always @(posedge clock) begin
- if (clk_en)
-	result <= dataa;
-end
+float_to_int ftoi(
+.input_a(dataa),
+.clk(clock),
+.rst(rst),
+.output_z(result)
+);
 
 endmodule
 
 
+/////////////////////////////////////////////////////////////////////
+//Int32 to FP32 Converter wrapper
+/////////////////////////////////////////////////////////////////////
 module altfp_sitofp32_6 (
 	result,
 	dataa,
@@ -7054,15 +7077,21 @@ input  [31:0] dataa;
 input  clock;
 input  clk_en;
 
-reg [31:0] result;
+wire rst;
+assign rst = ~clk_en;
 
-always @(posedge clock) begin
- if (clk_en)
-	result <= dataa;
-end
+int_to_float itof(
+.input_a(dataa),
+.clk(clock),
+.rst(rst),
+.output_z(result)
+);
 
 endmodule
 
+/////////////////////////////////////////////////////////////////////
+//FP32 to FP32 Comparator wrapper
+/////////////////////////////////////////////////////////////////////
 module altfp_compare32_1 (
 	dataa, 
 	datab,
@@ -7097,20 +7126,43 @@ reg agb;
 reg ageb;
 reg unordered;
 
+wire aeb_raw;
+wire aneb_raw;
+wire alb_raw;
+wire aleb_raw;
+wire agb_raw;
+wire ageb_raw;
+wire unordered_raw;
+
 always @(posedge clock) begin
- if (clk_en) begin
-  aeb <= (dataa == datab);
-  aneb <= ~(dataa == datab);
-  alb <= (dataa < datab);
-  aleb <= (dataa <= datab);
-  agb <= (dataa > datab);
-  ageb <= (dataa >= datab);
-  unordered <= 0;
- end
+  if (clk_en) begin
+  aeb <= aeb_raw;
+  aneb <= aneb_raw;
+  alb <= alb_raw;
+  aleb <= aleb_raw;
+  agb <= agb_raw;
+  ageb <= ageb_raw;
+  unordered <= unordered_raw;
+  end
 end
+
+comparator u_comparator(
+.a(dataa),
+.b(datab),
+.aeb(aeb_raw),
+.aneb(aneb_raw),
+.alb(alb_raw),
+.aleb(aleb_raw),
+.agb(agb_raw),
+.ageb(ageb_raw),
+.unordered(unordered_raw)
+);
 
 endmodule
 
+/////////////////////////////////////////////////////////////////////
+//FP32 Divider (actual implementation)
+/////////////////////////////////////////////////////////////////////
 module divider(
         input_a,
         input_b,
@@ -7394,5 +7446,757 @@ module divider(
   end
 
   assign output_z = s_output_z;
+
+endmodule
+
+
+/////////////////////////////////////////////////////////////////////
+//FP32 to FP32 comparator (actual implementation)
+/////////////////////////////////////////////////////////////////////
+
+//============================================================================
+//
+//This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
+//Arithmetic Package, Release 1, by John R. Hauser.
+//
+//Copyright 2019 The Regents of the University of California.  All rights
+//reserved.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+//    this list of conditions, and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions, and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the University nor the names of its contributors may
+//    be used to endorse or promote products derived from this software without
+//    specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+//EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+//DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//=============================================================================
+
+
+module comparator(
+a,
+b,
+aeb,
+aneb,
+alb,
+aleb,
+agb,
+ageb,
+unordered
+);
+//Default for FP32
+//parameter exp = 8;
+//parameter man = 23;
+
+input [31:0] a;
+input [31:0] b;
+output aeb;
+output aneb;
+output alb;
+output aleb;
+output agb;
+output ageb;
+output unordered;
+
+wire [32:0] a_RecFN;
+wire [32:0] b_RecFN;
+
+//Convert to Recoded representation
+fNToRecFN#(8,24) convert_a(.in(a), .out(a_RecFN));  
+fNToRecFN#(8,24) convert_b(.in(b), .out(b_RecFN));  
+
+wire [4:0] except_flags;
+wire less_than;
+wire equal;
+wire greater_than;
+
+wire signaling;
+assign signaling = 1'b0;
+
+//Actual conversion module
+compareRecFN_Fp32 compare(
+.a(a_RecFN),
+.b(b_RecFN),
+.signaling(signaling),
+.lt(less_than),
+.eq(equal),
+.gt(greater_than),
+.unordered(unordered),
+.exceptionFlags(except_flags)
+);
+
+
+//Result flags
+assign aeb = equal;
+assign aneb = ~equal;
+assign alb = less_than;
+assign aleb = less_than | equal;
+assign agb = greater_than;
+assign ageb = greater_than | equal;
+
+endmodule
+
+module  reverseFp32 (input [22:0] in, output [22:0] out);
+
+   assign out[0] = in[22];
+   assign out[1] = in[21];
+   assign out[2] = in[20];
+   assign out[3] = in[19];
+   assign out[4] = in[18];
+   assign out[5] = in[17];
+   assign out[6] = in[16];
+   assign out[7] = in[15];
+   assign out[8] = in[14];
+   assign out[9] = in[13];
+   assign out[10] = in[12];
+   assign out[11] = in[11];
+   assign out[12] = in[10];
+   assign out[13] = in[9];
+   assign out[14] = in[8];
+   assign out[15] = in[7];
+   assign out[16] = in[6];
+   assign out[17] = in[5];
+   assign out[18] = in[4];
+   assign out[19] = in[3];
+   assign out[20] = in[2];
+   assign out[21] = in[1];
+   assign out[22] = in[0];
+   // genvar ix;
+   // generate
+   //     for (ix = 0; ix < width; ix = ix + 1) begin :Bit
+   //         assign out[ix] = in[width - 1 - ix];
+   //     end
+   // endgenerate
+
+endmodule
+
+module fNToRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(expWidth + sigWidth - 1):0] in,
+        output [(expWidth + sigWidth):0] out
+    );
+
+    //`include "HardFloat_localFuncs.vi"
+    //localparam normDistWidth = clog2(sigWidth);
+    localparam normDistWidth = 5;  //Hardcoding for FP32
+
+    wire sign;
+    wire [(expWidth - 1):0] expIn;
+    wire [(sigWidth - 2):0] fractIn;
+    assign {sign, expIn, fractIn} = in;
+    wire isZeroExpIn = (expIn == 0);
+    wire isZeroFractIn = (fractIn == 0);
+
+
+    wire [(normDistWidth - 1):0] normDist;
+    //sigwidth = 24, normDistWidth=5
+    countLeadingZerosfp32 #(sigWidth - 1, normDistWidth) countLeadingZeros(.in(fractIn), .count(normDist)); 
+    wire [(sigWidth - 2):0] subnormFract = (fractIn<<normDist)<<1;
+    wire [expWidth:0] adjustedExp =
+        (isZeroExpIn ? normDist ^ ((1<<(expWidth + 1)) - 1) : expIn)
+            + ((1<<(expWidth - 1)) | (isZeroExpIn ? 2 : 1));
+    wire isZero = isZeroExpIn && isZeroFractIn;
+    wire isSpecial = (adjustedExp[expWidth:(expWidth - 1)] == 'b11);
+
+
+    wire [expWidth:0] exp;
+    assign exp[expWidth:(expWidth - 2)] =
+        isSpecial ? {2'b11, !isZeroFractIn}
+            : isZero ? 3'b000 : adjustedExp[expWidth:(expWidth - 2)];
+    assign exp[(expWidth - 3):0] = adjustedExp;
+    assign out = {sign, exp, isZeroExpIn ? subnormFract : fractIn};
+
+endmodule
+
+
+module compareRecFN_Fp32(
+  a,
+  b,
+  signaling,
+  lt,
+  eq,
+  gt,
+  unordered,
+  exceptionFlags
+  );
+  //parameter expWidth = 3;
+  //parameter sigWidth = 3;
+
+  input [(8 + 24):0] a;
+  input [(8 + 24):0] b;
+  input signaling;
+  output lt;
+  output eq;
+  output gt;
+  output unordered;
+  output [4:0] exceptionFlags;
+   
+
+    wire isNaNA, isInfA, isZeroA, signA;
+    wire [(8 + 1):0] sExpA;
+    wire [24:0] sigA;
+    recFNToRawFN#(8, 24)  recFNToRawFN_a(
+      .in(a), 
+      .isNaN(isNaNA), 
+      .isInf(isInfA), 
+      .isZero(isZeroA), 
+      .sign(signA), 
+      .sExp(sExpA), 
+      .sig(sigA)
+      );
+    wire isSigNaNA;
+    isSigNaNRecFN#(8, 24) isSigNaN_a(.in(a), .isSigNaN(isSigNaNA));
+    wire isNaNB, isInfB, isZeroB, signB;
+    wire [(8 + 1):0] sExpB;
+    wire [24:0] sigB;
+    recFNToRawFN#(8, 24)  recFNToRawFN_b(
+      .in(b), 
+      .isNaN(isNaNB), 
+      .isInf(isInfB), 
+      .isZero(isZeroB), 
+      .sign(signB), 
+      .sExp(sExpB), 
+      .sig(sigB)
+      );
+    wire isSigNaNB;
+    isSigNaNRecFN#(8, 24) isSigNaN_b(.in(b), .isSigNaN(isSigNaNB));
+
+    wire ordered = !isNaNA && !isNaNB;
+    wire bothInfs  = isInfA  && isInfB;
+    wire bothZeros = isZeroA && isZeroB;
+    wire eqExps = (sExpA == sExpB);
+    wire common_ltMags = (sExpA < sExpB) || (eqExps && (sigA < sigB));
+    wire common_eqMags = eqExps && (sigA == sigB);
+    wire ordered_lt =
+        !bothZeros
+            && ((signA && !signB)
+                    || (!bothInfs
+                            && ((signA && !common_ltMags && !common_eqMags)
+                                    || (!signB && common_ltMags))));
+    wire ordered_eq =
+        bothZeros || ((signA == signB) && (bothInfs || common_eqMags));
+
+
+    wire invalid = isSigNaNA || isSigNaNB || (signaling && !ordered);
+    assign lt = ordered && ordered_lt;
+    assign eq = ordered && ordered_eq;
+    assign gt = ordered && !ordered_lt && !ordered_eq;
+    assign unordered = !ordered;
+    assign exceptionFlags = {invalid, 4'b0};
+
+endmodule
+
+
+
+module recFNToRawFN(
+  in,
+  isNaN,
+  isInf,
+  isZero,
+  sign,
+  sExp,
+  sig
+  );
+
+  parameter expWidth = 3;
+  parameter sigWidth = 3;
+
+  input [(expWidth + sigWidth):0] in;
+  output isNaN;
+  output isInf;
+  output isZero;
+  output sign;
+  output [(expWidth + 1):0] sExp;
+  output [sigWidth:0] sig;
+
+
+    wire [expWidth:0] exp;
+    wire [(sigWidth - 2):0] fract;
+    assign {sign, exp, fract} = in;
+    wire isSpecial = (exp>>(expWidth - 1) == 'b11);
+
+
+    assign isNaN = isSpecial &&  exp[expWidth - 2];
+    assign isInf = isSpecial && !exp[expWidth - 2];
+    assign isZero = (exp>>(expWidth - 2) == 'b000);
+    assign sExp = exp;
+    assign sig = {1'b0, !isZero, fract};
+
+endmodule
+
+
+
+module  isSigNaNRecFN(in, isSigNaN);
+
+  parameter expWidth = 3;
+  parameter sigWidth = 3;
+
+  input [(expWidth + sigWidth):0] in;
+  output isSigNaN;
+
+    wire isNaN =
+        (in[(expWidth + sigWidth - 1):(expWidth + sigWidth - 3)] == 'b111);
+    assign isSigNaN = isNaN && !in[sigWidth - 2];
+
+endmodule
+
+module countLeadingZerosfp32 #(parameter inWidth = 23, parameter countWidth = 5) (
+      input [(inWidth - 1):0] in, output reg [(countWidth - 1):0] count
+    );
+
+    wire [(inWidth - 1):0] reverseIn;
+    reverseFp32 reverse_in(in, reverseIn);
+    wire [inWidth:0] oneLeastReverseIn =
+        {1'b1, reverseIn} & ({1'b0, ~reverseIn} + 1);
+		
+  always@(oneLeastReverseIn)
+    begin
+      if (oneLeastReverseIn[23] == 1)
+        begin
+          count = 5'd23;
+        end
+      else if (oneLeastReverseIn[22] == 1)
+        begin
+          count = 5'd22;
+        end
+      else if (oneLeastReverseIn[21] == 1)
+        begin
+          count = 5'd21;
+        end
+      else if (oneLeastReverseIn[20] == 1)
+        begin
+          count = 5'd20;
+        end
+      else if (oneLeastReverseIn[19] == 1)
+        begin
+          count = 5'd19;
+        end
+      else if (oneLeastReverseIn[18] == 1)
+        begin
+          count = 5'd18;
+        end
+      else if (oneLeastReverseIn[17] == 1)
+        begin
+          count = 5'd17;
+        end
+      else if (oneLeastReverseIn[16] == 1)
+        begin
+          count = 5'd16;
+        end
+      else if (oneLeastReverseIn[15] == 1)
+        begin
+          count = 5'd15;
+        end
+      else if (oneLeastReverseIn[14] == 1)
+        begin
+          count = 5'd14;
+        end
+      else if (oneLeastReverseIn[13] == 1)
+        begin
+          count = 5'd13;
+        end
+      else if (oneLeastReverseIn[12] == 1)
+        begin
+          count = 5'd12;
+        end
+      else if (oneLeastReverseIn[11] == 1)
+        begin
+          count = 5'd11;
+        end
+      else if (oneLeastReverseIn[10] == 1)
+        begin
+          count = 5'd10;
+        end
+      else if (oneLeastReverseIn[9] == 1)
+        begin
+          count = 5'd9;
+        end
+      else if (oneLeastReverseIn[8] == 1)
+        begin
+          count= 5'd8;
+        end
+      else if (oneLeastReverseIn[7] == 1)
+        begin
+          count = 5'd7;
+        end
+      else if (oneLeastReverseIn[6] == 1)
+        begin
+          count = 5'd6;
+        end
+      else if (oneLeastReverseIn[5] == 1)
+        begin
+          count = 5'd5;
+        end
+      else if (oneLeastReverseIn[4] == 1)
+        begin
+          count = 5'd4;
+        end
+      else if (oneLeastReverseIn[3] == 1)
+        begin
+          count = 5'd3;
+        end
+      else if (oneLeastReverseIn[2] == 1)
+        begin
+          count = 5'd2;
+        end
+      else if (oneLeastReverseIn[1] == 1)
+        begin
+          count = 5'd1;
+        end
+      else
+        begin
+          count = 5'd0;
+        end
+      end
+  
+endmodule
+
+/////////////////////////////////////////////////////////////////////
+//INT to FP32 converter (actual implementation)
+/////////////////////////////////////////////////////////////////////
+module int_to_float(
+        input_a,
+        clk,
+        rst,
+        output_z);
+
+  input     clk;
+  input     rst;
+
+  input     [31:0] input_a;
+  output    [31:0] output_z;
+
+  
+  reg [31:0] pipe_in;
+  reg [64:0] pipe_1;
+  reg [70:0] pipe_2;
+  reg [70:0] pipe_3;
+  reg [70:0] pipe_4;
+  reg [64:0] pipe_5;
+  reg [31:0] pipe_6;
+  
+  wire [31:0] value;
+  wire z_s;
+  wire [5:0] tmp_cnt;
+  wire [5:0] sub_a_e;
+  wire [5:0] sub_z_e;
+  wire [31:0] a_m_shift;
+  wire [23:0] z_m_final;
+  wire [7:0] z_e_final;
+  wire [31:0] z;
+  
+  align dut_align (pipe_in,value,z_s);
+  lzc dut_lzc (pipe_1[31:0],tmp_cnt);
+  sub dut_sub (pipe_2[38:33],sub_a_e);
+  sub2 dut_sub2 (pipe_3[38:33],sub_z_e);
+  a_m_shift dut_a_m_shift (pipe_3[31:0],pipe_3[38:33],a_m_shift);
+  exception dut_exception (pipe_4[31:0],{2'b0,pipe_4[38:33]},z_m_final,z_e_final);
+  final_out dut_final_out (pipe_5[64:33],pipe_5[23:0],pipe_5[31:24],pipe_5[32],z);
+  
+  always@(posedge clk) begin
+	if (rst) begin
+        pipe_in <= 32'h0;
+		pipe_1 <= 65'h0;
+		pipe_2 <= 71'h0;
+		pipe_3 <= 71'h0;
+		pipe_4 <= 71'h0;
+		pipe_5 <= 65'h0;
+		pipe_6 <= 31'h0;
+	end
+	else begin
+        pipe_in <= input_a;
+		pipe_1 <= {input_a,z_s,value};
+		pipe_2 <= {pipe_1[64:33],tmp_cnt,pipe_1[32:0]};
+		pipe_3 <= {pipe_2[70:39],sub_a_e,pipe_2[32:0]};
+		pipe_4 <= {pipe_3[70:39],sub_z_e,pipe_3[32],a_m_shift};
+		pipe_5 <= {pipe_4[70:39],pipe_4[32],z_e_final,z_m_final};
+        pipe_6 <= z;
+  end	
+  end
+  assign output_z = pipe_6;
+  
+endmodule
+
+module align (
+input [31:0] a,
+output [31:0] value,
+output z_s);
+
+
+	assign value = a[31] ? -a : a;
+    assign z_s = a[31];
+
+endmodule
+
+/*module align2 (
+input [31:0] value,
+output [31:0] z_m,
+//output [7:0] z_r,
+//output [7:0] z_e);
+
+
+	//z_e <= 8'd31;
+    z_m <= value[31:0];
+    //z_r <= value[7:0];
+
+endmodule*/
+
+module lzc (
+  input [31:0] z_m,
+output reg [5:0] tmp_cnt_final);
+
+wire [31:0] Sj_int;
+  //wire [15:0] val32;
+wire [15:0] val16;
+wire [7:0] val8;
+wire [3:0] val4;
+wire [5:0] tmp_cnt;
+
+assign Sj_int = z_m;
+  
+assign    tmp_cnt[5] = 1'b0;
+assign    tmp_cnt[4] = (Sj_int[31:16] == 16'b0);
+assign    val16 = tmp_cnt[4] ? Sj_int[15:0] : Sj_int[31:16];
+assign    tmp_cnt[3] = (val16[15:8] == 8'b0);
+assign    val8 = tmp_cnt[3] ? val16[7:0] : val16 [15:8];
+assign    tmp_cnt[2] = (val8[7:4] == 4'b0);
+assign    val4 = tmp_cnt[2] ? val8[3:0] : val8[7:4];
+assign    tmp_cnt[1] = (val4[3:2] == 2'b0);
+assign    tmp_cnt[0] = tmp_cnt[1] ? ~val4[1] : ~val4[3];
+
+always@(Sj_int or tmp_cnt)
+begin
+if (Sj_int[31:0] == 32'b0)
+   tmp_cnt_final = 6'd32;
+else
+   begin
+   tmp_cnt_final = tmp_cnt;
+end
+end
+endmodule
+
+module sub (
+input [5:0] a_e,
+  output [5:0] sub_a_e);
+
+assign sub_a_e = a_e;
+
+endmodule
+
+module sub2 (
+input [5:0] a_e,
+  output [5:0] sub_a_e);
+
+assign sub_a_e = 31 - a_e;
+
+endmodule
+
+module a_m_shift (
+input [31:0] a_m,
+input [5:0] tmp_cnt,
+output [31:0] a_m_shift);
+
+assign a_m_shift = a_m << tmp_cnt;  
+endmodule
+
+module exception (
+input [31:0] a_m_shift,
+input [7:0] z_e,
+output reg [23:0] z_m_final,
+output reg [7:0] z_e_final
+);
+
+wire guard;
+wire round_bit;
+wire sticky;
+wire [23:0] z_m;
+
+assign guard = a_m_shift[7];
+assign round_bit = a_m_shift[6];
+assign sticky = a_m_shift[5:0] != 0;
+
+assign z_m = a_m_shift[31:8];
+
+always@(guard or round_bit or sticky or z_m or z_e)
+begin
+if (guard && (round_bit || sticky || z_m[0])) begin
+    z_m_final = z_m + 1;
+          if (z_m == 24'hffffff) begin
+            z_e_final = z_e + 1;
+          end
+		  else z_e_final = z_e;
+          end
+else begin 
+  z_m_final = z_m;
+  z_e_final = z_e;
+end
+end
+endmodule
+
+module final_out (
+input [31:0] a,
+input [23:0] z_m,
+input [7:0] z_e,
+input z_s,
+output reg [31:0] output_z);
+
+  always@(a or z_m or z_e or z_s) begin
+	if (a == 32'b0) begin
+		output_z = 32'b0;
+	end
+	else begin
+		output_z[22:0] = z_m[22:0];
+      output_z[30:23] = z_e + 8'd127;
+		output_z[31] = z_s;
+	end
+  end
+
+endmodule
+
+
+/////////////////////////////////////////////////////////////////////
+//FP32 to INT converter (actual implementation)
+/////////////////////////////////////////////////////////////////////
+module float_to_int(
+        input_a,
+        clk,
+        rst,
+        output_z);
+
+  input     clk;
+  input     rst;
+
+  input     [31:0] input_a;
+  output    [31:0] output_z;
+
+  
+  wire [31:0] z;
+  wire [8:0] a_e, sub_a_e;
+  wire a_s;
+  wire [31:0] a_m;
+  wire [31:0] a_m_shift;
+  wire [31:0] temp_z;
+  
+  reg [31:0] pipe_in;
+  reg [41:0] pipe_1;
+  reg [50:0] pipe_2;
+  reg [50:0] pipe_3;
+  reg [40:0] pipe_4;
+  reg [31:0] pipe_5;
+  reg [31:0] pipe_6;
+  
+  
+  align_ftoi dut_align (pipe_in,a_m,a_e,a_s);
+  sub_ftoi dut_sub (pipe_1[40:32],sub_a_e);
+  am_shift_ftoi dut_am_shift (pipe_2[40:32],pipe_2[50:42],pipe_2[31:0],a_m_shift);
+  two_comp_ftoi dut_two_comp (pipe_3[50:19], pipe_3[9],z);
+  final_out_ftoi dut_final_out (pipe_4[40:9], pipe_4[8:0], temp_z);
+  
+  always@(posedge clk) begin
+	if (rst) begin
+        pipe_in <= 32'h0;
+		pipe_1 <= 42'h0;
+		pipe_2 <= 51'h0;
+		pipe_3 <= 51'h0;
+		pipe_4 <= 41'h0;
+		pipe_5 <= 32'h0;
+		pipe_6 <= 32'h0;
+	end
+	else begin
+        pipe_in <= input_a;
+		pipe_1 <= {a_s,a_e,a_m};
+		pipe_2 <= {sub_a_e,pipe_1};
+		pipe_3 <= {a_m_shift,pipe_2[50:32]};
+		pipe_4 <= {z,pipe_3[8:0]};
+		pipe_5 <= temp_z;
+        pipe_6 <= pipe_5;
+  end	
+  end
+  assign output_z = pipe_6;
+  
+endmodule
+
+module align_ftoi (
+input [31:0] input_a,
+output [31:0] a_m,
+output [8:0] a_e,
+output a_s);
+
+wire [31:0] a;
+
+  assign a = input_a;
+  assign a_m[31:8] = {1'b1, a[22 : 0]};
+  assign a_m[7:0] = 8'b0;
+  assign a_e = a[30 : 23] - 127;
+  assign a_s = a[31];
+
+endmodule
+
+module sub_ftoi (
+input [8:0] a_e,
+  output [8:0] sub_a_e);
+
+assign sub_a_e = 31 - a_e;
+
+endmodule
+
+module am_shift_ftoi (
+input [8:0] a_e,
+input [8:0] sub_a_e,
+input [31:0] a_m,
+  output reg [31:0] a_m_shift);
+
+always@(a_e or sub_a_e or a_m) begin
+    if ((a_e) <= 31 && (a_e) >= 0 ) begin
+		a_m_shift = a_m >> sub_a_e;
+	end
+	else begin
+		a_m_shift = 32'h0;
+	end
+  end
+  
+endmodule
+
+module two_comp_ftoi (
+input [31:0] a_m_shift,
+input a_s,
+  output [31:0] z);
+
+assign z = a_s ? -a_m_shift : a_m_shift; // 2's complement
+
+endmodule
+
+module final_out_ftoi (
+input [31:0] z,
+  input [8:0] a_e,
+  output reg [31:0] output_z);
+
+always@(a_e or z) begin
+	if (a_e[8] == 1'b1 && a_e[7:0] == 8'd127) begin
+		output_z = 32'b0;
+	end
+	else if (a_e[8] == 0 && a_e[7:0] > 8'd31) begin
+		output_z = 32'hFFFFFFFF;
+	end
+	else begin
+		output_z = z;
+	end
+  end
 
 endmodule
