@@ -53,9 +53,10 @@
     3. Two 18x19 fixed point macs (mac_int)
     4. Four 9x9 fixed point multipliers (multiply)
     5. Four 9x9 fixed point macs (mac_int)
-    6. 18x19 sum-of-2 mode (sop_2_mode/int_sop_2) resulta = (bx * by) +/- (ax * ay) + chainin. chainout = resulta    
-    7. 18x19 plus 36 mode (mult_add_mode/mult_add_int). 18 * 19 + 36 -> 64. resulta = ax * ay +/- bx. chainout = resulta 
-    8. 9x9 sum-of-4 mode (sop_4_mode/int_sop_4) resulta = (dx * dy) + (cx * cy) + (bx * by) + (ax * ay) + chainin. chainout = resulta 
+    6. 27x27 plus 64 mode (mult_add_mode_27_27_64/mult_add_int). 27 * 27 + 64 -> 64. result = ax * ay + chainin. chainout = result 
+    7. 18x19 sum-of-2 mode (sop_2_mode/int_sop_2) resulta = (bx * by) +/- (ax * ay) + chainin. chainout = resulta    
+    8. 18x19 plus 36 mode (mult_add_mode_18_19_36/mult_add_int). 18 * 19 + 36 -> 64. resulta = ax * ay +/- bx. chainout = resulta 
+    9. 9x9 sum-of-4 mode (sop_4_mode/int_sop_4) resulta = (dx * dy) + (cx * cy) + (bx * by) + (ax * ay) + chainin. chainout = resulta 
 
     Floating point modes:
     ____________________
@@ -1142,9 +1143,9 @@
             <input name="ay" num_pins="19"/>
             <input name="bx" num_pins="18"/>
             <input name="by" num_pins="19"/>
-            <input name="chainin" num_pins="38"/>
-            <output name="resulta" num_pins="38"/>
-            <output name="chainout" num_pins="38"/>
+            <input name="chainin" num_pins="37"/>
+            <output name="resulta" num_pins="37"/>
+            <output name="chainout" num_pins="37"/>
 
             <delay_constant max="2.14e-9" in_port="sop_2.mode_sigs" out_port="sop_2.resulta"/>
             <delay_constant max="2.14e-9" in_port="sop_2.ax" out_port="sop_2.resulta"/>
@@ -1171,17 +1172,17 @@
             </direct>
             <direct name="datain2by" input="dsp_pb.datain[73:55]" output="sop_2.by">
             </direct>
-            <direct name="chainin"   input="dsp_pb.chainin[37:0]" output="sop_2.chainin">
+            <direct name="chainin"   input="dsp_pb.chainin[36:0]" output="sop_2.chainin">
             </direct>
-            <direct name="dataout2result" input="sop_2.resulta" output="dsp_pb.resulta[37:0]">
+            <direct name="dataout2result" input="sop_2.resulta" output="dsp_pb.resulta[36:0]">
             </direct>
-            <direct name="chainout" input="sop_2.chainout" output="dsp_pb.chainout[37:0]">
+            <direct name="chainout" input="sop_2.chainout" output="dsp_pb.chainout[36:0]">
             </direct>
           </interconnect>
         </mode>
 
         <!-- fixed-point multiplier-add-sum mode resulta = (ax * ay) +/- (bx). chainout = resulta  -->
-        <mode name="mult_add_mode">
+        <mode name="mult_add_mode_18_19_36">
           <pb_type name="mult_add" num_pb="1" blif_model=".subckt mult_add_int">
             <input name="mode_sigs" num_pins="11"/>
             <input name="ax" num_pins="18"/>
@@ -1211,6 +1212,47 @@
             <direct name="datain2ay" input="dsp_pb.datain[36:18]" output="mult_add.ay">
             </direct>
             <direct name="datain2bx" input="dsp_pb.datain[72:37]" output="mult_add.bx">
+            </direct>
+            <direct name="chainin"   input="dsp_pb.chainin[63:0]" output="mult_add.chainin">
+            </direct>
+            <direct name="dataout2result" input="mult_add.resulta" output="dsp_pb.resulta[63:0]">
+            </direct>
+            <direct name="chainout" input="mult_add.chainout" output="dsp_pb.chainout[63:0]">
+            </direct>
+          </interconnect>
+        </mode>
+
+        <!-- fixed-point multiplier-add-sum mode result = (ax * ay) + chainin. chainout = result  -->
+        <mode name="mult_add_mode_27_27_64">
+          <pb_type name="mult_add" num_pb="1" blif_model=".subckt mult_add_int">
+            <input name="mode_sigs" num_pins="11"/>
+            <input name="ax" num_pins="27"/>
+            <input name="ay" num_pins="27"/>
+            <input name="bx" num_pins="36"/>
+            <input name="chainin" num_pins="64"/>
+            <output name="resulta" num_pins="64"/>
+            <output name="chainout" num_pins="64"/>
+
+            <delay_constant max="2.14e-9" in_port="mult_add.mode_sigs" out_port="mult_add.resulta"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.ax" out_port="mult_add.resulta"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.ay" out_port="mult_add.resulta"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.bx" out_port="mult_add.resulta"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.chainin" out_port="mult_add.resulta"/>
+
+            <delay_constant max="2.14e-9" in_port="mult_add.mode_sigs" out_port="mult_add.chainout"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.ax" out_port="mult_add.chainout"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.ay" out_port="mult_add.chainout"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.bx" out_port="mult_add.chainout"/>
+            <delay_constant max="2.14e-9" in_port="mult_add.chainin" out_port="mult_add.chainout"/>
+          </pb_type>
+          <interconnect>
+            <direct name="modesigs" input="dsp_pb.mode_sigs" output="mult_add.mode_sigs">
+            </direct>
+            <direct name="datain2ax" input="dsp_pb.datain[26:0]" output="mult_add.ax">
+            </direct>
+            <direct name="datain2ay" input="dsp_pb.datain[53:27]" output="mult_add.ay">
+            </direct>
+            <direct name="datain2bx" input="dsp_pb.datain[89:54]" output="mult_add.bx">
             </direct>
             <direct name="chainin"   input="dsp_pb.chainin[63:0]" output="mult_add.chainin">
             </direct>
@@ -1325,7 +1367,7 @@
             <input name="reset" num_pins="1"/>
             <input name="a" num_pins="18"/>
             <input name="b" num_pins="19"/>
-            <output name="out" num_pins="38"/>
+            <output name="out" num_pins="37"/>
             <clock name="clk" num_pins="1"/>
 
             <delay_constant max="2.14e-9" in_port="mac_fixed_pt.a" out_port="mac_fixed_pt.out"/>
@@ -1351,8 +1393,8 @@
             <direct name="btob0" input="dsp_pb.datain[36:18]" output="mac_fixed_pt[0].b"/>
             <direct name="atoa1" input="dsp_pb.datain[54:37]" output="mac_fixed_pt[1].a"/>
             <direct name="btob1" input="dsp_pb.datain[73:55]" output="mac_fixed_pt[1].b"/>
-            <direct name="sumouttosumout0" input="mac_fixed_pt[0].out" output="dsp_pb.resulta[37:0]"/>
-            <direct name="sumouttosumout1" input="mac_fixed_pt[1].out" output="dsp_pb.resultb[37:0]"/>
+            <direct name="sumouttosumout0" input="mac_fixed_pt[0].out" output="dsp_pb.resulta[36:0]"/>
+            <direct name="sumouttosumout1" input="mac_fixed_pt[1].out" output="dsp_pb.resultb[36:0]"/>
           </interconnect>
         </mode>
 
