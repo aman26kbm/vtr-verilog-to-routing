@@ -498,15 +498,8 @@
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
           <!-- clock pins and chain ports do not connect to local routing -->
           <fc_override port_name="clk" fc_type="frac" fc_val="0"/>
-          <fc_override port_name="chainin" fc_type="frac" fc_val="0"/>
-          <fc_override port_name="chainout" fc_type="frac" fc_val="0"/>
         </fc>
-        <pinlocations pattern="custom">
-          <loc side="left">dsp_top.dsp_I1 dsp_top.dsp_I2</loc>
-          <loc side="top">dsp_top.chainin</loc>
-          <loc side="right">dsp_top.resulta dsp_top.resultb dsp_top.reset dsp_top.clk</loc>
-          <loc side="bottom">dsp_top.chainout</loc>
-        </pinlocations>
+        <pinlocations pattern="perimeter"/>
       </sub_tile>
     </tile>
     <tile name="memory" height="2" width="1" area="204346">
@@ -628,8 +621,6 @@
     <direct name="direct_left_2" from_pin="clb.O[34:30]" to_pin="clb.I2[14:10]" x_offset="-1" y_offset="0" z_offset="0"/>
     <direct name="direct_left_3" from_pin="clb.O[19:15]" to_pin="clb.I3[14:10]" x_offset="-1" y_offset="0" z_offset="0"/>
     <direct name="direct_left_4" from_pin="clb.O[39:35]" to_pin="clb.I4[14:10]" x_offset="-1" y_offset="0" z_offset="0"/>
-    <!-- Direct connect from one DSP to the DSP directly below it -->
-    <direct name="dsp_chain" from_pin="dsp_top.chainout" from_side="bottom" to_pin="dsp_top.chainin" to_side="top" x_offset="0" y_offset="-4" z_offset="0"/>
   </directlist>
   <complexblocklist>
     <!-- Define I/O pads begin -->
