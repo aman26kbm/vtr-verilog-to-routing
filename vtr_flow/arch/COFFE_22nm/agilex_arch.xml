@@ -57,6 +57,7 @@
     7. 18x19 sum-of-2 mode (sop_2_mode/int_sop_2) resulta = (bx * by) +/- (ax * ay) + chainin. chainout = resulta    
     8. 18x19 plus 36 mode (mult_add_mode_18_19_36/mult_add_int). 18 * 19 + 36 -> 64. resulta = ax * ay +/- bx. chainout = resulta 
     9. 9x9 sum-of-4 mode (sop_4_mode/int_sop_4) resulta = (dx * dy) + (cx * cy) + (bx * by) + (ax * ay) + chainin. chainout = resulta 
+    10. 9x9 sum-of-4 accum mode (sop_4_accum_mode/int_sop_accum_4) resulta = (dx * dy) + (cx * cy) + (bx * by) + (ax * ay) + accumulator. chainout = resulta 
 
     Floating point modes:
     ____________________
@@ -283,6 +284,27 @@
       <output_ports>
         <port name="resulta"/>
         <port name="chainout"/>
+      </output_ports>
+    </model>
+    <!--A mode in DSP slice-->
+    <model name="int_sop_accum_4">
+      <input_ports>
+        <port name="clk" is_clock="1"/>  
+        <port name="reset" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="mode_sigs" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="ax" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="ay" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="bx" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="by" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="cx" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="cy" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="dx" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="dy" clock="clk" combinational_sink_ports="resulta chainout"/>
+        <port name="chainin" clock="clk" combinational_sink_ports="resulta chainout"/>
+      </input_ports>
+      <output_ports>
+        <port name="resulta" clock="clk"/>
+        <port name="chainout" clock="clk"/>
       </output_ports>
     </model>
     <!-- Floating point MAC inside DSP slices -->
@@ -576,13 +598,22 @@
   <switchlist>
     <switch type="mux" name="0" R="0.0" Cin="0.0" Cout="0.0" Tdel="207.9e-12" mux_trans_size="2.377" buf_size="35.69"/>
     <switch type="mux" name="ipin_cblock" R="0.0" Cout="0.0" Cin="0.0" Tdel="130e-12" mux_trans_size="1.508" buf_size="11.71"/>
-    <switch type="mux" name="short_switch" R="0.0" Cin="0.0" Cout="0.0" Tdel="1e-12" mux_trans_size="0.0" buf_size="0.0"/>
   </switchlist>
   <segmentlist>
-    <segment freq="1.000000" length="4" type="unidir" Rmetal="0.0" Cmetal="0.0">
+    <segment name="L4" freq="260" length="4" type="unidir" Rmetal="0.0" Cmetal="0.0">
       <mux name="0"/>
       <sb type="pattern">1 1 1 1 1</sb>
       <cb type="pattern">1 1 1 1</cb>
+    </segment>
+    <segment name="L16" freq="40" length="16" type="unidir" Rmetal="0.0" Cmetal="0.0">
+      <mux name="0"/>
+      <!-- Vias from the top of the metal stack (global layers, where the long wires are 
+           implemented) down to the middle/bottom of the metal stack (semi-global layers, 
+           where the short wires are implemented) are expensive and restrictive.
+           As a result Startix IV only places long wire switch blocks every 4 LABs -->
+      <sb type="pattern">1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1</sb>
+      <!-- For the same reasons, long wires do not connect to block pins in Stratix IV -->
+      <cb type="pattern">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</cb>
     </segment>
   </segmentlist>
   <directlist>
@@ -1307,6 +1338,108 @@
             <delay_constant max="2.14e-9" in_port="sop_4.chainin" out_port="sop_4.chainout"/>
           </pb_type>
           <interconnect>
+            <direct name="mode_sigs" input="dsp_pb.mode_sigs" output="sop_4.mode_sigs">
+            </direct>
+            <direct name="datain2ax" input="dsp_pb.datain[8:0]" output="sop_4.ax">
+            </direct>
+            <direct name="datain2ay" input="dsp_pb.datain[17:9]" output="sop_4.ay">
+            </direct>
+            <direct name="datain2bx" input="dsp_pb.datain[26:18]" output="sop_4.bx">
+            </direct>
+            <direct name="datain2by" input="dsp_pb.datain[35:27]" output="sop_4.by">
+            </direct>
+            <direct name="datain2cx" input="dsp_pb.datain[44:36]" output="sop_4.cx">
+            </direct>
+            <direct name="datain2cy" input="dsp_pb.datain[53:45]" output="sop_4.cy">
+            </direct>
+            <direct name="datain2dx" input="dsp_pb.datain[62:54]" output="sop_4.dx">
+            </direct>
+            <direct name="datain2dy" input="dsp_pb.datain[71:63]" output="sop_4.dy">
+            </direct>
+            <direct name="chainin"   input="dsp_pb.chainin[63:0]" output="sop_4.chainin">
+            </direct>
+            <direct name="dataout2result" input="sop_4.resulta" output="dsp_pb.resulta[63:0]">
+            </direct>
+            <direct name="chainout" input="sop_4.chainout" output="dsp_pb.chainout[63:0]">
+            </direct>
+          </interconnect>
+        </mode>
+
+        <!-- fixed-point sum-of-4 accum mode resulta = (dx * dy) + (cx * cy) + (bx * by) + (ax * ay) + accumulator. chainout = resulta -->
+        <mode name="sop_4_accum_mode">
+          <pb_type name="sop_4" num_pb="1" blif_model=".subckt int_sop_accum_4">
+            <input name="reset" num_pins="1"/>
+            <input name="mode_sigs" num_pins="11"/>
+            <input name="ax" num_pins="9"/>
+            <input name="ay" num_pins="9"/>
+            <input name="bx" num_pins="9"/>
+            <input name="by" num_pins="9"/>
+            <input name="cx" num_pins="9"/>
+            <input name="cy" num_pins="9"/>
+            <input name="dx" num_pins="9"/>
+            <input name="dy" num_pins="9"/>
+            <input name="chainin" num_pins="64"/>
+            <output name="resulta" num_pins="64"/>
+            <output name="chainout" num_pins="64"/>
+            <clock name="clk" num_pins="1"/>
+
+            <delay_constant max="2.14e-9" in_port="sop_4.mode_sigs" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.ax" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.ay" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.bx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.by" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.cx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.cy" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.dx" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.dy" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.chainin" out_port="sop_4.resulta"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.reset" out_port="sop_4.resulta"/>
+
+            <delay_constant max="2.14e-9" in_port="sop_4.mode_sigs" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.ax" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.ay" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.bx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.by" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.cx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.cy" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.dx" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.dy" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.chainin" out_port="sop_4.chainout"/>
+            <delay_constant max="2.14e-9" in_port="sop_4.reset" out_port="sop_4.chainout"/>
+
+            <T_setup value="18.91e-12" port="sop_4.mode_sigs" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.ax" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.ay" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.bx" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.by" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.cx" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.cy" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.dx" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.dy" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.chainin" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.reset" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.resulta" clock="clk"/>
+            <T_setup value="18.91e-12" port="sop_4.chainout" clock="clk"/>
+
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.mode_sigs" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.ax" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.ay" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.bx" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.by" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.cx" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.cy" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.dx" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.dy" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.chainin" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.reset" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.resulta" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="sop_4.chainout" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="clk" input="dsp_pb.clk" output="sop_4.clk">
+            </direct>
+            <direct name="reset" input="dsp_pb.reset" output="sop_4.reset">
+            </direct>
             <direct name="mode_sigs" input="dsp_pb.mode_sigs" output="sop_4.mode_sigs">
             </direct>
             <direct name="datain2ax" input="dsp_pb.datain[8:0]" output="sop_4.ax">

@@ -600,20 +600,10 @@
     <switch type="mux" name="ipin_cblock" R="0.0" Cout="0.0" Cin="0.0" Tdel="130e-12" mux_trans_size="1.508" buf_size="11.71"/>
   </switchlist>
   <segmentlist>
-    <segment name="L4" freq="260" length="4" type="unidir" Rmetal="0.0" Cmetal="0.0">
+    <segment name="L4" freq="1.000000" length="4" type="unidir" Rmetal="0.0" Cmetal="0.0">
       <mux name="0"/>
       <sb type="pattern">1 1 1 1 1</sb>
       <cb type="pattern">1 1 1 1</cb>
-    </segment>
-    <segment name="L16" freq="40" length="16" type="unidir" Rmetal="0.0" Cmetal="0.0">
-      <mux name="0"/>
-      <!-- Vias from the top of the metal stack (global layers, where the long wires are 
-           implemented) down to the middle/bottom of the metal stack (semi-global layers, 
-           where the short wires are implemented) are expensive and restrictive.
-           As a result Startix IV only places long wire switch blocks every 4 LABs -->
-      <sb type="pattern">1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1</sb>
-      <!-- For the same reasons, long wires do not connect to block pins in Stratix IV -->
-      <cb type="pattern">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</cb>
     </segment>
   </segmentlist>
   <directlist>
