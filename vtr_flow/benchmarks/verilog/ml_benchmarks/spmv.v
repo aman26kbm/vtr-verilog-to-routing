@@ -1905,11 +1905,6 @@ module bvb(
 
 	wire fifo_in_val;
 
-	reg [`LOCAL_ID_BITS*`NUM_CHANNEL-1:0] local_id;
-	wire [`LOCAL_ID_BITS-1:0] local_id_arr [`NUM_CHANNEL-1:0];
-	// mask used for simulation only
-	reg [`COL_ID_BITS-1:0] mask;
-
 	wire [`NUM_VEC_VALS_PER_ADDR*`VEC_VAL_BITS-1:0] din_nc;
 
 	reg [`COL_ID_BITS-1:0] rd_addr;
