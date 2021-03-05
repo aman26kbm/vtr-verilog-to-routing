@@ -31,7 +31,7 @@
 // 	(x <= 1073741824) ? 30 : \
 // 	0 )
 
-// `define SIMULATION
+`define SIMULATION
 `define COL_ID_BITS 8
 `define ROW_ID_BITS 8
 `define MAT_VAL_BITS 8
@@ -41,7 +41,7 @@
 `define NUM_CHANNEL_BITS $clog2(`NUM_CHANNEL)
 `define LANE_NUM (3 * `NUM_CHANNEL)
 // `define LANE_NUM_BITS $clog2(`LANE_NUM)
-`define NUM_MAT_VALS 8672
+`define NUM_MAT_VALS 8864
 `define NUM_COL_IDS `NUM_MAT_VALS
 `define NUM_ROW_IDS `NUM_MAT_VALS
 `define NUM_VEC_VALS 128
@@ -50,19 +50,17 @@
 `define MAX_COLS (1<<`COL_ID_BITS)
 
 // MACROS for BVB
-`define BYTES_PER_ADDR_PER_BRAM 4
+`define BYTES_PER_ADDR_PER_BRAM 1
+`define NUM_BRAMS 1
 `define VEC_VAL_BYTES (`VEC_VAL_BITS/8)
 `define VEC_VAL_OFFSET $clog2(`VEC_VAL_BITS)
 `define NUM_VEC_VALS_PER_ADDR_PER_BRAM (`BYTES_PER_ADDR_PER_BRAM/`VEC_VAL_BYTES)
-`define NUM_VEC_VALS_PER_ADDR `NUM_VEC_VALS
+`define NUM_VEC_VALS_PER_ADDR `NUM_VEC_VALS_PER_ADDR_PER_BRAM*`NUM_BRAMS
 `define NUM_VEC_VALS_PER_ADDR_BITS $clog2(`NUM_VEC_VALS_PER_ADDR)
-`define NUM_BRAMS (`NUM_VEC_VALS_PER_ADDR/`NUM_VEC_VALS_PER_ADDR_PER_BRAM)
 `define NUM_ADDR (`NUM_VEC_VALS/`NUM_VEC_VALS_PER_ADDR)
-`define BVB_AWIDTH 1 //$clog2(`NUM_ADDR) Use `NUM_ADDR when `NUM_ADDR>1
-`define BVB_DWIDTH (`NUM_VEC_VALS_PER_ADDR*`VEC_VAL_BITS)
-`define COUNTER_BITS `BVB_AWIDTH
+`define BVB_AWIDTH `COL_ID_BITS
+`define COUNTER_BITS $clog2(`NUM_ADDR)
 `define LOCAL_ID_BITS `NUM_VEC_VALS_PER_ADDR_BITS
-
 
 module spmv(
 	input clk,
@@ -1881,7 +1879,6 @@ module fetcher(
 	end
 endmodule
 
-
 module bvb(
 	input clk,
 	input rst,
@@ -1901,36 +1898,42 @@ module bvb(
 
 	parameter FIFO_DEPTH_BITS = $clog2(`FIFO_DEPTH);
 
-	parameter COUNTER_MAX  = ((1 << `COUNTER_BITS) - 1) & (`NUM_VEC_VALS_PER_ADDR!=`NUM_VEC_VALS);
-
-	reg [`COUNTER_BITS-1:0] counter;
-	reg [`COUNTER_BITS-1:0] counter_delay;
-
 	reg [`NUM_CHANNEL-1:0] val_wr_en;
 	wire [`NUM_CHANNEL-1:0] val_full;
 
-	wire [`BVB_DWIDTH-1:0] ram_out;
+	wire [`NUM_VEC_VALS_PER_ADDR*`VEC_VAL_BITS-1:0] ram_out;
 
-	wire [(`NUM_CHANNEL*`VEC_VAL_BITS)-1:0] fifo_in_val;
+	wire fifo_in_val;
 
-	reg [(`LOCAL_ID_BITS*`NUM_CHANNEL)-1:0] local_id;
+	reg [`LOCAL_ID_BITS*`NUM_CHANNEL-1:0] local_id;
+	wire [`LOCAL_ID_BITS-1:0] local_id_arr [`NUM_CHANNEL-1:0];
+	// mask used for simulation only
 	reg [`COL_ID_BITS-1:0] mask;
 
-	wire [`BVB_DWIDTH-1:0] din_nc;
+	wire [`NUM_VEC_VALS_PER_ADDR*`VEC_VAL_BITS-1:0] din_nc;
 
-	reg [`NUM_CHANNEL-1:0] id_rd_en_reg;
+	reg [`COL_ID_BITS-1:0] rd_addr;
+
+	wire id_empty_shifted;
+	wire val_full_shifted;
+
+	wire id_rd_en_local;
+	reg id_rd_en_local_reg;
+
+	reg [`NUM_CHANNEL_BITS-1:0] counter;
+	reg [`NUM_CHANNEL_BITS-1:0] counter_delay;
 
 	spram #(
 	`ifdef SIMULATION
 		.INIT("/home/aatman/Desktop/SpMV/src/coe/vec_val.txt"),
 	`endif
-		.AWIDTH(1),  // Replace this with `BVB_AWIDTH when NUM_ADDR become >= 2
-		.NUM_WORDS(2),  // Replace this with NUM_ADDR_VEC_RAM
-		.DWIDTH(`BVB_DWIDTH)
+		.AWIDTH(`BVB_AWIDTH),
+		.NUM_WORDS(`NUM_ADDR),
+		.DWIDTH(`NUM_VEC_VALS_PER_ADDR*`VEC_VAL_BITS)
 		) vector_ram (
 			.clk(clk), 
 			.wren(0),
-			.address(counter_delay),  
+			.address(rd_addr), 
 			.din(din_nc), 
 			.dout(ram_out)
 		);
@@ -1942,7 +1945,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(0+1)*`VEC_VAL_BITS-1:0*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[0]), // input wr_en 
 		.re(val_rd_en[0]), // input rd_en 
 		.dout(val[(0+1)*`VEC_VAL_BITS-1:0*`VEC_VAL_BITS]), 
@@ -1957,7 +1960,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(1+1)*`VEC_VAL_BITS-1:1*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[1]), // input wr_en 
 		.re(val_rd_en[1]), // input rd_en 
 		.dout(val[(1+1)*`VEC_VAL_BITS-1:1*`VEC_VAL_BITS]), 
@@ -1972,7 +1975,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(2+1)*`VEC_VAL_BITS-1:2*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[2]), // input wr_en 
 		.re(val_rd_en[2]), // input rd_en 
 		.dout(val[(2+1)*`VEC_VAL_BITS-1:2*`VEC_VAL_BITS]), 
@@ -1987,7 +1990,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(3+1)*`VEC_VAL_BITS-1:3*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[3]), // input wr_en 
 		.re(val_rd_en[3]), // input rd_en 
 		.dout(val[(3+1)*`VEC_VAL_BITS-1:3*`VEC_VAL_BITS]), 
@@ -2002,7 +2005,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(4+1)*`VEC_VAL_BITS-1:4*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[4]), // input wr_en 
 		.re(val_rd_en[4]), // input rd_en 
 		.dout(val[(4+1)*`VEC_VAL_BITS-1:4*`VEC_VAL_BITS]), 
@@ -2017,7 +2020,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(5+1)*`VEC_VAL_BITS-1:5*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[5]), // input wr_en 
 		.re(val_rd_en[5]), // input rd_en 
 		.dout(val[(5+1)*`VEC_VAL_BITS-1:5*`VEC_VAL_BITS]), 
@@ -2032,7 +2035,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(6+1)*`VEC_VAL_BITS-1:6*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[6]), // input wr_en 
 		.re(val_rd_en[6]), // input rd_en 
 		.dout(val[(6+1)*`VEC_VAL_BITS-1:6*`VEC_VAL_BITS]), 
@@ -2047,7 +2050,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(7+1)*`VEC_VAL_BITS-1:7*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[7]), // input wr_en 
 		.re(val_rd_en[7]), // input rd_en 
 		.dout(val[(7+1)*`VEC_VAL_BITS-1:7*`VEC_VAL_BITS]), 
@@ -2062,7 +2065,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(8+1)*`VEC_VAL_BITS-1:8*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[8]), // input wr_en 
 		.re(val_rd_en[8]), // input rd_en 
 		.dout(val[(8+1)*`VEC_VAL_BITS-1:8*`VEC_VAL_BITS]), 
@@ -2077,7 +2080,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(9+1)*`VEC_VAL_BITS-1:9*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[9]), // input wr_en 
 		.re(val_rd_en[9]), // input rd_en 
 		.dout(val[(9+1)*`VEC_VAL_BITS-1:9*`VEC_VAL_BITS]), 
@@ -2092,7 +2095,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(10+1)*`VEC_VAL_BITS-1:10*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[10]), // input wr_en 
 		.re(val_rd_en[10]), // input rd_en 
 		.dout(val[(10+1)*`VEC_VAL_BITS-1:10*`VEC_VAL_BITS]), 
@@ -2107,7 +2110,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(11+1)*`VEC_VAL_BITS-1:11*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[11]), // input wr_en 
 		.re(val_rd_en[11]), // input rd_en 
 		.dout(val[(11+1)*`VEC_VAL_BITS-1:11*`VEC_VAL_BITS]), 
@@ -2122,7 +2125,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(12+1)*`VEC_VAL_BITS-1:12*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[12]), // input wr_en 
 		.re(val_rd_en[12]), // input rd_en 
 		.dout(val[(12+1)*`VEC_VAL_BITS-1:12*`VEC_VAL_BITS]), 
@@ -2137,7 +2140,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(13+1)*`VEC_VAL_BITS-1:13*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[13]), // input wr_en 
 		.re(val_rd_en[13]), // input rd_en 
 		.dout(val[(13+1)*`VEC_VAL_BITS-1:13*`VEC_VAL_BITS]), 
@@ -2152,7 +2155,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(14+1)*`VEC_VAL_BITS-1:14*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[14]), // input wr_en 
 		.re(val_rd_en[14]), // input rd_en 
 		.dout(val[(14+1)*`VEC_VAL_BITS-1:14*`VEC_VAL_BITS]), 
@@ -2167,7 +2170,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(15+1)*`VEC_VAL_BITS-1:15*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[15]), // input wr_en 
 		.re(val_rd_en[15]), // input rd_en 
 		.dout(val[(15+1)*`VEC_VAL_BITS-1:15*`VEC_VAL_BITS]), 
@@ -2182,7 +2185,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(16+1)*`VEC_VAL_BITS-1:16*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[16]), // input wr_en 
 		.re(val_rd_en[16]), // input rd_en 
 		.dout(val[(16+1)*`VEC_VAL_BITS-1:16*`VEC_VAL_BITS]), 
@@ -2197,7 +2200,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(17+1)*`VEC_VAL_BITS-1:17*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[17]), // input wr_en 
 		.re(val_rd_en[17]), // input rd_en 
 		.dout(val[(17+1)*`VEC_VAL_BITS-1:17*`VEC_VAL_BITS]), 
@@ -2212,7 +2215,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(18+1)*`VEC_VAL_BITS-1:18*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[18]), // input wr_en 
 		.re(val_rd_en[18]), // input rd_en 
 		.dout(val[(18+1)*`VEC_VAL_BITS-1:18*`VEC_VAL_BITS]), 
@@ -2227,7 +2230,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(19+1)*`VEC_VAL_BITS-1:19*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[19]), // input wr_en 
 		.re(val_rd_en[19]), // input rd_en 
 		.dout(val[(19+1)*`VEC_VAL_BITS-1:19*`VEC_VAL_BITS]), 
@@ -2242,7 +2245,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(20+1)*`VEC_VAL_BITS-1:20*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[20]), // input wr_en 
 		.re(val_rd_en[20]), // input rd_en 
 		.dout(val[(20+1)*`VEC_VAL_BITS-1:20*`VEC_VAL_BITS]), 
@@ -2257,7 +2260,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(21+1)*`VEC_VAL_BITS-1:21*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[21]), // input wr_en 
 		.re(val_rd_en[21]), // input rd_en 
 		.dout(val[(21+1)*`VEC_VAL_BITS-1:21*`VEC_VAL_BITS]), 
@@ -2272,7 +2275,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(22+1)*`VEC_VAL_BITS-1:22*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[22]), // input wr_en 
 		.re(val_rd_en[22]), // input rd_en 
 		.dout(val[(22+1)*`VEC_VAL_BITS-1:22*`VEC_VAL_BITS]), 
@@ -2287,7 +2290,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(23+1)*`VEC_VAL_BITS-1:23*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[23]), // input wr_en 
 		.re(val_rd_en[23]), // input rd_en 
 		.dout(val[(23+1)*`VEC_VAL_BITS-1:23*`VEC_VAL_BITS]), 
@@ -2302,7 +2305,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(24+1)*`VEC_VAL_BITS-1:24*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[24]), // input wr_en 
 		.re(val_rd_en[24]), // input rd_en 
 		.dout(val[(24+1)*`VEC_VAL_BITS-1:24*`VEC_VAL_BITS]), 
@@ -2317,7 +2320,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(25+1)*`VEC_VAL_BITS-1:25*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[25]), // input wr_en 
 		.re(val_rd_en[25]), // input rd_en 
 		.dout(val[(25+1)*`VEC_VAL_BITS-1:25*`VEC_VAL_BITS]), 
@@ -2332,7 +2335,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(26+1)*`VEC_VAL_BITS-1:26*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[26]), // input wr_en 
 		.re(val_rd_en[26]), // input rd_en 
 		.dout(val[(26+1)*`VEC_VAL_BITS-1:26*`VEC_VAL_BITS]), 
@@ -2347,7 +2350,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(27+1)*`VEC_VAL_BITS-1:27*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[27]), // input wr_en 
 		.re(val_rd_en[27]), // input rd_en 
 		.dout(val[(27+1)*`VEC_VAL_BITS-1:27*`VEC_VAL_BITS]), 
@@ -2362,7 +2365,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(28+1)*`VEC_VAL_BITS-1:28*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[28]), // input wr_en 
 		.re(val_rd_en[28]), // input rd_en 
 		.dout(val[(28+1)*`VEC_VAL_BITS-1:28*`VEC_VAL_BITS]), 
@@ -2377,7 +2380,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(29+1)*`VEC_VAL_BITS-1:29*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[29]), // input wr_en 
 		.re(val_rd_en[29]), // input rd_en 
 		.dout(val[(29+1)*`VEC_VAL_BITS-1:29*`VEC_VAL_BITS]), 
@@ -2392,7 +2395,7 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(30+1)*`VEC_VAL_BITS-1:30*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[30]), // input wr_en 
 		.re(val_rd_en[30]), // input rd_en 
 		.dout(val[(30+1)*`VEC_VAL_BITS-1:30*`VEC_VAL_BITS]), 
@@ -2407,826 +2410,33 @@ module bvb(
 		.clk(clk), // input clk 
 		.rst(rst), 
 		.clr(0), 
-		.din(fifo_in_val[(31+1)*`VEC_VAL_BITS-1:31*`VEC_VAL_BITS]), 
+		.din(ram_out), 
 		.we(val_wr_en[31]), // input wr_en 
 		.re(val_rd_en[31]), // input rd_en 
 		.dout(val[(31+1)*`VEC_VAL_BITS-1:31*`VEC_VAL_BITS]), 
 		.full(val_full[31]), // output full 
 		.empty(val_empty[31]) // output empty 
 	);
- 
-	always @ (posedge clk) begin
-		id_rd_en_reg <= id_rd_en;
-	end
 
-	assign id_rd_en[0] = start & (counter == id[(0*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(0*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[0]) & (~val_full[0]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[0]) begin 
-			local_id[(0+1)*`LOCAL_ID_BITS-1:0*`LOCAL_ID_BITS] <= (id[(0+1)*`COL_ID_BITS-1:0*`COL_ID_BITS] & mask); 
-			val_wr_en[0] <= 1; 
-		end 
-		else begin 
-			val_wr_en[0] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[1] = start & (counter == id[(1*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(1*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[1]) & (~val_full[1]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[1]) begin 
-			local_id[(1+1)*`LOCAL_ID_BITS-1:1*`LOCAL_ID_BITS] <= (id[(1+1)*`COL_ID_BITS-1:1*`COL_ID_BITS] & mask); 
-			val_wr_en[1] <= 1; 
-		end 
-		else begin 
-			val_wr_en[1] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[2] = start & (counter == id[(2*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(2*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[2]) & (~val_full[2]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[2]) begin 
-			local_id[(2+1)*`LOCAL_ID_BITS-1:2*`LOCAL_ID_BITS] <= (id[(2+1)*`COL_ID_BITS-1:2*`COL_ID_BITS] & mask); 
-			val_wr_en[2] <= 1; 
-		end 
-		else begin 
-			val_wr_en[2] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[3] = start & (counter == id[(3*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(3*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[3]) & (~val_full[3]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[3]) begin 
-			local_id[(3+1)*`LOCAL_ID_BITS-1:3*`LOCAL_ID_BITS] <= (id[(3+1)*`COL_ID_BITS-1:3*`COL_ID_BITS] & mask); 
-			val_wr_en[3] <= 1; 
-		end 
-		else begin 
-			val_wr_en[3] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[4] = start & (counter == id[(4*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(4*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[4]) & (~val_full[4]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[4]) begin 
-			local_id[(4+1)*`LOCAL_ID_BITS-1:4*`LOCAL_ID_BITS] <= (id[(4+1)*`COL_ID_BITS-1:4*`COL_ID_BITS] & mask); 
-			val_wr_en[4] <= 1; 
-		end 
-		else begin 
-			val_wr_en[4] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[5] = start & (counter == id[(5*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(5*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[5]) & (~val_full[5]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[5]) begin 
-			local_id[(5+1)*`LOCAL_ID_BITS-1:5*`LOCAL_ID_BITS] <= (id[(5+1)*`COL_ID_BITS-1:5*`COL_ID_BITS] & mask); 
-			val_wr_en[5] <= 1; 
-		end 
-		else begin 
-			val_wr_en[5] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[6] = start & (counter == id[(6*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(6*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[6]) & (~val_full[6]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[6]) begin 
-			local_id[(6+1)*`LOCAL_ID_BITS-1:6*`LOCAL_ID_BITS] <= (id[(6+1)*`COL_ID_BITS-1:6*`COL_ID_BITS] & mask); 
-			val_wr_en[6] <= 1; 
-		end 
-		else begin 
-			val_wr_en[6] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[7] = start & (counter == id[(7*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(7*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[7]) & (~val_full[7]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[7]) begin 
-			local_id[(7+1)*`LOCAL_ID_BITS-1:7*`LOCAL_ID_BITS] <= (id[(7+1)*`COL_ID_BITS-1:7*`COL_ID_BITS] & mask); 
-			val_wr_en[7] <= 1; 
-		end 
-		else begin 
-			val_wr_en[7] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[8] = start & (counter == id[(8*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(8*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[8]) & (~val_full[8]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[8]) begin 
-			local_id[(8+1)*`LOCAL_ID_BITS-1:8*`LOCAL_ID_BITS] <= (id[(8+1)*`COL_ID_BITS-1:8*`COL_ID_BITS] & mask); 
-			val_wr_en[8] <= 1; 
-		end 
-		else begin 
-			val_wr_en[8] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[9] = start & (counter == id[(9*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(9*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[9]) & (~val_full[9]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[9]) begin 
-			local_id[(9+1)*`LOCAL_ID_BITS-1:9*`LOCAL_ID_BITS] <= (id[(9+1)*`COL_ID_BITS-1:9*`COL_ID_BITS] & mask); 
-			val_wr_en[9] <= 1; 
-		end 
-		else begin 
-			val_wr_en[9] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[10] = start & (counter == id[(10*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(10*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[10]) & (~val_full[10]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[10]) begin 
-			local_id[(10+1)*`LOCAL_ID_BITS-1:10*`LOCAL_ID_BITS] <= (id[(10+1)*`COL_ID_BITS-1:10*`COL_ID_BITS] & mask); 
-			val_wr_en[10] <= 1; 
-		end 
-		else begin 
-			val_wr_en[10] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[11] = start & (counter == id[(11*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(11*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[11]) & (~val_full[11]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[11]) begin 
-			local_id[(11+1)*`LOCAL_ID_BITS-1:11*`LOCAL_ID_BITS] <= (id[(11+1)*`COL_ID_BITS-1:11*`COL_ID_BITS] & mask); 
-			val_wr_en[11] <= 1; 
-		end 
-		else begin 
-			val_wr_en[11] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[12] = start & (counter == id[(12*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(12*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[12]) & (~val_full[12]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[12]) begin 
-			local_id[(12+1)*`LOCAL_ID_BITS-1:12*`LOCAL_ID_BITS] <= (id[(12+1)*`COL_ID_BITS-1:12*`COL_ID_BITS] & mask); 
-			val_wr_en[12] <= 1; 
-		end 
-		else begin 
-			val_wr_en[12] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[13] = start & (counter == id[(13*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(13*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[13]) & (~val_full[13]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[13]) begin 
-			local_id[(13+1)*`LOCAL_ID_BITS-1:13*`LOCAL_ID_BITS] <= (id[(13+1)*`COL_ID_BITS-1:13*`COL_ID_BITS] & mask); 
-			val_wr_en[13] <= 1; 
-		end 
-		else begin 
-			val_wr_en[13] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[14] = start & (counter == id[(14*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(14*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[14]) & (~val_full[14]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[14]) begin 
-			local_id[(14+1)*`LOCAL_ID_BITS-1:14*`LOCAL_ID_BITS] <= (id[(14+1)*`COL_ID_BITS-1:14*`COL_ID_BITS] & mask); 
-			val_wr_en[14] <= 1; 
-		end 
-		else begin 
-			val_wr_en[14] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[15] = start & (counter == id[(15*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(15*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[15]) & (~val_full[15]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[15]) begin 
-			local_id[(15+1)*`LOCAL_ID_BITS-1:15*`LOCAL_ID_BITS] <= (id[(15+1)*`COL_ID_BITS-1:15*`COL_ID_BITS] & mask); 
-			val_wr_en[15] <= 1; 
-		end 
-		else begin 
-			val_wr_en[15] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[16] = start & (counter == id[(16*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(16*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[16]) & (~val_full[16]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[16]) begin 
-			local_id[(16+1)*`LOCAL_ID_BITS-1:16*`LOCAL_ID_BITS] <= (id[(16+1)*`COL_ID_BITS-1:16*`COL_ID_BITS] & mask); 
-			val_wr_en[16] <= 1; 
-		end 
-		else begin 
-			val_wr_en[16] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[17] = start & (counter == id[(17*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(17*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[17]) & (~val_full[17]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[17]) begin 
-			local_id[(17+1)*`LOCAL_ID_BITS-1:17*`LOCAL_ID_BITS] <= (id[(17+1)*`COL_ID_BITS-1:17*`COL_ID_BITS] & mask); 
-			val_wr_en[17] <= 1; 
-		end 
-		else begin 
-			val_wr_en[17] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[18] = start & (counter == id[(18*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(18*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[18]) & (~val_full[18]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[18]) begin 
-			local_id[(18+1)*`LOCAL_ID_BITS-1:18*`LOCAL_ID_BITS] <= (id[(18+1)*`COL_ID_BITS-1:18*`COL_ID_BITS] & mask); 
-			val_wr_en[18] <= 1; 
-		end 
-		else begin 
-			val_wr_en[18] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[19] = start & (counter == id[(19*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(19*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[19]) & (~val_full[19]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[19]) begin 
-			local_id[(19+1)*`LOCAL_ID_BITS-1:19*`LOCAL_ID_BITS] <= (id[(19+1)*`COL_ID_BITS-1:19*`COL_ID_BITS] & mask); 
-			val_wr_en[19] <= 1; 
-		end 
-		else begin 
-			val_wr_en[19] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[20] = start & (counter == id[(20*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(20*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[20]) & (~val_full[20]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[20]) begin 
-			local_id[(20+1)*`LOCAL_ID_BITS-1:20*`LOCAL_ID_BITS] <= (id[(20+1)*`COL_ID_BITS-1:20*`COL_ID_BITS] & mask); 
-			val_wr_en[20] <= 1; 
-		end 
-		else begin 
-			val_wr_en[20] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[21] = start & (counter == id[(21*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(21*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[21]) & (~val_full[21]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[21]) begin 
-			local_id[(21+1)*`LOCAL_ID_BITS-1:21*`LOCAL_ID_BITS] <= (id[(21+1)*`COL_ID_BITS-1:21*`COL_ID_BITS] & mask); 
-			val_wr_en[21] <= 1; 
-		end 
-		else begin 
-			val_wr_en[21] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[22] = start & (counter == id[(22*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(22*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[22]) & (~val_full[22]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[22]) begin 
-			local_id[(22+1)*`LOCAL_ID_BITS-1:22*`LOCAL_ID_BITS] <= (id[(22+1)*`COL_ID_BITS-1:22*`COL_ID_BITS] & mask); 
-			val_wr_en[22] <= 1; 
-		end 
-		else begin 
-			val_wr_en[22] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[23] = start & (counter == id[(23*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(23*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[23]) & (~val_full[23]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[23]) begin 
-			local_id[(23+1)*`LOCAL_ID_BITS-1:23*`LOCAL_ID_BITS] <= (id[(23+1)*`COL_ID_BITS-1:23*`COL_ID_BITS] & mask); 
-			val_wr_en[23] <= 1; 
-		end 
-		else begin 
-			val_wr_en[23] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[24] = start & (counter == id[(24*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(24*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[24]) & (~val_full[24]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[24]) begin 
-			local_id[(24+1)*`LOCAL_ID_BITS-1:24*`LOCAL_ID_BITS] <= (id[(24+1)*`COL_ID_BITS-1:24*`COL_ID_BITS] & mask); 
-			val_wr_en[24] <= 1; 
-		end 
-		else begin 
-			val_wr_en[24] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[25] = start & (counter == id[(25*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(25*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[25]) & (~val_full[25]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[25]) begin 
-			local_id[(25+1)*`LOCAL_ID_BITS-1:25*`LOCAL_ID_BITS] <= (id[(25+1)*`COL_ID_BITS-1:25*`COL_ID_BITS] & mask); 
-			val_wr_en[25] <= 1; 
-		end 
-		else begin 
-			val_wr_en[25] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[26] = start & (counter == id[(26*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(26*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[26]) & (~val_full[26]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[26]) begin 
-			local_id[(26+1)*`LOCAL_ID_BITS-1:26*`LOCAL_ID_BITS] <= (id[(26+1)*`COL_ID_BITS-1:26*`COL_ID_BITS] & mask); 
-			val_wr_en[26] <= 1; 
-		end 
-		else begin 
-			val_wr_en[26] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[27] = start & (counter == id[(27*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(27*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[27]) & (~val_full[27]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[27]) begin 
-			local_id[(27+1)*`LOCAL_ID_BITS-1:27*`LOCAL_ID_BITS] <= (id[(27+1)*`COL_ID_BITS-1:27*`COL_ID_BITS] & mask); 
-			val_wr_en[27] <= 1; 
-		end 
-		else begin 
-			val_wr_en[27] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[28] = start & (counter == id[(28*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(28*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[28]) & (~val_full[28]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[28]) begin 
-			local_id[(28+1)*`LOCAL_ID_BITS-1:28*`LOCAL_ID_BITS] <= (id[(28+1)*`COL_ID_BITS-1:28*`COL_ID_BITS] & mask); 
-			val_wr_en[28] <= 1; 
-		end 
-		else begin 
-			val_wr_en[28] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[29] = start & (counter == id[(29*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(29*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[29]) & (~val_full[29]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[29]) begin 
-			local_id[(29+1)*`LOCAL_ID_BITS-1:29*`LOCAL_ID_BITS] <= (id[(29+1)*`COL_ID_BITS-1:29*`COL_ID_BITS] & mask); 
-			val_wr_en[29] <= 1; 
-		end 
-		else begin 
-			val_wr_en[29] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[30] = start & (counter == id[(30*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(30*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[30]) & (~val_full[30]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[30]) begin 
-			local_id[(30+1)*`LOCAL_ID_BITS-1:30*`LOCAL_ID_BITS] <= (id[(30+1)*`COL_ID_BITS-1:30*`COL_ID_BITS] & mask); 
-			val_wr_en[30] <= 1; 
-		end 
-		else begin 
-			val_wr_en[30] <= 0; 
-		end 
-	end
-
-	assign id_rd_en[31] = start & (counter == id[(31*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS+`COUNTER_BITS-1:(31*`COL_ID_BITS)+`NUM_VEC_VALS_PER_ADDR_BITS]) & (~id_empty[31]) & (~val_full[31]); 
-	always @ (posedge clk) begin 
-		if(id_rd_en_reg[31]) begin 
-			local_id[(31+1)*`LOCAL_ID_BITS-1:31*`LOCAL_ID_BITS] <= (id[(31+1)*`COL_ID_BITS-1:31*`COL_ID_BITS] & mask); 
-			val_wr_en[31] <= 1; 
-		end 
-		else begin 
-			val_wr_en[31] <= 0; 
-		end 
-	end
-
-	Switch_Matrix xbar 
-	(
-		.in(ram_out),
-		.addr(local_id),
-		.out(fifo_in_val)
-	);
+	assign id_empty_shifted = id_empty >> counter;
+	assign val_full_shifted = val_full >> counter;
+	assign id_rd_en_local = (start & (~id_empty_shifted) & (~val_full_shifted));
+	assign id_rd_en = id_rd_en_local << counter;
 
 	always @ (posedge clk or posedge rst) begin
 		if (rst) begin
+			mask <= {`NUM_VEC_VALS_PER_ADDR_BITS{1'b1}};
 			counter <= 0;
 			counter_delay <= 0;
-			mask <= {`NUM_VEC_VALS_PER_ADDR_BITS{1'b1}};
 		end
 		else if (start) begin
-			counter <= (counter == COUNTER_MAX) ? 0 : counter + 1;
+			counter <= counter + 1;
 			counter_delay <= counter;
+			id_rd_en_local_reg <= id_rd_en_local;
+			val_wr_en <= id_rd_en_local_reg << counter_delay;
+			rd_addr <= id >> (counter*`COL_ID_BITS);
 		end
 	end
-endmodule
-
-module Switch_Matrix
-	(
-		input [`BVB_DWIDTH-1:0] in,
-		input [`NUM_CHANNEL*`LOCAL_ID_BITS-1:0] addr,
-		output [(`NUM_CHANNEL*`VEC_VAL_BITS)-1:0] out
-	);
-
-	mux_128to1 mux_0 
-	( 
-		.in(in), 
-		.sel(addr[(0+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:0*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(0+1)*`VEC_VAL_BITS-1:0*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_1 
-	( 
-		.in(in), 
-		.sel(addr[(1+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:1*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(1+1)*`VEC_VAL_BITS-1:1*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_2 
-	( 
-		.in(in), 
-		.sel(addr[(2+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:2*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(2+1)*`VEC_VAL_BITS-1:2*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_3 
-	( 
-		.in(in), 
-		.sel(addr[(3+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:3*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(3+1)*`VEC_VAL_BITS-1:3*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_4 
-	( 
-		.in(in), 
-		.sel(addr[(4+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:4*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(4+1)*`VEC_VAL_BITS-1:4*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_5 
-	( 
-		.in(in), 
-		.sel(addr[(5+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:5*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(5+1)*`VEC_VAL_BITS-1:5*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_6 
-	( 
-		.in(in), 
-		.sel(addr[(6+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:6*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(6+1)*`VEC_VAL_BITS-1:6*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_7 
-	( 
-		.in(in), 
-		.sel(addr[(7+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:7*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(7+1)*`VEC_VAL_BITS-1:7*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_8 
-	( 
-		.in(in), 
-		.sel(addr[(8+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:8*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(8+1)*`VEC_VAL_BITS-1:8*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_9 
-	( 
-		.in(in), 
-		.sel(addr[(9+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:9*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(9+1)*`VEC_VAL_BITS-1:9*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_10 
-	( 
-		.in(in), 
-		.sel(addr[(10+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:10*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(10+1)*`VEC_VAL_BITS-1:10*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_11 
-	( 
-		.in(in), 
-		.sel(addr[(11+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:11*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(11+1)*`VEC_VAL_BITS-1:11*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_12 
-	( 
-		.in(in), 
-		.sel(addr[(12+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:12*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(12+1)*`VEC_VAL_BITS-1:12*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_13 
-	( 
-		.in(in), 
-		.sel(addr[(13+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:13*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(13+1)*`VEC_VAL_BITS-1:13*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_14 
-	( 
-		.in(in), 
-		.sel(addr[(14+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:14*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(14+1)*`VEC_VAL_BITS-1:14*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_15 
-	( 
-		.in(in), 
-		.sel(addr[(15+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:15*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(15+1)*`VEC_VAL_BITS-1:15*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_16 
-	( 
-		.in(in), 
-		.sel(addr[(16+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:16*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(16+1)*`VEC_VAL_BITS-1:16*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_17 
-	( 
-		.in(in), 
-		.sel(addr[(17+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:17*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(17+1)*`VEC_VAL_BITS-1:17*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_18 
-	( 
-		.in(in), 
-		.sel(addr[(18+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:18*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(18+1)*`VEC_VAL_BITS-1:18*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_19 
-	( 
-		.in(in), 
-		.sel(addr[(19+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:19*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(19+1)*`VEC_VAL_BITS-1:19*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_20 
-	( 
-		.in(in), 
-		.sel(addr[(20+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:20*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(20+1)*`VEC_VAL_BITS-1:20*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_21 
-	( 
-		.in(in), 
-		.sel(addr[(21+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:21*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(21+1)*`VEC_VAL_BITS-1:21*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_22 
-	( 
-		.in(in), 
-		.sel(addr[(22+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:22*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(22+1)*`VEC_VAL_BITS-1:22*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_23 
-	( 
-		.in(in), 
-		.sel(addr[(23+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:23*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(23+1)*`VEC_VAL_BITS-1:23*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_24 
-	( 
-		.in(in), 
-		.sel(addr[(24+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:24*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(24+1)*`VEC_VAL_BITS-1:24*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_25 
-	( 
-		.in(in), 
-		.sel(addr[(25+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:25*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(25+1)*`VEC_VAL_BITS-1:25*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_26 
-	( 
-		.in(in), 
-		.sel(addr[(26+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:26*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(26+1)*`VEC_VAL_BITS-1:26*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_27 
-	( 
-		.in(in), 
-		.sel(addr[(27+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:27*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(27+1)*`VEC_VAL_BITS-1:27*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_28 
-	( 
-		.in(in), 
-		.sel(addr[(28+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:28*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(28+1)*`VEC_VAL_BITS-1:28*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_29 
-	( 
-		.in(in), 
-		.sel(addr[(29+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:29*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(29+1)*`VEC_VAL_BITS-1:29*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_30 
-	( 
-		.in(in), 
-		.sel(addr[(30+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:30*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(30+1)*`VEC_VAL_BITS-1:30*`VEC_VAL_BITS]) 
-	);
-
-	mux_128to1 mux_31 
-	( 
-		.in(in), 
-		.sel(addr[(31+1)*`NUM_VEC_VALS_PER_ADDR_BITS-1:31*`NUM_VEC_VALS_PER_ADDR_BITS]), 
-		.out(out[(31+1)*`VEC_VAL_BITS-1:31*`VEC_VAL_BITS]) 
-	);
-
-endmodule
-
-module mux_2to1 
-	(
-		input [2*`VEC_VAL_BITS-1:0] in,
-		input [1-1:0] sel,
-		output [1*`VEC_VAL_BITS-1:0] out
-	);
-
-	reg [1*`VEC_VAL_BITS-1:0] mux_out;
-
-	always @ (in or sel) begin
-		case (sel)
-			1'b00: mux_out <= in[1*`VEC_VAL_BITS-1:0];
-			1'b01: mux_out <= in[2*`VEC_VAL_BITS-1:1*`VEC_VAL_BITS];
-			default: mux_out <= 0;
-		endcase
-	end
-	assign out = mux_out;
-endmodule
-
-// module mux_4to1 
-// 	parameter 8 = 8
-// 	)
-// 	(
-// 		input [4*8-1:0] in,
-// 		input [2-1:0] sel,
-// 		output [1*8-1:0] out
-// 	);
-
-// 	reg [1*8-1:0] mux_out;
-
-// 	always @ (in or sel) begin
-// 		case (sel)
-// 			2'b00: mux_out <= in[1*8-1:0];
-// 			2'b01: mux_out <= in[2*8-1:1*8];
-// 			2'b10: mux_out <= in[3*8-1:2*8];
-// 			2'b11: mux_out <= in[4*8-1:3*8];
-// 			default: mux_out <= 0;
-// 		endcase
-// 	end
-
-// 	assign out = mux_out;
-// endmodule
-
-module mux_8to1 
-	(
-		input [8*`VEC_VAL_BITS-1:0] in,
-		input [3-1:0] sel,
-		output [1*`VEC_VAL_BITS-1:0] out
-	);
-
-	reg [1*`VEC_VAL_BITS-1:0] mux_out;
-
-	always @ (in or sel) begin
-		case (sel)
-			3'b000: mux_out <= in[1*`VEC_VAL_BITS-1:0];
-			3'b001: mux_out <= in[2*`VEC_VAL_BITS-1:1*`VEC_VAL_BITS];
-			3'b010: mux_out <= in[3*`VEC_VAL_BITS-1:2*`VEC_VAL_BITS];
-			3'b011: mux_out <= in[4*`VEC_VAL_BITS-1:3*`VEC_VAL_BITS];
-			3'b100: mux_out <= in[5*`VEC_VAL_BITS-1:4*`VEC_VAL_BITS];
-			3'b101: mux_out <= in[6*`VEC_VAL_BITS-1:5*`VEC_VAL_BITS];
-			3'b110: mux_out <= in[7*`VEC_VAL_BITS-1:6*`VEC_VAL_BITS];
-			3'b111: mux_out <= in[8*`VEC_VAL_BITS-1:7*`VEC_VAL_BITS];
-			default: mux_out <= 0;
-		endcase
-	end
-
-	assign out = mux_out;
-endmodule
-
-module mux_16to1
-	(
-		input [16*`VEC_VAL_BITS-1:0] in,
-		input [4-1:0] sel,
-		output [1*`VEC_VAL_BITS-1:0] out
-	);
-
-	wire [1*`VEC_VAL_BITS-1:0] out1;
-	wire [1*`VEC_VAL_BITS-1:0] out2;
-	wire [2*`VEC_VAL_BITS-1:0] out3;
-
-	mux_8to1 mux1
-	(
-		.in(in[8*`VEC_VAL_BITS-1:0]),
-		.sel(sel[3-1:0]),
-		.out(out1)
-	);
-
-	mux_8to1 mux2
-	(
-		.in(in[16*`VEC_VAL_BITS-1:8*`VEC_VAL_BITS]),
-		.sel(sel[3-1:0]),
-		.out(out2)
-	);
-
-	mux_2to1 mux_out
-	(
-		.in(out3),
-		.sel(sel[4-1]),
-		.out(out)
-	);
-	assign out3 = {out2, out1};
-endmodule
-
-module mux_32to1
-	(
-		input [32*`VEC_VAL_BITS-1:0] in,
-		input [5-1:0] sel,
-		output [1*`VEC_VAL_BITS-1:0] out
-	);
-
-	wire [1*`VEC_VAL_BITS-1:0] out1;
-	wire [1*`VEC_VAL_BITS-1:0] out2;
-	wire [2*`VEC_VAL_BITS-1:0] out3;
-
-	mux_16to1 mux1
-	(
-		.in(in[16*`VEC_VAL_BITS-1:0]),
-		.sel(sel[4-1:0]),
-		.out(out1)
-	);
-
-	mux_16to1 mux2 
-	(
-		.in(in[32*`VEC_VAL_BITS-1:16*`VEC_VAL_BITS]),
-		.sel(sel[4-1:0]),
-		.out(out2)
-	);
-
-	mux_2to1 mux_out
-	(
-		.in(out3),
-		.sel(sel[5-1]),
-		.out(out)
-	);
-	assign out3 = {out2, out1};
-endmodule
-
-module mux_64to1
-	(
-		input [64*`VEC_VAL_BITS-1:0] in,
-		input [6-1:0] sel,
-		output [1*`VEC_VAL_BITS-1:0] out
-	);
-
-	wire [1*`VEC_VAL_BITS-1:0] out1;
-	wire [1*`VEC_VAL_BITS-1:0] out2;
-	wire [2*`VEC_VAL_BITS-1:0] out3;
-
-	mux_32to1 mux1 
-	(
-		.in(in[32*`VEC_VAL_BITS-1:0]),
-		.sel(sel[5-1:0]),
-		.out(out1)
-	);
-
-	mux_32to1 mux2 
-	(
-		.in(in[64*`VEC_VAL_BITS-1:32*`VEC_VAL_BITS]),
-		.sel(sel[5-1:0]),
-		.out(out2)
-	);
-
-	mux_2to1 mux_out
-	(
-		.in(out3),
-		.sel(sel[6-1]),
-		.out(out)
-	);
-	assign out3 = {out2, out1};
-endmodule
-
-module mux_128to1
-	(
-		input [128*`VEC_VAL_BITS-1:0] in,
-		input [7-1:0] sel,
-		output [1*`VEC_VAL_BITS-1:0] out
-	);
-
-	wire [1*`VEC_VAL_BITS-1:0] out1;
-	wire [1*`VEC_VAL_BITS-1:0] out2;
-	wire [2*`VEC_VAL_BITS-1:0] out3;
-
-	mux_64to1 mux1 
-	(
-		.in(in[64*`VEC_VAL_BITS-1:0]),
-		.sel(sel[6-1:0]),
-		.out(out1)
-	);
-
-	mux_64to1 mux2 
-	(
-		.in(in[128*`VEC_VAL_BITS-1:64*`VEC_VAL_BITS]),
-		.sel(sel[6-1:0]),
-		.out(out2)
-	);
-
-	mux_2to1 mux_out
-	(
-		.in(out3),
-		.sel(sel[7-1]),
-		.out(out)
-	);
-	assign out3 = {out2, out1};
 endmodule
 
 module Big_Channel(
