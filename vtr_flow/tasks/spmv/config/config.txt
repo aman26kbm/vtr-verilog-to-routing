@@ -6,8 +6,8 @@
 circuits_dir=benchmarks/verilog/ml_benchmarks
 
 # Path to directory of architectures to use
-#archs_dir=arch/timing
-archs_dir=arch/COFFE_22nm
+archs_dir=arch/timing
+#archs_dir=arch/COFFE_22nm
 
 # Add circuits to list to sweep
 circuit_list_add=spmv.v
@@ -16,8 +16,8 @@ circuit_list_add=spmv.v
 
 # Add architectures to list to sweep
 #arch_list_add=k6_frac_N10_mem32K_40nm_aman.xml
-#arch_list_add=k6_frac_N10_mem32K_40nm.xml
-arch_list_add=agilex_arch.xml
+arch_list_add=k6_frac_N10_mem32K_40nm.xml
+#arch_list_add=agilex_arch.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt

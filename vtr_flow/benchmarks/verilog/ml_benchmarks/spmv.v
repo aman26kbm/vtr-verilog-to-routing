@@ -31,7 +31,7 @@
 // 	(x <= 1073741824) ? 30 : \
 // 	0 )
 
-`define SIMULATION
+// `define SIMULATION
 `define COL_ID_BITS 8
 `define ROW_ID_BITS 8
 `define MAT_VAL_BITS 8
@@ -2425,7 +2425,6 @@ module bvb(
 
 	always @ (posedge clk or posedge rst) begin
 		if (rst) begin
-			mask <= {`NUM_VEC_VALS_PER_ADDR_BITS{1'b1}};
 			counter <= 0;
 			counter_delay <= 0;
 		end
