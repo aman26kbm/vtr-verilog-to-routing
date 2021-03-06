@@ -10,12 +10,15 @@
 module top(
 input clk,
 input reset,
-input [12:0] wren_b_ext,
-input [5:0] address_b_ext,
-input [`uarraysize-1:0] hdata_b_ext,
-input [`varraysize-1:0] xdata_b_ext,
-input [`DATA_WIDTH-1:0] bias,
-output [`DATA_WIDTH-1:0] ht_out
+input [12:0] wren_b_ext, 	//external write enable to bram
+input [6:0] address_b_ext,	//external address to feed bram
+input [`DATA_WIDTH-1:0] data_b_ext,//external data to bram
+input [6:0] start_addr,   //start address of the Xin bram (input words to LSTM)
+input [6:0] end_addr,	  //end address of the Xin bram 
+output ht_valid,	//indicates the output ht_out is valid in those cycles
+output [`DATA_WIDTH-1:0] ht_out, //output ht from the lstm
+output reg cycle_complete,	//generates a pulse when a cycle fo 64 ht outputs are complete
+output reg Done        //Stays high indicating the end of lstm output computation for all the Xin words provided.
 );
 
 wire [`uarraysize-1:0] Ui_in;
@@ -41,10 +44,8 @@ wire [`DATA_WIDTH-1:0] bf_in;
 wire [`DATA_WIDTH-1:0] bo_in;
 wire [`DATA_WIDTH-1:0] bc_in;
 reg [`DATA_WIDTH-1:0] C_in;
-
-
-
-wire [`varraysize-1:0] data_b_ext;
+wire [`varraysize-1:0] xdata_b_ext;
+wire [`uarraysize-1:0] hdata_b_ext;
 //keeping an additional bit so that the counters don't get reset to 0 automatically after 63 
 //and start repeating access to elements prematurely
 reg [6:0] inaddr; 
@@ -53,27 +54,25 @@ reg wren_a;
 reg [6:0] c_count;
 reg [6:0] b_count;
 reg [6:0] ct_count;
-reg cycle_complete;
 reg [6:0] count;
 reg [6:0] i,j;
 reg [5:0] h_count;
 
 wire [`DATA_WIDTH-1:0] ht;
-
-//
-//wire [`DATA_WIDTH-1:0] ht_prev[`ARRAY_DEPTH-1:0];
- 
 reg [`uarraysize-1:0] ht_prev;
-
-//reg [`DATA_WIDTH-1:0] C[`ARRAY_DEPTH-1:0];
-//reg [`DATA_WIDTH-1:0] Ct[`ARRAY_DEPTH-1:0];
 reg [`uarraysize-1:0] Ct;
 wire [`DATA_WIDTH-1:0] add_cf;
 reg wren_a_ct, wren_b_cin;
 
 assign ht_out = ht;
 
-//assign data_b_ext = (wren_b_ext>15)? xdata_b_ext:hdata_b_ext; //Depending on whether its input weight memory or hweight memory select data
+//Instead of having very wide Input ports of uarraysize and varraysize,
+//we are replicating data from `DATA_WIDTH size external port to get the wide input to BRAMs.
+assign xdata_b_ext={`INPUT_DEPTH{data_b_ext}};
+assign hdata_b_ext={`ARRAY_DEPTH{data_b_ext}};
+
+//indicates that the ht_out output is valid 
+assign ht_valid = (count>10)?1:0;
 
 dpram_u Ui_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[0]),.data_a(dummyin_u),.data_b(hdata_b_ext),.out_a(Ui_in),.out_b(dummyo0));
 dpram_u Uf_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[1]),.data_a(dummyin_u),.data_b(hdata_b_ext),.out_a(Uf_in),.out_b(dummyo1));
@@ -84,36 +83,36 @@ dpram_v Wf_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wre
 dpram_v Wo_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[6]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(Wo_in),.out_b(dummyo6));
 dpram_v Wc_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[7]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(Wc_in),.out_b(dummyo7));
 dpram_v Xi_mem(.clk(clk),.address_a(inaddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[8]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(x_in),.out_b(dummyo8));
-dpram_b bi_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[9]),.data_a(dummyin_b),.data_b(bias),.out_a(bi_in),.out_b(dummyo9));
-dpram_b bf_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[10]),.data_a(dummyin_b),.data_b(bias),.out_a(bf_in),.out_b(dummyo10));
-dpram_b bo_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[11]),.data_a(dummyin_b),.data_b(bias),.out_a(bo_in),.out_b(dummyo11));
-dpram_b bc_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[12]),.data_a(dummyin_b),.data_b(bias),.out_a(bc_in),.out_b(dummyo12));
-//dpram_b Ct_mem(.clk(clk),.address_a(ct_count),.address_b(c_count),.wren_a(wren_a_ct),.wren_b(wren_b_cin),.data_a(add_cf),.data_b(),.out_a(dummyo13),.out_b(C_in));
+dpram_b bi_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[9]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bi_in),.out_b(dummyo9));
+dpram_b bf_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[10]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bf_in),.out_b(dummyo10));
+dpram_b bo_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[11]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bo_in),.out_b(dummyo11));
+dpram_b bc_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[12]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bc_in),.out_b(dummyo12));
+
 
 
 lstm_top lstm(.clk(clk),.rst(reset),.ht_out(ht),.Ui_in(Ui_in),.Wi_in(Wi_in),.Uf_in(Uf_in),.Wf_in(Wf_in),.Uo_in(Uo_in),.Wo_in(Wo_in),
 .Uc_in(Uc_in),.Wc_in(Wc_in),.x_in(x_in),.h_in(h_in),.C_in(C_in),.bi_in(bi_in),.bf_in(bf_in),.bo_in(bo_in),.bc_in(bc_in),.add_cf(add_cf));
 
 always @(posedge clk) begin
- if(reset == 1'b1)
+ if(reset == 1'b1) //if start=0
   begin      
 	   count <= 0;
 	   b_count <=0;
 	   h_count <= 0;
 	   c_count <= 0;
 	   ct_count <=0;
-	   waddr <=0;	
-	   inaddr <= 0;
+	   Ct <= 0;
+	   C_in <=0;
 	   h_in <= 0;
 	   ht_prev <= 0;
 	   wren_a <= 0;
 	   wren_a_ct <= 1;
 	   wren_b_cin <= 0;
 	   cycle_complete <=0;
-		
-	    Ct <= 0;
-	    C_in <=0;
-
+	   Done <= 0;
+   	   waddr <=0;	
+	   inaddr <= start_addr;
+	  
 	   //dummy ports initialize
 	   dummyin_u <= 0; 
 	   dummyin_v <=0;
@@ -123,18 +122,24 @@ always @(posedge clk) begin
   else begin
 	
 	if(h_count == `ARRAY_DEPTH-1) begin
-		cycle_complete <= 1;
+		cycle_complete <= 1; 
 		waddr <= 0;
 		count <=0;
 		b_count <= 0;
 		ct_count <=0;
 		c_count <= 0;
-		h_count <= 0;
-		inaddr <= inaddr+1;
+	
+		if(inaddr == end_addr)
+			Done = 1;			
+		else begin
+			inaddr <= inaddr+1;
+			h_count <= 0;
+
+		 end
 	 end
 	 else begin
 		cycle_complete <= 0;
-    		waddr <= waddr+1;
+    	waddr <= waddr+1;
 	  	  count <= count+1;
 	 
 		if(count>5)     //delay before bias add
