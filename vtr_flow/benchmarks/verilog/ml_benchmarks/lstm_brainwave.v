@@ -13,6 +13,7 @@ input reset,
 input [12:0] wren_b_ext, 	//external write enable to bram
 input [6:0] address_b_ext,	//external address to feed bram
 input [`DATA_WIDTH-1:0] data_b_ext,//external data to bram
+input start,			  //Start of computation
 input [6:0] start_addr,   //start address of the Xin bram (input words to LSTM)
 input [6:0] end_addr,	  //end address of the Xin bram 
 output ht_valid,	//indicates the output ht_out is valid in those cycles
@@ -94,7 +95,7 @@ lstm_top lstm(.clk(clk),.rst(reset),.ht_out(ht),.Ui_in(Ui_in),.Wi_in(Wi_in),.Uf_
 .Uc_in(Uc_in),.Wc_in(Wc_in),.x_in(x_in),.h_in(h_in),.C_in(C_in),.bi_in(bi_in),.bf_in(bf_in),.bo_in(bo_in),.bc_in(bc_in),.add_cf(add_cf));
 
 always @(posedge clk) begin
- if(reset == 1'b1) //if start=0
+ if(reset == 1'b1 || start==1'b0) 
   begin      
 	   count <= 0;
 	   b_count <=0;
@@ -140,7 +141,7 @@ always @(posedge clk) begin
 	 else begin
 		cycle_complete <= 0;
     	waddr <= waddr+1;
-	  	  count <= count+1;
+	  	count <= count+1;
 	 
 		if(count>5)     //delay before bias add
 			b_count <= b_count+1; 
