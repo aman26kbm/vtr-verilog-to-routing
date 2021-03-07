@@ -26,9 +26,6 @@ class GenResults():
                     "dirname", \
                     "run_num", \
                     "vpr_results_found", \
-                    "precision", \
-                    "building_block", \
-                    "design_size", \
                     "arch", \
                     "critical_path", \
                     "frequency", \
@@ -37,18 +34,26 @@ class GenResults():
                     "total_area", \
                     "area_delay_product", \
                     "channel_width", \
+                    "min_channel_width", \
                     "average_net_length", \
                     "max_net_length", \
+                    "max_fanout", \
                     "average_wire_segments_per_net", \
                     "max_segments_used_by_a_net", \
                     "total_routed_wire_length", \
+                    "resource_usage_io", \
                     "resource_usage_clb", \
                     "resource_usage_dsp", \
                     "resource_usage_memory", \
+                    "single_bit_adders", \
                     "odin_blif_found", \
                     "netlist_primitives", \
+                    "netlist_primitives>100k", \
                     "vtr_flow_elapsed_time", \
-                    "vtr_flow_peak_memory_usage"]
+                    "vtr_flow_peak_memory_usage", \
+                    "logic_depth", \
+                    "device_height", \
+                    "device_width" ]
 
     #method calls in order
     self.parse_args()
@@ -101,7 +106,7 @@ class GenResults():
         if match is not None:
           found = True
           found_filename = os.path.join(root,filename)
-          print("Found {} for {}: {}".format(file_to_find, dirname, found_filename))
+          #print("Found {} for {}: {}".format(file_to_find, dirname, found_filename))
           return found_filename
     if not found:
       print("Could not find {} for {}".format(file_to_find, dirname))
@@ -157,21 +162,6 @@ class GenResults():
 
         for line in vpr_out:
           #print(line)
-          #crit_path_match1 = re.search(r'matrix_multiplication.clk to matrix_multiplication.clk CPD: (.*) ns \((.*) MHz\)', line)
-          #crit_path_match2 = re.search(r'top.clk to top.clk CPD: (.*) ns \((.*) MHz\)', line)
-          crit_path_match3 = re.search(r'Final critical path: (.*) ns, Fmax: (.*) MHz', line)
-          crit_path_match4 = re.search(r'Final critical path delay \(least slack\): (.*) ns, Fmax: (.*) MHz', line)
-          #crit_path_match5 = re.search(r'conv.clk to conv.clk CPD: (.*) ns \((.*) MHz\)', line)
-          if crit_path_match3 is not None or crit_path_match4 is not None:
-            if crit_path_match3 is not None:
-              crit_path_match = crit_path_match3
-            if crit_path_match4 is not None:
-              crit_path_match = crit_path_match4
-            critical_path = crit_path_match.group(1)
-            frequency = crit_path_match.group(2)
-            result_dict['critical_path'] = critical_path or "Not found"
-            result_dict['frequency'] = frequency or "Not found" 
- 
           logic_area_match = re.search(r'Total used logic block area: (.*)', line)
           if logic_area_match is not None:
             logic_area = logic_area_match.group(1)
@@ -207,10 +197,15 @@ class GenResults():
             max_segments_used_by_a_net = max_segments_used_by_a_net_match.group(1)
             result_dict['max_segments_used_by_a_net'] = max_segments_used_by_a_net or "Not found"
 
-          total_routed_wire_length_match = re.search(r'Total wiring segments used: (.*), average wire segments per net', line)
+          total_routed_wire_length_match = re.search(r'Total wirelength: (.*), average net length:', line)
           if total_routed_wire_length_match is not None:
             total_routed_wire_length = total_routed_wire_length_match.group(1)
             result_dict['total_routed_wire_length'] = total_routed_wire_length or "Not found"
+
+          resource_usage_io_match = re.search(r'(\d+)\s+blocks of type: io', line)
+          if resource_usage_io_match is not None and ("Netlist" in prev_line):
+            resource_usage_io = resource_usage_io_match.group(1)
+            result_dict['resource_usage_io'] = int(resource_usage_io) or 0
 
           resource_usage_clb_match = re.search(r'(\d+)\s+blocks of type: clb', line)
           if resource_usage_clb_match is not None and ("Netlist" in prev_line):
@@ -227,15 +222,24 @@ class GenResults():
             resource_usage_memory = resource_usage_memory_match.group(1)
             result_dict['resource_usage_memory'] = int(resource_usage_memory) or 0
 
+          resource_usage_adder_match = re.search(r'adder\s*:\s*(\d*)', line)
+          if resource_usage_adder_match is not None and ("LUT" in prev_line):
+            resource_usage_adder = resource_usage_adder_match.group(1)
+            result_dict['single_bit_adders'] = int(resource_usage_adder) or 0
+
+          max_fanout_match = re.search(r'Max Fanout\s*:\s*(.*)', line)
+          if max_fanout_match is not None and ("Avg Fanout" in prev_line):
+            max_fanout = max_fanout_match.group(1)
+            result_dict['max_fanout'] = round(float(max_fanout)) or 0
+
           prev_line = line 
           
         #calculated metrics
-        if 'logic_area' in result_dict and 'critical_path' in result_dict and 'resource_usage_clb' in result_dict and 'resource_usage_dsp' in result_dict and 'resource_usage_memory' in result_dict:
+        if 'logic_area' in result_dict and 'resource_usage_clb' in result_dict and 'resource_usage_dsp' in result_dict and 'resource_usage_memory' in result_dict:
           result_dict['routing_area'] = (routing_area_clb * result_dict['resource_usage_clb']) +\
                                         (routing_area_dsp * result_dict['resource_usage_dsp']) +\
                                         (routing_area_memory * result_dict['resource_usage_memory'])
           result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
-          result_dict['area_delay_product'] = float(result_dict['total_area']) * float(result_dict['critical_path'])
 
       #--------------------------
       #extract information from odin.blif
@@ -254,6 +258,8 @@ class GenResults():
             netlist_primitives = netlist_primitives + 1
 
         result_dict['netlist_primitives'] = netlist_primitives
+        result_dict['netlist_primitives>100k'] = (netlist_primitives > 100000)
+
         odin_blif.close()
 
       #--------------------------
@@ -269,8 +275,16 @@ class GenResults():
         result_dict['vtr_flow_elapsed_time'] = row['vtr_flow_elapsed_time']
         result_dict['vtr_flow_peak_memory_usage'] = max(float(row['max_odin_mem']), \
                                                         float(row['max_abc_mem']), \
-                                                        float(row['max_ace_mem']), \
                                                         float(row['max_vpr_mem']))
+        result_dict['logic_depth'] = row['abc_depth']
+        result_dict['device_height'] = row['device_height']
+        result_dict['device_width'] = row['device_width']
+        result_dict['min_channel_width'] = row['min_chan_width']
+        result_dict['critical_path'] = row['critical_path_delay']
+          
+      
+      result_dict['area_delay_product'] = float(result_dict.get('total_area',0)) * float(result_dict.get('critical_path',0))
+      result_dict['frequency'] = 1/float(row['critical_path_delay'])*1000
 
       #append the current results to the main result list
       self.result_list.append(result_dict)

@@ -53,16 +53,16 @@ class GenTaskDirs():
     #the dirs file contains dir names. each dir_name contains 
     #information about the experiment
     for line in dirs:
-      dirname = line.rstrip()
+      expname = line.rstrip()
       #if the line is commented out, ignore it
-      check_for_comment = re.search(r'^#', dirname)
+      check_for_comment = re.search(r'^#', expname)
       if check_for_comment is not None:
         continue
 
-      print("Processing: " + dirname)
-      #extract arch info from dirname
-      ag = re.search(r'agilex', dirname)
-      st = re.search(r'stratix', dirname)
+      print("Processing: " + expname)
+      #evaluate arch info from expname
+      ag = re.search(r'agilex\.', expname)
+      st = re.search(r'stratix\.', expname)
       if ag is not None:
         arch_file = "agilex_arch.auto_layout.xml"
         arch_dir = "arch/COFFE_22nm"
@@ -70,7 +70,7 @@ class GenTaskDirs():
         arch_file = "k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml"
         arch_dir = "arch/timing"
       else:
-        print("Unable to extract arch info from " + dirname)
+        print("Unable to extract arch info from " + expname)
         raise SystemExit(0)
 
       #check it exists
@@ -79,19 +79,37 @@ class GenTaskDirs():
         print("Arch file {} doesn't exist".format(arch_file_path))
         raise SystemExit(0)
       
-      design_dir="benchmarks/verilog/ml_benchmarks/"
-      #extract benchmark info from dirname
-      info = re.search(r'(agilex|stratix)\.(.*)', dirname)
-      if info is not None:
-        design_file = info.group(2)+".v"
+      #evaluate design dir based on expname
+      ml = re.search(r'\.ml\.', expname)
+      non_ml = re.search(r'\.non_ml\.', expname)
+      if ml is not None:
+        design_dir="benchmarks/verilog/ml_benchmarks"
+      elif non_ml is not None:
+        design_dir="benchmarks/verilog/"
       else:
-        print("Unable to extract benchmark info from " + dirname)
+        print("Unable to extract design dir from " + expname)
+        raise SystemExit(0)
+
+      #extract benchmark info from expname
+      info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', expname)
+      if info is not None:
+        design_file = info.group(3)+".v"
+      else:
+        print("Unable to extract benchmark info from " + expname)
         raise SystemExit(0)
 
       #check it exists
       design_file_path = "../" + design_dir + "/" + design_file
       if not os.path.exists(design_file_path):
         print("Design file {} doesn't exist".format(design_file_path))
+        raise SystemExit(0)
+
+      #extract task dir info from expname
+      info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', expname)
+      if info is not None:
+        dirname = info.group(1) + "." + info.group(3)
+      else:
+        print("Unable to extract benchmark info from " + expname)
         raise SystemExit(0)
 
       #create the config file by replacing tags in the template

@@ -62,11 +62,19 @@ class GenCommands():
     for run in range(self.reruns): 
       dirs = open(self.dirs, 'r')
       for line in dirs:
-        dirname = line.rstrip()
+        line=line.strip()
+
         #if the line is commented out, ignore it
-        check_for_comment = re.search(r'^#', dirname)
+        check_for_comment = re.search(r'^#', line)
         if check_for_comment is not None:
           continue
+
+        info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', line)
+        if info is not None:
+          dirname = info.group(1) + "." + info.group(3)
+        else:
+          print("Unable to extract benchmark info from " + expname)
+          raise SystemExit(0)
 
         count += 1
         cmd = re.sub(r'<dir>', dirname, self.cmd_template)
