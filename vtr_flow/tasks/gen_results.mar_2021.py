@@ -46,7 +46,9 @@ class GenResults():
                     "resource_usage_dsp", \
                     "resource_usage_memory", \
                     "odin_blif_found", \
-                    "netlist_primitives"]
+                    "netlist_primitives", \
+                    "vtr_flow_elapsed_time", \
+                    "vtr_flow_peak_memory_usage"]
 
     #method calls in order
     self.parse_args()
@@ -61,8 +63,8 @@ class GenResults():
     parser.add_argument("-i",
                         "--infile",
                         action='store',
-                        default="list_of_result_dirs.mar_2021",
-                        help="File containing list of directories")
+                        default="mar_2021.log",
+                        help="File containing the STDOUT of VTR runs")
     parser.add_argument("-o",
                         "--outfile",
                         action='store',
@@ -87,7 +89,26 @@ class GenResults():
     outfile.close()
 
   #--------------------------
-  #extract information from vpr.out for each entry in infile
+  #find a file
+  #--------------------------
+  def find_file(self, dirname, run_num, file_to_find):
+    found = False
+    for root, dirs, files in os.walk(os.path.realpath(dirname + "/" + run_num), topdown=True):
+      #print(root, dirs, files)
+      for filename in files:
+        #print(filename)
+        match = re.match(file_to_find, filename)
+        if match is not None:
+          found = True
+          found_filename = os.path.join(root,filename)
+          print("Found {} for {}: {}".format(file_to_find, dirname, found_filename))
+          return found_filename
+    if not found:
+      print("Could not find {} for {}".format(file_to_find, dirname))
+      return None
+
+  #--------------------------
+  #extract information for each entry in infile
   #--------------------------
   def extract_info(self):
     infile = open(self.infile, 'r')
@@ -97,7 +118,10 @@ class GenResults():
       check_for_comment = re.search(r'^#', line)
       if check_for_comment is not None:
         continue
-      m = re.search('(.*)/(run.*)', line.rstrip())
+      check_for_task_dir = re.search(r'^task_run_dir=', line)
+      if check_for_task_dir is None:
+        continue
+      m = re.search('task_run_dir=(.*)/(run.*)', line.rstrip())
       if m is not None:
         dirname = m.group(1)
         run_num = m.group(2)
@@ -117,21 +141,14 @@ class GenResults():
         print("Unable to extract experiment info from " + dirname)
 
       print("Extracting info for " + dirname)
-      #try to find vpr.crit.path.out
-      found = False
-      for root, dirs, files in os.walk(os.path.realpath(dirname + "/" + run_num), topdown=True):
-        #print(root, dirs, files)
-        for filename in files:
-          #print(filename)
-          match = re.match(r'vpr.crit_path.out', filename)
-          if match is not None:
-            print("Found vpr.crit_path.out for " + result_dict['design'])
-            found = True
-            vpr_out_filename = os.path.join(root,filename)
-            break
-      if not found:
+
+      #--------------------------
+      #extract information from vpr.crit_path.out
+      #--------------------------
+      #try to find vpr.crit_path.out
+      vpr_out_filename = self.find_file(dirname, run_num, "vpr.crit_path.out")
+      if vpr_out_filename is None:
         result_dict['vpr_results_found'] = "No" 
-        print("Could not find vpr.crit_path.out for ", dirname)
       else:      
         result_dict['vpr_results_found'] = "Yes" 
 
@@ -220,32 +237,40 @@ class GenResults():
           result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
           result_dict['area_delay_product'] = float(result_dict['total_area']) * float(result_dict['critical_path'])
 
+      #--------------------------
+      #extract information from odin.blif
+      #--------------------------
       #try to find <design>.odin.blif 
-      found = False
-      for root, dirs, files in os.walk(os.path.realpath(dirname + "/" + run_num), topdown=True):
-        #print(root, dirs, files)
-        for filename in files:
-          #print(filename)
-          match = re.match(result_dict['design']+'.odin.blif', filename)
-          if match is not None:
-            print("Found odin.blif for " + result_dict['design'])
-            found = True
-            odin_blif_filename = os.path.join(root,filename)
-            break
-      if not found:
+      odin_blif_filename = self.find_file(dirname, run_num, result_dict['design']+'.odin.blif')
+      if odin_blif_filename is None:
         result_dict['odin_blif_found'] = "No" 
-        print("Could not find odin.blif for ", dirname)
       else:      
         result_dict['odin_blif_found'] = "Yes" 
   
-      netlist_primitives = 0
-      odin_blif = open(odin_blif_filename, "r")
-      for line in odin_blif:
-        if ".latch" in line or ".subckt" in line or ".names" in line:
-          netlist_primitives = netlist_primitives + 1
+        netlist_primitives = 0
+        odin_blif = open(odin_blif_filename, "r")
+        for line in odin_blif:
+          if ".latch" in line or ".subckt" in line or ".names" in line:
+            netlist_primitives = netlist_primitives + 1
 
-      result_dict['netlist_primitives'] = netlist_primitives
-      odin_blif.close()
+        result_dict['netlist_primitives'] = netlist_primitives
+        odin_blif.close()
+
+      #--------------------------
+      #extract information from parse_results.txt
+      #--------------------------
+      #try to find parse_results.txt
+      parse_results_filename = self.find_file(dirname, run_num, 'parse_results.txt')
+      parse_results_filehandle = open(parse_results_filename, "r")
+      parse_results_dict_reader = csv.DictReader(parse_results_filehandle, delimiter='\t')
+      for row in parse_results_dict_reader:
+        #print(row.keys())
+        #print(row.values())
+        result_dict['vtr_flow_elapsed_time'] = row['vtr_flow_elapsed_time']
+        result_dict['vtr_flow_peak_memory_usage'] = max(float(row['max_odin_mem']), \
+                                                        float(row['max_abc_mem']), \
+                                                        float(row['max_ace_mem']), \
+                                                        float(row['max_vpr_mem']))
 
       #append the current results to the main result list
       self.result_list.append(result_dict)
