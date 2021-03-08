@@ -428,13 +428,13 @@ wire                    pop_buf;        // finish reading a buffer
 // buffer signals
 wire [BufferCount-1:0] buf_ce0;
 wire [BufferCount-1:0] buf_we0;
-wire [AddressWidth-1:0] buf_a0[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_d0[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_q0[BufferCount-1:0];
+wire [AddressWidth-1:0] buf_a0_0, buf_a0_1;
+wire [DataWidth-1:0] buf_d0_0, buf_d0_1;
+wire [DataWidth-1:0] buf_q0_0, buf_q0_1;
 wire [BufferCount-1:0] buf_ce1;
 wire [BufferCount-1:0] buf_we1;
-wire [AddressWidth-1:0] buf_a1[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_d1[BufferCount-1:0];
+wire [AddressWidth-1:0] buf_a1_0, buf_a1_1;
+wire [DataWidth-1:0] buf_d1_0, buf_d1_1;
 //------------------------Instantiation------------------
 //genvar i;
         td_fused_top_dataflow_in_loop_TOP_LOOP49028_accum1_out_0_memcore td_fused_top_dataflow_in_loop_TOP_LOOP49028_accum1_out_0_memcore_U_0 (
@@ -442,58 +442,58 @@ wire [DataWidth-1:0]    buf_d1[BufferCount-1:0];
             .reset    ( reset ),
             .ce0      ( buf_ce0[ 0 ] ),
             .we0      ( buf_we0[ 0 ] ),
-            .address0 ( buf_a0[ 0 ] ),
-            .d0       ( buf_d0[ 0 ] ),
-            .q0       ( buf_q0[ 0 ] ),
+            .address0 ( buf_a0_0 ),
+            .d0       ( buf_d0_0 ),
+            .q0       ( buf_q0_0 ),
             .ce1      ( buf_ce1[ 0 ] ),
             .we1      ( buf_we1[ 0 ] ),
-            .address1 ( buf_a1[ 0 ] ),
-            .d1       ( buf_d1[ 0 ] )
+            .address1 ( buf_a1_0 ),
+            .d1       ( buf_d1_0 )
         );
         td_fused_top_dataflow_in_loop_TOP_LOOP49028_accum1_out_0_memcore td_fused_top_dataflow_in_loop_TOP_LOOP49028_accum1_out_0_memcore_U_1 (
             .clk      ( clk ),
             .reset    ( reset ),
             .ce0      ( buf_ce0[ 1 ] ),
             .we0      ( buf_we0[ 1 ] ),
-            .address0 ( buf_a0[ 1 ] ),
-            .d0       ( buf_d0[ 1 ] ),
-            .q0       ( buf_q0[ 1 ] ),
+            .address0 ( buf_a0_1 ),
+            .d0       ( buf_d0_1 ),
+            .q0       ( buf_q0_1 ),
             .ce1      ( buf_ce1[ 1 ] ),
             .we1      ( buf_we1[ 1 ] ),
-            .address1 ( buf_a1[ 1 ] ),
-            .d1       ( buf_d1[ 1 ] )
+            .address1 ( buf_a1_1 ),
+            .d1       ( buf_d1_1 )
         );
 
 //++++++++++++++++++++++++buffer signals+++++++++++++++++
         assign buf_ce0[ 0 ] = (tptr ==  0  && empty_n) ? t_ce0
                              : (iptr ==  0 ) ? i_ce0 : 1'b0;
-        assign buf_a0[ 0 ]  = (tptr ==  0  && empty_n) ?  t_address0 : i_address0;
+        assign buf_a0_0  = (tptr ==  0  && empty_n) ?  t_address0 : i_address0;
         assign buf_we0[ 0 ] = (tptr ==  0  && empty_n)  ? t_we0
                              : (iptr ==  0 ) ? i_we0 : 1'b0;
-        assign buf_d0[ 0 ]  = (tptr ==  0  && empty_n) ? t_d0       : i_d0;
+        assign buf_d0_0  = (tptr ==  0  && empty_n) ? t_d0       : i_d0;
         assign buf_ce1[ 0 ] = (tptr ==  0  && empty_n) ? t_ce1
                              : (iptr ==  0 ) ? i_ce1 : 1'b0;
-        assign buf_a1[ 0 ]  = (tptr ==  0  && empty_n) ?  t_address1 : i_address1;
+        assign buf_a1_0  = (tptr ==  0  && empty_n) ?  t_address1 : i_address1;
         assign buf_we1[ 0 ] = (tptr ==  0  && empty_n)  ? t_we1
                              : (iptr ==  0 ) ? i_we1 : 1'b0;
-        assign buf_d1[ 0 ]  = (tptr ==  0  && empty_n) ? t_d1       : i_d1;
+        assign buf_d1_0  = (tptr ==  0  && empty_n) ? t_d1       : i_d1;
         assign buf_ce0[ 1 ] = (tptr ==  1  && empty_n) ? t_ce0
                              : (iptr ==  1 ) ? i_ce0 : 1'b0;
-        assign buf_a0[ 1 ]  = (tptr ==  1  && empty_n) ?  t_address0 : i_address0;
+        assign buf_a0_1  = (tptr ==  1  && empty_n) ?  t_address0 : i_address0;
         assign buf_we0[ 1 ] = (tptr ==  1  && empty_n)  ? t_we0
                              : (iptr ==  1 ) ? i_we0 : 1'b0;
-        assign buf_d0[ 1 ]  = (tptr ==  1  && empty_n) ? t_d0       : i_d0;
+        assign buf_d0_1  = (tptr ==  1  && empty_n) ? t_d0       : i_d0;
         assign buf_ce1[ 1 ] = (tptr ==  1  && empty_n) ? t_ce1
                              : (iptr ==  1 ) ? i_ce1 : 1'b0;
-        assign buf_a1[ 1 ]  = (tptr ==  1  && empty_n) ?  t_address1 : i_address1;
+        assign buf_a1_1  = (tptr ==  1  && empty_n) ?  t_address1 : i_address1;
         assign buf_we1[ 1 ] = (tptr ==  1  && empty_n)  ? t_we1
                              : (iptr ==  1 ) ? i_we1 : 1'b0;
-        assign buf_d1[ 1 ]  = (tptr ==  1  && empty_n) ? t_d1       : i_d1;
+        assign buf_d1_1  = (tptr ==  1  && empty_n) ? t_d1       : i_d1;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //------------------------Body---------------------------
-assign i_q0      = (prev_iptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
-assign t_q0      = reg_valid0 ? reg_q0 : (prev_tptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
+assign i_q0      = (prev_iptr == 1'b1 ? buf_q0_1 : buf_q0_0);
+assign t_q0      = reg_valid0 ? reg_q0 : (prev_tptr == 1'b1 ? buf_q0_1 : buf_q0_0);
 
 //++++++++++++++++++++++++output+++++++++++++++++++++++++
 assign i_full_n  = full_n;
@@ -553,7 +553,7 @@ always @(posedge clk) begin
         reg_q0     <= 1'b0;
         reg_valid0 <= 1'b0;
     end else if (!t_ce0 && !reg_valid0) begin
-        reg_q0     <= (prev_tptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
+        reg_q0     <= (prev_tptr == 1'b1 ? buf_q0_1 : buf_q0_0);
         reg_valid0 <= 1'b1;
     end else if (t_ce0) begin
         reg_valid0 <= 1'b0;
@@ -773,13 +773,13 @@ wire                    pop_buf;        // finish reading a buffer
 // buffer signals
 wire [BufferCount-1:0] buf_ce0;
 wire [BufferCount-1:0] buf_we0;
-wire [AddressWidth-1:0] buf_a0[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_d0[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_q0[BufferCount-1:0];
+wire [AddressWidth-1:0] buf_a0_0, buf_a0_1;
+wire [DataWidth-1:0] buf_d0_0, buf_d0_1;
+wire [DataWidth-1:0] buf_q0_0, buf_q0_1;
 wire [BufferCount-1:0] buf_ce1;
 wire [BufferCount-1:0] buf_we1;
-wire [AddressWidth-1:0] buf_a1[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_d1[BufferCount-1:0];
+wire [AddressWidth-1:0] buf_a1_0, buf_a1_1;
+wire [DataWidth-1:0] buf_d1_0, buf_d1_1;
 //------------------------Instantiation------------------
 //genvar i;
         td_fused_top_dataflow_in_loop_TOP_LOOP49028_ifmap_vec_0_0_memcore td_fused_top_dataflow_in_loop_TOP_LOOP49028_ifmap_vec_0_0_memcore_U_0 (
@@ -787,62 +787,62 @@ wire [DataWidth-1:0]    buf_d1[BufferCount-1:0];
             .reset    ( reset ),
             .ce0      ( buf_ce0[ 0 ] ),
             .we0      ( buf_we0[ 0 ] ),
-            .address0 ( buf_a0[ 0 ] ),
-            .d0       ( buf_d0[ 0 ] ),
-            .q0       ( buf_q0[ 0 ] ),
+            .address0 ( buf_a0_0 ),
+            .d0       ( buf_d0_0 ),
+            .q0       ( buf_q0_0 ),
             .ce1      ( buf_ce1[ 0 ] ),
             .we1      ( buf_we1[ 0 ] ),
-            .address1 ( buf_a1[ 0 ] ),
-            .d1       ( buf_d1[ 0 ] )
+            .address1 ( buf_a1_0 ),
+            .d1       ( buf_d1_0 )
         );
         td_fused_top_dataflow_in_loop_TOP_LOOP49028_ifmap_vec_0_0_memcore td_fused_top_dataflow_in_loop_TOP_LOOP49028_ifmap_vec_0_0_memcore_U_1 (
             .clk      ( clk ),
             .reset    ( reset ),
             .ce0      ( buf_ce0[ 1 ] ),
             .we0      ( buf_we0[ 1 ] ),
-            .address0 ( buf_a0[ 1 ] ),
-            .d0       ( buf_d0[ 1 ] ),
-            .q0       ( buf_q0[ 1 ] ),
+            .address0 ( buf_a0_1 ),
+            .d0       ( buf_d0_1 ),
+            .q0       ( buf_q0_1 ),
             .ce1      ( buf_ce1[ 1 ] ),
             .we1      ( buf_we1[ 1 ] ),
-            .address1 ( buf_a1[ 1 ] ),
-            .d1       ( buf_d1[ 1 ] )
+            .address1 ( buf_a1_1 ),
+            .d1       ( buf_d1_1 )
         );
 
 //++++++++++++++++++++++++buffer signals+++++++++++++++++
         assign buf_ce0[ 0 ] = (tptr ==  0  && empty_n) ? t_ce0
                              : (iptr ==  0 ) ? i_ce0 : 1'b0;
-        assign buf_a0[ 0 ]  = (tptr ==  0  && empty_n) ?  t_address0 : i_address0;
+        assign buf_a0_0  = (tptr ==  0  && empty_n) ?  t_address0 : i_address0;
         assign buf_we0[ 0 ] = (tptr ==  0  && empty_n)  ? t_we0
                              : (iptr ==  0 ) ? i_we0 : 1'b0;
-        assign buf_d0[ 0 ]  = (tptr ==  0  && empty_n) ? t_d0       : i_d0;
+        assign buf_d0_0  = (tptr ==  0  && empty_n) ? t_d0       : i_d0;
         assign buf_ce1[ 0 ] = (tptr ==  0  && empty_n) ? t_ce1
                              : (iptr ==  0 ) ? i_ce1 : 1'b0;
-        assign buf_a1[ 0 ]  = (tptr ==  0  && empty_n) ?  t_address1 : i_address1;
+        assign buf_a1_0  = (tptr ==  0  && empty_n) ?  t_address1 : i_address1;
         assign buf_we1[ 0 ] = (tptr ==  0  && empty_n)  ? t_we1
                              : (iptr ==  0 ) ? i_we1 : 1'b0;
-        assign buf_d1[ 0 ]  = (tptr ==  0  && empty_n) ? t_d1       : i_d1;
+        assign buf_d1_0  = (tptr ==  0  && empty_n) ? t_d1       : i_d1;
         assign buf_ce0[ 1 ] = (tptr ==  1  && empty_n) ? t_ce0
                              : (iptr ==  1 ) ? i_ce0 : 1'b0;
-        assign buf_a0[ 1 ]  = (tptr ==  1  && empty_n) ?  t_address0 : i_address0;
+        assign buf_a0_1  = (tptr ==  1  && empty_n) ?  t_address0 : i_address0;
         assign buf_we0[ 1 ] = (tptr ==  1  && empty_n)  ? t_we0
                              : (iptr ==  1 ) ? i_we0 : 1'b0;
-        assign buf_d0[ 1 ]  = (tptr ==  1  && empty_n) ? t_d0       : i_d0;
+        assign buf_d0_1  = (tptr ==  1  && empty_n) ? t_d0       : i_d0;
         assign buf_ce1[ 1 ] = (tptr ==  1  && empty_n) ? t_ce1
                              : (iptr ==  1 ) ? i_ce1 : 1'b0;
-        assign buf_a1[ 1 ]  = (tptr ==  1  && empty_n) ?  t_address1 : i_address1;
+        assign buf_a1_1  = (tptr ==  1  && empty_n) ?  t_address1 : i_address1;
         assign buf_we1[ 1 ] = (tptr ==  1  && empty_n)  ? t_we1
                              : (iptr ==  1 ) ? i_we1 : 1'b0;
-        assign buf_d1[ 1 ]  = (tptr ==  1  && empty_n) ? t_d1       : i_d1;
+        assign buf_d1_1  = (tptr ==  1  && empty_n) ? t_d1       : i_d1;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //------------------------Body---------------------------
-//assign i_q0      = (prev_iptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
-assign i_q0      = (prev_iptr == 1'b1) ? buf_q0[1] : buf_q0[0];
+//assign i_q0      = (prev_iptr == 1'b1 ? buf_q0_1 : buf_q0_0);
+assign i_q0      = (prev_iptr == 1'b1) ? buf_q0_1 : buf_q0_0;
 
-//assign t_q0      = reg_valid0 ? reg_q0 : (prev_tptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
+//assign t_q0      = reg_valid0 ? reg_q0 : (prev_tptr == 1'b1 ? buf_q0_1 : buf_q0_0);
 wire [DataWidth-1:0] buf_q0_prev;
-assign buf_q0_prev = (prev_tptr == 1'b1) ? buf_q0[1] : buf_q0[0];
+assign buf_q0_prev = (prev_tptr == 1'b1) ? buf_q0_1 : buf_q0_0;
 assign t_q0      = reg_valid0 ? reg_q0 : buf_q0_prev;
 
 //++++++++++++++++++++++++output+++++++++++++++++++++++++
@@ -1115,12 +1115,12 @@ wire                    pop_buf;        // finish reading a buffer
 // buffer signals
 wire [BufferCount-1:0] buf_ce0;
 wire [BufferCount-1:0] buf_we0;
-wire [AddressWidth-1:0] buf_a0[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_d0[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_q0[BufferCount-1:0];
+wire [AddressWidth-1:0] buf_a0_0, buf_a0_1;
+wire [DataWidth-1:0] buf_d0_0, buf_d0_1;
+wire [DataWidth-1:0] buf_q0_0, buf_q0_1;
 wire [BufferCount-1:0] buf_ce1;
-wire [AddressWidth-1:0] buf_a1[BufferCount-1:0];
-wire [DataWidth-1:0]    buf_q1[BufferCount-1:0];
+wire [AddressWidth-1:0] buf_a1_0, buf_a1_1;
+wire [DataWidth-1:0] buf_q1_0, buf_q1_1;
 //------------------------Instantiation------------------
 //genvar i;
         td_fused_top_dataflow_in_loop_TOP_LOOP49028_products_0_memcore td_fused_top_dataflow_in_loop_TOP_LOOP49028_products_0_memcore_U_0 (
@@ -1128,52 +1128,52 @@ wire [DataWidth-1:0]    buf_q1[BufferCount-1:0];
             .reset    ( reset ),
             .ce0      ( buf_ce0[ 0 ] ),
             .we0      ( buf_we0[ 0 ] ),
-            .address0 ( buf_a0[ 0 ] ),
-            .d0       ( buf_d0[ 0 ] ),
-            .q0       ( buf_q0[ 0 ] ),
+            .address0 ( buf_a0_0 ),
+            .d0       ( buf_d0_0 ),
+            .q0       ( buf_q0_0 ),
             .ce1      ( buf_ce1[ 0 ] ),
-            .address1 ( buf_a1[ 0 ] ),
-            .q1       ( buf_q1[ 0 ] )
+            .address1 ( buf_a1_0 ),
+            .q1       ( buf_q1_0 )
         );
         td_fused_top_dataflow_in_loop_TOP_LOOP49028_products_0_memcore td_fused_top_dataflow_in_loop_TOP_LOOP49028_products_0_memcore_U_1 (
             .clk      ( clk ),
             .reset    ( reset ),
             .ce0      ( buf_ce0[ 1 ] ),
             .we0      ( buf_we0[ 1 ] ),
-            .address0 ( buf_a0[ 1 ] ),
-            .d0       ( buf_d0[ 1 ] ),
-            .q0       ( buf_q0[ 1 ] ),
+            .address0 ( buf_a0_1 ),
+            .d0       ( buf_d0_1 ),
+            .q0       ( buf_q0_1 ),
             .ce1      ( buf_ce1[ 1 ] ),
-            .address1 ( buf_a1[ 1 ] ),
-            .q1       ( buf_q1[ 1 ] )
+            .address1 ( buf_a1_1 ),
+            .q1       ( buf_q1_1 )
         );
 
 //++++++++++++++++++++++++buffer signals+++++++++++++++++
         assign buf_ce0[ 0 ] = (tptr ==  0  && empty_n) ? t_ce0
                              : (iptr ==  0 ) ? i_ce0 : 1'b0;
-        assign buf_a0[ 0 ]  = (tptr ==  0  && empty_n) ?  t_address0 : i_address0;
+        assign buf_a0_0  = (tptr ==  0  && empty_n) ?  t_address0 : i_address0;
         assign buf_we0[ 0 ] = (tptr ==  0  && empty_n)  ? t_we0
                              : (iptr ==  0 ) ? i_we0 : 1'b0;
-        assign buf_d0[ 0 ]  = (tptr ==  0  && empty_n) ? t_d0       : i_d0;
+        assign buf_d0_0  = (tptr ==  0  && empty_n) ? t_d0       : i_d0;
         assign buf_ce1[ 0 ] = (tptr ==  0  && empty_n) ? t_ce1
                              : (iptr ==  0 ) ? i_ce1 : 1'b0;
-        assign buf_a1[ 0 ]  = (tptr ==  0  && empty_n) ?  t_address1 : i_address1;
+        assign buf_a1_0  = (tptr ==  0  && empty_n) ?  t_address1 : i_address1;
         assign buf_ce0[ 1 ] = (tptr ==  1  && empty_n) ? t_ce0
                              : (iptr ==  1 ) ? i_ce0 : 1'b0;
-        assign buf_a0[ 1 ]  = (tptr ==  1  && empty_n) ?  t_address0 : i_address0;
+        assign buf_a0_1  = (tptr ==  1  && empty_n) ?  t_address0 : i_address0;
         assign buf_we0[ 1 ] = (tptr ==  1  && empty_n)  ? t_we0
                              : (iptr ==  1 ) ? i_we0 : 1'b0;
-        assign buf_d0[ 1 ]  = (tptr ==  1  && empty_n) ? t_d0       : i_d0;
+        assign buf_d0_1  = (tptr ==  1  && empty_n) ? t_d0       : i_d0;
         assign buf_ce1[ 1 ] = (tptr ==  1  && empty_n) ? t_ce1
                              : (iptr ==  1 ) ? i_ce1 : 1'b0;
-        assign buf_a1[ 1 ]  = (tptr ==  1  && empty_n) ?  t_address1 : i_address1;
+        assign buf_a1_1  = (tptr ==  1  && empty_n) ?  t_address1 : i_address1;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //------------------------Body---------------------------
-assign i_q0      = (prev_iptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
-assign t_q0      = reg_valid0 ? reg_q0 : (prev_tptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
-assign i_q1      = (prev_iptr == 1'b1 ? buf_q1[1] : buf_q1[0]);
-assign t_q1      = reg_valid1 ? reg_q1 : (prev_tptr == 1'b1 ? buf_q1[1] : buf_q1[0]);
+assign i_q0      = (prev_iptr == 1'b1 ? buf_q0_1 : buf_q0_0);
+assign t_q0      = reg_valid0 ? reg_q0 : (prev_tptr == 1'b1 ? buf_q0_1 : buf_q0_0);
+assign i_q1      = (prev_iptr == 1'b1 ? buf_q1_1 : buf_q1_0);
+assign t_q1      = reg_valid1 ? reg_q1 : (prev_tptr == 1'b1 ? buf_q1_1 : buf_q1_0);
 
 //++++++++++++++++++++++++output+++++++++++++++++++++++++
 assign i_full_n  = full_n;
@@ -1233,7 +1233,7 @@ always @(posedge clk) begin
         reg_q0     <= 1'b0;
         reg_valid0 <= 1'b0;
     end else if (!t_ce0 && !reg_valid0) begin
-        reg_q0     <= (prev_tptr == 1'b1 ? buf_q0[1] : buf_q0[0]);
+        reg_q0     <= (prev_tptr == 1'b1 ? buf_q0_1 : buf_q0_0);
         reg_valid0 <= 1'b1;
     end else if (t_ce0) begin
         reg_valid0 <= 1'b0;
@@ -1246,7 +1246,7 @@ always @(posedge clk) begin
         reg_q1     <= 1'b0;
         reg_valid1 <= 1'b0;
     end else if (!t_ce1 && !reg_valid1) begin
-        reg_q1     <= (prev_tptr == 1'b1 ? buf_q1[1] : buf_q1[0]);
+        reg_q1     <= (prev_tptr == 1'b1 ? buf_q1_1 : buf_q1_0);
         reg_valid1 <= 1'b1;
     end else if (t_ce1) begin
         reg_valid1 <= 1'b0;
