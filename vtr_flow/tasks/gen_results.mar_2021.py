@@ -4,11 +4,7 @@ import argparse
 import csv
 import subprocess
 
-#area values from coffe, changed from um2 to mwtas
-#area is SB + CB in the tile
-routing_area_clb = (688+305) / 0.033864
-routing_area_dsp = 4 * routing_area_clb #DSP is 4 rows high
-routing_area_memory = 2 * routing_area_clb #Memory is 2 rows high
+
 
 # ###############################################################
 # Class for parsing VTR results for various experiments
@@ -25,8 +21,11 @@ class GenResults():
     self.metrics = ["design",\
                     "dirname", \
                     "run_num", \
-                    "vpr_results_found", \
+                    "type", \
                     "arch", \
+                    "vpr_results_found", \
+                    "pre_vpr_blif_found", \
+                    "parse_results_found", \
                     "critical_path", \
                     "frequency", \
                     "logic_area", \
@@ -46,7 +45,6 @@ class GenResults():
                     "resource_usage_dsp", \
                     "resource_usage_memory", \
                     "single_bit_adders", \
-                    "odin_blif_found", \
                     "netlist_primitives", \
                     "netlist_primitives>100k", \
                     "vtr_flow_elapsed_time", \
@@ -113,6 +111,34 @@ class GenResults():
       return None
 
   #--------------------------
+  #get routing area of various blocks
+  #--------------------------
+  def get_routing_area(self, arch, block):
+    if arch == "stratix":
+      routing_area_clb = 30481 #in MWTAs
+      routing_area_dsp = 4 * routing_area_clb #DSP is 4 rows high
+      routing_area_memory = 6 * routing_area_clb #Memory is 6 rows high
+    elif arch == "agilex":
+      #area values from coffe, changed from um2 to mwtas
+      #area is SB + CB in the tile
+      routing_area_clb = (688+305) / 0.033864 #converting um2 into MWTAs
+      routing_area_dsp = 4 * routing_area_clb #DSP is 4 rows high
+      routing_area_memory = 2 * routing_area_clb #Memory is 2 rows high
+    else:
+      print("Unsupported architecture: {}".format(arch))  
+      raise SystemExit(0)
+
+    if block == "clb":
+      return routing_area_clb
+    elif block == "dsp":
+      return routing_area_dsp
+    elif block == "memory":
+      return routing_area_memory
+    else:
+      print("Unsupported block: {}".format(block))
+      raise SystemExit(0)
+
+  #--------------------------
   #extract information for each entry in infile
   #--------------------------
   def extract_info(self):
@@ -145,7 +171,7 @@ class GenResults():
       else:
         print("Unable to extract experiment info from " + dirname)
 
-      print("Extracting info for " + dirname)
+      print("Extracting info for " + dirname + "/" + run_num)
 
       #--------------------------
       #extract information from vpr.crit_path.out
@@ -212,7 +238,14 @@ class GenResults():
             resource_usage_clb = resource_usage_clb_match.group(1)
             result_dict['resource_usage_clb'] = int(resource_usage_clb) or 0
 
-          resource_usage_dsp_match = re.search(r'(\d+)\s+blocks of type: dsp_top', line)
+          if result_dict['arch'] == "stratix":
+            resource_usage_dsp_match = re.search(r'(\d+)\s+blocks of type: mult_36', line)
+          elif result_dict['arch'] == "agilex":
+            resource_usage_dsp_match = re.search(r'(\d+)\s+blocks of type: dsp_top', line)
+          else:
+            print("Unsupported architecture")
+            raise SystemExit(0)
+
           if resource_usage_dsp_match is not None and ("Netlist" in prev_line):
             resource_usage_dsp = resource_usage_dsp_match.group(1)
             result_dict['resource_usage_dsp'] = int(resource_usage_dsp) or 0
@@ -236,55 +269,97 @@ class GenResults():
           
         #calculated metrics
         if 'logic_area' in result_dict and 'resource_usage_clb' in result_dict and 'resource_usage_dsp' in result_dict and 'resource_usage_memory' in result_dict:
+          routing_area_clb = self.get_routing_area(result_dict["arch"], "clb")
+          routing_area_dsp = self.get_routing_area(result_dict["arch"], "dsp")
+          routing_area_memory = self.get_routing_area(result_dict["arch"], "memory")
           result_dict['routing_area'] = (routing_area_clb * result_dict['resource_usage_clb']) +\
                                         (routing_area_dsp * result_dict['resource_usage_dsp']) +\
                                         (routing_area_memory * result_dict['resource_usage_memory'])
           result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
 
+      ##--------------------------
+      ##extract information from odin.blif
+      ##--------------------------
+      ##try to find <design>.odin.blif 
+      #odin_blif_filename = self.find_file(dirname, run_num, result_dict['design']+'.odin.blif')
+      #if odin_blif_filename is None:
+      #  result_dict['odin_blif_found'] = "No" 
+      #else:      
+      #  result_dict['odin_blif_found'] = "Yes" 
+  
+      #  netlist_primitives = 0
+      #  odin_blif = open(odin_blif_filename, "r")
+      #  for line in odin_blif:
+      #    if ".latch" in line or ".subckt" in line or ".names" in line:
+      #      netlist_primitives = netlist_primitives + 1
+
+      #  result_dict['netlist_primitives'] = netlist_primitives
+      #  result_dict['netlist_primitives>100k'] = (netlist_primitives > 100000)
+
+      #  odin_blif.close()
+
       #--------------------------
-      #extract information from odin.blif
+      #extract information from pre-vpr.blif
       #--------------------------
       #try to find <design>.odin.blif 
-      odin_blif_filename = self.find_file(dirname, run_num, result_dict['design']+'.odin.blif')
-      if odin_blif_filename is None:
-        result_dict['odin_blif_found'] = "No" 
+      pre_vpr_blif_filename = self.find_file(dirname, run_num, result_dict['design']+'.pre-vpr.blif')
+      if pre_vpr_blif_filename is None:
+        result_dict['pre_vpr_blif_found'] = "No" 
       else:      
-        result_dict['odin_blif_found'] = "Yes" 
+        result_dict['pre_vpr_blif_found'] = "Yes" 
   
         netlist_primitives = 0
-        odin_blif = open(odin_blif_filename, "r")
-        for line in odin_blif:
+        pre_vpr_blif = open(pre_vpr_blif_filename, "r")
+        for line in pre_vpr_blif:
           if ".latch" in line or ".subckt" in line or ".names" in line:
             netlist_primitives = netlist_primitives + 1
 
         result_dict['netlist_primitives'] = netlist_primitives
         result_dict['netlist_primitives>100k'] = (netlist_primitives > 100000)
 
-        odin_blif.close()
+        pre_vpr_blif.close()
 
       #--------------------------
       #extract information from parse_results.txt
       #--------------------------
       #try to find parse_results.txt
       parse_results_filename = self.find_file(dirname, run_num, 'parse_results.txt')
-      parse_results_filehandle = open(parse_results_filename, "r")
-      parse_results_dict_reader = csv.DictReader(parse_results_filehandle, delimiter='\t')
-      for row in parse_results_dict_reader:
-        #print(row.keys())
-        #print(row.values())
-        result_dict['vtr_flow_elapsed_time'] = row['vtr_flow_elapsed_time']
-        result_dict['vtr_flow_peak_memory_usage'] = max(float(row['max_odin_mem']), \
-                                                        float(row['max_abc_mem']), \
-                                                        float(row['max_vpr_mem']))
-        result_dict['logic_depth'] = row['abc_depth']
-        result_dict['device_height'] = row['device_height']
-        result_dict['device_width'] = row['device_width']
-        result_dict['min_channel_width'] = row['min_chan_width']
-        result_dict['critical_path'] = row['critical_path_delay']
+      if parse_results_filename is None:
+        result_dict['parse_results_found'] = "No" 
+      else:
+        result_dict['parse_results_found'] = "Yes"
+        parse_results_filehandle = open(parse_results_filename, "r")
+        parse_results_dict_reader = csv.DictReader(parse_results_filehandle, delimiter='\t')
+        for row in parse_results_dict_reader:
+          #print(row.keys())
+          #print(row.values())
+          result_dict['vtr_flow_elapsed_time'] = row['vtr_flow_elapsed_time']
+          result_dict['vtr_flow_peak_memory_usage'] = max(float(row['max_odin_mem']), \
+                                                          float(row['max_abc_mem']), \
+                                                          float(row['max_vpr_mem']))
+          result_dict['logic_depth'] = row['abc_depth']
+          result_dict['device_height'] = row['device_height']
+          result_dict['device_width'] = row['device_width']
+          result_dict['min_channel_width'] = row['min_chan_width']
+          result_dict['critical_path'] = row['critical_path_delay']
+          result_dict['frequency'] = 1/float(row['critical_path_delay'])*1000
+        parse_results_filehandle.close()
           
       
       result_dict['area_delay_product'] = float(result_dict.get('total_area',0)) * float(result_dict.get('critical_path',0))
-      result_dict['frequency'] = 1/float(row['critical_path_delay'])*1000
+
+      #--------------------------
+      #identify whether this is ml or non-ml design
+      #--------------------------
+      config_file = dirname + "/config/config.txt"
+      config_fh = open(config_file, "r")
+      result_dict["type"] = "non_ml"
+      for line in config_fh:
+        m = re.search("circuits_dir.*ml_benchmarks", line)
+        if m is not None:
+          result_dict["type"] = "ml"
+          break
+      config_fh.close()  
 
       #append the current results to the main result list
       self.result_list.append(result_dict)
