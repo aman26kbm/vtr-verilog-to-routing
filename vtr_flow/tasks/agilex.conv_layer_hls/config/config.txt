@@ -3,7 +3,7 @@
 ##############################################
 
 # Path to directory of circuits to use
-circuits_dir=benchmarks/verilog/ml_benchmarks/
+circuits_dir=benchmarks/verilog/ml_benchmarks
 
 # Path to directory of architectures to use
 archs_dir=arch/COFFE_22nm
@@ -12,7 +12,7 @@ archs_dir=arch/COFFE_22nm
 circuit_list_add=conv_layer_hls.v
 
 # Add architectures to list to sweep
-arch_list_add=agilex_arch.auto_layout.xml
+arch_list_add=agilex_like_arch.auto_layout.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt

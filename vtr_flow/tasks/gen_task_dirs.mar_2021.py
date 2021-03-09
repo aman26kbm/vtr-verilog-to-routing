@@ -64,7 +64,7 @@ class GenTaskDirs():
       ag = re.search(r'agilex\.', expname)
       st = re.search(r'stratix\.', expname)
       if ag is not None:
-        arch_file = "agilex_arch.auto_layout.xml"
+        arch_file = "agilex_like_arch.auto_layout.xml"
         arch_dir = "arch/COFFE_22nm"
       elif st is not None:
         arch_file = "k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml"

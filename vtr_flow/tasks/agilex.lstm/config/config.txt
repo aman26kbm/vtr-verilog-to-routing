@@ -9,7 +9,7 @@ circuits_dir=benchmarks/verilog/ml_benchmarks
 archs_dir=arch/COFFE_22nm
 
 # Add circuits to list to sweep
-circuit_list_add=clstm_medium.v
+circuit_list_add=lstm.v
 
 # Add architectures to list to sweep
 arch_list_add=agilex_like_arch.auto_layout.xml

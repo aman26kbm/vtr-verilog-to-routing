@@ -45,10 +45,14 @@ class GenResults():
                     "resource_usage_dsp", \
                     "resource_usage_memory", \
                     "single_bit_adders", \
+                    "luts", \
+                    "ffs", \
+                    "ff_to_lut_ratio", \
                     "netlist_primitives", \
                     "netlist_primitives>100k", \
                     "vtr_flow_elapsed_time", \
                     "vtr_flow_peak_memory_usage", \
+                    "near_crit_connections", \
                     "logic_depth", \
                     "device_height", \
                     "device_width" ]
@@ -186,7 +190,22 @@ class GenResults():
         #Start parsing vtr.out
         vpr_out = open(vpr_out_filename, 'r')
 
+        resource_usage_ff = 0
+        resource_usage_adder = 0
+        resource_usage_lut = 0
+        pb_types_usage = False
+
         for line in vpr_out:
+          #pb types usage section starts with this text
+          pb_types_usage_match = re.search('Pb types usage', line)
+          if pb_types_usage_match is not None:
+            pb_types_usage = True
+
+          #pb types usage section ends with this text
+          create_device_usage_match = re.search('# Create Device', line)
+          if create_device_usage_match is not None:
+            pb_types_usage = False
+
           #print(line)
           logic_area_match = re.search(r'Total used logic block area: (.*)', line)
           if logic_area_match is not None:
@@ -256,14 +275,29 @@ class GenResults():
             result_dict['resource_usage_memory'] = int(resource_usage_memory) or 0
 
           resource_usage_adder_match = re.search(r'adder\s*:\s*(\d*)', line)
-          if resource_usage_adder_match is not None and ("LUT" in prev_line):
-            resource_usage_adder = resource_usage_adder_match.group(1)
+          if resource_usage_adder_match is not None and pb_types_usage is True:
+            resource_usage_adder += int(resource_usage_adder_match.group(1))
             result_dict['single_bit_adders'] = int(resource_usage_adder) or 0
+
+          resource_usage_lut_match = re.search(r'lut\s*:\s*(\d*)', line)
+          if resource_usage_lut_match is not None and pb_types_usage is True:
+            resource_usage_lut += int(resource_usage_lut_match.group(1))
+            result_dict['luts'] = int(resource_usage_lut) or 0
+
+          resource_usage_ff_match = re.search(r'ff\s*:\s*(\d*)', line)
+          if resource_usage_ff_match is not None and pb_types_usage is True:
+            resource_usage_ff += int(resource_usage_ff_match.group(1))
+            result_dict['ffs'] = resource_usage_ff or 0
 
           max_fanout_match = re.search(r'Max Fanout\s*:\s*(.*)', line)
           if max_fanout_match is not None and ("Avg Fanout" in prev_line):
             max_fanout = max_fanout_match.group(1)
             result_dict['max_fanout'] = round(float(max_fanout)) or 0
+
+          near_crit_connections_match = re.search(r'\[        0:      0.1\)\s*\d+\s*\(\s*([\d\.]*)%\)', line)
+          if near_crit_connections_match is not None and ("Final Net Connection Criticality Histogram" in prev_line):
+            near_crit_connections = near_crit_connections_match.group(1)
+            result_dict['near_crit_connections'] = float(near_crit_connections) or 0
 
           prev_line = line 
           
@@ -276,6 +310,8 @@ class GenResults():
                                         (routing_area_dsp * result_dict['resource_usage_dsp']) +\
                                         (routing_area_memory * result_dict['resource_usage_memory'])
           result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
+
+        result_dict['ff_to_lut_ratio'] = result_dict['ffs']) / result_dict['luts']
 
       ##--------------------------
       ##extract information from odin.blif
