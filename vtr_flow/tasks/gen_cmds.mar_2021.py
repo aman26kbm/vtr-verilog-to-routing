@@ -18,7 +18,7 @@ class GenCommands():
     self.outfile = ''
     #self.cmd_template = '../scripts/run_vtr_task.py <dir> -s "--const_gen_inference comb --seed <seed> --timing_report_npaths 1000 --timing_report_detail aggregated"'
     self.cmd_template = '../scripts/run_vtr_task.py <dir> -s --const_gen_inference comb --seed <seed> --timing_report_detail aggregated --sdc_file <sdc_full_path>'
-    self.num_proc = 6
+    self.num_proc = 3
     
     #method calls in order
     self.parse_args()
@@ -79,7 +79,7 @@ class GenCommands():
 
         count += 1
         cmd = re.sub(r'<dir>', dirname, self.cmd_template)
-        cmd = re.sub(r'<sdc_full_path>', os.path.abspath(design_name+".sdc"), self.cmd_template)
+        cmd = re.sub(r'<sdc_full_path>', os.path.abspath(design_name+".sdc"), cmd)
         cmd = re.sub(r'<seed>', str(random.randint(1,10000)), cmd)
 
         # We want only num_proc jobs to be launched at a time

@@ -8,8 +8,7 @@ create_clock -period 0 *
 '''
 
 two_clk_sdc = '''
-create_clock -period 0 <clk1>
-create_clock -period 0 <clk2>
+create_clock -period 0 *
 set_clock_groups -exclusive -group {<clk1>} -group {<clk2>}
 '''
 
@@ -30,6 +29,28 @@ clk_names_dict = {
 'clstm_medium' : ['clk'],
 'clstm_small' : ['clk'],
 'lstm' : ['clk'],
+'LU32PEEng' : ['clk'],
+'LU64PEEng' : ['clk'],
+'LU8PEEng' : ['clk'],
+'arm_core' : ['i_clk'],
+'bgm' : ['clock'],
+'blob_merge' : ['clk'],
+'boundtop' : ['tm3_clk_v0'],
+'ch_intrinsics' : ['clk'],
+'diffeq1' : ['clk'],
+'diffeq2' : ['clk'],
+'mcml' : ['clk'],
+'mkDelayWorker32B' : ['wciS0_Clk'],
+'mkPktMerge' : ['CLK'],
+'mkSMAdapter4B' : ['wciS0_Clk'],
+'or1200' : ['clk'],
+'raygentop' : ['tm3_clk_v0'],
+'sha' : ['clk_i'],
+'spree' : ['clk'],
+'stereovision0' : ['tm3_clk_v0'],
+'stereovision1' : ['tm3_clk_v0'],
+'stereovision2' : ['tm3_clk_v0'],
+'stereovision3' : ['tm3_clk_v0'],
 }
 
 # ###############################################################

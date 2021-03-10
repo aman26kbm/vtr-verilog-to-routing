@@ -1,4 +1,3 @@
 
-create_clock -period 0 clk
-create_clock -period 0 clk_mem
+create_clock -period 0 *
 set_clock_groups -exclusive -group {clk} -group {clk_mem}

@@ -16,17 +16,23 @@ agilex.ml.robot_reinforcement_learning
 agilex.ml.softmax_p4_smem_rfloat16_alut_v512_b2_0_10
 agilex.ml.mlp_leflow
 agilex.ml.spmv
-agilex.ml.clstm_large
-agilex.ml.clstm_medium
+#agilex.ml.clstm_large
+#agilex.ml.clstm_medium
 agilex.ml.clstm_small
 agilex.ml.lstm
 #-------------------
 # Non-ML benchmarks
 #-------------------
 agilex.non_ml.LU32PEEng
+agilex.non_ml.LU64PEEng
+agilex.non_ml.LU8PEEng
 agilex.non_ml.arm_core
 agilex.non_ml.bgm
 agilex.non_ml.blob_merge
+agilex.non_ml.boundtop
+agilex.non_ml.ch_intrinsics
+agilex.non_ml.diffeq1
+agilex.non_ml.diffeq2
 agilex.non_ml.mcml
 agilex.non_ml.mkDelayWorker32B
 agilex.non_ml.mkPktMerge
@@ -34,7 +40,11 @@ agilex.non_ml.mkSMAdapter4B
 agilex.non_ml.or1200
 agilex.non_ml.raygentop
 agilex.non_ml.sha
+agilex.non_ml.spree
+agilex.non_ml.stereovision0
+agilex.non_ml.stereovision1
 agilex.non_ml.stereovision2
+agilex.non_ml.stereovision3
 #####################################
 # Stratix (Flagship)
 #####################################

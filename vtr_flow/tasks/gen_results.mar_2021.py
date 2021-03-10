@@ -48,6 +48,8 @@ class GenResults():
                     "luts", \
                     "ffs", \
                     "ff_to_lut_ratio", \
+                    "dsp_to_clb_ratio", \
+                    "memory_to_clb_ratio", \
                     "netlist_primitives", \
                     "netlist_primitives>100k", \
                     "vtr_flow_elapsed_time", \
@@ -311,7 +313,9 @@ class GenResults():
                                         (routing_area_memory * result_dict['resource_usage_memory'])
           result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
 
-        result_dict['ff_to_lut_ratio'] = result_dict['ffs']) / result_dict['luts']
+        result_dict['ff_to_lut_ratio'] = result_dict['ffs'] / result_dict['luts']
+        result_dict['dsp_to_clb_ratio'] = result_dict['resource_usage_dsp'] / result_dict['resource_usage_clb']
+        result_dict['memory_to_clb_ratio'] = result_dict['resource_usage_memory'] / result_dict['resource_usage_clb']
 
       ##--------------------------
       ##extract information from odin.blif
@@ -337,7 +341,7 @@ class GenResults():
       #--------------------------
       #extract information from pre-vpr.blif
       #--------------------------
-      #try to find <design>.odin.blif 
+      #try to find <design>.pre-vpr.blif 
       pre_vpr_blif_filename = self.find_file(dirname, run_num, result_dict['design']+'.pre-vpr.blif')
       if pre_vpr_blif_filename is None:
         result_dict['pre_vpr_blif_found'] = "No" 
