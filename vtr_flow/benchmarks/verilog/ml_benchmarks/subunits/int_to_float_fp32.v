@@ -49,7 +49,7 @@ module int_to_float(
 	end
 	else begin
         pipe_in <= input_a;
-		pipe_1 <= {input_a,z_s,value};
+		pipe_1 <= {pipe_in,z_s,value};
 		pipe_2 <= {pipe_1[64:33],tmp_cnt,pipe_1[32:0]};
 		pipe_3 <= {pipe_2[70:39],sub_a_e,pipe_2[32:0]};
 		pipe_4 <= {pipe_3[70:39],sub_z_e,pipe_3[32],a_m_shift};
