@@ -17,7 +17,12 @@ class GenCommands():
     self.reruns = 3
     self.outfile = ''
     #self.cmd_template = '../scripts/run_vtr_task.py <dir> -s "--const_gen_inference comb --seed <seed> --timing_report_npaths 1000 --timing_report_detail aggregated"'
-    self.cmd_template = '../scripts/run_vtr_task.py <dir> -s --const_gen_inference comb --seed <seed> --timing_report_detail aggregated --sdc_file <sdc_full_path>'
+    self.cmd_template = '../scripts/run_vtr_task.py <dir> ' +\
+                        '-s --const_gen_inference comb ' +\
+                        '--seed <seed> ' +\
+                        '--timing_report_detail aggregated ' +\
+                        '--sdc_file <sdc_full_path> ' +\
+                        '--route_chan_width 300 '
     self.num_proc = 3
     
     #method calls in order
