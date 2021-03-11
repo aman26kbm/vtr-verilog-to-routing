@@ -94,6 +94,7 @@ class GenTaskDirs():
       info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', expname)
       if info is not None:
         design_file = info.group(3)+".v"
+        sdc_file = os.path.abspath(info.group(3)+".sdc")
       else:
         print("Unable to extract benchmark info from " + expname)
         raise SystemExit(0)
@@ -144,6 +145,7 @@ class GenTaskDirs():
           line = re.sub(r'<arch_dir>',    arch_dir,    line)
           line = re.sub(r'<design_file>', design_file, line)
           line = re.sub(r'<arch_file>',   arch_file,   line)
+          line = re.sub(r'<sdc_full_path>', sdc_file, line)
           config.write(line)
           config.write("\n")
         config.close()
