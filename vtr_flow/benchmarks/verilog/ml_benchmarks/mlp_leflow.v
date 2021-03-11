@@ -7928,7 +7928,7 @@ module int_to_float(
   lzc dut_lzc (pipe_1[31:0],tmp_cnt);
   sub dut_sub (pipe_2[38:33],sub_a_e);
   sub2 dut_sub2 (pipe_3[38:33],sub_z_e);
-  a_m_shift dut_a_m_shift (pipe_3[31:0],pipe_3[38:33],a_m_shift);
+  am_shift dut_am_shift (pipe_3[31:0],pipe_3[38:33],a_m_shift);
   exception dut_exception (pipe_4[31:0],{2'b0,pipe_4[38:33]},z_m_final,z_e_final);
   final_out dut_final_out (pipe_5[64:33],pipe_5[23:0],pipe_5[31:24],pipe_5[32],z);
   
@@ -7944,7 +7944,7 @@ module int_to_float(
 	end
 	else begin
         pipe_in <= input_a;
-		pipe_1 <= {input_a,z_s,value};
+		pipe_1 <= {pipe_in,z_s,value};
 		pipe_2 <= {pipe_1[64:33],tmp_cnt,pipe_1[32:0]};
 		pipe_3 <= {pipe_2[70:39],sub_a_e,pipe_2[32:0]};
 		pipe_4 <= {pipe_3[70:39],sub_z_e,pipe_3[32],a_m_shift};
@@ -8030,7 +8030,7 @@ assign sub_a_e = 31 - a_e;
 
 endmodule
 
-module a_m_shift (
+module am_shift (
 input [31:0] a_m,
 input [5:0] tmp_cnt,
 output [31:0] a_m_shift);
