@@ -24,7 +24,6 @@ agilex.ml.lstm
 # Non-ML benchmarks
 #-------------------
 agilex.non_ml.LU32PEEng
-agilex.non_ml.LU64PEEng
 agilex.non_ml.LU8PEEng
 agilex.non_ml.mcml
 agilex.non_ml.arm_core
