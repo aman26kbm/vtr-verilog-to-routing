@@ -19,3 +19,6 @@ parse_file=vpr_standard.txt
 
 # Pass requirements
 pass_requirements_file=pass_requirements.txt
+
+# VPR parameters
+script_params=--const_gen_inference comb --timing_report_detail aggregated --sdc_file /export/aman/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/raygentop.sdc --route_chan_width 300
