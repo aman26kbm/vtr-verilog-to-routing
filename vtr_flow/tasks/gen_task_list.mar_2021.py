@@ -35,10 +35,16 @@ class GenTaskList():
                         default="task_list.mar_2021",
                         action='store',
                         help="Name of the output task lsit file")
+    parser.add_argument("-f",
+                        "--folder",
+                        default=None,
+                        action='store',
+                        help="Name of the folder under the tasks/ directory where the task dirs are located")
     args = parser.parse_args()
     print("Parsed arguments:", vars(args))
     self.dirs = args.dirs
     self.outfile = args.outfile
+    self.folder = args.folder
 
   #--------------------------
   #generate task list
@@ -58,7 +64,10 @@ class GenTaskList():
 
       info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', line)
       if info is not None:
-        dirname = info.group(1) + "." + info.group(3)
+        if self.folder is not None:
+          dirname = self.folder + "/" + info.group(1) + "." + info.group(3)
+        else:
+          dirname = info.group(1) + "." + info.group(3)
       else:
         print("Unable to extract benchmark info from " + expname)
         raise SystemExit(0)
