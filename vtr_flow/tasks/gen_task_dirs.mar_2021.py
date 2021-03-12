@@ -110,7 +110,7 @@ class GenTaskDirs():
       if info is not None:
         design_file = info.group(3)+".v"
         #sdc_file = os.path.abspath(info.group(3)+".sdc")
-        sdc_file = os.path.abspath(self.vtr_flow_dir)+"/tasks/"+info.group(3)+".sdc"
+        sdc_file = os.path.abspath(self.vtr_flow_dir)+"/tasks/sdc/"+info.group(3)+".sdc"
       else:
         print("Unable to extract benchmark info from " + expname)
         raise SystemExit(0)

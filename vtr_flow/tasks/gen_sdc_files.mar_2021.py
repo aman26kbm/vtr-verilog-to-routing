@@ -94,7 +94,7 @@ class GenSDCFiles():
   def generate_sdcs(self):
     for design,clk_list in clk_names_dict.items():
       print("Processing: " + design)
-      sdc_filename = design+".sdc"
+      sdc_filename = "sdc/"+design+".sdc"
      
       print("sdc_filename: ", sdc_filename)
 
