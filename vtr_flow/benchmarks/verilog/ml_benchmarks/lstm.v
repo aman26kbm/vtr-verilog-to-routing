@@ -10,10 +10,7 @@
 module top(
 input clk,
 input reset,
-input [12:0] wren_b_ext, 	//external write enable to bram
-input [6:0] address_b_ext,	//external address to feed bram
-input [`DATA_WIDTH-1:0] data_b_ext,//external data to bram
-input start,			  //Start of computation
+input start,  		   //start the computation
 input [6:0] start_addr,   //start address of the Xin bram (input words to LSTM)
 input [6:0] end_addr,	  //end address of the Xin bram 
 output ht_valid,	//indicates the output ht_out is valid in those cycles
@@ -32,9 +29,9 @@ wire [`uarraysize-1:0] Uc_in;
 wire [`varraysize-1:0] Wc_in;
 wire [`varraysize-1:0] x_in;
 reg [`uarraysize-1:0] h_in;
-wire [`uarraysize-1:0] dummyo0,dummyo1,dummyo2,dummyo3;
-wire [`varraysize-1:0] dummyo4,dummyo5,dummyo6,dummyo7,dummyo8;
-wire [`DATA_WIDTH-1:0] dummyo9,dummyo10,dummyo11,dummyo12,dummyo13;
+//wire [`uarraysize-1:0] dummyo0,dummyo1,dummyo2,dummyo3;
+//wire [`varraysize-1:0] dummyo4,dummyo5,dummyo6,dummyo7,dummyo8;
+//wire [`DATA_WIDTH-1:0] dummyo9,dummyo10,dummyo11,dummyo12,dummyo13;
 
 reg [`uarraysize-1:0] dummyin_u;
 reg [`varraysize-1:0] dummyin_v;
@@ -45,8 +42,9 @@ wire [`DATA_WIDTH-1:0] bf_in;
 wire [`DATA_WIDTH-1:0] bo_in;
 wire [`DATA_WIDTH-1:0] bc_in;
 reg [`DATA_WIDTH-1:0] C_in;
-wire [`varraysize-1:0] xdata_b_ext;
-wire [`uarraysize-1:0] hdata_b_ext;
+//wire [`varraysize-1:0] xdata_b_ext;
+//wire [`uarraysize-1:0] hdata_b_ext;
+
 //keeping an additional bit so that the counters don't get reset to 0 automatically after 63 
 //and start repeating access to elements prematurely
 reg [6:0] inaddr; 
@@ -69,25 +67,25 @@ assign ht_out = ht;
 
 //Instead of having very wide Input ports of uarraysize and varraysize,
 //we are replicating data from `DATA_WIDTH size external port to get the wide input to BRAMs.
-assign xdata_b_ext={`INPUT_DEPTH{data_b_ext}};
-assign hdata_b_ext={`ARRAY_DEPTH{data_b_ext}};
+//assign xdata_b_ext={`INPUT_DEPTH{data_b_ext}};
+//assign hdata_b_ext={`ARRAY_DEPTH{data_b_ext}};
 
 //indicates that the ht_out output is valid 
-assign ht_valid = (count>10)?1:0;
+assign ht_valid = (count>16)?1:0;
 
-dpram_u Ui_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[0]),.data_a(dummyin_u),.data_b(hdata_b_ext),.out_a(Ui_in),.out_b(dummyo0));
-dpram_u Uf_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[1]),.data_a(dummyin_u),.data_b(hdata_b_ext),.out_a(Uf_in),.out_b(dummyo1));
-dpram_u Uo_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[2]),.data_a(dummyin_u),.data_b(hdata_b_ext),.out_a(Uo_in),.out_b(dummyo2));
-dpram_u Uc_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[3]),.data_a(dummyin_u),.data_b(hdata_b_ext),.out_a(Uc_in),.out_b(dummyo3));
-dpram_v Wi_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[4]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(Wi_in),.out_b(dummyo4));
-dpram_v Wf_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[5]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(Wf_in),.out_b(dummyo5));
-dpram_v Wo_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[6]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(Wo_in),.out_b(dummyo6));
-dpram_v Wc_mem(.clk(clk),.address_a(waddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[7]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(Wc_in),.out_b(dummyo7));
-dpram_v Xi_mem(.clk(clk),.address_a(inaddr),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[8]),.data_a(dummyin_v),.data_b(xdata_b_ext),.out_a(x_in),.out_b(dummyo8));
-dpram_b bi_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[9]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bi_in),.out_b(dummyo9));
-dpram_b bf_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[10]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bf_in),.out_b(dummyo10));
-dpram_b bo_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[11]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bo_in),.out_b(dummyo11));
-dpram_b bc_mem(.clk(clk),.address_a(b_count),.address_b(address_b_ext),.wren_a(wren_a),.wren_b(wren_b_ext[12]),.data_a(dummyin_b),.data_b(data_b_ext),.out_a(bc_in),.out_b(dummyo12));
+spram_u Ui_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_u),.out_a(Ui_in));
+spram_u Uf_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_u),.out_a(Uf_in));
+spram_u Uo_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_u),.out_a(Uo_in));
+spram_u Uc_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_u),.out_a(Uc_in));
+spram_v Wi_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(Wi_in));
+spram_v Wf_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(Wf_in));
+spram_v Wo_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(Wo_in));
+spram_v Wc_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(Wc_in));
+spram_v Xi_mem(.clk(clk),.address_a(inaddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(x_in));
+spram_b bi_mem(.clk(clk),.address_a(b_count),.wren_a(wren_a),.data_a(dummyin_b),.out_a(bi_in));
+spram_b bf_mem(.clk(clk),.address_a(b_count),.wren_a(wren_a),.data_a(dummyin_b),.out_a(bf_in));
+spram_b bo_mem(.clk(clk),.address_a(b_count),.wren_a(wren_a),.data_a(dummyin_b),.out_a(bo_in));
+spram_b bc_mem(.clk(clk),.address_a(b_count),.wren_a(wren_a),.data_a(dummyin_b),.out_a(bc_in));
 
 
 
@@ -141,12 +139,12 @@ always @(posedge clk) begin
 	 else begin
 		cycle_complete <= 0;
     	waddr <= waddr+1;
-	  	count <= count+1;
+	  	  count <= count+1;
 	 
-		if(count>5)     //delay before bias add
+		if(count>7)     //delay before bias add
 			b_count <= b_count+1; 
 
-		if(count >6)  begin //delay before Cin elmul
+		if(count >8)  begin //delay before Cin elmul
 			c_count <=c_count+1;
 			case(c_count)
 			0: C_in<=Ct[16*0+:16] ;
@@ -217,7 +215,7 @@ always @(posedge clk) begin
 		endcase	
 		end
 
-		if(count >7) begin  //for storing output of Ct
+		if(count >11) begin  //for storing output of Ct
 			ct_count <= ct_count+1;
 		 //storing cell state
 			case(ct_count)
@@ -288,7 +286,7 @@ always @(posedge clk) begin
 			default : Ct <= 0;
 		 endcase
 		end
-		if(count >10) begin
+		if(count >16) begin
 			h_count <= h_count + 1;
 			case(h_count)
 			0:	ht_prev[16*0+:16] <= ht;
@@ -378,16 +376,12 @@ endmodule
 
 
 
-module dpram_v(	
+module spram_v(	
 input clk,
 input [(7-1):0] address_a,
-input [(7-1):0] address_b,
 input  wren_a,
-input  wren_b,
 input [(`varraysize-1):0] data_a,
-input [(`varraysize-1):0] data_b,
-output reg [(`varraysize-1):0] out_a,
-output reg [(`varraysize-1):0] out_b
+output reg [(`varraysize-1):0] out_a
 );
 
 
@@ -404,26 +398,14 @@ always @ (posedge clk) begin
   end
 end
   
-always @ (posedge clk) begin 
-  if (wren_b) begin
-      ram[address_b] <= data_b;
-  end 
-  else begin
-      out_b <= ram[address_b];
-  end
-end
 
 `else
 
-dual_port_ram u_dual_port_ram(
-.addr1(address_a),
-.we1(wren_a),
-.data1(data_a),
-.out1(out_a),
-.addr2(address_b),
-.we2(wren_b),
-.data2(data_b),
-.out2(out_b),
+single_port_ram u_single_port_ram(
+.addr(address_a),
+.we(wren_a),
+.data(data_a),
+.out(out_a),
 .clk(clk)
 );
 
@@ -431,16 +413,12 @@ dual_port_ram u_dual_port_ram(
 
 endmodule
 
-module dpram_u (	
+module spram_u (	
 input clk,
 input [(7-1):0] address_a,
-input [(7-1):0] address_b,
 input  wren_a,
-input  wren_b,
 input [(`uarraysize-1):0] data_a,
-input [(`uarraysize-1):0] data_b,
-output reg [(`uarraysize-1):0] out_a,
-output reg [(`uarraysize-1):0] out_b
+output reg [(`uarraysize-1):0] out_a
 );
 
 
@@ -457,26 +435,14 @@ always @ (posedge clk) begin
   end
 end
   
-always @ (posedge clk) begin 
-  if (wren_b) begin
-      ram[address_b] <= data_b;
-  end 
-  else begin
-      out_b <= ram[address_b];
-  end
-end
 
 `else
 
-dual_port_ram u_dual_port_ram(
-.addr1(address_a),
-.we1(wren_a),
-.data1(data_a),
-.out1(out_a),
-.addr2(address_b),
-.we2(wren_b),
-.data2(data_b),
-.out2(out_b),
+single_port_ram u_single_port_ram(
+.addr(address_a),
+.we(wren_a),
+.data(data_a),
+.out(out_a),
 .clk(clk)
 );
 
@@ -484,16 +450,12 @@ dual_port_ram u_dual_port_ram(
 
 endmodule
 
-module dpram_b (	
+module spram_b (	
 input clk,
 input [(7-1):0] address_a,
-input [(7-1):0] address_b,
 input  wren_a,
-input  wren_b,
 input [(`DATA_WIDTH-1):0] data_a,
-input [(`DATA_WIDTH-1):0] data_b,
-output reg [(`DATA_WIDTH-1):0] out_a,
-output reg [(`DATA_WIDTH-1):0] out_b
+output reg [(`DATA_WIDTH-1):0] out_a
 );
 
 
@@ -510,26 +472,14 @@ always @ (posedge clk) begin
   end
 end
   
-always @ (posedge clk) begin 
-  if (wren_b) begin
-      ram[address_b] <= data_b;
-  end 
-  else begin
-      out_b <= ram[address_b];
-  end
-end
 
 `else
 
-dual_port_ram u_dual_port_ram(
-.addr1(address_a),
-.we1(wren_a),
-.data1(data_a),
-.out1(out_a),
-.addr2(address_b),
-.we2(wren_b),
-.data2(data_b),
-.out2(out_b),
+single_port_ram u_single_port_ram(
+.addr(address_a),
+.we(wren_a),
+.data(data_a),
+.out(out_a),
 .clk(clk)
 );
 
@@ -615,7 +565,7 @@ reg [15:0] tan_c_reg,elmul_co_reg,add_cf_reg,tan_h_reg,elmul_fo_reg;
 reg [`uarraysize-1:0] mulout_ih_reg,mulout_fh_reg,mulout_oh_reg,mulout_ch_reg;
 reg [`varraysize-1:0] mulout_ix_reg,mulout_fx_reg,mulout_ox_reg,mulout_cx_reg;
 
-reg [15:0] sig_oo_d1,sig_oo_d2,sig_oo_d3;
+reg [15:0] sig_oo_d1,sig_oo_d2,sig_oo_d3,sig_oo_d4,sig_oo_d5;
 
 always @(posedge clk) begin
 
@@ -646,9 +596,11 @@ always @(posedge clk) begin
 		sig_oo_reg <= sig_oo;   
 
 
-		sig_oo_d1 <= sig_oo_reg; //delaying sig_oo by 3 cycles to feed to c gate
+		sig_oo_d1 <= sig_oo_reg; //delaying sig_oo by 5 cycles to feed to c gate
 		sig_oo_d2 <= sig_oo_d1;
 		sig_oo_d3 <= sig_oo_d2;
+	    sig_oo_d4 <= sig_oo_d3;
+		sig_oo_d5 <= sig_oo_d4;
 
 		mulout_cx_reg <= mulout_cx;
 		mulout_ch_reg <= mulout_ch;
@@ -673,7 +625,7 @@ end
   qadd2 f_gate_biasadd(.a(bf_in),.b(add_f),.c(addbias_f));
   sigmoid sigf(addb_f_reg,sig_fo);
   //qmult #(12,16) f_elmul(.i_multiplicand(sig_fo_reg),.i_multiplier(C_in),.o_result(elmul_fo),.ovr(overflow0));
-  signedmul f_elmul(.a(sig_fo_reg),.b(C_in),.c(elmul_fo));
+  signedmul f_elmul(.clk(clk),.a(sig_fo_reg),.b(C_in),.c(elmul_fo));
 
 //INPUT GATE
   vecmat_mul_x #(`varraysize,`INPUT_DEPTH) i_gatex(.clk(clk),.reset(rst),.data(x_in),.W(Wi_in),.tmp(mulout_ix));
@@ -702,11 +654,11 @@ end
   qadd2 c_gate_biasadd(.a(bc_in),.b(add_c),.c(addbias_c)); 
   tanh tan_c1(addb_c_reg,tan_c);
   //qmult #(12,16) c_elmul(.i_multiplicand(tan_c_reg),.i_multiplier(sig_io_reg),.o_result(elmul_co),.ovr(overflow0));
-  signedmul c_elmul(.a(tan_c_reg),.b(sig_io_reg),.c(elmul_co));	  
+  signedmul c_elmul(.clk(clk),.a(tan_c_reg),.b(sig_io_reg),.c(elmul_co));	  
   qadd2 cf_gate_add(.a(elmul_co_reg),.b(elmul_fo_reg),.c(add_cf));
   tanh tan_c2(add_cf_reg,tan_h);
   //qmult #(12,16) h_elmul(.i_multiplicand(tan_h_reg),.i_multiplier(sig_oo_d3),.o_result(ht),.ovr(overflow0));
-  signedmul h_elmul(.a(tan_h_reg),.b(sig_oo_d3),.c(ht));
+  signedmul h_elmul(.clk(clk),.a(tan_h_reg),.b(sig_oo_d5),.c(ht));
 
 
 
@@ -732,7 +684,7 @@ module vecmat_mul_h #( parameter uarraysize=1024,parameter vectwidth=64)  //,mat
  always @(posedge clk) begin
 	if(~reset) begin
 
-	        vector <= data;
+	    vector <= data;
 		matrix <= W;
     
 	end
@@ -745,70 +697,70 @@ module vecmat_mul_h #( parameter uarraysize=1024,parameter vectwidth=64)  //,mat
   end
   endgenerate*/
 
-   	signedmul mult_u0(.a(vector[0*16+:16]),.b(matrix[0*16+:16]),.c(tmp[0*16+:16]));
-	signedmul mult_u1(.a(vector[1*16+:16]),.b(matrix[1*16+:16]),.c(tmp[1*16+:16]));
-	signedmul mult_u2(.a(vector[2*16+:16]),.b(matrix[2*16+:16]),.c(tmp[2*16+:16]));
-	signedmul mult_u3(.a(vector[3*16+:16]),.b(matrix[3*16+:16]),.c(tmp[3*16+:16]));
-	signedmul mult_u4(.a(vector[4*16+:16]),.b(matrix[4*16+:16]),.c(tmp[4*16+:16]));
-	signedmul mult_u5(.a(vector[5*16+:16]),.b(matrix[5*16+:16]),.c(tmp[5*16+:16]));
-	signedmul mult_u6(.a(vector[6*16+:16]),.b(matrix[6*16+:16]),.c(tmp[6*16+:16]));
-	signedmul mult_u7(.a(vector[7*16+:16]),.b(matrix[7*16+:16]),.c(tmp[7*16+:16]));
-	signedmul mult_u8(.a(vector[8*16+:16]),.b(matrix[8*16+:16]),.c(tmp[8*16+:16]));
-	signedmul mult_u9(.a(vector[9*16+:16]),.b(matrix[9*16+:16]),.c(tmp[9*16+:16]));
-	signedmul mult_u10(.a(vector[10*16+:16]),.b(matrix[10*16+:16]),.c(tmp[10*16+:16]));
-	signedmul mult_u11(.a(vector[11*16+:16]),.b(matrix[11*16+:16]),.c(tmp[11*16+:16]));
-	signedmul mult_u12(.a(vector[12*16+:16]),.b(matrix[12*16+:16]),.c(tmp[12*16+:16]));
-	signedmul mult_u13(.a(vector[13*16+:16]),.b(matrix[13*16+:16]),.c(tmp[13*16+:16]));
-	signedmul mult_u14(.a(vector[14*16+:16]),.b(matrix[14*16+:16]),.c(tmp[14*16+:16]));
-	signedmul mult_u15(.a(vector[15*16+:16]),.b(matrix[15*16+:16]),.c(tmp[15*16+:16]));
-	signedmul mult_u16(.a(vector[16*16+:16]),.b(matrix[16*16+:16]),.c(tmp[16*16+:16]));
-	signedmul mult_u17(.a(vector[17*16+:16]),.b(matrix[17*16+:16]),.c(tmp[17*16+:16]));
-	signedmul mult_u18(.a(vector[18*16+:16]),.b(matrix[18*16+:16]),.c(tmp[18*16+:16]));
-	signedmul mult_u19(.a(vector[19*16+:16]),.b(matrix[19*16+:16]),.c(tmp[19*16+:16]));
-	signedmul mult_u20(.a(vector[20*16+:16]),.b(matrix[20*16+:16]),.c(tmp[20*16+:16]));
-	signedmul mult_u21(.a(vector[21*16+:16]),.b(matrix[21*16+:16]),.c(tmp[21*16+:16]));
-	signedmul mult_u22(.a(vector[22*16+:16]),.b(matrix[22*16+:16]),.c(tmp[22*16+:16]));
-	signedmul mult_u23(.a(vector[23*16+:16]),.b(matrix[23*16+:16]),.c(tmp[23*16+:16]));
-	signedmul mult_u24(.a(vector[24*16+:16]),.b(matrix[24*16+:16]),.c(tmp[24*16+:16]));
-	signedmul mult_u25(.a(vector[25*16+:16]),.b(matrix[25*16+:16]),.c(tmp[25*16+:16]));
-	signedmul mult_u26(.a(vector[26*16+:16]),.b(matrix[26*16+:16]),.c(tmp[26*16+:16]));
-	signedmul mult_u27(.a(vector[27*16+:16]),.b(matrix[27*16+:16]),.c(tmp[27*16+:16]));
-	signedmul mult_u28(.a(vector[28*16+:16]),.b(matrix[28*16+:16]),.c(tmp[28*16+:16]));
-	signedmul mult_u29(.a(vector[29*16+:16]),.b(matrix[29*16+:16]),.c(tmp[29*16+:16]));
-	signedmul mult_u30(.a(vector[30*16+:16]),.b(matrix[30*16+:16]),.c(tmp[30*16+:16]));
-	signedmul mult_u31(.a(vector[31*16+:16]),.b(matrix[31*16+:16]),.c(tmp[31*16+:16]));
-	signedmul mult_u32(.a(vector[32*16+:16]),.b(matrix[32*16+:16]),.c(tmp[32*16+:16]));
-	signedmul mult_u33(.a(vector[33*16+:16]),.b(matrix[33*16+:16]),.c(tmp[33*16+:16]));
-	signedmul mult_u34(.a(vector[34*16+:16]),.b(matrix[34*16+:16]),.c(tmp[34*16+:16]));
-	signedmul mult_u35(.a(vector[35*16+:16]),.b(matrix[35*16+:16]),.c(tmp[35*16+:16]));
-	signedmul mult_u36(.a(vector[36*16+:16]),.b(matrix[36*16+:16]),.c(tmp[36*16+:16]));
-	signedmul mult_u37(.a(vector[37*16+:16]),.b(matrix[37*16+:16]),.c(tmp[37*16+:16]));
-	signedmul mult_u38(.a(vector[38*16+:16]),.b(matrix[38*16+:16]),.c(tmp[38*16+:16]));
-	signedmul mult_u39(.a(vector[39*16+:16]),.b(matrix[39*16+:16]),.c(tmp[39*16+:16]));
-	signedmul mult_u40(.a(vector[40*16+:16]),.b(matrix[40*16+:16]),.c(tmp[40*16+:16]));
-	signedmul mult_u41(.a(vector[41*16+:16]),.b(matrix[41*16+:16]),.c(tmp[41*16+:16]));
-	signedmul mult_u42(.a(vector[42*16+:16]),.b(matrix[42*16+:16]),.c(tmp[42*16+:16]));
-	signedmul mult_u43(.a(vector[43*16+:16]),.b(matrix[43*16+:16]),.c(tmp[43*16+:16]));
-	signedmul mult_u44(.a(vector[44*16+:16]),.b(matrix[44*16+:16]),.c(tmp[44*16+:16]));
-	signedmul mult_u45(.a(vector[45*16+:16]),.b(matrix[45*16+:16]),.c(tmp[45*16+:16]));
-	signedmul mult_u46(.a(vector[46*16+:16]),.b(matrix[46*16+:16]),.c(tmp[46*16+:16]));
-	signedmul mult_u47(.a(vector[47*16+:16]),.b(matrix[47*16+:16]),.c(tmp[47*16+:16]));
-	signedmul mult_u48(.a(vector[48*16+:16]),.b(matrix[48*16+:16]),.c(tmp[48*16+:16]));
-	signedmul mult_u49(.a(vector[49*16+:16]),.b(matrix[49*16+:16]),.c(tmp[49*16+:16]));
-	signedmul mult_u50(.a(vector[50*16+:16]),.b(matrix[50*16+:16]),.c(tmp[50*16+:16]));
-	signedmul mult_u51(.a(vector[51*16+:16]),.b(matrix[51*16+:16]),.c(tmp[51*16+:16]));
-	signedmul mult_u52(.a(vector[52*16+:16]),.b(matrix[52*16+:16]),.c(tmp[52*16+:16]));
-	signedmul mult_u53(.a(vector[53*16+:16]),.b(matrix[53*16+:16]),.c(tmp[53*16+:16]));
-	signedmul mult_u54(.a(vector[54*16+:16]),.b(matrix[54*16+:16]),.c(tmp[54*16+:16]));
-	signedmul mult_u55(.a(vector[55*16+:16]),.b(matrix[55*16+:16]),.c(tmp[55*16+:16]));
-	signedmul mult_u56(.a(vector[56*16+:16]),.b(matrix[56*16+:16]),.c(tmp[56*16+:16]));
-	signedmul mult_u57(.a(vector[57*16+:16]),.b(matrix[57*16+:16]),.c(tmp[57*16+:16]));
-	signedmul mult_u58(.a(vector[58*16+:16]),.b(matrix[58*16+:16]),.c(tmp[58*16+:16]));
-	signedmul mult_u59(.a(vector[59*16+:16]),.b(matrix[59*16+:16]),.c(tmp[59*16+:16]));
-	signedmul mult_u60(.a(vector[60*16+:16]),.b(matrix[60*16+:16]),.c(tmp[60*16+:16]));
-	signedmul mult_u61(.a(vector[61*16+:16]),.b(matrix[61*16+:16]),.c(tmp[61*16+:16]));
-	signedmul mult_u62(.a(vector[62*16+:16]),.b(matrix[62*16+:16]),.c(tmp[62*16+:16]));
-	signedmul mult_u63(.a(vector[63*16+:16]),.b(matrix[63*16+:16]),.c(tmp[63*16+:16]));
+   	signedmul mult_u0(.clk(clk),.a(vector[0*16+:16]),.b(matrix[0*16+:16]),.c(tmp[0*16+:16]));
+	signedmul mult_u1(.clk(clk),.a(vector[1*16+:16]),.b(matrix[1*16+:16]),.c(tmp[1*16+:16]));
+	signedmul mult_u2(.clk(clk),.a(vector[2*16+:16]),.b(matrix[2*16+:16]),.c(tmp[2*16+:16]));
+	signedmul mult_u3(.clk(clk),.a(vector[3*16+:16]),.b(matrix[3*16+:16]),.c(tmp[3*16+:16]));
+	signedmul mult_u4(.clk(clk),.a(vector[4*16+:16]),.b(matrix[4*16+:16]),.c(tmp[4*16+:16]));
+	signedmul mult_u5(.clk(clk),.a(vector[5*16+:16]),.b(matrix[5*16+:16]),.c(tmp[5*16+:16]));
+	signedmul mult_u6(.clk(clk),.a(vector[6*16+:16]),.b(matrix[6*16+:16]),.c(tmp[6*16+:16]));
+	signedmul mult_u7(.clk(clk),.a(vector[7*16+:16]),.b(matrix[7*16+:16]),.c(tmp[7*16+:16]));
+	signedmul mult_u8(.clk(clk),.a(vector[8*16+:16]),.b(matrix[8*16+:16]),.c(tmp[8*16+:16]));
+	signedmul mult_u9(.clk(clk),.a(vector[9*16+:16]),.b(matrix[9*16+:16]),.c(tmp[9*16+:16]));
+	signedmul mult_u10(.clk(clk),.a(vector[10*16+:16]),.b(matrix[10*16+:16]),.c(tmp[10*16+:16]));
+	signedmul mult_u11(.clk(clk),.a(vector[11*16+:16]),.b(matrix[11*16+:16]),.c(tmp[11*16+:16]));
+	signedmul mult_u12(.clk(clk),.a(vector[12*16+:16]),.b(matrix[12*16+:16]),.c(tmp[12*16+:16]));
+	signedmul mult_u13(.clk(clk),.a(vector[13*16+:16]),.b(matrix[13*16+:16]),.c(tmp[13*16+:16]));
+	signedmul mult_u14(.clk(clk),.a(vector[14*16+:16]),.b(matrix[14*16+:16]),.c(tmp[14*16+:16]));
+	signedmul mult_u15(.clk(clk),.a(vector[15*16+:16]),.b(matrix[15*16+:16]),.c(tmp[15*16+:16]));
+	signedmul mult_u16(.clk(clk),.a(vector[16*16+:16]),.b(matrix[16*16+:16]),.c(tmp[16*16+:16]));
+	signedmul mult_u17(.clk(clk),.a(vector[17*16+:16]),.b(matrix[17*16+:16]),.c(tmp[17*16+:16]));
+	signedmul mult_u18(.clk(clk),.a(vector[18*16+:16]),.b(matrix[18*16+:16]),.c(tmp[18*16+:16]));
+	signedmul mult_u19(.clk(clk),.a(vector[19*16+:16]),.b(matrix[19*16+:16]),.c(tmp[19*16+:16]));
+	signedmul mult_u20(.clk(clk),.a(vector[20*16+:16]),.b(matrix[20*16+:16]),.c(tmp[20*16+:16]));
+	signedmul mult_u21(.clk(clk),.a(vector[21*16+:16]),.b(matrix[21*16+:16]),.c(tmp[21*16+:16]));
+	signedmul mult_u22(.clk(clk),.a(vector[22*16+:16]),.b(matrix[22*16+:16]),.c(tmp[22*16+:16]));
+	signedmul mult_u23(.clk(clk),.a(vector[23*16+:16]),.b(matrix[23*16+:16]),.c(tmp[23*16+:16]));
+	signedmul mult_u24(.clk(clk),.a(vector[24*16+:16]),.b(matrix[24*16+:16]),.c(tmp[24*16+:16]));
+	signedmul mult_u25(.clk(clk),.a(vector[25*16+:16]),.b(matrix[25*16+:16]),.c(tmp[25*16+:16]));
+	signedmul mult_u26(.clk(clk),.a(vector[26*16+:16]),.b(matrix[26*16+:16]),.c(tmp[26*16+:16]));
+	signedmul mult_u27(.clk(clk),.a(vector[27*16+:16]),.b(matrix[27*16+:16]),.c(tmp[27*16+:16]));
+	signedmul mult_u28(.clk(clk),.a(vector[28*16+:16]),.b(matrix[28*16+:16]),.c(tmp[28*16+:16]));
+	signedmul mult_u29(.clk(clk),.a(vector[29*16+:16]),.b(matrix[29*16+:16]),.c(tmp[29*16+:16]));
+	signedmul mult_u30(.clk(clk),.a(vector[30*16+:16]),.b(matrix[30*16+:16]),.c(tmp[30*16+:16]));
+	signedmul mult_u31(.clk(clk),.a(vector[31*16+:16]),.b(matrix[31*16+:16]),.c(tmp[31*16+:16]));
+	signedmul mult_u32(.clk(clk),.a(vector[32*16+:16]),.b(matrix[32*16+:16]),.c(tmp[32*16+:16]));
+	signedmul mult_u33(.clk(clk),.a(vector[33*16+:16]),.b(matrix[33*16+:16]),.c(tmp[33*16+:16]));
+	signedmul mult_u34(.clk(clk),.a(vector[34*16+:16]),.b(matrix[34*16+:16]),.c(tmp[34*16+:16]));
+	signedmul mult_u35(.clk(clk),.a(vector[35*16+:16]),.b(matrix[35*16+:16]),.c(tmp[35*16+:16]));
+	signedmul mult_u36(.clk(clk),.a(vector[36*16+:16]),.b(matrix[36*16+:16]),.c(tmp[36*16+:16]));
+	signedmul mult_u37(.clk(clk),.a(vector[37*16+:16]),.b(matrix[37*16+:16]),.c(tmp[37*16+:16]));
+	signedmul mult_u38(.clk(clk),.a(vector[38*16+:16]),.b(matrix[38*16+:16]),.c(tmp[38*16+:16]));
+	signedmul mult_u39(.clk(clk),.a(vector[39*16+:16]),.b(matrix[39*16+:16]),.c(tmp[39*16+:16]));
+	signedmul mult_u40(.clk(clk),.a(vector[40*16+:16]),.b(matrix[40*16+:16]),.c(tmp[40*16+:16]));
+	signedmul mult_u41(.clk(clk),.a(vector[41*16+:16]),.b(matrix[41*16+:16]),.c(tmp[41*16+:16]));
+	signedmul mult_u42(.clk(clk),.a(vector[42*16+:16]),.b(matrix[42*16+:16]),.c(tmp[42*16+:16]));
+	signedmul mult_u43(.clk(clk),.a(vector[43*16+:16]),.b(matrix[43*16+:16]),.c(tmp[43*16+:16]));
+	signedmul mult_u44(.clk(clk),.a(vector[44*16+:16]),.b(matrix[44*16+:16]),.c(tmp[44*16+:16]));
+	signedmul mult_u45(.clk(clk),.a(vector[45*16+:16]),.b(matrix[45*16+:16]),.c(tmp[45*16+:16]));
+	signedmul mult_u46(.clk(clk),.a(vector[46*16+:16]),.b(matrix[46*16+:16]),.c(tmp[46*16+:16]));
+	signedmul mult_u47(.clk(clk),.a(vector[47*16+:16]),.b(matrix[47*16+:16]),.c(tmp[47*16+:16]));
+	signedmul mult_u48(.clk(clk),.a(vector[48*16+:16]),.b(matrix[48*16+:16]),.c(tmp[48*16+:16]));
+	signedmul mult_u49(.clk(clk),.a(vector[49*16+:16]),.b(matrix[49*16+:16]),.c(tmp[49*16+:16]));
+	signedmul mult_u50(.clk(clk),.a(vector[50*16+:16]),.b(matrix[50*16+:16]),.c(tmp[50*16+:16]));
+	signedmul mult_u51(.clk(clk),.a(vector[51*16+:16]),.b(matrix[51*16+:16]),.c(tmp[51*16+:16]));
+	signedmul mult_u52(.clk(clk),.a(vector[52*16+:16]),.b(matrix[52*16+:16]),.c(tmp[52*16+:16]));
+	signedmul mult_u53(.clk(clk),.a(vector[53*16+:16]),.b(matrix[53*16+:16]),.c(tmp[53*16+:16]));
+	signedmul mult_u54(.clk(clk),.a(vector[54*16+:16]),.b(matrix[54*16+:16]),.c(tmp[54*16+:16]));
+	signedmul mult_u55(.clk(clk),.a(vector[55*16+:16]),.b(matrix[55*16+:16]),.c(tmp[55*16+:16]));
+	signedmul mult_u56(.clk(clk),.a(vector[56*16+:16]),.b(matrix[56*16+:16]),.c(tmp[56*16+:16]));
+	signedmul mult_u57(.clk(clk),.a(vector[57*16+:16]),.b(matrix[57*16+:16]),.c(tmp[57*16+:16]));
+	signedmul mult_u58(.clk(clk),.a(vector[58*16+:16]),.b(matrix[58*16+:16]),.c(tmp[58*16+:16]));
+	signedmul mult_u59(.clk(clk),.a(vector[59*16+:16]),.b(matrix[59*16+:16]),.c(tmp[59*16+:16]));
+	signedmul mult_u60(.clk(clk),.a(vector[60*16+:16]),.b(matrix[60*16+:16]),.c(tmp[60*16+:16]));
+	signedmul mult_u61(.clk(clk),.a(vector[61*16+:16]),.b(matrix[61*16+:16]),.c(tmp[61*16+:16]));
+	signedmul mult_u62(.clk(clk),.a(vector[62*16+:16]),.b(matrix[62*16+:16]),.c(tmp[62*16+:16]));
+	signedmul mult_u63(.clk(clk),.a(vector[63*16+:16]),.b(matrix[63*16+:16]),.c(tmp[63*16+:16]));
 	
 endmodule                    
 
@@ -967,106 +919,106 @@ module vecmat_mul_x #(parameter varraysize=1600,vectwidth=100) //,matsize=64)   
 	 end
  endgenerate*/
  
- 	 signedmul mult_u0(.a(vector[0*16+:16]),.b(matrix[0*16+:16]),.c(tmp[0*16+:16]));
-	signedmul mult_u1(.a(vector[1*16+:16]),.b(matrix[1*16+:16]),.c(tmp[1*16+:16]));
-	signedmul mult_u2(.a(vector[2*16+:16]),.b(matrix[2*16+:16]),.c(tmp[2*16+:16]));
-	signedmul mult_u3(.a(vector[3*16+:16]),.b(matrix[3*16+:16]),.c(tmp[3*16+:16]));
-	signedmul mult_u4(.a(vector[4*16+:16]),.b(matrix[4*16+:16]),.c(tmp[4*16+:16]));
-	signedmul mult_u5(.a(vector[5*16+:16]),.b(matrix[5*16+:16]),.c(tmp[5*16+:16]));
-	signedmul mult_u6(.a(vector[6*16+:16]),.b(matrix[6*16+:16]),.c(tmp[6*16+:16]));
-	signedmul mult_u7(.a(vector[7*16+:16]),.b(matrix[7*16+:16]),.c(tmp[7*16+:16]));
-	signedmul mult_u8(.a(vector[8*16+:16]),.b(matrix[8*16+:16]),.c(tmp[8*16+:16]));
-	signedmul mult_u9(.a(vector[9*16+:16]),.b(matrix[9*16+:16]),.c(tmp[9*16+:16]));
-	signedmul mult_u10(.a(vector[10*16+:16]),.b(matrix[10*16+:16]),.c(tmp[10*16+:16]));
-	signedmul mult_u11(.a(vector[11*16+:16]),.b(matrix[11*16+:16]),.c(tmp[11*16+:16]));
-	signedmul mult_u12(.a(vector[12*16+:16]),.b(matrix[12*16+:16]),.c(tmp[12*16+:16]));
-	signedmul mult_u13(.a(vector[13*16+:16]),.b(matrix[13*16+:16]),.c(tmp[13*16+:16]));
-	signedmul mult_u14(.a(vector[14*16+:16]),.b(matrix[14*16+:16]),.c(tmp[14*16+:16]));
-	signedmul mult_u15(.a(vector[15*16+:16]),.b(matrix[15*16+:16]),.c(tmp[15*16+:16]));
-	signedmul mult_u16(.a(vector[16*16+:16]),.b(matrix[16*16+:16]),.c(tmp[16*16+:16]));
-	signedmul mult_u17(.a(vector[17*16+:16]),.b(matrix[17*16+:16]),.c(tmp[17*16+:16]));
-	signedmul mult_u18(.a(vector[18*16+:16]),.b(matrix[18*16+:16]),.c(tmp[18*16+:16]));
-	signedmul mult_u19(.a(vector[19*16+:16]),.b(matrix[19*16+:16]),.c(tmp[19*16+:16]));
-	signedmul mult_u20(.a(vector[20*16+:16]),.b(matrix[20*16+:16]),.c(tmp[20*16+:16]));
-	signedmul mult_u21(.a(vector[21*16+:16]),.b(matrix[21*16+:16]),.c(tmp[21*16+:16]));
-	signedmul mult_u22(.a(vector[22*16+:16]),.b(matrix[22*16+:16]),.c(tmp[22*16+:16]));
-	signedmul mult_u23(.a(vector[23*16+:16]),.b(matrix[23*16+:16]),.c(tmp[23*16+:16]));
-	signedmul mult_u24(.a(vector[24*16+:16]),.b(matrix[24*16+:16]),.c(tmp[24*16+:16]));
-	signedmul mult_u25(.a(vector[25*16+:16]),.b(matrix[25*16+:16]),.c(tmp[25*16+:16]));
-	signedmul mult_u26(.a(vector[26*16+:16]),.b(matrix[26*16+:16]),.c(tmp[26*16+:16]));
-	signedmul mult_u27(.a(vector[27*16+:16]),.b(matrix[27*16+:16]),.c(tmp[27*16+:16]));
-	signedmul mult_u28(.a(vector[28*16+:16]),.b(matrix[28*16+:16]),.c(tmp[28*16+:16]));
-	signedmul mult_u29(.a(vector[29*16+:16]),.b(matrix[29*16+:16]),.c(tmp[29*16+:16]));
-	signedmul mult_u30(.a(vector[30*16+:16]),.b(matrix[30*16+:16]),.c(tmp[30*16+:16]));
-	signedmul mult_u31(.a(vector[31*16+:16]),.b(matrix[31*16+:16]),.c(tmp[31*16+:16]));
-	signedmul mult_u32(.a(vector[32*16+:16]),.b(matrix[32*16+:16]),.c(tmp[32*16+:16]));
-	signedmul mult_u33(.a(vector[33*16+:16]),.b(matrix[33*16+:16]),.c(tmp[33*16+:16]));
-	signedmul mult_u34(.a(vector[34*16+:16]),.b(matrix[34*16+:16]),.c(tmp[34*16+:16]));
-	signedmul mult_u35(.a(vector[35*16+:16]),.b(matrix[35*16+:16]),.c(tmp[35*16+:16]));
-	signedmul mult_u36(.a(vector[36*16+:16]),.b(matrix[36*16+:16]),.c(tmp[36*16+:16]));
-	signedmul mult_u37(.a(vector[37*16+:16]),.b(matrix[37*16+:16]),.c(tmp[37*16+:16]));
-	signedmul mult_u38(.a(vector[38*16+:16]),.b(matrix[38*16+:16]),.c(tmp[38*16+:16]));
-	signedmul mult_u39(.a(vector[39*16+:16]),.b(matrix[39*16+:16]),.c(tmp[39*16+:16]));
-	signedmul mult_u40(.a(vector[40*16+:16]),.b(matrix[40*16+:16]),.c(tmp[40*16+:16]));
-	signedmul mult_u41(.a(vector[41*16+:16]),.b(matrix[41*16+:16]),.c(tmp[41*16+:16]));
-	signedmul mult_u42(.a(vector[42*16+:16]),.b(matrix[42*16+:16]),.c(tmp[42*16+:16]));
-	signedmul mult_u43(.a(vector[43*16+:16]),.b(matrix[43*16+:16]),.c(tmp[43*16+:16]));
-	signedmul mult_u44(.a(vector[44*16+:16]),.b(matrix[44*16+:16]),.c(tmp[44*16+:16]));
-	signedmul mult_u45(.a(vector[45*16+:16]),.b(matrix[45*16+:16]),.c(tmp[45*16+:16]));
-	signedmul mult_u46(.a(vector[46*16+:16]),.b(matrix[46*16+:16]),.c(tmp[46*16+:16]));
-	signedmul mult_u47(.a(vector[47*16+:16]),.b(matrix[47*16+:16]),.c(tmp[47*16+:16]));
-	signedmul mult_u48(.a(vector[48*16+:16]),.b(matrix[48*16+:16]),.c(tmp[48*16+:16]));
-	signedmul mult_u49(.a(vector[49*16+:16]),.b(matrix[49*16+:16]),.c(tmp[49*16+:16]));
-	signedmul mult_u50(.a(vector[50*16+:16]),.b(matrix[50*16+:16]),.c(tmp[50*16+:16]));
-	signedmul mult_u51(.a(vector[51*16+:16]),.b(matrix[51*16+:16]),.c(tmp[51*16+:16]));
-	signedmul mult_u52(.a(vector[52*16+:16]),.b(matrix[52*16+:16]),.c(tmp[52*16+:16]));
-	signedmul mult_u53(.a(vector[53*16+:16]),.b(matrix[53*16+:16]),.c(tmp[53*16+:16]));
-	signedmul mult_u54(.a(vector[54*16+:16]),.b(matrix[54*16+:16]),.c(tmp[54*16+:16]));
-	signedmul mult_u55(.a(vector[55*16+:16]),.b(matrix[55*16+:16]),.c(tmp[55*16+:16]));
-	signedmul mult_u56(.a(vector[56*16+:16]),.b(matrix[56*16+:16]),.c(tmp[56*16+:16]));
-	signedmul mult_u57(.a(vector[57*16+:16]),.b(matrix[57*16+:16]),.c(tmp[57*16+:16]));
-	signedmul mult_u58(.a(vector[58*16+:16]),.b(matrix[58*16+:16]),.c(tmp[58*16+:16]));
-	signedmul mult_u59(.a(vector[59*16+:16]),.b(matrix[59*16+:16]),.c(tmp[59*16+:16]));
-	signedmul mult_u60(.a(vector[60*16+:16]),.b(matrix[60*16+:16]),.c(tmp[60*16+:16]));
-	signedmul mult_u61(.a(vector[61*16+:16]),.b(matrix[61*16+:16]),.c(tmp[61*16+:16]));
-	signedmul mult_u62(.a(vector[62*16+:16]),.b(matrix[62*16+:16]),.c(tmp[62*16+:16]));
-	signedmul mult_u63(.a(vector[63*16+:16]),.b(matrix[63*16+:16]),.c(tmp[63*16+:16]));
-	signedmul mult_u64(.a(vector[64*16+:16]),.b(matrix[64*16+:16]),.c(tmp[64*16+:16]));
-	signedmul mult_u65(.a(vector[65*16+:16]),.b(matrix[65*16+:16]),.c(tmp[65*16+:16]));
-	signedmul mult_u66(.a(vector[66*16+:16]),.b(matrix[66*16+:16]),.c(tmp[66*16+:16]));
-	signedmul mult_u67(.a(vector[67*16+:16]),.b(matrix[67*16+:16]),.c(tmp[67*16+:16]));
-	signedmul mult_u68(.a(vector[68*16+:16]),.b(matrix[68*16+:16]),.c(tmp[68*16+:16]));
-	signedmul mult_u69(.a(vector[69*16+:16]),.b(matrix[69*16+:16]),.c(tmp[69*16+:16]));
-	signedmul mult_u70(.a(vector[70*16+:16]),.b(matrix[70*16+:16]),.c(tmp[70*16+:16]));
-	signedmul mult_u71(.a(vector[71*16+:16]),.b(matrix[71*16+:16]),.c(tmp[71*16+:16]));
-	signedmul mult_u72(.a(vector[72*16+:16]),.b(matrix[72*16+:16]),.c(tmp[72*16+:16]));
-	signedmul mult_u73(.a(vector[73*16+:16]),.b(matrix[73*16+:16]),.c(tmp[73*16+:16]));
-	signedmul mult_u74(.a(vector[74*16+:16]),.b(matrix[74*16+:16]),.c(tmp[74*16+:16]));
-	signedmul mult_u75(.a(vector[75*16+:16]),.b(matrix[75*16+:16]),.c(tmp[75*16+:16]));
-	signedmul mult_u76(.a(vector[76*16+:16]),.b(matrix[76*16+:16]),.c(tmp[76*16+:16]));
-	signedmul mult_u77(.a(vector[77*16+:16]),.b(matrix[77*16+:16]),.c(tmp[77*16+:16]));
-	signedmul mult_u78(.a(vector[78*16+:16]),.b(matrix[78*16+:16]),.c(tmp[78*16+:16]));
-	signedmul mult_u79(.a(vector[79*16+:16]),.b(matrix[79*16+:16]),.c(tmp[79*16+:16]));
-	signedmul mult_u80(.a(vector[80*16+:16]),.b(matrix[80*16+:16]),.c(tmp[80*16+:16]));
-	signedmul mult_u81(.a(vector[81*16+:16]),.b(matrix[81*16+:16]),.c(tmp[81*16+:16]));
-	signedmul mult_u82(.a(vector[82*16+:16]),.b(matrix[82*16+:16]),.c(tmp[82*16+:16]));
-	signedmul mult_u83(.a(vector[83*16+:16]),.b(matrix[83*16+:16]),.c(tmp[83*16+:16]));
-	signedmul mult_u84(.a(vector[84*16+:16]),.b(matrix[84*16+:16]),.c(tmp[84*16+:16]));
-	signedmul mult_u85(.a(vector[85*16+:16]),.b(matrix[85*16+:16]),.c(tmp[85*16+:16]));
-	signedmul mult_u86(.a(vector[86*16+:16]),.b(matrix[86*16+:16]),.c(tmp[86*16+:16]));
-	signedmul mult_u87(.a(vector[87*16+:16]),.b(matrix[87*16+:16]),.c(tmp[87*16+:16]));
-	signedmul mult_u88(.a(vector[88*16+:16]),.b(matrix[88*16+:16]),.c(tmp[88*16+:16]));
-	signedmul mult_u89(.a(vector[89*16+:16]),.b(matrix[89*16+:16]),.c(tmp[89*16+:16]));
-	signedmul mult_u90(.a(vector[90*16+:16]),.b(matrix[90*16+:16]),.c(tmp[90*16+:16]));
-	signedmul mult_u91(.a(vector[91*16+:16]),.b(matrix[91*16+:16]),.c(tmp[91*16+:16]));
-	signedmul mult_u92(.a(vector[92*16+:16]),.b(matrix[92*16+:16]),.c(tmp[92*16+:16]));
-	signedmul mult_u93(.a(vector[93*16+:16]),.b(matrix[93*16+:16]),.c(tmp[93*16+:16]));
-	signedmul mult_u94(.a(vector[94*16+:16]),.b(matrix[94*16+:16]),.c(tmp[94*16+:16]));
-	signedmul mult_u95(.a(vector[95*16+:16]),.b(matrix[95*16+:16]),.c(tmp[95*16+:16]));
-	signedmul mult_u96(.a(vector[96*16+:16]),.b(matrix[96*16+:16]),.c(tmp[96*16+:16]));
-	signedmul mult_u97(.a(vector[97*16+:16]),.b(matrix[97*16+:16]),.c(tmp[97*16+:16]));
-	signedmul mult_u98(.a(vector[98*16+:16]),.b(matrix[98*16+:16]),.c(tmp[98*16+:16]));
-	signedmul mult_u99(.a(vector[99*16+:16]),.b(matrix[99*16+:16]),.c(tmp[99*16+:16]));
+ 	 signedmul mult_u0(.clk(clk),.a(vector[0*16+:16]),.b(matrix[0*16+:16]),.c(tmp[0*16+:16]));
+	signedmul mult_u1(.clk(clk),.a(vector[1*16+:16]),.b(matrix[1*16+:16]),.c(tmp[1*16+:16]));
+	signedmul mult_u2(.clk(clk),.a(vector[2*16+:16]),.b(matrix[2*16+:16]),.c(tmp[2*16+:16]));
+	signedmul mult_u3(.clk(clk),.a(vector[3*16+:16]),.b(matrix[3*16+:16]),.c(tmp[3*16+:16]));
+	signedmul mult_u4(.clk(clk),.a(vector[4*16+:16]),.b(matrix[4*16+:16]),.c(tmp[4*16+:16]));
+	signedmul mult_u5(.clk(clk),.a(vector[5*16+:16]),.b(matrix[5*16+:16]),.c(tmp[5*16+:16]));
+	signedmul mult_u6(.clk(clk),.a(vector[6*16+:16]),.b(matrix[6*16+:16]),.c(tmp[6*16+:16]));
+	signedmul mult_u7(.clk(clk),.a(vector[7*16+:16]),.b(matrix[7*16+:16]),.c(tmp[7*16+:16]));
+	signedmul mult_u8(.clk(clk),.a(vector[8*16+:16]),.b(matrix[8*16+:16]),.c(tmp[8*16+:16]));
+	signedmul mult_u9(.clk(clk),.a(vector[9*16+:16]),.b(matrix[9*16+:16]),.c(tmp[9*16+:16]));
+	signedmul mult_u10(.clk(clk),.a(vector[10*16+:16]),.b(matrix[10*16+:16]),.c(tmp[10*16+:16]));
+	signedmul mult_u11(.clk(clk),.a(vector[11*16+:16]),.b(matrix[11*16+:16]),.c(tmp[11*16+:16]));
+	signedmul mult_u12(.clk(clk),.a(vector[12*16+:16]),.b(matrix[12*16+:16]),.c(tmp[12*16+:16]));
+	signedmul mult_u13(.clk(clk),.a(vector[13*16+:16]),.b(matrix[13*16+:16]),.c(tmp[13*16+:16]));
+	signedmul mult_u14(.clk(clk),.a(vector[14*16+:16]),.b(matrix[14*16+:16]),.c(tmp[14*16+:16]));
+	signedmul mult_u15(.clk(clk),.a(vector[15*16+:16]),.b(matrix[15*16+:16]),.c(tmp[15*16+:16]));
+	signedmul mult_u16(.clk(clk),.a(vector[16*16+:16]),.b(matrix[16*16+:16]),.c(tmp[16*16+:16]));
+	signedmul mult_u17(.clk(clk),.a(vector[17*16+:16]),.b(matrix[17*16+:16]),.c(tmp[17*16+:16]));
+	signedmul mult_u18(.clk(clk),.a(vector[18*16+:16]),.b(matrix[18*16+:16]),.c(tmp[18*16+:16]));
+	signedmul mult_u19(.clk(clk),.a(vector[19*16+:16]),.b(matrix[19*16+:16]),.c(tmp[19*16+:16]));
+	signedmul mult_u20(.clk(clk),.a(vector[20*16+:16]),.b(matrix[20*16+:16]),.c(tmp[20*16+:16]));
+	signedmul mult_u21(.clk(clk),.a(vector[21*16+:16]),.b(matrix[21*16+:16]),.c(tmp[21*16+:16]));
+	signedmul mult_u22(.clk(clk),.a(vector[22*16+:16]),.b(matrix[22*16+:16]),.c(tmp[22*16+:16]));
+	signedmul mult_u23(.clk(clk),.a(vector[23*16+:16]),.b(matrix[23*16+:16]),.c(tmp[23*16+:16]));
+	signedmul mult_u24(.clk(clk),.a(vector[24*16+:16]),.b(matrix[24*16+:16]),.c(tmp[24*16+:16]));
+	signedmul mult_u25(.clk(clk),.a(vector[25*16+:16]),.b(matrix[25*16+:16]),.c(tmp[25*16+:16]));
+	signedmul mult_u26(.clk(clk),.a(vector[26*16+:16]),.b(matrix[26*16+:16]),.c(tmp[26*16+:16]));
+	signedmul mult_u27(.clk(clk),.a(vector[27*16+:16]),.b(matrix[27*16+:16]),.c(tmp[27*16+:16]));
+	signedmul mult_u28(.clk(clk),.a(vector[28*16+:16]),.b(matrix[28*16+:16]),.c(tmp[28*16+:16]));
+	signedmul mult_u29(.clk(clk),.a(vector[29*16+:16]),.b(matrix[29*16+:16]),.c(tmp[29*16+:16]));
+	signedmul mult_u30(.clk(clk),.a(vector[30*16+:16]),.b(matrix[30*16+:16]),.c(tmp[30*16+:16]));
+	signedmul mult_u31(.clk(clk),.a(vector[31*16+:16]),.b(matrix[31*16+:16]),.c(tmp[31*16+:16]));
+	signedmul mult_u32(.clk(clk),.a(vector[32*16+:16]),.b(matrix[32*16+:16]),.c(tmp[32*16+:16]));
+	signedmul mult_u33(.clk(clk),.a(vector[33*16+:16]),.b(matrix[33*16+:16]),.c(tmp[33*16+:16]));
+	signedmul mult_u34(.clk(clk),.a(vector[34*16+:16]),.b(matrix[34*16+:16]),.c(tmp[34*16+:16]));
+	signedmul mult_u35(.clk(clk),.a(vector[35*16+:16]),.b(matrix[35*16+:16]),.c(tmp[35*16+:16]));
+	signedmul mult_u36(.clk(clk),.a(vector[36*16+:16]),.b(matrix[36*16+:16]),.c(tmp[36*16+:16]));
+	signedmul mult_u37(.clk(clk),.a(vector[37*16+:16]),.b(matrix[37*16+:16]),.c(tmp[37*16+:16]));
+	signedmul mult_u38(.clk(clk),.a(vector[38*16+:16]),.b(matrix[38*16+:16]),.c(tmp[38*16+:16]));
+	signedmul mult_u39(.clk(clk),.a(vector[39*16+:16]),.b(matrix[39*16+:16]),.c(tmp[39*16+:16]));
+	signedmul mult_u40(.clk(clk),.a(vector[40*16+:16]),.b(matrix[40*16+:16]),.c(tmp[40*16+:16]));
+	signedmul mult_u41(.clk(clk),.a(vector[41*16+:16]),.b(matrix[41*16+:16]),.c(tmp[41*16+:16]));
+	signedmul mult_u42(.clk(clk),.a(vector[42*16+:16]),.b(matrix[42*16+:16]),.c(tmp[42*16+:16]));
+	signedmul mult_u43(.clk(clk),.a(vector[43*16+:16]),.b(matrix[43*16+:16]),.c(tmp[43*16+:16]));
+	signedmul mult_u44(.clk(clk),.a(vector[44*16+:16]),.b(matrix[44*16+:16]),.c(tmp[44*16+:16]));
+	signedmul mult_u45(.clk(clk),.a(vector[45*16+:16]),.b(matrix[45*16+:16]),.c(tmp[45*16+:16]));
+	signedmul mult_u46(.clk(clk),.a(vector[46*16+:16]),.b(matrix[46*16+:16]),.c(tmp[46*16+:16]));
+	signedmul mult_u47(.clk(clk),.a(vector[47*16+:16]),.b(matrix[47*16+:16]),.c(tmp[47*16+:16]));
+	signedmul mult_u48(.clk(clk),.a(vector[48*16+:16]),.b(matrix[48*16+:16]),.c(tmp[48*16+:16]));
+	signedmul mult_u49(.clk(clk),.a(vector[49*16+:16]),.b(matrix[49*16+:16]),.c(tmp[49*16+:16]));
+	signedmul mult_u50(.clk(clk),.a(vector[50*16+:16]),.b(matrix[50*16+:16]),.c(tmp[50*16+:16]));
+	signedmul mult_u51(.clk(clk),.a(vector[51*16+:16]),.b(matrix[51*16+:16]),.c(tmp[51*16+:16]));
+	signedmul mult_u52(.clk(clk),.a(vector[52*16+:16]),.b(matrix[52*16+:16]),.c(tmp[52*16+:16]));
+	signedmul mult_u53(.clk(clk),.a(vector[53*16+:16]),.b(matrix[53*16+:16]),.c(tmp[53*16+:16]));
+	signedmul mult_u54(.clk(clk),.a(vector[54*16+:16]),.b(matrix[54*16+:16]),.c(tmp[54*16+:16]));
+	signedmul mult_u55(.clk(clk),.a(vector[55*16+:16]),.b(matrix[55*16+:16]),.c(tmp[55*16+:16]));
+	signedmul mult_u56(.clk(clk),.a(vector[56*16+:16]),.b(matrix[56*16+:16]),.c(tmp[56*16+:16]));
+	signedmul mult_u57(.clk(clk),.a(vector[57*16+:16]),.b(matrix[57*16+:16]),.c(tmp[57*16+:16]));
+	signedmul mult_u58(.clk(clk),.a(vector[58*16+:16]),.b(matrix[58*16+:16]),.c(tmp[58*16+:16]));
+	signedmul mult_u59(.clk(clk),.a(vector[59*16+:16]),.b(matrix[59*16+:16]),.c(tmp[59*16+:16]));
+	signedmul mult_u60(.clk(clk),.a(vector[60*16+:16]),.b(matrix[60*16+:16]),.c(tmp[60*16+:16]));
+	signedmul mult_u61(.clk(clk),.a(vector[61*16+:16]),.b(matrix[61*16+:16]),.c(tmp[61*16+:16]));
+	signedmul mult_u62(.clk(clk),.a(vector[62*16+:16]),.b(matrix[62*16+:16]),.c(tmp[62*16+:16]));
+	signedmul mult_u63(.clk(clk),.a(vector[63*16+:16]),.b(matrix[63*16+:16]),.c(tmp[63*16+:16]));
+	signedmul mult_u64(.clk(clk),.a(vector[64*16+:16]),.b(matrix[64*16+:16]),.c(tmp[64*16+:16]));
+	signedmul mult_u65(.clk(clk),.a(vector[65*16+:16]),.b(matrix[65*16+:16]),.c(tmp[65*16+:16]));
+	signedmul mult_u66(.clk(clk),.a(vector[66*16+:16]),.b(matrix[66*16+:16]),.c(tmp[66*16+:16]));
+	signedmul mult_u67(.clk(clk),.a(vector[67*16+:16]),.b(matrix[67*16+:16]),.c(tmp[67*16+:16]));
+	signedmul mult_u68(.clk(clk),.a(vector[68*16+:16]),.b(matrix[68*16+:16]),.c(tmp[68*16+:16]));
+	signedmul mult_u69(.clk(clk),.a(vector[69*16+:16]),.b(matrix[69*16+:16]),.c(tmp[69*16+:16]));
+	signedmul mult_u70(.clk(clk),.a(vector[70*16+:16]),.b(matrix[70*16+:16]),.c(tmp[70*16+:16]));
+	signedmul mult_u71(.clk(clk),.a(vector[71*16+:16]),.b(matrix[71*16+:16]),.c(tmp[71*16+:16]));
+	signedmul mult_u72(.clk(clk),.a(vector[72*16+:16]),.b(matrix[72*16+:16]),.c(tmp[72*16+:16]));
+	signedmul mult_u73(.clk(clk),.a(vector[73*16+:16]),.b(matrix[73*16+:16]),.c(tmp[73*16+:16]));
+	signedmul mult_u74(.clk(clk),.a(vector[74*16+:16]),.b(matrix[74*16+:16]),.c(tmp[74*16+:16]));
+	signedmul mult_u75(.clk(clk),.a(vector[75*16+:16]),.b(matrix[75*16+:16]),.c(tmp[75*16+:16]));
+	signedmul mult_u76(.clk(clk),.a(vector[76*16+:16]),.b(matrix[76*16+:16]),.c(tmp[76*16+:16]));
+	signedmul mult_u77(.clk(clk),.a(vector[77*16+:16]),.b(matrix[77*16+:16]),.c(tmp[77*16+:16]));
+	signedmul mult_u78(.clk(clk),.a(vector[78*16+:16]),.b(matrix[78*16+:16]),.c(tmp[78*16+:16]));
+	signedmul mult_u79(.clk(clk),.a(vector[79*16+:16]),.b(matrix[79*16+:16]),.c(tmp[79*16+:16]));
+	signedmul mult_u80(.clk(clk),.a(vector[80*16+:16]),.b(matrix[80*16+:16]),.c(tmp[80*16+:16]));
+	signedmul mult_u81(.clk(clk),.a(vector[81*16+:16]),.b(matrix[81*16+:16]),.c(tmp[81*16+:16]));
+	signedmul mult_u82(.clk(clk),.a(vector[82*16+:16]),.b(matrix[82*16+:16]),.c(tmp[82*16+:16]));
+	signedmul mult_u83(.clk(clk),.a(vector[83*16+:16]),.b(matrix[83*16+:16]),.c(tmp[83*16+:16]));
+	signedmul mult_u84(.clk(clk),.a(vector[84*16+:16]),.b(matrix[84*16+:16]),.c(tmp[84*16+:16]));
+	signedmul mult_u85(.clk(clk),.a(vector[85*16+:16]),.b(matrix[85*16+:16]),.c(tmp[85*16+:16]));
+	signedmul mult_u86(.clk(clk),.a(vector[86*16+:16]),.b(matrix[86*16+:16]),.c(tmp[86*16+:16]));
+	signedmul mult_u87(.clk(clk),.a(vector[87*16+:16]),.b(matrix[87*16+:16]),.c(tmp[87*16+:16]));
+	signedmul mult_u88(.clk(clk),.a(vector[88*16+:16]),.b(matrix[88*16+:16]),.c(tmp[88*16+:16]));
+	signedmul mult_u89(.clk(clk),.a(vector[89*16+:16]),.b(matrix[89*16+:16]),.c(tmp[89*16+:16]));
+	signedmul mult_u90(.clk(clk),.a(vector[90*16+:16]),.b(matrix[90*16+:16]),.c(tmp[90*16+:16]));
+	signedmul mult_u91(.clk(clk),.a(vector[91*16+:16]),.b(matrix[91*16+:16]),.c(tmp[91*16+:16]));
+	signedmul mult_u92(.clk(clk),.a(vector[92*16+:16]),.b(matrix[92*16+:16]),.c(tmp[92*16+:16]));
+	signedmul mult_u93(.clk(clk),.a(vector[93*16+:16]),.b(matrix[93*16+:16]),.c(tmp[93*16+:16]));
+	signedmul mult_u94(.clk(clk),.a(vector[94*16+:16]),.b(matrix[94*16+:16]),.c(tmp[94*16+:16]));
+	signedmul mult_u95(.clk(clk),.a(vector[95*16+:16]),.b(matrix[95*16+:16]),.c(tmp[95*16+:16]));
+	signedmul mult_u96(.clk(clk),.a(vector[96*16+:16]),.b(matrix[96*16+:16]),.c(tmp[96*16+:16]));
+	signedmul mult_u97(.clk(clk),.a(vector[97*16+:16]),.b(matrix[97*16+:16]),.c(tmp[97*16+:16]));
+	signedmul mult_u98(.clk(clk),.a(vector[98*16+:16]),.b(matrix[98*16+:16]),.c(tmp[98*16+:16]));
+	signedmul mult_u99(.clk(clk),.a(vector[99*16+:16]),.b(matrix[99*16+:16]),.c(tmp[99*16+:16]));
 	
  endmodule
 
@@ -1218,6 +1170,7 @@ module vecmat_mul_x #(parameter varraysize=1600,vectwidth=100) //,matsize=64)   
 endmodule
 
 module signedmul(
+  input clk,
   input [15:0] a,
   input [15:0] b,
   output [15:0] c
@@ -1227,10 +1180,27 @@ wire [31:0] result;
 wire [15:0] a_new;
 wire [15:0] b_new;
 
-assign c = (b[15]==a[15])?result[26:12]:(~result[26:12]+1'b1);
+reg [15:0] a_ff;
+reg [15:0] b_ff;
+reg [31:0] result_ff;
+reg a_sign,b_sign,a_sign_ff,b_sign_ff;
+
+assign c = (b_sign_ff==a_sign_ff)?result_ff[26:12]:(~result_ff[26:12]+1'b1);
 assign a_new = a[15]?(~a + 1'b1):a;
 assign b_new = b[15]?(~b + 1'b1):b;
-assign result = a_new*b_new;
+assign result = a_ff*b_ff;
+
+always@(posedge clk) begin
+	a_ff <= a_new;
+	b_ff <= b_new; 
+
+	a_sign <= a[15];
+	b_sign <= b[15];
+	a_sign_ff <= a_sign;
+	b_sign_ff <= b_sign;
+    result_ff <= result;
+    
+end
 
 
 endmodule

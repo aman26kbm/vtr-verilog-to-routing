@@ -1,3 +1,1069 @@
+//softmax_p4_smem_rfloat16_alut_v512_b2_0_10.v
+`ifndef DEFINES_DONE
+`define DEFINES_DONE
+`define EXPONENT 5
+`define MANTISSA 10
+`define SIGN 1
+`define DATAWIDTH (`SIGN+`EXPONENT+`MANTISSA)
+`define IEEE_COMPLIANCE 1
+`define NUM 4
+`define ADDRSIZE 8
+`define ADDRSIZE_FOR_TB 10
+`endif
+
+
+`timescale 1ns / 1ps
+
+//fixed adder adds unsigned fixed numbers. Overflow flag is high in case of overflow
+module softmax(
+  inp,      //data in from memory to max block
+  sub0_inp, //data inputs from memory to first-stage subtractors
+  sub1_inp, //data inputs from memory to second-stage subtractors
+
+  start_addr,   //the first address that contains input data in the on-chip memory
+  end_addr,     //max address containing required data
+
+  addr,          //address corresponding to data inp
+  sub0_inp_addr, //address corresponding to sub0_inp
+  sub1_inp_addr, //address corresponding to sub1_inp
+
+  outp0,
+  outp1,
+  outp2,
+  outp3,
+
+  clk,
+  reset,
+  init,   //the signal indicating to latch the new start address
+  done,   //done signal asserts when the softmax calculation is over
+  start); //start signal for the overall softmax operation
+
+  input clk;
+  input reset;
+  input start;
+  input init;
+
+  input  [`DATAWIDTH*`NUM-1:0] inp;
+  input  [`DATAWIDTH*`NUM-1:0] sub0_inp;
+  input  [`DATAWIDTH*`NUM-1:0] sub1_inp;
+  input  [`ADDRSIZE-1:0]       end_addr;
+  input  [`ADDRSIZE-1:0]       start_addr;
+
+  output [`ADDRSIZE-1 :0] addr;
+  output  [`ADDRSIZE-1:0] sub0_inp_addr;
+  output  [`ADDRSIZE-1:0] sub1_inp_addr;
+
+  output [`DATAWIDTH-1:0] outp0;
+  output [`DATAWIDTH-1:0] outp1;
+  output [`DATAWIDTH-1:0] outp2;
+  output [`DATAWIDTH-1:0] outp3;
+  output done;
+
+  reg [`DATAWIDTH*`NUM-1:0] inp_reg;
+  reg [`ADDRSIZE-1:0] addr;
+  reg [`DATAWIDTH*`NUM-1:0] sub0_inp_reg;
+  reg [`DATAWIDTH*`NUM-1:0] sub1_inp_reg;
+  reg [`ADDRSIZE-1:0] sub0_inp_addr;
+  reg [`ADDRSIZE-1:0] sub1_inp_addr;
+
+
+  ////-----------control signals--------------////
+  reg mode1_start;
+  reg mode1_run;
+  reg mode2_start;
+  reg mode2_run;
+
+  reg mode3_stage_run;
+  reg mode7_stage_run;
+
+  reg mode3_run;
+
+  wire mode1_stage0_run;
+  assign mode1_stage0_run = mode1_run;
+
+  reg mode4_stage1_run_a;
+  reg mode4_stage2_run_a;
+  reg mode4_stage0_run;
+  reg mode4_stage1_run;
+  reg mode4_stage2_run;
+
+  reg mode5_run;
+  reg mode6_run;
+  reg mode7_run;
+  reg presub_start;
+  reg presub_run;
+  reg done;
+
+  always @(posedge clk)begin
+    mode4_stage1_run_a <= mode4_stage1_run;
+    mode4_stage2_run_a <= mode4_stage2_run;
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      inp_reg <= 0;
+      addr <= 0;
+      mode1_start <= 0;
+      mode1_run <= 0;
+    end
+    //init latch the input address
+    else if(init) begin
+      addr <= start_addr;
+    end
+    //start the mode1 max calculation
+    else if(start)begin
+      mode1_start <= 1;
+    end
+    //logic when to finish mode1 and trigger mode2 to latch the mode2 address
+    else if(mode1_start && addr < end_addr) begin
+      addr <= addr + 1;
+      inp_reg <= inp;
+      mode1_run <= 1;
+    end else if(addr == end_addr)begin
+      addr <= 0;
+      mode1_run <= 0;
+      mode1_start <= 0;
+    end else begin
+      mode1_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      sub0_inp_addr <= 0;
+      sub0_inp_reg <= 0;
+      mode2_start <= 0;
+      mode2_run <= 0;
+    end
+    else if ((mode1_start) && (addr == (end_addr - 1))) begin
+        mode2_start <= 1;
+        sub0_inp_addr <= start_addr;
+	end
+    //logic when to finish mode2
+    else if(mode2_start && sub0_inp_addr < end_addr) begin
+      sub0_inp_addr <= sub0_inp_addr + 1;
+      sub0_inp_reg <= sub0_inp;
+      mode2_run <= 1;
+    end 
+	else if(sub0_inp_addr == end_addr)begin
+      sub0_inp_addr <= 0;
+      sub0_inp_reg <= 0;
+      mode2_run <= 0;
+      mode2_start <= 0;
+    end
+  end	
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode3_stage_run <= 0;
+    end
+    //logic when to trigger mode3
+    else if(mode2_run == 1) begin
+      mode3_stage_run <= 1;
+    end else begin
+      mode3_stage_run <= 0;
+    end
+  end	
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode3_run <= 0;
+    end
+    else if(mode3_stage_run == 1) begin
+      mode3_run <= 1;
+    end else begin
+      mode3_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage2_run <= 0;
+    end
+    //logic when to trigger mode4 last stage adderTree, since the final results of adderTree
+    //is always ready 1 cycle after mode3 finishes, so there is no need on extra
+    //logic to control the adderTree outputs
+    else if (mode3_run == 1) begin
+      mode4_stage2_run <= 1;
+    end else begin
+      mode4_stage2_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage1_run <= 0;
+    end
+    else if (mode4_stage2_run == 1) begin
+      mode4_stage1_run <= 1;
+    end else begin
+      mode4_stage1_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode4_stage0_run <= 0;
+    end
+    else if (mode4_stage1_run == 1) begin
+      mode4_stage0_run <= 1;
+    end else begin
+      mode4_stage0_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode5_run <= 0;
+    end
+    //mode5 should be triggered right at the falling edge of mode4_stage1_run
+    else if(mode4_stage1_run_a & ~mode4_stage1_run) begin
+      mode5_run <= 1;
+    end 
+	else if(mode4_stage1_run == 0) begin
+      mode5_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      presub_start <= 0;
+      sub1_inp_addr <= 0;
+      sub1_inp_reg <= 0;
+      presub_run <= 0;
+    end
+    else if(mode4_stage2_run_a & ~mode4_stage2_run) begin
+      presub_start <= 1;
+      sub1_inp_addr <= start_addr;
+      sub1_inp_reg <= sub1_inp;
+    end
+    else if(~reset && presub_start && sub1_inp_addr < end_addr)begin
+      sub1_inp_addr <= sub1_inp_addr + 1;
+      sub1_inp_reg <= sub1_inp;
+      presub_run <= 1;
+    end 
+	else if(sub1_inp_addr == end_addr) begin
+      presub_run <= 0;
+      presub_start <= 0;
+      sub1_inp_addr <= 0;
+      sub1_inp_reg <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode6_run <= 0;
+	end  
+    else if(presub_run) begin
+      mode6_run <= 1;
+    end else begin
+      mode6_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode7_stage_run <= 0;
+	end
+    else if(mode6_run == 1) begin
+      mode7_stage_run <= 1;
+    end else begin
+      mode7_stage_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode7_run <= 0;
+	end
+	else if(mode7_stage_run == 1) begin
+      mode7_run <= 1;
+    end else begin
+      mode7_run <= 0;
+    end
+  end
+
+  always @(posedge clk) begin
+    if(reset) begin
+      done <= 0;
+	end  
+    else if(mode7_run) begin
+      done <= 1;
+    end else begin
+      done <= 0;
+    end
+  end
+
+  ////------mode1 max block---------///////
+  wire [`DATAWIDTH-1:0] max_outp;
+
+  mode1_max_tree mode1_max(
+      .inp0(inp_reg[`DATAWIDTH*1-1:`DATAWIDTH*0]),
+      .inp1(inp_reg[`DATAWIDTH*2-1:`DATAWIDTH*1]),
+      .inp2(inp_reg[`DATAWIDTH*3-1:`DATAWIDTH*2]),
+      .inp3(inp_reg[`DATAWIDTH*4-1:`DATAWIDTH*3]),
+      .mode1_stage0_run(mode1_stage0_run),
+      .clk(clk),
+      .reset(reset),
+      .outp(max_outp));
+
+  ////------mode2 subtraction---------///////
+  wire [`DATAWIDTH-1:0] mode2_outp_sub0;
+  wire [`DATAWIDTH-1:0] mode2_outp_sub1;
+  wire [`DATAWIDTH-1:0] mode2_outp_sub2;
+  wire [`DATAWIDTH-1:0] mode2_outp_sub3;
+  mode2_sub mode2_sub(
+      .a_inp0(sub0_inp_reg[`DATAWIDTH*1-1:`DATAWIDTH*0]),
+      .a_inp1(sub0_inp_reg[`DATAWIDTH*2-1:`DATAWIDTH*1]),
+      .a_inp2(sub0_inp_reg[`DATAWIDTH*3-1:`DATAWIDTH*2]),
+      .a_inp3(sub0_inp_reg[`DATAWIDTH*4-1:`DATAWIDTH*3]),
+      .outp0(mode2_outp_sub0),
+      .outp1(mode2_outp_sub1),
+      .outp2(mode2_outp_sub2),
+      .outp3(mode2_outp_sub3),
+      .b_inp(max_outp));
+
+  reg [`DATAWIDTH-1:0] mode2_outp_sub0_reg;
+  reg [`DATAWIDTH-1:0] mode2_outp_sub1_reg;
+  reg [`DATAWIDTH-1:0] mode2_outp_sub2_reg;
+  reg [`DATAWIDTH-1:0] mode2_outp_sub3_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      mode2_outp_sub0_reg <= 0;
+      mode2_outp_sub1_reg <= 0;
+      mode2_outp_sub2_reg <= 0;
+      mode2_outp_sub3_reg <= 0;
+    end else if (mode2_run) begin
+      mode2_outp_sub0_reg <= mode2_outp_sub0;
+      mode2_outp_sub1_reg <= mode2_outp_sub1;
+      mode2_outp_sub2_reg <= mode2_outp_sub2;
+      mode2_outp_sub3_reg <= mode2_outp_sub3;
+    end
+  end
+
+  ////------mode3 exponential---------///////
+  wire [`DATAWIDTH-1:0] mode3_outp_exp0;
+  wire [`DATAWIDTH-1:0] mode3_outp_exp1;
+  wire [`DATAWIDTH-1:0] mode3_outp_exp2;
+  wire [`DATAWIDTH-1:0] mode3_outp_exp3;
+  mode3_exp mode3_exp(
+      .inp0(mode2_outp_sub0_reg),
+      .inp1(mode2_outp_sub1_reg),
+      .inp2(mode2_outp_sub2_reg),
+      .inp3(mode2_outp_sub3_reg),
+
+      .clk(clk),
+      .reset(reset),
+      .stage_run(mode3_stage_run),
+
+      .outp0(mode3_outp_exp0),
+      .outp1(mode3_outp_exp1),
+      .outp2(mode3_outp_exp2),
+      .outp3(mode3_outp_exp3)
+  );
+
+  reg [`DATAWIDTH-1:0] mode3_outp_exp0_reg;
+  reg [`DATAWIDTH-1:0] mode3_outp_exp1_reg;
+  reg [`DATAWIDTH-1:0] mode3_outp_exp2_reg;
+  reg [`DATAWIDTH-1:0] mode3_outp_exp3_reg;
+  always @(posedge clk) begin
+    if (reset) begin
+      mode3_outp_exp0_reg <= 0;
+      mode3_outp_exp1_reg <= 0;
+      mode3_outp_exp2_reg <= 0;
+      mode3_outp_exp3_reg <= 0;
+    end else if (mode3_run) begin
+      mode3_outp_exp0_reg <= mode3_outp_exp0;
+      mode3_outp_exp1_reg <= mode3_outp_exp1;
+      mode3_outp_exp2_reg <= mode3_outp_exp2;
+      mode3_outp_exp3_reg <= mode3_outp_exp3;
+    end
+  end
+
+  //////------mode4 pipelined adder tree---------///////
+  wire [`DATAWIDTH-1:0] mode4_adder_tree_outp;
+  mode4_adder_tree mode4_adder_tree(
+    .inp0(mode3_outp_exp0_reg),
+    .inp1(mode3_outp_exp1_reg),
+    .inp2(mode3_outp_exp2_reg),
+    .inp3(mode3_outp_exp3_reg),
+    .mode4_stage2_run(mode4_stage2_run),
+    .mode4_stage1_run(mode4_stage1_run),
+    .mode4_stage0_run(mode4_stage0_run),
+
+    .clk(clk),
+    .reset(reset),
+    .outp(mode4_adder_tree_outp)
+  );
+
+
+  //////------mode5 log---------///////
+  wire [`DATAWIDTH-1:0] mode5_outp_log;
+  reg  [`DATAWIDTH-1:0] mode5_outp_log_reg;
+  mode5_ln mode5_ln(.inp(mode4_adder_tree_outp), .outp(mode5_outp_log));
+
+  always @(posedge clk) begin
+    if(reset) begin
+      mode5_outp_log_reg <= 0;
+    end else if(mode5_run) begin
+      mode5_outp_log_reg <= mode5_outp_log;
+    end
+  end
+
+  //////------mode6 pre-sub---------///////
+  wire [`DATAWIDTH-1:0] mode6_outp_presub0;
+  wire [`DATAWIDTH-1:0] mode6_outp_presub1;
+  wire [`DATAWIDTH-1:0] mode6_outp_presub2;
+  wire [`DATAWIDTH-1:0] mode6_outp_presub3;
+  reg [`DATAWIDTH-1:0] mode6_outp_presub0_reg;
+  reg [`DATAWIDTH-1:0] mode6_outp_presub1_reg;
+  reg [`DATAWIDTH-1:0] mode6_outp_presub2_reg;
+  reg [`DATAWIDTH-1:0] mode6_outp_presub3_reg;
+
+  mode6_sub pre_sub(
+      .a_inp0(sub1_inp_reg[`DATAWIDTH*1-1:`DATAWIDTH*0]),
+      .a_inp1(sub1_inp_reg[`DATAWIDTH*2-1:`DATAWIDTH*1]),
+      .a_inp2(sub1_inp_reg[`DATAWIDTH*3-1:`DATAWIDTH*2]),
+      .a_inp3(sub1_inp_reg[`DATAWIDTH*4-1:`DATAWIDTH*3]),
+      .b_inp(max_outp),
+      .outp0(mode6_outp_presub0),
+      .outp1(mode6_outp_presub1),
+      .outp2(mode6_outp_presub2),
+      .outp3(mode6_outp_presub3)
+  );
+  always @(posedge clk) begin
+    if (reset) begin
+      mode6_outp_presub0_reg <= 0;
+      mode6_outp_presub1_reg <= 0;
+      mode6_outp_presub2_reg <= 0;
+      mode6_outp_presub3_reg <= 0;
+    end else if (presub_run) begin
+      mode6_outp_presub0_reg <= mode6_outp_presub0;
+      mode6_outp_presub1_reg <= mode6_outp_presub1;
+      mode6_outp_presub2_reg <= mode6_outp_presub2;
+      mode6_outp_presub3_reg <= mode6_outp_presub3;
+    end
+  end
+
+  //////------mode6 logsub ---------///////
+  wire [`DATAWIDTH-1:0] mode6_outp_logsub0;
+  wire [`DATAWIDTH-1:0] mode6_outp_logsub1;
+  wire [`DATAWIDTH-1:0] mode6_outp_logsub2;
+  wire [`DATAWIDTH-1:0] mode6_outp_logsub3;
+  reg [`DATAWIDTH-1:0] mode6_outp_logsub0_reg;
+  reg [`DATAWIDTH-1:0] mode6_outp_logsub1_reg;
+  reg [`DATAWIDTH-1:0] mode6_outp_logsub2_reg;
+  reg [`DATAWIDTH-1:0] mode6_outp_logsub3_reg;
+
+  mode6_sub log_sub(
+      .a_inp0(mode6_outp_presub0_reg),
+      .a_inp1(mode6_outp_presub1_reg),
+      .a_inp2(mode6_outp_presub2_reg),
+      .a_inp3(mode6_outp_presub3_reg),
+      .b_inp(mode5_outp_log_reg),
+      .outp0(mode6_outp_logsub0),
+      .outp1(mode6_outp_logsub1),
+      .outp2(mode6_outp_logsub2),
+      .outp3(mode6_outp_logsub3)
+  );
+  always @(posedge clk) begin
+    if (reset) begin
+      mode6_outp_logsub0_reg <= 0;
+      mode6_outp_logsub1_reg <= 0;
+      mode6_outp_logsub2_reg <= 0;
+      mode6_outp_logsub3_reg <= 0;
+    end else if (mode6_run) begin
+      mode6_outp_logsub0_reg <= mode6_outp_logsub0;
+      mode6_outp_logsub1_reg <= mode6_outp_logsub1;
+      mode6_outp_logsub2_reg <= mode6_outp_logsub2;
+      mode6_outp_logsub3_reg <= mode6_outp_logsub3;
+    end
+  end
+
+  //////------mode7 exp---------///////
+  wire [`DATAWIDTH-1:0] outp0_temp;
+  wire [`DATAWIDTH-1:0] outp1_temp;
+  wire [`DATAWIDTH-1:0] outp2_temp;
+  wire [`DATAWIDTH-1:0] outp3_temp;
+  reg [`DATAWIDTH-1:0] outp0;
+  reg [`DATAWIDTH-1:0] outp1;
+  reg [`DATAWIDTH-1:0] outp2;
+  reg [`DATAWIDTH-1:0] outp3;
+
+  mode7_exp mode7_exp(
+      .inp0(mode6_outp_logsub0_reg),
+      .inp1(mode6_outp_logsub1_reg),
+      .inp2(mode6_outp_logsub2_reg),
+      .inp3(mode6_outp_logsub3_reg),
+
+      .clk(clk),
+      .reset(reset),
+      .stage_run(mode7_stage_run),
+
+      .outp0(outp0_temp),
+      .outp1(outp1_temp),
+      .outp2(outp2_temp),
+      .outp3(outp3_temp)
+  );
+  always @(posedge clk) begin
+    if (reset) begin
+      outp0 <= 0;
+      outp1 <= 0;
+      outp2 <= 0;
+      outp3 <= 0;
+    end else if (mode7_run) begin
+      outp0 <= outp0_temp;
+      outp1 <= outp1_temp;
+      outp2 <= outp2_temp;
+      outp3 <= outp3_temp;
+    end
+  end
+
+endmodule
+
+
+
+module mode1_max_tree(
+  inp0, 
+  inp1, 
+  inp2, 
+  inp3, 
+ 
+  mode1_stage0_run,
+  clk,
+  reset,
+  outp
+
+);
+
+  input  [`DATAWIDTH-1 : 0] inp0; 
+  input  [`DATAWIDTH-1 : 0] inp1; 
+  input  [`DATAWIDTH-1 : 0] inp2; 
+  input  [`DATAWIDTH-1 : 0] inp3; 
+
+  input mode1_stage0_run;
+  input clk;
+  input reset;
+
+  output reg [`DATAWIDTH-1 : 0] outp;
+      // [`DATAWIDTH-1 : 0] outp;
+
+
+  wire   [`DATAWIDTH-1 : 0] cmp0_out_stage2;
+  wire   [`DATAWIDTH-1 : 0] cmp1_out_stage2;
+  wire   [`DATAWIDTH-1 : 0] cmp0_out_stage1;
+  wire   [`DATAWIDTH-1 : 0] cmp0_out_stage0;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      outp <= 0;
+    end
+
+    else if(~reset && mode1_stage0_run) begin
+      outp <= cmp0_out_stage0;
+    end
+
+  end
+
+wire cmp0_stage2_aeb;
+wire cmp0_stage2_aneb;
+wire cmp0_stage2_alb;
+wire cmp0_stage2_aleb;
+wire cmp0_stage2_agb;
+wire cmp0_stage2_ageb;
+wire cmp0_stage2_unordered;
+
+wire cmp1_stage2_aeb;
+wire cmp1_stage2_aneb;
+wire cmp1_stage2_alb;
+wire cmp1_stage2_aleb;
+wire cmp1_stage2_agb;
+wire cmp1_stage2_ageb;
+wire cmp1_stage2_unordered;
+
+wire cmp0_stage1_aeb;
+wire cmp0_stage1_aneb;
+wire cmp0_stage1_alb;
+wire cmp0_stage1_aleb;
+wire cmp0_stage1_agb;
+wire cmp0_stage1_ageb;
+wire cmp0_stage1_unordered;
+
+wire cmp0_stage0_aeb;
+wire cmp0_stage0_aneb;
+wire cmp0_stage0_alb;
+wire cmp0_stage0_aleb;
+wire cmp0_stage0_agb;
+wire cmp0_stage0_ageb;
+wire cmp0_stage0_unordered;
+
+comparator cmp0_stage2(.a(inp0),       .b(inp1),        .aeb(cmp0_stage2_aeb), .aneb(cmp0_stage2_aneb), .alb(cmp0_stage2_alb), .aleb(cmp0_stage2_aleb), .agb(cmp0_stage2_agb), .ageb(cmp0_stage2_ageb), .unordered(cmp0_stage2_unordered));
+assign cmp0_out_stage2 = (cmp0_stage2_ageb==1'b1) ? inp0 : inp1;
+
+comparator cmp1_stage2(.a(inp2),       .b(inp3),         .aeb(cmp1_stage2_aeb), .aneb(cmp1_stage2_aneb), .alb(cmp1_stage2_alb), .aleb(cmp1_stage2_aleb), .agb(cmp1_stage2_agb), .ageb(cmp1_stage2_ageb), .unordered(cmp1_stage2_unordered));   
+assign cmp1_out_stage2 = (cmp1_stage2_ageb==1'b1) ? inp2 : inp3;
+
+comparator cmp0_stage1(.a(cmp0_out_stage2),       .b(cmp1_out_stage2),          .aeb(cmp0_stage1_aeb), .aneb(cmp0_stage1_aneb), .alb(cmp0_stage1_alb), .aleb(cmp0_stage1_aleb), .agb(cmp0_stage1_agb), .ageb(cmp0_stage1_ageb), .unordered(cmp0_stage1_unordered));
+assign cmp0_out_stage1 = (cmp0_stage1_ageb==1'b1) ? cmp0_out_stage2: cmp1_out_stage2;
+
+comparator cmp0_stage0(.a(outp),       .b(cmp0_out_stage1),         .aeb(cmp0_stage0_aeb), .aneb(cmp0_stage0_aneb), .alb(cmp0_stage0_alb), .aleb(cmp0_stage0_aleb), .agb(cmp0_stage0_agb), .ageb(cmp0_stage0_ageb), .unordered(cmp0_stage0_unordered));
+assign cmp0_out_stage0 = (cmp0_stage0_ageb==1'b1) ? outp : cmp0_out_stage1;
+
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage2(.a(inp0),       .b(inp1),      .z1(cmp0_out_stage2), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp1_stage2(.a(inp2),       .b(inp3),      .z1(cmp1_out_stage2), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+//
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage1(.a(cmp0_out_stage2),       .b(cmp1_out_stage2),      .z1(cmp0_out_stage1), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+//
+//DW_fp_cmp #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) cmp0_stage0(.a(outp),       .b(cmp0_out_stage1),      .z1(cmp0_out_stage0), .zctr(1'b0), .aeqb(), .altb(), .agtb(), .unordered(), .z0(), .status0(), .status1());
+
+endmodule
+
+	  
+module mode2_sub(
+  a_inp0,
+  a_inp1,
+  a_inp2,
+  a_inp3,
+  outp0,
+  outp1,
+  outp2,
+  outp3,
+  b_inp
+);
+
+  input  [`DATAWIDTH-1 : 0] a_inp0;
+  input  [`DATAWIDTH-1 : 0] a_inp1;
+  input  [`DATAWIDTH-1 : 0] a_inp2;
+  input  [`DATAWIDTH-1 : 0] a_inp3;
+  output  [`DATAWIDTH-1 : 0] outp0;
+  output  [`DATAWIDTH-1 : 0] outp1;
+  output  [`DATAWIDTH-1 : 0] outp2;
+  output  [`DATAWIDTH-1 : 0] outp3;
+  input  [`DATAWIDTH-1 : 0] b_inp;
+
+
+  wire clk_NC;
+  wire rst_NC;
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
+
+  // 0 add, 1 sub
+  FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
+  FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
+  FPAddSub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
+  FPAddSub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
+
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub0(.a(a_inp0), .b(b_inp), .z(outp0), .rnd(3'b000), .status());
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub1(.a(a_inp1), .b(b_inp), .z(outp1), .rnd(3'b000), .status());
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub2(.a(a_inp2), .b(b_inp), .z(outp2), .rnd(3'b000), .status());
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub3(.a(a_inp3), .b(b_inp), .z(outp3), .rnd(3'b000), .status());
+endmodule
+
+
+module mode3_exp(
+  inp0, 
+  inp1, 
+  inp2, 
+  inp3, 
+
+  clk,
+  reset,
+  stage_run,
+
+  outp0, 
+  outp1, 
+  outp2, 
+  outp3
+);
+
+  input  [`DATAWIDTH-1 : 0] inp0;
+  input  [`DATAWIDTH-1 : 0] inp1;
+  input  [`DATAWIDTH-1 : 0] inp2;
+  input  [`DATAWIDTH-1 : 0] inp3;
+
+  input  clk;
+  input  reset;
+  input  stage_run;
+
+  output  [`DATAWIDTH-1 : 0] outp0;
+  output  [`DATAWIDTH-1 : 0] outp1;
+  output  [`DATAWIDTH-1 : 0] outp2;
+  output  [`DATAWIDTH-1 : 0] outp3;
+  expunit exp0(.a(inp0), .z(outp0), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+  expunit exp1(.a(inp1), .z(outp1), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+  expunit exp2(.a(inp2), .z(outp2), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+  expunit exp3(.a(inp3), .z(outp3), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+endmodule
+
+
+module mode4_adder_tree(
+  inp0, 
+  inp1, 
+  inp2, 
+  inp3, 
+  mode4_stage0_run,
+  mode4_stage1_run,
+  mode4_stage2_run,
+
+  clk,
+  reset,
+  outp
+);
+
+  input clk;
+  input reset;
+  input  [`DATAWIDTH-1 : 0] inp0; 
+  input  [`DATAWIDTH-1 : 0] inp1; 
+  input  [`DATAWIDTH-1 : 0] inp2; 
+  input  [`DATAWIDTH-1 : 0] inp3; 
+  output [`DATAWIDTH-1 : 0] outp;
+  input mode4_stage0_run;
+  input mode4_stage1_run;
+  input mode4_stage2_run;
+
+  wire   [`DATAWIDTH-1 : 0] add0_out_stage2;
+  reg    [`DATAWIDTH-1 : 0] add0_out_stage2_reg;
+  wire   [`DATAWIDTH-1 : 0] add1_out_stage2;
+  reg    [`DATAWIDTH-1 : 0] add1_out_stage2_reg;
+
+  wire   [`DATAWIDTH-1 : 0] add0_out_stage1;
+  reg    [`DATAWIDTH-1 : 0] add0_out_stage1_reg;
+
+  wire   [`DATAWIDTH-1 : 0] add0_out_stage0;
+  reg    [`DATAWIDTH-1 : 0] outp;
+/*
+  always @(posedge clk) begin
+    if (reset) begin
+      outp <= 0;
+      add0_out_stage2_reg <= 0;
+      add1_out_stage2_reg <= 0;
+      add0_out_stage1_reg <= 0;
+    end
+
+    if(~reset && mode4_stage2_run) begin
+      add0_out_stage2_reg <= add0_out_stage2;
+      add1_out_stage2_reg <= add1_out_stage2;
+    end
+
+    if(~reset && mode4_stage1_run) begin
+      add0_out_stage1_reg <= add0_out_stage1;
+    end
+
+    if(~reset && mode4_stage0_run) begin
+      outp <= add0_out_stage0;
+    end
+  end
+*/
+always @ (posedge clk) begin
+	if(~reset && mode4_stage2_run) begin
+      add0_out_stage2_reg <= add0_out_stage2;
+      add1_out_stage2_reg <= add1_out_stage2;
+    end
+	
+	else if (reset) begin
+		add0_out_stage2_reg <= 0;
+		add1_out_stage2_reg <= 0;
+	end
+end		
+
+always @ (posedge clk) begin
+	if(~reset && mode4_stage1_run) begin
+      add0_out_stage1_reg <= add0_out_stage1;
+    end
+	else if (reset) begin
+	add0_out_stage1_reg <= 0;
+	end
+end
+
+always @ (posedge clk) begin
+	if(~reset && mode4_stage0_run) begin
+		outp <= add0_out_stage0;
+    end
+	else if (reset) begin
+		outp <= 0;
+	end
+end	
+		
+	
+  wire clk_NC;
+  wire rst_NC;
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
+
+  // 0 add, 1 sub
+  FPAddSub add0_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp0),	.b(inp1), .operation(1'b0),	.result(add0_out_stage2), .flags(flags_NC0));
+  FPAddSub add1_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp2),	.b(inp3), .operation(1'b0),	.result(add1_out_stage2), .flags(flags_NC1));
+  FPAddSub add0_stage1(.clk(clk_NC), .rst(rst_NC), .a(add0_out_stage2_reg),	.b(add1_out_stage2_reg), .operation(1'b0),	.result(add0_out_stage1), .flags(flags_NC2));
+  FPAddSub add0_stage0(.clk(clk_NC), .rst(rst_NC), .a(outp),	.b(add0_out_stage1_reg), .operation(1'b0),	.result(add0_out_stage0), .flags(flags_NC3));
+
+  //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add0_stage2(.a(inp0),       .b(inp1),      .z(add0_out_stage2), .rnd(3'b000),    .status());
+  //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add1_stage2(.a(inp2),       .b(inp3),      .z(add1_out_stage2), .rnd(3'b000),    .status());
+
+  //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add0_stage1(.a(add0_out_stage2_reg),       .b(add1_out_stage2_reg),      .z(add0_out_stage1), .rnd(3'b000),    .status());
+
+  //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add0_stage0(.a(outp),       .b(add0_out_stage1_reg),      .z(add0_out_stage0), .rnd(3'b000),    .status());
+
+endmodule
+
+module mode5_ln(
+inp,
+outp
+);
+  input  [`DATAWIDTH-1 : 0] inp;
+  output [`DATAWIDTH-1 : 0] outp;
+  logunit ln(.fpin(inp), .fpout(outp), .status());
+endmodule
+
+
+module mode6_sub(
+  a_inp0,
+  a_inp1,
+  a_inp2,
+  a_inp3,
+  b_inp,
+  outp0,
+  outp1,
+  outp2,
+  outp3
+);
+
+  input  [`DATAWIDTH-1 : 0] a_inp0;
+  input  [`DATAWIDTH-1 : 0] a_inp1;
+  input  [`DATAWIDTH-1 : 0] a_inp2;
+  input  [`DATAWIDTH-1 : 0] a_inp3;
+  input  [`DATAWIDTH-1 : 0] b_inp;
+  output  [`DATAWIDTH-1 : 0] outp0;
+  output  [`DATAWIDTH-1 : 0] outp1;
+  output  [`DATAWIDTH-1 : 0] outp2;
+  output  [`DATAWIDTH-1 : 0] outp3;
+
+  wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
+  // 0 add, 1 sub
+  wire clk_NC, rst_NC;
+  FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
+  FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
+  FPAddSub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
+  FPAddSub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
+
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub0(.a(a_inp0), .b(b_inp), .z(outp0), .rnd(3'b000), .status());
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub1(.a(a_inp1), .b(b_inp), .z(outp1), .rnd(3'b000), .status());
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub2(.a(a_inp2), .b(b_inp), .z(outp2), .rnd(3'b000), .status());
+//  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub3(.a(a_inp3), .b(b_inp), .z(outp3), .rnd(3'b000), .status());
+endmodule
+
+
+module mode7_exp(
+  inp0, 
+  inp1, 
+  inp2, 
+  inp3, 
+
+  clk,
+  reset,
+  stage_run,
+
+  outp0, 
+  outp1, 
+  outp2, 
+  outp3
+);
+
+  input  [`DATAWIDTH-1 : 0] inp0;
+  input  [`DATAWIDTH-1 : 0] inp1;
+  input  [`DATAWIDTH-1 : 0] inp2;
+  input  [`DATAWIDTH-1 : 0] inp3;
+
+  input  clk;
+  input  reset;
+  input  stage_run;
+
+  output  [`DATAWIDTH-1 : 0] outp0;
+  output  [`DATAWIDTH-1 : 0] outp1;
+  output  [`DATAWIDTH-1 : 0] outp2;
+  output  [`DATAWIDTH-1 : 0] outp3;
+  expunit exp0(.a(inp0), .z(outp0), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+  expunit exp1(.a(inp1), .z(outp1), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+  expunit exp2(.a(inp2), .z(outp2), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+  expunit exp3(.a(inp3), .z(outp3), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
+endmodule
+
+module FPAddSub(
+		clk,
+		rst,
+		a,
+		b,
+		operation,			// 0 add, 1 sub
+		result,
+		flags
+	);
+	
+	// Clock and reset
+	input clk ;										// Clock signal
+	input rst ;										// Reset (active high, resets pipeline registers)
+	
+	// Input ports
+  input [`DATAWIDTH-1:0] a ;								// Input A, a 32-bit floating point number
+  input [`DATAWIDTH-1:0] b ;								// Input B, a 32-bit floating point number
+	input operation ;								// Operation select signal
+	
+	// Output ports
+  output reg [`DATAWIDTH-1:0] result ;						// Result of the operation
+	output [4:0] flags ;							// Flags indicating exceptions according to IEEE754
+	
+  reg [`DATAWIDTH:0] result_t ;
+  wire [`DATAWIDTH-1:0] b_t ;
+	
+	assign b_t = ~b + 1;
+	
+	always@(*) begin
+      if (operation == 1'b0) begin
+			result_t = a + b;
+		end
+		else begin
+			result_t = a + b_t;
+		end
+	end
+
+	
+	always @ (*) begin	
+		if(rst) begin
+			result = 0;
+		end
+		else if (result_t[16] == 1'b1 && operation == 1'b0) begin
+			result = 16'h7000;
+		end
+		else if (result_t[16] == 1'b1 && operation == 1'b1) begin
+			result = 16'h8000;
+		end
+		else begin
+			result = result_t[15:0];
+		end
+	end
+	// Pipeline Registers
+	//reg [79:0] pipe_1;							// Pipeline register PreAlign->Align1
+	
+	
+endmodule
+
+
+//============================================================================
+// Comparator module
+//============================================================================
+
+
+module comparator(
+a,
+b,
+aeb,
+aneb,
+alb,
+aleb,
+agb,
+ageb,
+unordered
+);
+//Default for FP16
+//parameter exp = 5;
+//parameter man = 10;
+
+input [15:0] a;
+input [15:0] b;
+output aeb;
+output aneb;
+output alb;
+output aleb;
+output agb;
+output ageb;
+output unordered;
+
+  
+
+reg lt;
+reg eq;
+reg gt;
+
+wire [15:0] a_t;
+wire [15:0] b_t;
+
+assign a_t = (~a[15:0])+1;
+assign b_t = (~b[15:0])+1;
+
+always @(*) begin
+	if (a[15] == 1'b0 && b[15] == 1'b1) begin
+		if (a != b) begin
+		eq = 1'b0;
+		lt = 1'b0;
+		gt = 1'b1;
+		end
+		else begin
+		eq = 1'b1;
+		lt = 1'b0;
+		gt = 1'b0;
+		end
+	end
+	else if (a[15] == 1'b1 && b[15] == 1'b0) begin
+		if (a != b) begin
+		lt = 1'b1;
+		gt = 1'b0;
+		eq = 1'b0;
+		end
+		else begin
+		lt = 1'b0;
+		gt = 1'b0;
+		eq = 1'b1;
+		end
+	end
+	else if (a[15] == 1'b0 && b[15] == 1'b0) begin
+		if (a > b) begin
+		lt = 1'b0;
+		gt = 1'b1;
+		eq = 1'b0;
+		end
+		else if (a < b) begin
+		lt = 1'b1;
+		gt = 1'b0;
+		eq = 1'b0;
+		end
+		else begin
+		lt = 1'b0;
+		gt = 1'b0;
+		eq = 1'b1;
+		end
+	end
+	else if (a[15] == 1'b1 && b[15] == 1'b1) begin
+		if (a_t > b_t) begin
+		lt = 1'b1;
+		gt = 1'b0;
+		eq = 1'b0;
+		end
+		else if (a_t < b_t) begin
+		lt = 1'b0;
+		gt = 1'b1;
+		eq = 1'b0;
+		end
+		else begin
+		lt = 1'b0;
+		gt = 1'b0;
+		eq = 1'b1;
+		end
+	end
+end
+
+
+//Result flags
+assign aeb = eq;
+assign aneb = ~eq;
+assign alb = lt;
+assign aleb = lt | eq;
+assign agb = gt;
+assign ageb = gt | eq;
+
+endmodule
+
+
+
+//////////////////////////////////////////////////////
+// Log unit
+//////////////////////////////////////////////////////
+
 `define EXPONENT 5
 `define MANTISSA 10
 `define ACTUAL_MANTISSA 11
@@ -12,40 +1078,28 @@
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
 
-module logunit (clk, fpin, fpout, rst);
+module logunit (fpin, fpout, status);
 
 	
 	input [15:0] fpin;
 	output [15:0] fpout;
-
-	input clk,rst;
+	output [7:0] status;
+	wire clk,rst;
 
 
 	wire [15: 0] fxout1;
 	wire [15: 0] fxout2;
     wire [15:0] fpin_f;
     wire [15:0] fpout_f;
-	reg [15: 0] pipe1;
-	reg [15: 0] pipe2;
+	//reg [15: 0] pipe1;
+	//reg [15: 0] pipe2;
 
   int_to_float_fp16 int_float (.input_a(fpin),.output_z(fpin_f));
   FPLUT1 lut1 (.addr(fpin_f[14:10]),.log(fxout1)); // LUT for exponent
   FP8LUT2 lut2 (.addr(fpin_f[9:2]),.log(fxout2)); 
-  FPAddSub add(.a(pipe1), .b(pipe2), .clk(clk),.rst(rst), .operation(1'b0), .result(fpout_f), .flags());
+  FPAddSub_2 add(.a(fxout1), .b(fxout2), .clk(clk),.rst(rst), .operation(1'b0), .result(fpout_f), .flags());
   float_to_int_fp16 float_int (.input_a(fpout_f),.output_z(fpout));
 
-  always @(*)
-  begin
-	if (rst) begin
-		pipe1 <= 0;
-		pipe2 <= 0;
-	end
-	else begin
-		pipe1 <= fxout1;
-		pipe2 <= fxout2;
-	end
-end
-  
 endmodule
 
 module float_to_int_fp16(
@@ -613,7 +1667,7 @@ module FP8LUT2(addr, log);
     end
 endmodule
 
-module FPAddSub(
+module FPAddSub_2(
 		clk,
 		rst,
 		a,
@@ -781,105 +1835,105 @@ module FPAddSub(
 		else begin
 		
 			pipe_1 = {Opout_0, Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Sa_0, Sb_0, ShiftDet_0[9:0], InputExc_0[4:0]} ;	
-			/* PIPE_2 :
-				[67] operation
-				[66] Sa_0
-				[65] Sb_0
-				[64] MaxAB_0
-				[63:56] CExp_0
-				[55:51] Shift_0
-				[50:28] Mmax_0
-				[27:23] InputExc_0
-				[22:0] MminS_1
-			*/
+			// PIPE_2 :
+			//[67] operation
+			//[66] Sa_0
+			//[65] Sb_0
+			//[64] MaxAB_0
+			//[63:56] CExp_0
+			//[55:51] Shift_0
+			//[50:28] Mmax_0
+			//[27:23] InputExc_0
+			//[22:0] MminS_1
+			//
 			pipe_2 = {pipe_1[`DWIDTH*2+15], pipe_1[16:15], MaxAB_1, CExp_1[`EXPONENT-1:0], Shift_1[4:0], Mmax_1[`MANTISSA-1:0], pipe_1[4:0], MminS_1[`MANTISSA-1:0]} ;	
-			/* PIPE_3 :
-				[68] operation
-				[67] Sa_0
-				[66] Sb_0
-				[65] MaxAB_0
-				[64:57] CExp_0
-				[56:52] Shift_0
-				[51:29] Mmax_0
-				[28:24] InputExc_0
-				[23:0] MminS_1
-			*/
+			// PIPE_3 :
+			//[68] operation
+			//[67] Sa_0
+			//[66] Sb_0
+			//[65] MaxAB_0
+			//[64:57] CExp_0
+			//[56:52] Shift_0
+			//[51:29] Mmax_0
+			//[28:24] InputExc_0
+			//[23:0] MminS_1
+			//
 			pipe_3 = {pipe_2[`MANTISSA*2+`EXPONENT+13:`MANTISSA], MminS_2[`MANTISSA:0]} ;	
-			/* PIPE_4 :
-				[68] operation
-				[67] Sa_0
-				[66] Sb_0
-				[65] MaxAB_0
-				[64:57] CExp_0
-				[56:52] Shift_0
-				[51:29] Mmax_0
-				[28:24] InputExc_0
-				[23:0] Mmin_3
-			*/					
+			// PIPE_4 :
+			//[68] operation
+			//[67] Sa_0
+			//[66] Sb_0
+			//[65] MaxAB_0
+			//[64:57] CExp_0
+			//[56:52] Shift_0
+			//[51:29] Mmax_0
+			//[28:24] InputExc_0
+			//[23:0] Mmin_3
+			//					
 			pipe_4 = {pipe_3[`MANTISSA*2+`EXPONENT+14:`MANTISSA+1], Mmin_3[`MANTISSA:0]} ;	
-			/* PIPE_5 :
-				[51] operation
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/					
+			// PIPE_5 :
+			//[51] operation
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//					
 			pipe_5 = {pipe_4[2*`MANTISSA+`EXPONENT+14], PSgn_4, Opr_4, pipe_4[2*`MANTISSA+`EXPONENT+13:2*`MANTISSA+11], pipe_4[`MANTISSA+5:`MANTISSA+1], Sum_4[`DWIDTH:0]} ;
-			/* PIPE_6 :
-				[56] operation
-				[55:51] Shift_5
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/					
+			// PIPE_6 :
+			//[56] operation
+			//[55:51] Shift_5
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//					
 			pipe_6 = {pipe_5[`EXPONENT+`EXPONENT+11], Shift_5[4:0], pipe_5[`DWIDTH+`EXPONENT+10:`DWIDTH+1], SumS_5[`DWIDTH:0]} ;	
-			/* pipe_7 :
-				[56] operation
-				[55:51] Shift_5
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/						
+			// pipe_7 :
+			//[56] operation
+			//[55:51] Shift_5
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//						
 			pipe_7 = {pipe_6[`DWIDTH+`EXPONENT+16:`DWIDTH+1], SumS_7[`DWIDTH:0]} ;	
-			/* pipe_8:
-				[54] FG_8 
-				[53] operation
-				[52] PSgn_4
-				[51] Sa_0
-				[50] Sb_0
-				[49] MaxAB_0
-				[48:41] CExp_0
-				[40:36] InputExc_8
-				[35:13] NormM_8 
-				[12:4] NormE_8
-				[3] ZeroSum_8
-				[2] NegE_8
-				[1] R_8
-				[0] S_8
-			*/				
+			// pipe_8:
+			//[54] FG_8 
+			//[53] operation
+			//[52] PSgn_4
+			//[51] Sa_0
+			//[50] Sb_0
+			//[49] MaxAB_0
+			//[48:41] CExp_0
+			//[40:36] InputExc_8
+			//[35:13] NormM_8 
+			//[12:4] NormE_8
+			//[3] ZeroSum_8
+			//[2] NegE_8
+			//[1] R_8
+			//[0] S_8
+			//				
 			pipe_8 = {FG_8, pipe_7[`DWIDTH+`EXPONENT+16], pipe_7[`DWIDTH+`EXPONENT+10], pipe_7[`DWIDTH+`EXPONENT+8:`DWIDTH+1], NormM_8[`MANTISSA-1:0], NormE_8[`EXPONENT:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
-			/* pipe_9:
-				[40:9] P_int
-				[8] NegE_8
-				[7] R_8
-				[6] S_8
-				[5:1] InputExc_8
-				[0] EOF
-			*/				
+			// pipe_9:
+			//[40:9] P_int
+			//[8] NegE_8
+			//[7] R_8
+			//[6] S_8
+			//[5:1] InputExc_8
+			//[0] EOF
+			//				
 			pipe_9 = {P_int[`DWIDTH-1:0], pipe_8[2], pipe_8[1], pipe_8[0], pipe_8[`EXPONENT+`MANTISSA+9:`EXPONENT+`MANTISSA+5], EOF} ;	
 		end
 	end		
@@ -1059,9 +2113,9 @@ module FPAddSub_AlignShift1(
 			// Rotate by 0	
 			2'b00:  Lvl2 <= Stage1[`MANTISSA:0];       			
 			// Rotate by 4	
-			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end Lvl2[`MANTISSA:`MANTISSA-3] <= 0; end
+			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end /*Lvl2[`MANTISSA:`MANTISSA-3] <= 0;*/ end
 			// Rotate by 8
-			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end Lvl2[`MANTISSA:`MANTISSA-7] <= 0; end
+			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end /*Lvl2[`MANTISSA:`MANTISSA-7] <= 0;*/ end
 			// Rotate by 12	
 			2'b11: Lvl2[`MANTISSA: 0] <= 0; 
 			//2'b11:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+12]; end Lvl2[`MANTISSA:`MANTISSA-12] <= 0; end
@@ -1109,11 +2163,11 @@ module FPAddSub_AlignShift2(
 			// Rotate by 0
 			2'b00:  Lvl3 <= Stage2[`MANTISSA:0];   
 			// Rotate by 1
-			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end Lvl3[`MANTISSA] <= 0; end 
+			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end /*Lvl3[`MANTISSA] <= 0; */end 
 			// Rotate by 2
-			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end Lvl3[`MANTISSA:`MANTISSA-1] <= 0; end 
+			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end /*Lvl3[`MANTISSA:`MANTISSA-1] <= 0;*/ end 
 			// Rotate by 3
-			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end Lvl3[`MANTISSA:`MANTISSA-2] <= 0; end 	  
+			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end /*Lvl3[`MANTISSA:`MANTISSA-2] <= 0;*/ end 	  
 	  endcase
 	end
 	
@@ -1269,13 +2323,17 @@ module FPAddSub_NormalizeShift1(
 	always @(*) begin    					// Rotate {0 | 4 | 8 | 12} bits
 	  case (Shift[3:2])
 			// Rotate by 0
-			2'b00: Lvl2 <= Stage1[`DWIDTH:0];       		
+			2'b00: //Lvl2 <= Stage1[`DWIDTH:0];       		
+      begin Lvl2 = Stage1[`DWIDTH:0];  end
 			// Rotate by 4
-			2'b01: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
+			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-4)] = Stage1[3:0]; Lvl2[`DWIDTH-4-1:0] = Stage1[`DWIDTH-4]; end
 			// Rotate by 8
-			2'b10: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
+			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-8)] = Stage1[3:0]; Lvl2[`DWIDTH-8-1:0] = Stage1[`DWIDTH-8]; end
 			// Rotate by 12
-			2'b11: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
+			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-12)] = Stage1[3:0]; Lvl2[`DWIDTH-12-1:0] = Stage1[`DWIDTH-12]; end
 	  endcase
 	end
 	
@@ -1284,13 +2342,17 @@ module FPAddSub_NormalizeShift1(
 	always @(*) begin   				 		// Rotate {0 | 1 | 2 | 3} bits
 	  case (Shift[1:0])
 			// Rotate by 0
-			2'b00:  Lvl3 <= Stage2[`DWIDTH:0];
+			2'b00:  //Lvl3 <= Stage2[`DWIDTH:0];
+      begin Lvl3 = Stage2[`DWIDTH:0]; end
 			// Rotate by 1
-			2'b01: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
+			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
+      begin Lvl3[`DWIDTH: (`DWIDTH-1)] = Stage2[3:0]; Lvl3[`DWIDTH-1-1:0] = Stage2[`DWIDTH-1]; end
 			// Rotate by 2
-			2'b10: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
+			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-2)] = Stage2[3:0]; Lvl3[`DWIDTH-2-1:0] = Stage2[`DWIDTH-2]; end
 			// Rotate by 3
-			2'b11: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
+			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-3)] = Stage2[3:0]; Lvl3[`DWIDTH-3-1:0] = Stage2[`DWIDTH-3]; end
 	  endcase
 	end
 	
@@ -1501,3 +2563,194 @@ module FPAddSub_ExceptionModule(
 	assign Flags = {Overflow, Underflow, DivideByZero, Invalid, Inexact} ; 	
 	
 endmodule
+
+
+//////////////////////////////////////////////////////
+// Exponential unit
+//////////////////////////////////////////////////////
+
+module expunit (a, z, status, stage_run, clk, reset);
+
+	input [15:0] a;
+    input stage_run;
+    input clk;
+    input reset;
+    output reg [15:0] z;
+    output [7:0] status;
+	
+    reg  [31:0] LUTout_reg;
+    reg  [15:0] a_reg;
+	reg  [31:0] Mult_out_reg;
+    wire [31:0] LUTout;
+    wire [31:0] Mult_out;
+    wire [15:0] a_comp;
+    wire [15:0] z_out;
+  	
+    always @(posedge clk) begin
+    if(reset) begin
+      Mult_out_reg <= 0;
+      LUTout_reg <= 0;
+	  a_reg <= 0;
+    end 
+	else if(stage_run) begin
+      Mult_out_reg <= Mult_out;
+      LUTout_reg <= LUTout;
+	  a_reg <= a;
+    end
+    end
+
+    assign a_comp = ~a + 1'b1;
+    LUT lut(.addr(a_comp[14:8]), .exp(LUTout)); 
+    assign Mult_out = ~(a_comp*LUTout[31:16])+1;
+    assign z_out = Mult_out_reg[27:12] + LUTout_reg[15:0];
+
+    always@(z_out or a_reg) begin
+      if (a_reg[15:12] == 4'b1000) begin
+        z = 12'b1;
+      end
+      else
+        z = z_out;
+    end
+  
+endmodule
+
+module LUT(addr, exp);
+    input [6:0] addr;
+    output reg [31:0] exp;
+
+    always @(addr) begin
+        case (addr)
+	     7'b0000000            : exp =  32'b00001111100000100001000000000000;
+	     7'b0000001            : exp =  32'b00001110100100100000111111110000;
+	     7'b0000010            : exp =  32'b00001101101100000000111111010100;
+	     7'b0000011            : exp =  32'b00001100110110110000111110101100;
+	     7'b0000100            : exp =  32'b00001100000101000000111101111011;
+	     7'b0000101            : exp =  32'b00001011010110000000111101000000;
+	     7'b0000110            : exp =  32'b00001010101010000000111011111110;
+	     7'b0000111            : exp =  32'b00001010000000110000111010110110;
+	     7'b0001000            : exp =  32'b00001001011010000000111001101000;
+	     7'b0001001            : exp =  32'b00001000110101100000111000010110;
+	     7'b0001010            : exp =  32'b00001000010011010000110111000000;
+	     7'b0001011            : exp =  32'b00000111110011000000110101101000;
+	     7'b0001100            : exp =  32'b00000111010100110000110100001101;
+	     7'b0001101            : exp =  32'b00000110111000010000110010110001;
+	     7'b0001110            : exp =  32'b00000110011101110000110001010011;
+	     7'b0001111            : exp =  32'b00000110000100100000101111110101;
+	     7'b0010000            : exp =  32'b00000101101101000000101110010111;
+	     7'b0010001            : exp =  32'b00000101010111000000101100111001;
+	     7'b0010010            : exp =  32'b00000101000010010000101011011011;
+	     7'b0010011            : exp =  32'b00000100101110100000101001111111;
+	     7'b0010100            : exp =  32'b00000100011100010000101000100011;
+	     7'b0010101            : exp =  32'b00000100001011000000100111001001;
+	     7'b0010110            : exp =  32'b00000011111010110000100101110000;
+	     7'b0010111            : exp =  32'b00000011101011110000100100011000;
+	     7'b0011000            : exp =  32'b00000011011101010000100011000010;
+	     7'b0011001            : exp =  32'b00000011010000000000100001101111;
+	     7'b0011010            : exp =  32'b00000011000011010000100000011101;
+	     7'b0011011            : exp =  32'b00000010110111100000011111001101;
+	     7'b0011100            : exp =  32'b00000010101100010000011101111111;
+	     7'b0011101            : exp =  32'b00000010100010000000011100110011;
+	     7'b0011110            : exp =  32'b00000010011000000000011011101001;
+	     7'b0011111            : exp =  32'b00000010001111000000011010100010;
+	     7'b0100000            : exp =  32'b00000010000110010000011001011101;
+	     7'b0100001            : exp =  32'b00000001111110000000011000011001;
+	     7'b0100010            : exp =  32'b00000001110110100000010111011000;
+	     7'b0100011            : exp =  32'b00000001101111010000010110011010;
+	     7'b0100100            : exp =  32'b00000001101000100000010101011101;
+	     7'b0100101            : exp =  32'b00000001100010010000010100100010;
+	     7'b0100110            : exp =  32'b00000001011100010000010011101010;
+	     7'b0100111            : exp =  32'b00000001010110100000010010110011;
+	     7'b0101000            : exp =  32'b00000001010001010000010001111111;
+	     7'b0101001            : exp =  32'b00000001001100100000010001001100;
+	     7'b0101010            : exp =  32'b00000001000111110000010000011011;
+	     7'b0101011            : exp =  32'b00000001000011100000001111101100;
+	     7'b0101100            : exp =  32'b00000000111111010000001110111111;
+	     7'b0101101            : exp =  32'b00000000111011100000001110010100;
+	     7'b0101110            : exp =  32'b00000000111000000000001101101011;
+	     7'b0101111            : exp =  32'b00000000110100100000001101000011;
+	     7'b0110000            : exp =  32'b00000000110001010000001100011100;
+	     7'b0110001            : exp =  32'b00000000101110010000001011111000;
+	     7'b0110010            : exp =  32'b00000000101011100000001011010101;
+	     7'b0110011            : exp =  32'b00000000101000110000001010110011;
+	     7'b0110100            : exp =  32'b00000000100110010000001010010011;
+	     7'b0110101            : exp =  32'b00000000100100000000001001110100;
+	     7'b0110110            : exp =  32'b00000000100001110000001001010110;
+	     7'b0110111            : exp =  32'b00000000011111110000001000111010;
+	     7'b0111000            : exp =  32'b00000000011101110000001000011111;
+	     7'b0111001            : exp =  32'b00000000011100000000001000000101;
+	     7'b0111010            : exp =  32'b00000000011010010000000111101100;
+	     7'b0111011            : exp =  32'b00000000011000110000000111010101;
+	     7'b0111100            : exp =  32'b00000000010111010000000110111110;
+	     7'b0111101            : exp =  32'b00000000010101110000000110101000;
+	     7'b0111110            : exp =  32'b00000000010100100000000110010100;
+	     7'b0111111            : exp =  32'b00000000010011010000000110000000;
+	     7'b1000000            : exp =  32'b00000000010010000000000101101101;
+	     7'b1000001            : exp =  32'b00000000010001000000000101011100;
+	     7'b1000010            : exp =  32'b00000000010000000000000101001010;
+	     7'b1000011            : exp =  32'b00000000001111000000000100111010;
+	     7'b1000100            : exp =  32'b00000000001110000000000100101011;
+	     7'b1000101            : exp =  32'b00000000001101010000000100011100;
+	     7'b1000110            : exp =  32'b00000000001100010000000100001110;
+	     7'b1000111            : exp =  32'b00000000001011100000000100000000;
+	     7'b1001000            : exp =  32'b00000000001011000000000011110011;
+	     7'b1001001            : exp =  32'b00000000001010010000000011100111;
+	     7'b1001010            : exp =  32'b00000000001001100000000011011100;
+	     7'b1001011            : exp =  32'b00000000001001000000000011010001;
+	     7'b1001100            : exp =  32'b00000000001000100000000011000110;
+	     7'b1001101            : exp =  32'b00000000001000000000000010111100;
+	     7'b1001110            : exp =  32'b00000000000111100000000010110011;
+	     7'b1001111            : exp =  32'b00000000000111000000000010101001;
+	     7'b1010000            : exp =  32'b00000000000110100000000010100001;
+	     7'b1010001            : exp =  32'b00000000000110010000000010011001;
+	     7'b1010010            : exp =  32'b00000000000101110000000010010001;
+	     7'b1010011            : exp =  32'b00000000000101100000000010001001;
+	     7'b1010100            : exp =  32'b00000000000101000000000010000010;
+	     7'b1010101            : exp =  32'b00000000000100110000000001111100;
+	     7'b1010110            : exp =  32'b00000000000100100000000001110101;
+	     7'b1010111            : exp =  32'b00000000000100010000000001101111;
+	     7'b1011000            : exp =  32'b00000000000100000000000001101001;
+	     7'b1011001            : exp =  32'b00000000000011110000000001100100;
+	     7'b1011010            : exp =  32'b00000000000011100000000001011111;
+	     7'b1011011            : exp =  32'b00000000000011010000000001011010;
+	     7'b1011100            : exp =  32'b00000000000011000000000001010101;
+	     7'b1011101            : exp =  32'b00000000000010110000000001010001;
+	     7'b1011110            : exp =  32'b00000000000010110000000001001101;
+	     7'b1011111            : exp =  32'b00000000000010100000000001001001;
+	     7'b1100000            : exp =  32'b00000000000010010000000001000101;
+	     7'b1100001            : exp =  32'b00000000000010010000000001000001;
+	     7'b1100010            : exp =  32'b00000000000010000000000000111110;
+	     7'b1100011            : exp =  32'b00000000000010000000000000111010;
+	     7'b1100100            : exp =  32'b00000000000001110000000000110111;
+	     7'b1100101            : exp =  32'b00000000000001110000000000110100;
+	     7'b1100110            : exp =  32'b00000000000001100000000000110010;
+	     7'b1100111            : exp =  32'b00000000000001100000000000101111;
+	     7'b1101000            : exp =  32'b00000000000001010000000000101100;
+	     7'b1101001            : exp =  32'b00000000000001010000000000101010;
+	     7'b1101010            : exp =  32'b00000000000001010000000000101000;
+	     7'b1101011            : exp =  32'b00000000000001000000000000100110;
+	     7'b1101100            : exp =  32'b00000000000001000000000000100100;
+	     7'b1101101            : exp =  32'b00000000000001000000000000100010;
+	     7'b1101110            : exp =  32'b00000000000001000000000000100000;
+	     7'b1101111            : exp =  32'b00000000000000110000000000011110;
+	     7'b1110000            : exp =  32'b00000000000000110000000000011101;
+	     7'b1110001            : exp =  32'b00000000000000110000000000011011;
+	     7'b1110010            : exp =  32'b00000000000000110000000000011010;
+	     7'b1110011            : exp =  32'b00000000000000110000000000011000;
+	     7'b1110100            : exp =  32'b00000000000000100000000000010111;
+	     7'b1110101            : exp =  32'b00000000000000100000000000010110;
+	     7'b1110110            : exp =  32'b00000000000000100000000000010100;
+	     7'b1110111            : exp =  32'b00000000000000100000000000010011;
+	     7'b1111000            : exp =  32'b00000000000000100000000000010010;
+	     7'b1111001            : exp =  32'b00000000000000100000000000010001;
+	     7'b1111010            : exp =  32'b00000000000000010000000000010000;
+	     7'b1111011            : exp =  32'b00000000000000010000000000001111;
+	     7'b1111100            : exp =  32'b00000000000000010000000000001111;
+	     7'b1111101            : exp =  32'b00000000000000010000000000001110;
+	     7'b1111110            : exp =  32'b00000000000000010000000000001101;
+	     7'b1111111            : exp =  32'b00000000000000010000000000001100;
+        endcase
+    end
+endmodule
+
+
+
