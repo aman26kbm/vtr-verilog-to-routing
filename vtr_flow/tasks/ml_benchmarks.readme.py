@@ -19,6 +19,7 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
 #--------------------------
     cmd += "python ../gen_task_dirs.mar_2021.py -d ../list_of_experiments.mar_2021 -t ../template_config.mar_2021 -s {e} -v ../.. ;".format(e=exp)
     cmd += "python ../gen_task_dirs.mar_2021.py -d ../list_of_experiments.mar_2021.shorter -t ../template_config.mar_2021 -s {e} -v ../.. ;".format(e=exp)
+
 #
 #Generate task lists:
 #--------------------------
@@ -27,6 +28,7 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
 
     os.system(cmd)
     print(cmd)
+
 #
 #Create command files:
 #--------------------------
@@ -41,6 +43,8 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
     for i in range(3):
         fh.write('python ../../scripts/run_vtr_task.py -l task_list_exp{e}.shorter -j 5 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
     fh.close()
+    os.system("chmod 755 exp{e}/cmds.mar_2021.exp{e}".format(e=exp))
+
 #
 #Run command files:
 #--------------------------
@@ -49,6 +53,7 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
     fh.write('nohup ./cmds.mar_2021.exp{e} > log.mar10.exp{e} &\n'.format(e=exp))
     fh.write('nohup ./cmds.mar_2021.exp{e}.shorter > log.mar10.exp{e}.shorter &\n'.format(e=exp))
     fh.close()
+    os.system("chmod 755 exp{e}/run".format(e=exp))
     
 #
 #Parse logs:
@@ -58,6 +63,7 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
     fh.write('python ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e} -o out.mar10.exp{e}.csv\n'.format(e=exp))
     fh.write('python ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e}.shorter -o out.mar10.exp{e}.shorter.csv\n'.format(e=exp))
     fh.close()
+    os.system("chmod 755 exp{e}/parse".format(e=exp))
 
 #
 #Add to git:
