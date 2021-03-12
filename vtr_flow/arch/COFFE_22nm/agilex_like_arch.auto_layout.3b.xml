@@ -611,21 +611,24 @@
       <x distr="uniform" peak="1.000000"/>
       <y distr="uniform" peak="1.000000"/>
     </chan_width_distr>
-    <switch_block type="wilton" fs="3"/>
+    <switch_block type="custom"/>
     <connection_block input_switch_name="ipin_cblock"/>
   </device>
   <switchlist>
-    <switch type="mux" name="0" R="0.0" Cin="0.0" Cout="0.0" Tdel="207.9e-12" mux_trans_size="2.377" buf_size="35.69"/>
+    <switch type="mux" name="L4_driver" R="0.0" Cin="0.0" Cout="0.0" Tdel="207.9e-12" mux_trans_size="2.377" buf_size="35.69"/>
+    <!-- Delay of L16 driver is scaled from L4 by a factor of 1.5x (based on numbers from the Titan Stratix IV architecture file)
+	 Area numbers will not be totally accurate because of the same buf_size -->
+    <switch type="mux" name="L16_driver" R="0.0" Cin="0.0" Cout="0.0" Tdel="312.9e-12" mux_trans_size="2.377" buf_size="35.69"/> 
     <switch type="mux" name="ipin_cblock" R="0.0" Cout="0.0" Cin="0.0" Tdel="130e-12" mux_trans_size="1.508" buf_size="11.71"/>
   </switchlist>
   <segmentlist>
     <segment name="L4" freq="260" length="4" type="unidir" Rmetal="0.0" Cmetal="0.0">
-      <mux name="0"/>
+      <mux name="L4_driver"/>
       <sb type="pattern">1 1 1 1 1</sb>
       <cb type="pattern">1 1 1 1</cb>
     </segment>
     <segment name="L16" freq="40" length="16" type="unidir" Rmetal="0.0" Cmetal="0.0">
-      <mux name="0"/>
+      <mux name="L16_driver"/>
       <!-- Vias from the top of the metal stack (global layers, where the long wires are 
            implemented) down to the middle/bottom of the metal stack (semi-global layers, 
            where the short wires are implemented) are expensive and restrictive.
@@ -2709,6 +2712,263 @@
     </pb_type>
     <!-- Define fracturable memory end -->
   </complexblocklist>
+
+  <switchblocklist>
+    <!-- Stratix IV uses a uni-directional routing architecture with a Driver Input Mux (DIM) size of 12 (i.e.
+           each wire can be driven by one of 12 block/outputs or wires) for the L4s.
+           
+           In the Stratix IV architecture the long wires (L16 here) are accessible only from the short wires, 
+           and are not connected to the block pins (i.e. connection blocks). Furthermore, they only connect 
+           to switch blocks every 4 LABs (to avoid expensive deep via stacks).
+           We approximate the L16 DIM size as 40:1 (in reality it is a pair of 20:1 (?) muxes with a 2:1 swap mux
+           in front, which has nearly the same connectivity as a full 40:1).
+
+           L4 wires
+           ================
+           At a channel width of 300 there are 260 L4/L4prime wires. At an effective Fc_out of 0.075 
+           and 40 LAB outputs this yeilds:
+
+                40 * 2 = 80 outputs per channel  [2 LABs per-channel]
+
+                80 * 0.075 = 6 outputs drive each L4 wire [output connection block]
+
+           This leaves:
+
+                12 - 6 = 6 inputs to the DIMs from other routing wires [switch block]
+
+           Since L4s connect at every switch block, there are:
+
+                260 L16 wires per channel + direction which can drive wires at a particular switchblock
+                (via switchpoints 0, 1, 2, 3)
+
+           And for each direction (260 wires) only:
+
+               260 / 4 = 65 wires starting/ending per channel + direction at each switch block
+               (i.e. from each direction, north/south/east/west, there are 32 L4s starting, and 32 L4s ending; + 1 wire for the 65th)
+
+           Which we allocate as follows:
+
+                L4
+                =====
+                straight-through connection: 2 (from L4 or L16)
+                clock-wise turn            : 2 (from L4 or L16)
+                counter-clock-wise turn    : 2 (from L4 or L16)
+
+           L16 wires
+           =========
+           At a channel width of 300 there are 40 L16 wires (20 in each direction), which do not connect to the input/output connection blocks.
+           This leaves 40 inputs to the DIM to select from routing wires (long wires use larger DIMs to improve reachability,
+           the area cost is relatively small since they are so rare).
+
+           Since L16s only connect at every 4th switch block there are:
+
+                40 / 4 = 10 L16 wires per channel (5 in each direction) which can drive wires at a particular switchblock
+                (via switchpoints 0, 4, 8, 12)
+
+           And for each direction (20 wires) only:
+
+               40 / 16 = 2.25 => 2 wires starting/ending per channel + direction at each switch block
+               (i.e. from each direction, north/south/east/west, there is one L16 starting, and one L16 ending)
+           
+           We assign the 40 DIM inputs as follows:
+
+                L16
+                =====
+                straight-through connection:  3 (from L16)
+                straight-through connection: 11 (from L4)
+                clock-wise turn            :  3 (from L16)
+                clock-wise turn            : 10 (from L4)
+                counter clock-wise turn    :  3 (from L16)
+                counter clock-wise turn    : 10 (from L4)
+
+           Switch pattern
+           ==============
+           This switch block is based on the Wilton switch block (see Page 103 of Steve Wilton's PhD Thesis 
+           "Architecture and Algorithms for Field-Programmable Gate Arrays with Embedded Memory", 1997):
+
+                left-to-top: W - t
+                top-to-right: t + 1
+                right-to-bottom: 2*W - 2 - t
+                bottom-to-left: t + 1
+                left-to-right: t
+                top-to-bottom: t
+
+           Since Wilton assumed bidirection routing (while we use unidirectional routing),
+           we mirror the clock-wise turns to match the conter-clock-wise specification.
+           -->
+    <switchblock name="wilton_turn_clockwise_core" type="unidir">
+      <switchblock_location type="CORE"/>
+      <switchfuncs>
+        <!-- Clock-wise turns -->
+        <func type="tl" formula="W-t"/>
+        <!-- top to left -->
+        <func type="rt" formula="t+1"/>
+        <!-- right to top -->
+        <func type="br" formula="2*W-2-t"/>
+        <!-- bottom to right -->
+        <func type="lb" formula="t+1"/>
+        <!-- left to bottom -->
+      </switchfuncs>
+      <!-- L16 drivers -->
+      <wireconn num_conns="3*to" from_type="L16" from_switchpoint="0,12,8,4" to_type="L16" to_switchpoint="0"/>
+      <wireconn num_conns="10*to" from_type="L4" from_switchpoint="0" to_type="L16" to_switchpoint="0"/>
+      <!-- L4 drivers 
+
+               Driving from L16 (few) to L4 (many) preferr driving from end-point of L16, although since there are many they will
+               all be multiply connected.
+               
+               Driving from L4 (many) to L4 (many) shuffle the switchpoints so the L4's are driven from a variety of switchpoints.
+               Since the actual number L4s starting/ending are equal, using 'fixed' from_order would mean only switchpoint 0 -> 0
+               connections. A 'shuffled' order will mix-up the from switchpoints for more diversity.
+               -->
+      <wireconn num_conns="2*to" from_order="shuffled">
+        <from type="L16" switchpoint="0,12,8,4"/>
+        <from type="L4" switchpoint="0,1,2,3"/>
+        <to type="L4" switchpoint="0"/>
+      </wireconn>
+    </switchblock>
+    <switchblock name="wilton_turn_counter_clockwise_core" type="unidir">
+      <switchblock_location type="CORE"/>
+      <switchfuncs>
+        <!-- Counter-clock-wise turns -->
+        <func type="lt" formula="W-t"/>
+        <!-- left to top -->
+        <func type="tr" formula="t+1"/>
+        <!-- top to right -->
+        <func type="rb" formula="2*W-2-t"/>
+        <!-- right to bottom -->
+        <func type="bl" formula="t+1"/>
+        <!-- bottom to left -->
+      </switchfuncs>
+      <!-- L16 drivers -->
+      <wireconn num_conns="3*to" from_type="L16" from_switchpoint="0,12,8,4" to_type="L16" to_switchpoint="0"/>
+      <wireconn num_conns="10*to" from_type="L4" from_switchpoint="0" to_type="L16" to_switchpoint="0"/>
+      <!-- L4 drivers 
+
+               Driving from L16 (few) to L4 (many) preferr driving from end-point of L16, although since there are many they will
+               all be multiply connected.
+               
+               Driving from L4 (many) to L4 (many) shuffle the switchpoints so the L4's are driven from a variety of switchpoints.
+               Since the actual number L4s starting/ending are equal, using 'fixed' from_order would mean only switchpoint 0 -> 0
+               connections. A 'shuffled' order will mix-up the from switchpoints for more diversity.
+
+               Note that a different from_switchpoints ordering is used to ensure a different shuffling occurs compared to 
+               wilton_turn_clockwise_core.
+               -->
+      <wireconn num_conns="2*to" from_order="shuffled">
+        <from type="L16" switchpoint="0,12,8,4"/>
+        <from type="L4" switchpoint="0,1,2,3"/>
+        <to type="L4" switchpoint="0"/>
+      </wireconn>
+    </switchblock>
+    <switchblock name="wilton_straight" type="unidir">
+      <switchblock_location type="EVERYWHERE"/>
+      <switchfuncs>
+        <!-- Straight -->
+        <func type="lr" formula="t"/>
+        <!-- left to right -->
+        <func type="tb" formula="t"/>
+        <!-- top to bottom -->
+        <func type="rl" formula="t"/>
+        <!-- right to left -->
+        <func type="bt" formula="t"/>
+        <!-- bottom to top -->
+      </switchfuncs>
+      <!-- L16 Drivers 
+                Note that we order the switchpoints in order of preference, since VPR currently
+                iterates through the source sets in order, such that we connect first to wires
+                ending at the switchblock (switchpoint 0), and then fallback to switchpoints
+                in decreasing distance from the drive point (if we have more to's than from's
+                it then wraps around).
+
+                Note also that we multiply the number of expected connections by 'to', since while usually
+                there is only one 'to' wire, ocasionally there may be more, and we want to ensure they all
+                get the same number of connections.
+
+                For L16->L16:
+                  We allow any valid switchpoint to be used as the 'from' point.
+                  Allow 'low' switchpoints like '4' may seem counter-intuitive (i.e. why not use a cheaper L4)
+                  this makes it easier to bypass once on the L16 network (e.g. to get around congestion).
+           -->
+      <wireconn num_conns="3*to" from_type="L16" from_switchpoint="0,12,8,4" to_type="L16" to_switchpoint="0"/>
+      <wireconn num_conns="11*to" from_type="L4" from_switchpoint="0,3,2,1" to_type="L16" to_switchpoint="0"/>
+      <!-- L4 Drivers -->
+      <wireconn num_conns="2*to" from_order="shuffled">
+        <from type="L16" switchpoint="0,12,8,4"/>
+        <from type="L4" switchpoint="0"/>
+        <to type="L4" switchpoint="0"/>
+      </wireconn>
+      <!--<wireconn num_conns="1*to" from_type="L4" from_switchpoint="0" to_type="L4" to_switchpoint="0"/>-->
+      <!--<wireconn num_conns="1*to" from_type="L16" from_switchpoint="0,12,8,4" to_type="L4" to_switchpoint="0"/>-->
+    </switchblock>
+    <switchblock name="wilton_straight_corner" type="unidir">
+      <!-- Same as wilton straight, but turning around a corner -->
+      <switchblock_location type="CORNER"/>
+      <switchfuncs>
+        <!-- Counter-clock-wise turns -->
+        <func type="lt" formula="t"/>
+        <!-- left to top -->
+        <func type="tr" formula="t"/>
+        <!-- top to right -->
+        <func type="rb" formula="t"/>
+        <!-- right to bottom -->
+        <func type="bl" formula="t"/>
+        <!-- bottom to left -->
+        <!-- Clock-wise turns -->
+        <func type="tl" formula="t"/>
+        <!-- top to left -->
+        <func type="rt" formula="t"/>
+        <!-- right to top -->
+        <func type="br" formula="t"/>
+        <!-- bottom to right -->
+        <func type="lb" formula="t"/>
+        <!-- left to bottom -->
+      </switchfuncs>
+      <!-- L16 Drivers -->
+      <wireconn num_conns="3*to" from_type="L16" from_switchpoint="0,12,8,4" to_type="L16" to_switchpoint="0"/>
+      <wireconn num_conns="11*to" from_type="L4" from_switchpoint="0,3,2,1" to_type="L16" to_switchpoint="0"/>
+      <!-- L4 Drivers -->
+      <wireconn num_conns="2*to" from_order="shuffled">
+        <from type="L16" switchpoint="0,12,8,4"/>
+        <from type="L4" switchpoint="0"/>
+        <to type="L4" switchpoint="0"/>
+      </wireconn>
+      <!--<wireconn num_conns="1*to" from_type="L4" from_switchpoint="0" to_type="L4" to_switchpoint="0"/>-->
+      <!--<wireconn num_conns="1*to" from_type="L16" from_switchpoint="0,12,8,4" to_type="L4" to_switchpoint="0"/>-->
+    </switchblock>
+    <switchblock name="wilton_turn_fringe" type="unidir">
+      <!-- Non-corner perimeter SBs -->
+      <switchblock_location type="FRINGE"/>
+      <switchfuncs>
+        <!-- Counter-clock-wise turns -->
+        <func type="lt" formula="W-t"/>
+        <!-- left to top -->
+        <func type="tr" formula="t+1"/>
+        <!-- top to right -->
+        <func type="rb" formula="2*W-2-t"/>
+        <!-- right to bottom -->
+        <func type="bl" formula="t+1"/>
+        <!-- bottom to left -->
+        <!-- Clock-wise turns -->
+        <func type="tl" formula="W-t"/>
+        <!-- top to left -->
+        <func type="rt" formula="t+1"/>
+        <!-- right to top -->
+        <func type="br" formula="2*W-2-t"/>
+        <!-- bottom to right -->
+        <func type="lb" formula="t+1"/>
+        <!-- left to bottom -->
+      </switchfuncs>
+      <!-- We use 'max' style connections here to ensure there are no dangling wires, otherwise like core turns -->
+      <!-- L16 drivers -->
+      <wireconn num_conns="3*max(from,to)" from_type="L16" from_switchpoint="0,12,8,4" to_type="L16" to_switchpoint="0"/>
+      <wireconn num_conns="21*max(from,to)" from_type="L4" from_switchpoint="0" to_type="L16" to_switchpoint="0"/>
+      <!-- L4 drivers -->
+      <wireconn num_conns="1*max(from,to)" from_type="L16" from_switchpoint="0,12,8,4" from_order="fixed" to_type="L4" to_switchpoint="0"/>
+      <wireconn num_conns="1*max(from,to)" from_type="L4" from_switchpoint="0,1,2,3" from_order="shuffled" to_type="L4" to_switchpoint="0"/>
+    </switchblock>
+  </switchblocklist>
+
   <power>
     <local_interconnect C_wire="2.5e-10"/>
     <mux_transistor_size mux_transistor_size="3"/>
