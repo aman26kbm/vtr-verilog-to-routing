@@ -9,10 +9,10 @@ circuits_dir=benchmarks/verilog/ml_benchmarks
 archs_dir=arch/COFFE_22nm
 
 # Add circuits to list to sweep
-circuit_list_add=softmax_p4_smem_rfloat16_alut_v512_b2_0_10.v
+circuit_list_add=softmax.v
 
 # Add architectures to list to sweep
-arch_list_add=agilex_like_arch.auto_layout.2a.xml
+arch_list_add=agilex_like_arch.auto_layout.3a.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt
@@ -21,4 +21,4 @@ parse_file=vpr_standard.txt
 pass_requirements_file=pass_requirements.txt
 
 # VPR parameters
-script_params=--const_gen_inference comb --timing_report_detail aggregated --sdc_file /export/aman/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/sdc/softmax_p4_smem_rfloat16_alut_v512_b2_0_10.sdc --route_chan_width 300
+script_params=--const_gen_inference comb --timing_report_detail aggregated --sdc_file /export/aman/vtr_aman/vtr-verilog-to-routing/vtr_flow/tasks/sdc/softmax.sdc --route_chan_width 300

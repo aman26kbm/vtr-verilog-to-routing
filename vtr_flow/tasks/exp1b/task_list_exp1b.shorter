@@ -7,7 +7,7 @@ exp1b/agilex.reduction_layer
 exp1b/agilex.eltwise_layer
 exp1b/agilex.conv_layer_hls
 exp1b/agilex.robot_reinforcement_learning
-exp1b/agilex.softmax_p4_smem_rfloat16_alut_v512_b2_0_10
+exp1b/agilex.softmax
 exp1b/agilex.mlp_leflow
 exp1b/agilex.spmv
 exp1b/agilex.lstm

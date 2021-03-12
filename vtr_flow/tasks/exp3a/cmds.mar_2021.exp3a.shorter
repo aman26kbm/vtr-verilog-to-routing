@@ -1,3 +1,3 @@
-python ../../scripts/run_vtr_task.py -l task_list_exp3a.shorter -j 5 -s --seed 3487
-python ../../scripts/run_vtr_task.py -l task_list_exp3a.shorter -j 5 -s --seed 8628
-python ../../scripts/run_vtr_task.py -l task_list_exp3a.shorter -j 5 -s --seed 8222
+python ../../scripts/run_vtr_task.py -l task_list_exp3a.shorter -j 5 -s --seed 1145
+python ../../scripts/run_vtr_task.py -l task_list_exp3a.shorter -j 5 -s --seed 622
+python ../../scripts/run_vtr_task.py -l task_list_exp3a.shorter -j 5 -s --seed 9717

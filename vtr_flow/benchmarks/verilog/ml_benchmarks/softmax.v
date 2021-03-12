@@ -1,4 +1,4 @@
-
+//softmax_p4_smem_rfloat16_alut_v512_b2_0_10.v
 `ifndef DEFINES_DONE
 `define DEFINES_DONE
 `define EXPONENT 5

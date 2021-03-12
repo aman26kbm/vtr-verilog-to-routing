@@ -13,7 +13,7 @@ agilex.ml.reduction_layer
 agilex.ml.eltwise_layer
 agilex.ml.conv_layer_hls
 agilex.ml.robot_reinforcement_learning
-agilex.ml.softmax_p4_smem_rfloat16_alut_v512_b2_0_10
+agilex.ml.softmax
 agilex.ml.mlp_leflow
 agilex.ml.spmv
 agilex.ml.lstm
@@ -54,7 +54,7 @@ agilex.non_ml.stereovision3
 #stratix.ml.eltwise_layer
 #stratix.ml.conv_layer_hls
 #stratix.ml.robot_reinforcement_learning
-#stratix.ml.softmax_p4_smem_rfloat16_alut_v512_b2_0_10
+#stratix.ml.softmax
 #stratix.ml.mlp_leflow
 #stratix.ml.spmv
 #stratix.ml.clstm_large

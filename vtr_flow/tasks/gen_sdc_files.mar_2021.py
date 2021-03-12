@@ -22,7 +22,7 @@ clk_names_dict = {
 'eltwise_layer' : ['clk', 'clk_mem'],
 'conv_layer_hls' : ['ap_clk'],
 'robot_reinforcement_learning' : ['clk'],
-'softmax_p4_smem_rfloat16_alut_v512_b2_0_10' : ['clk'],
+'softmax' : ['clk'],
 'mlp_leflow' : ['clk', 'clk2x'],
 'spmv' : ['clk'],
 'clstm_large' : ['clk'],
