@@ -1835,105 +1835,105 @@ module FPAddSub_2(
 		else begin
 		
 			pipe_1 = {Opout_0, Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Sa_0, Sb_0, ShiftDet_0[9:0], InputExc_0[4:0]} ;	
-			/* PIPE_2 :
-				[67] operation
-				[66] Sa_0
-				[65] Sb_0
-				[64] MaxAB_0
-				[63:56] CExp_0
-				[55:51] Shift_0
-				[50:28] Mmax_0
-				[27:23] InputExc_0
-				[22:0] MminS_1
-			*/
+			// PIPE_2 :
+			//[67] operation
+			//[66] Sa_0
+			//[65] Sb_0
+			//[64] MaxAB_0
+			//[63:56] CExp_0
+			//[55:51] Shift_0
+			//[50:28] Mmax_0
+			//[27:23] InputExc_0
+			//[22:0] MminS_1
+			//
 			pipe_2 = {pipe_1[`DWIDTH*2+15], pipe_1[16:15], MaxAB_1, CExp_1[`EXPONENT-1:0], Shift_1[4:0], Mmax_1[`MANTISSA-1:0], pipe_1[4:0], MminS_1[`MANTISSA-1:0]} ;	
-			/* PIPE_3 :
-				[68] operation
-				[67] Sa_0
-				[66] Sb_0
-				[65] MaxAB_0
-				[64:57] CExp_0
-				[56:52] Shift_0
-				[51:29] Mmax_0
-				[28:24] InputExc_0
-				[23:0] MminS_1
-			*/
+			// PIPE_3 :
+			//[68] operation
+			//[67] Sa_0
+			//[66] Sb_0
+			//[65] MaxAB_0
+			//[64:57] CExp_0
+			//[56:52] Shift_0
+			//[51:29] Mmax_0
+			//[28:24] InputExc_0
+			//[23:0] MminS_1
+			//
 			pipe_3 = {pipe_2[`MANTISSA*2+`EXPONENT+13:`MANTISSA], MminS_2[`MANTISSA:0]} ;	
-			/* PIPE_4 :
-				[68] operation
-				[67] Sa_0
-				[66] Sb_0
-				[65] MaxAB_0
-				[64:57] CExp_0
-				[56:52] Shift_0
-				[51:29] Mmax_0
-				[28:24] InputExc_0
-				[23:0] Mmin_3
-			*/					
+			// PIPE_4 :
+			//[68] operation
+			//[67] Sa_0
+			//[66] Sb_0
+			//[65] MaxAB_0
+			//[64:57] CExp_0
+			//[56:52] Shift_0
+			//[51:29] Mmax_0
+			//[28:24] InputExc_0
+			//[23:0] Mmin_3
+			//					
 			pipe_4 = {pipe_3[`MANTISSA*2+`EXPONENT+14:`MANTISSA+1], Mmin_3[`MANTISSA:0]} ;	
-			/* PIPE_5 :
-				[51] operation
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/					
+			// PIPE_5 :
+			//[51] operation
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//					
 			pipe_5 = {pipe_4[2*`MANTISSA+`EXPONENT+14], PSgn_4, Opr_4, pipe_4[2*`MANTISSA+`EXPONENT+13:2*`MANTISSA+11], pipe_4[`MANTISSA+5:`MANTISSA+1], Sum_4[`DWIDTH:0]} ;
-			/* PIPE_6 :
-				[56] operation
-				[55:51] Shift_5
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/					
+			// PIPE_6 :
+			//[56] operation
+			//[55:51] Shift_5
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//					
 			pipe_6 = {pipe_5[`EXPONENT+`EXPONENT+11], Shift_5[4:0], pipe_5[`DWIDTH+`EXPONENT+10:`DWIDTH+1], SumS_5[`DWIDTH:0]} ;	
-			/* pipe_7 :
-				[56] operation
-				[55:51] Shift_5
-				[50] PSgn_4
-				[49] Opr_4
-				[48] Sa_0
-				[47] Sb_0
-				[46] MaxAB_0
-				[45:38] CExp_0
-				[37:33] InputExc_0
-				[32:0] Sum_4
-			*/						
+			// pipe_7 :
+			//[56] operation
+			//[55:51] Shift_5
+			//[50] PSgn_4
+			//[49] Opr_4
+			//[48] Sa_0
+			//[47] Sb_0
+			//[46] MaxAB_0
+			//[45:38] CExp_0
+			//[37:33] InputExc_0
+			//[32:0] Sum_4
+			//						
 			pipe_7 = {pipe_6[`DWIDTH+`EXPONENT+16:`DWIDTH+1], SumS_7[`DWIDTH:0]} ;	
-			/* pipe_8:
-				[54] FG_8 
-				[53] operation
-				[52] PSgn_4
-				[51] Sa_0
-				[50] Sb_0
-				[49] MaxAB_0
-				[48:41] CExp_0
-				[40:36] InputExc_8
-				[35:13] NormM_8 
-				[12:4] NormE_8
-				[3] ZeroSum_8
-				[2] NegE_8
-				[1] R_8
-				[0] S_8
-			*/				
+			// pipe_8:
+			//[54] FG_8 
+			//[53] operation
+			//[52] PSgn_4
+			//[51] Sa_0
+			//[50] Sb_0
+			//[49] MaxAB_0
+			//[48:41] CExp_0
+			//[40:36] InputExc_8
+			//[35:13] NormM_8 
+			//[12:4] NormE_8
+			//[3] ZeroSum_8
+			//[2] NegE_8
+			//[1] R_8
+			//[0] S_8
+			//				
 			pipe_8 = {FG_8, pipe_7[`DWIDTH+`EXPONENT+16], pipe_7[`DWIDTH+`EXPONENT+10], pipe_7[`DWIDTH+`EXPONENT+8:`DWIDTH+1], NormM_8[`MANTISSA-1:0], NormE_8[`EXPONENT:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
-			/* pipe_9:
-				[40:9] P_int
-				[8] NegE_8
-				[7] R_8
-				[6] S_8
-				[5:1] InputExc_8
-				[0] EOF
-			*/				
+			// pipe_9:
+			//[40:9] P_int
+			//[8] NegE_8
+			//[7] R_8
+			//[6] S_8
+			//[5:1] InputExc_8
+			//[0] EOF
+			//				
 			pipe_9 = {P_int[`DWIDTH-1:0], pipe_8[2], pipe_8[1], pipe_8[0], pipe_8[`EXPONENT+`MANTISSA+9:`EXPONENT+`MANTISSA+5], EOF} ;	
 		end
 	end		
@@ -2113,9 +2113,9 @@ module FPAddSub_AlignShift1(
 			// Rotate by 0	
 			2'b00:  Lvl2 <= Stage1[`MANTISSA:0];       			
 			// Rotate by 4	
-			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end Lvl2[`MANTISSA:`MANTISSA-3] <= 0; end
+			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end /*Lvl2[`MANTISSA:`MANTISSA-3] <= 0;*/ end
 			// Rotate by 8
-			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end Lvl2[`MANTISSA:`MANTISSA-7] <= 0; end
+			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end /*Lvl2[`MANTISSA:`MANTISSA-7] <= 0;*/ end
 			// Rotate by 12	
 			2'b11: Lvl2[`MANTISSA: 0] <= 0; 
 			//2'b11:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+12]; end Lvl2[`MANTISSA:`MANTISSA-12] <= 0; end
@@ -2163,11 +2163,11 @@ module FPAddSub_AlignShift2(
 			// Rotate by 0
 			2'b00:  Lvl3 <= Stage2[`MANTISSA:0];   
 			// Rotate by 1
-			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end Lvl3[`MANTISSA] <= 0; end 
+			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end /*Lvl3[`MANTISSA] <= 0; */end 
 			// Rotate by 2
-			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end Lvl3[`MANTISSA:`MANTISSA-1] <= 0; end 
+			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end /*Lvl3[`MANTISSA:`MANTISSA-1] <= 0;*/ end 
 			// Rotate by 3
-			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end Lvl3[`MANTISSA:`MANTISSA-2] <= 0; end 	  
+			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end /*Lvl3[`MANTISSA:`MANTISSA-2] <= 0;*/ end 	  
 	  endcase
 	end
 	
@@ -2323,13 +2323,17 @@ module FPAddSub_NormalizeShift1(
 	always @(*) begin    					// Rotate {0 | 4 | 8 | 12} bits
 	  case (Shift[3:2])
 			// Rotate by 0
-			2'b00: Lvl2 <= Stage1[`DWIDTH:0];       		
+			2'b00: //Lvl2 <= Stage1[`DWIDTH:0];       		
+      begin Lvl2 = Stage1[`DWIDTH:0];  end
 			// Rotate by 4
-			2'b01: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
+			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-4)] = Stage1[3:0]; Lvl2[`DWIDTH-4-1:0] = Stage1[`DWIDTH-4]; end
 			// Rotate by 8
-			2'b10: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
+			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-8)] = Stage1[3:0]; Lvl2[`DWIDTH-8-1:0] = Stage1[`DWIDTH-8]; end
 			// Rotate by 12
-			2'b11: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
+			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
+      begin Lvl2[`DWIDTH: (`DWIDTH-12)] = Stage1[3:0]; Lvl2[`DWIDTH-12-1:0] = Stage1[`DWIDTH-12]; end
 	  endcase
 	end
 	
@@ -2338,13 +2342,17 @@ module FPAddSub_NormalizeShift1(
 	always @(*) begin   				 		// Rotate {0 | 1 | 2 | 3} bits
 	  case (Shift[1:0])
 			// Rotate by 0
-			2'b00:  Lvl3 <= Stage2[`DWIDTH:0];
+			2'b00:  //Lvl3 <= Stage2[`DWIDTH:0];
+      begin Lvl3 = Stage2[`DWIDTH:0]; end
 			// Rotate by 1
-			2'b01: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
+			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
+      begin Lvl3[`DWIDTH: (`DWIDTH-1)] = Stage2[3:0]; Lvl3[`DWIDTH-1-1:0] = Stage2[`DWIDTH-1]; end
 			// Rotate by 2
-			2'b10: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
+			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-2)] = Stage2[3:0]; Lvl3[`DWIDTH-2-1:0] = Stage2[`DWIDTH-2]; end
 			// Rotate by 3
-			2'b11: begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
+			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
+      begin Lvl3[`DWIDTH: (`DWIDTH-3)] = Stage2[3:0]; Lvl3[`DWIDTH-3-1:0] = Stage2[`DWIDTH-3]; end
 	  endcase
 	end
 	
@@ -2555,7 +2563,6 @@ module FPAddSub_ExceptionModule(
 	assign Flags = {Overflow, Underflow, DivideByZero, Invalid, Inexact} ; 	
 	
 endmodule
-
 
 
 //////////////////////////////////////////////////////
