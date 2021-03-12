@@ -1,0 +1,2 @@
+python ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp1b -o out.mar10.exp1b.csv
+python ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp1b.shorter -o out.mar10.exp1b.shorter.csv

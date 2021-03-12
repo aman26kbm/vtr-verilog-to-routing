@@ -1,0 +1,3 @@
+python ../../scripts/run_vtr_task.py -l task_list_exp1b.shorter -j 5 -s --seed 2054
+python ../../scripts/run_vtr_task.py -l task_list_exp1b.shorter -j 5 -s --seed 1948
+python ../../scripts/run_vtr_task.py -l task_list_exp1b.shorter -j 5 -s --seed 4874

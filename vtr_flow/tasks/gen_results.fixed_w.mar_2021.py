@@ -56,7 +56,10 @@ class GenResults():
                     "near_crit_connections", \
                     "logic_depth", \
                     "device_height", \
-                    "device_width" ]
+                    "device_width" ,
+                    "date", \
+                    "tag" , 
+                    "order"]
 
     #method calls in order
     self.parse_args()

@@ -1,0 +1,3 @@
+python ../../scripts/run_vtr_task.py -l task_list_exp2b -j 5 -s --seed 6844
+python ../../scripts/run_vtr_task.py -l task_list_exp2b -j 5 -s --seed 6518
+python ../../scripts/run_vtr_task.py -l task_list_exp2b -j 5 -s --seed 210
