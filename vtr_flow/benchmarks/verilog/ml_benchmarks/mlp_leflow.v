@@ -3180,7 +3180,7 @@ end
 always @(*) begin
 	/* main: %dot.loop_body.reduction.lr.ph*/
 	/*   %scevgep23 = getelementptr [1 x [10 x float]]* @temp0, i64 0, i64 0, i64 %dot.indvar.rhs.122*/
-		main_dotloop_bodyreductionlrph_scevgep23 = (`TAG_g_temp0_a + (64'd4 * main_dotloop_bodyreductionlrph_dotindvarrhs122_reg));
+		main_dotloop_bodyreductionlrph_scevgep23 = (`TAG_g_temp0_a + (main_dotloop_bodyreductionlrph_dotindvarrhs122_reg<<2));
 end
 always @(posedge clk) begin
 	/* main: %dot.loop_body.reduction.lr.ph*/
@@ -3245,12 +3245,12 @@ end
 always @(*) begin
 	/* main: %dot.loop_body.reduction*/
 	/*   %scevgep19 = getelementptr [784 x [10 x float]]* @param1, i64 0, i64 %dot.indvar.reduction20, i64 %dot.indvar.rhs.122*/
-		main_dotloop_bodyreduction_scevgep19 = (`TAG_g_param1_a + ((64'd40 * main_dotloop_bodyreduction_dotindvarreduction20_reg) + (64'd4 * main_dotloop_bodyreductionlrph_dotindvarrhs122_reg)));
+		main_dotloop_bodyreduction_scevgep19 = (`TAG_g_param1_a + (((main_dotloop_bodyreduction_dotindvarreduction20_reg<<3) + (main_dotloop_bodyreduction_dotindvarreduction20_reg<<5)) + (main_dotloop_bodyreductionlrph_dotindvarrhs122_reg<<2)));
 end
 always @(*) begin
 	/* main: %dot.loop_body.reduction*/
 	/*   %scevgep20 = getelementptr [1 x [784 x float]]* @param2, i64 0, i64 0, i64 %dot.indvar.reduction20*/
-		main_dotloop_bodyreduction_scevgep20 = (`TAG_g_param2_a + (64'd4 * main_dotloop_bodyreduction_dotindvarreduction20_reg));
+		main_dotloop_bodyreduction_scevgep20 = (`TAG_g_param2_a + (main_dotloop_bodyreduction_dotindvarreduction20_reg<<2));
 end
 always @(*) begin
 	/* main: %dot.loop_body.reduction*/
@@ -3455,7 +3455,7 @@ end
 always @(*) begin
 	/* main: %fusion.2.loop_body.dim.1*/
 	/*   %scevgep15 = getelementptr [1 x [10 x float]]* @temp1, i64 0, i64 0, i64 %fusion.2.indvar.dim.116*/
-		main_fusion2loop_bodydim1_scevgep15 = (`TAG_g_temp1_a + (64'd4 * main_fusion2loop_bodydim1_fusion2indvardim116_reg));
+		main_fusion2loop_bodydim1_scevgep15 = (`TAG_g_temp1_a + (main_fusion2loop_bodydim1_fusion2indvardim116_reg<<2));
 end
 always @(posedge clk) begin
 	/* main: %fusion.2.loop_body.dim.1*/
@@ -3468,12 +3468,12 @@ end
 always @(*) begin
 	/* main: %fusion.2.loop_body.dim.1*/
 	/*   %scevgep16 = getelementptr [10 x float]* @param0, i64 0, i64 %fusion.2.indvar.dim.116*/
-		main_fusion2loop_bodydim1_scevgep16 = (`TAG_g_param0_a + (64'd4 * main_fusion2loop_bodydim1_fusion2indvardim116_reg));
+		main_fusion2loop_bodydim1_scevgep16 = (`TAG_g_param0_a + (main_fusion2loop_bodydim1_fusion2indvardim116_reg<<2));
 end
 always @(*) begin
 	/* main: %fusion.2.loop_body.dim.1*/
 	/*   %scevgep17 = getelementptr [1 x [10 x float]]* @temp0, i64 0, i64 0, i64 %fusion.2.indvar.dim.116*/
-		main_fusion2loop_bodydim1_scevgep17 = (`TAG_g_temp0_a + (64'd4 * main_fusion2loop_bodydim1_fusion2indvardim116_reg));
+		main_fusion2loop_bodydim1_scevgep17 = (`TAG_g_temp0_a + (main_fusion2loop_bodydim1_fusion2indvardim116_reg<<2));
 end
 always @(*) begin
 	/* main: %fusion.2.loop_body.dim.1*/
@@ -3569,7 +3569,7 @@ end
 always @(*) begin
 	/* main: %reduce.inner.loop_body.reduction_dim.1*/
 	/*   %scevgep13 = getelementptr [1 x [10 x float]]* @temp1, i64 0, i64 0, i64 %reduce.inner.indvar.reduction_dim.112*/
-		main_reduceinnerloop_bodyreduction_dim1_scevgep13 = (`TAG_g_temp1_a + (64'd4 * main_reduceinnerloop_bodyreduction_dim1_reduceinnerindvarreduction_dim112_reg));
+		main_reduceinnerloop_bodyreduction_dim1_scevgep13 = (`TAG_g_temp1_a + (main_reduceinnerloop_bodyreduction_dim1_reduceinnerindvarreduction_dim112_reg<<2));
 end
 always @(*) begin
 	/* main: %reduce.inner.loop_body.reduction_dim.1*/
@@ -3729,7 +3729,7 @@ end
 always @(*) begin
 	/* main: %fusion.1.loop_body.dim.1*/
 	/*   %scevgep5 = getelementptr [1 x [10 x float]]* @temp1, i64 0, i64 0, i64 %fusion.1.indvar.dim.18*/
-		main_fusion1loop_bodydim1_scevgep5 = (`TAG_g_temp1_a + (64'd4 * main_fusion1loop_bodydim1_fusion1indvardim18_reg));
+		main_fusion1loop_bodydim1_scevgep5 = (`TAG_g_temp1_a + (main_fusion1loop_bodydim1_fusion1indvardim18_reg<<2));
 end
 always @(posedge clk) begin
 	/* main: %fusion.1.loop_body.dim.1*/
@@ -3742,12 +3742,12 @@ end
 always @(*) begin
 	/* main: %fusion.1.loop_body.dim.1*/
 	/*   %scevgep6 = getelementptr [10 x float]* @param0, i64 0, i64 %fusion.1.indvar.dim.18*/
-		main_fusion1loop_bodydim1_scevgep6 = (`TAG_g_param0_a + (64'd4 * main_fusion1loop_bodydim1_fusion1indvardim18_reg));
+		main_fusion1loop_bodydim1_scevgep6 = (`TAG_g_param0_a + (main_fusion1loop_bodydim1_fusion1indvardim18_reg<<2));
 end
 always @(*) begin
 	/* main: %fusion.1.loop_body.dim.1*/
 	/*   %scevgep7 = getelementptr [1 x [10 x float]]* @temp0, i64 0, i64 0, i64 %fusion.1.indvar.dim.18*/
-		main_fusion1loop_bodydim1_scevgep7 = (`TAG_g_temp0_a + (64'd4 * main_fusion1loop_bodydim1_fusion1indvardim18_reg));
+		main_fusion1loop_bodydim1_scevgep7 = (`TAG_g_temp0_a + (main_fusion1loop_bodydim1_fusion1indvardim18_reg<<2));
 end
 always @(*) begin
 	/* main: %fusion.1.loop_body.dim.1*/
@@ -3903,7 +3903,7 @@ end
 always @(*) begin
 	/* main: %40*/
 	/*   %42 = getelementptr inbounds [2 x float]* @ln2HI31, i64 0, i64 %41*/
-		main_40_42 = (`TAG_g_ln2HI31_a + (64'd4 * main_40_41));
+		main_40_42 = (`TAG_g_ln2HI31_a + (main_40_41<<2));
 end
 always @(*) begin
 	/* main: %40*/
@@ -3913,7 +3913,7 @@ end
 always @(*) begin
 	/* main: %40*/
 	/*   %44 = getelementptr inbounds [2 x float]* @ln2LO32, i64 0, i64 %41*/
-		main_40_44 = (`TAG_g_ln2LO32_a + (64'd4 * main_40_41));
+		main_40_44 = (`TAG_g_ln2LO32_a + (main_40_41<<2));
 end
 always @(*) begin
 	/* main: %40*/
@@ -3949,7 +3949,7 @@ end
 always @(*) begin
 	/* main: %48*/
 	/*   %51 = getelementptr inbounds [2 x float]* @halF33, i64 0, i64 %50*/
-		main_48_51 = (`TAG_g_halF33_a + (64'd4 * main_48_50));
+		main_48_51 = (`TAG_g_halF33_a + (main_48_50<<2));
 end
 always @(*) begin
 	/* main: %48*/
@@ -4852,7 +4852,7 @@ end
 always @(*) begin
 	/* main: %reduce.1.inner.loop_body.reduction_dim.1*/
 	/*   %scevgep3 = getelementptr [1 x [10 x float]]* @temp1, i64 0, i64 0, i64 %reduce.1.inner.indvar.reduction_dim.14*/
-		main_reduce1innerloop_bodyreduction_dim1_scevgep3 = (`TAG_g_temp1_a + (64'd4 * main_reduce1innerloop_bodyreduction_dim1_reduce1innerindvarreduction_dim14_reg));
+		main_reduce1innerloop_bodyreduction_dim1_scevgep3 = (`TAG_g_temp1_a + (main_reduce1innerloop_bodyreduction_dim1_reduce1innerindvarreduction_dim14_reg<<2));
 end
 always @(*) begin
 	/* main: %reduce.1.inner.loop_body.reduction_dim.1*/
@@ -4931,7 +4931,7 @@ end
 always @(*) begin
 	/* main: %fusion.loop_body.dim.0*/
 	/*   %scevgep = getelementptr [10 x float]* @temp3, i64 0, i64 %fusion.indvar.dim.02*/
-		main_fusionloop_bodydim0_scevgep = (`TAG_g_temp3_a + (64'd4 * main_fusionloop_bodydim0_fusionindvardim02_reg));
+		main_fusionloop_bodydim0_scevgep = (`TAG_g_temp3_a + (main_fusionloop_bodydim0_fusionindvardim02_reg<<2));
 end
 always @(posedge clk) begin
 	/* main: %fusion.loop_body.dim.0*/
@@ -4944,7 +4944,7 @@ end
 always @(*) begin
 	/* main: %fusion.loop_body.dim.0*/
 	/*   %scevgep2 = getelementptr [1 x [10 x float]]* @temp1, i64 0, i64 0, i64 %fusion.indvar.dim.02*/
-		main_fusionloop_bodydim0_scevgep2 = (`TAG_g_temp1_a + (64'd4 * main_fusionloop_bodydim0_fusionindvardim02_reg));
+		main_fusionloop_bodydim0_scevgep2 = (`TAG_g_temp1_a + (main_fusionloop_bodydim0_fusionindvardim02_reg<<2));
 end
 always @(*) begin
 	/* main: %fusion.loop_body.dim.0*/
