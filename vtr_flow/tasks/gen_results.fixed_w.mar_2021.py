@@ -81,11 +81,17 @@ class GenResults():
                         action='store',
                         default="out.mar_2021.csv",
                         help="Name of output file")
+    parser.add_argument("-t",
+                        "--tag",
+                        action='store',
+                        default="",
+                        help="Tag for these results")
     args = parser.parse_args()
     print("infile = "+ args.infile)
     print("outfile = "+args.outfile)
     self.infile = args.infile
     self.outfile = args.outfile
+    self.tag = args.tag
 
   #--------------------------
   #print the csv file 
@@ -415,6 +421,8 @@ class GenResults():
           result_dict["type"] = "ml"
           break
       config_fh.close()  
+
+      result_dict["tag"] = self.tag
 
       #append the current results to the main result list
       self.result_list.append(result_dict)

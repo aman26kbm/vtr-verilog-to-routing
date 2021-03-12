@@ -60,8 +60,8 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
 #--------------------------
     filename = "exp{e}/parse".format(e=exp)
     fh = open(filename, "w")
-    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e} -o out.mar10.exp{e}.csv\n'.format(e=exp))
-    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e}.shorter -o out.mar10.exp{e}.shorter.csv\n'.format(e=exp))
+    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e} -o out.mar10.exp{e}.csv -t exp{e}\n'.format(e=exp))
+    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e}.shorter -o out.mar10.exp{e}.shorter.csv -t exp{e}\n'.format(e=exp))
     fh.close()
     os.system("chmod 755 exp{e}/parse".format(e=exp))
 
