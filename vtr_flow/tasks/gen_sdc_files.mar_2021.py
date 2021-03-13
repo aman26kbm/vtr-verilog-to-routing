@@ -14,6 +14,7 @@ set_clock_groups -exclusive -group {<clk1>} -group {<clk2>}
 
 clk_names_dict = {
 'matmul_8x8_fp16' : ['clk', 'clk_mem'],
+'matmul_20x20_fp16' : ['clk', 'clk_mem'],
 'tpu.16x16.int8' : ['clk', 'clk_mem'],
 'tpu.32x32.int8' : ['clk', 'clk_mem'],
 'conv_layer' : ['clk', 'clk_mem'],
@@ -23,6 +24,7 @@ clk_names_dict = {
 'conv_layer_hls' : ['ap_clk'],
 'robot_reinforcement_learning' : ['clk'],
 'softmax' : ['clk'],
+'softmax_p8_fp16' : ['clk'],
 'mlp_leflow' : ['clk', 'clk2x'],
 'spmv' : ['clk'],
 'clstm_large' : ['clk'],
