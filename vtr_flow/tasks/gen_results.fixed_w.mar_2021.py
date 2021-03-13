@@ -50,7 +50,7 @@ class GenResults():
                     "dsp_to_clb_ratio", \
                     "memory_to_clb_ratio", \
                     "netlist_primitives", \
-                    "netlist_primitives>100k", \
+                    "netlist_primitives>10k", \
                     "vtr_flow_elapsed_time", \
                     "vtr_flow_peak_memory_usage", \
                     "near_crit_connections", \
@@ -377,7 +377,7 @@ class GenResults():
             netlist_primitives = netlist_primitives + 1
 
         result_dict['netlist_primitives'] = netlist_primitives
-        result_dict['netlist_primitives>100k'] = (netlist_primitives > 100000)
+        result_dict['netlist_primitives>10k'] = (netlist_primitives > 10000)
 
         pre_vpr_blif.close()
 
