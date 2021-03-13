@@ -39,11 +39,23 @@ class GenTaskDirs():
                         "--only_print",
                         action='store_true',
                         help="Only print. Do not execute commands")
+    parser.add_argument("-s",
+                        "--arch_suffix",
+                        default=None,
+                        action='store',
+                        help="Add this suffix to arch file name")
+    parser.add_argument("-v",
+                        "--vtr_flow_dir",
+                        default="..",
+                        action='store',
+                        help="Path of vtr_flow directory")
     args = parser.parse_args()
     print("Parsed arguments:", vars(args))
     self.dirs = args.dirs
     self.template = args.template
     self.only_print = args.only_print
+    self.arch_suffix = args.arch_suffix
+    self.vtr_flow_dir = args.vtr_flow_dir
 
   #--------------------------
   #generate task directories
@@ -64,7 +76,10 @@ class GenTaskDirs():
       ag = re.search(r'agilex\.', expname)
       st = re.search(r'stratix\.', expname)
       if ag is not None:
-        arch_file = "agilex_arch.auto_layout.xml"
+        if self.arch_suffix is not None:
+          arch_file = "agilex_like_arch.auto_layout." + self.arch_suffix + ".xml"
+        else:
+          arch_file = "agilex_like_arch.auto_layout.xml"
         arch_dir = "arch/COFFE_22nm"
       elif st is not None:
         arch_file = "k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml"
@@ -74,7 +89,7 @@ class GenTaskDirs():
         raise SystemExit(0)
 
       #check it exists
-      arch_file_path = "../"+arch_dir+"/"+ arch_file
+      arch_file_path = self.vtr_flow_dir+"/"+arch_dir+"/"+ arch_file
       if not os.path.exists(arch_file_path):
         print("Arch file {} doesn't exist".format(arch_file_path))
         raise SystemExit(0)
@@ -94,12 +109,14 @@ class GenTaskDirs():
       info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', expname)
       if info is not None:
         design_file = info.group(3)+".v"
+        #sdc_file = os.path.abspath(info.group(3)+".sdc")
+        sdc_file = os.path.abspath(self.vtr_flow_dir)+"/tasks/sdc/"+info.group(3)+".sdc"
       else:
         print("Unable to extract benchmark info from " + expname)
         raise SystemExit(0)
 
       #check it exists
-      design_file_path = "../" + design_dir + "/" + design_file
+      design_file_path = self.vtr_flow_dir + "/" + design_dir + "/" + design_file
       if not os.path.exists(design_file_path):
         print("Design file {} doesn't exist".format(design_file_path))
         raise SystemExit(0)
@@ -144,6 +161,7 @@ class GenTaskDirs():
           line = re.sub(r'<arch_dir>',    arch_dir,    line)
           line = re.sub(r'<design_file>', design_file, line)
           line = re.sub(r'<arch_file>',   arch_file,   line)
+          line = re.sub(r'<sdc_full_path>', sdc_file, line)
           config.write(line)
           config.write("\n")
         config.close()

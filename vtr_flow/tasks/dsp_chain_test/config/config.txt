@@ -1,0 +1,30 @@
+##############################################
+# Configuration file for running experiments
+##############################################
+
+# Path to directory of circuits to use
+circuits_dir=benchmarks/verilog/
+
+# Path to directory of architectures to use
+archs_dir=arch/COFFE_22nm/
+
+# Add circuits to list to sweep
+circuit_list_add=dsp_slice_chain_test.v
+
+# Add architectures to list to sweep
+arch_list_add=agilex_like_arch.auto_layout.xml
+arch_list_add=agilex_like_arch.auto_layout.1a.xml
+arch_list_add=agilex_like_arch.auto_layout.2a.xml
+arch_list_add=agilex_like_arch.auto_layout.2b.xml
+arch_list_add=agilex_like_arch.auto_layout.3a.xml
+arch_list_add=agilex_like_arch.auto_layout.3b.xml
+arch_list_add=agilex_like_arch.auto_layout.xml
+arch_list_add=agilex_like_arch.auto_layout.no_dsp_chains.xml
+arch_list_add=agilex_like_arch.auto_layout.only_len4_wires.xml
+
+# Parse info and how to parse
+parse_file=vpr_standard.txt
+
+# Pass requirements
+pass_requirements_file=pass_requirements.txt
+

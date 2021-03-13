@@ -17,8 +17,13 @@ class GenCommands():
     self.reruns = 3
     self.outfile = ''
     #self.cmd_template = '../scripts/run_vtr_task.py <dir> -s "--const_gen_inference comb --seed <seed> --timing_report_npaths 1000 --timing_report_detail aggregated"'
-    self.cmd_template = '../scripts/run_vtr_task.py <dir> -s --seed <seed>  --timing_report_detail aggregated'
-    self.num_proc = 6
+    self.cmd_template = '../scripts/run_vtr_task.py <dir> ' +\
+                        '-s --const_gen_inference comb ' +\
+                        '--seed <seed> ' +\
+                        '--timing_report_detail aggregated ' +\
+                        '--sdc_file <sdc_full_path> ' +\
+                        '--route_chan_width 300 '
+    self.num_proc = 3
     
     #method calls in order
     self.parse_args()
@@ -72,12 +77,14 @@ class GenCommands():
         info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', line)
         if info is not None:
           dirname = info.group(1) + "." + info.group(3)
+          design_name = info.group(3)
         else:
           print("Unable to extract benchmark info from " + expname)
           raise SystemExit(0)
 
         count += 1
         cmd = re.sub(r'<dir>', dirname, self.cmd_template)
+        cmd = re.sub(r'<sdc_full_path>', os.path.abspath(design_name+".sdc"), cmd)
         cmd = re.sub(r'<seed>', str(random.randint(1,10000)), cmd)
 
         # We want only num_proc jobs to be launched at a time

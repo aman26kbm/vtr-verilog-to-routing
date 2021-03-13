@@ -1,4 +1,6 @@
 module top(
+input clk,
+input reset,
 input [8:0] a,
 input [8:0] b,
 input [8:0] c,
@@ -32,6 +34,8 @@ wire [10:0] mode;
 assign mode = 11'b1010_1010_011;
 
 int_sop_4 u_dsp_1(
+.clk(clk),
+.reset(reset),
 .mode_sigs(mode),
 .ax(a),
 .ay(b),
@@ -48,6 +52,8 @@ int_sop_4 u_dsp_1(
 assign chainin_dsp_2 = chainout_dsp_1;
 
 int_sop_4 u_dsp_2(
+.clk(clk),
+.reset(reset),
 .mode_sigs(mode),
 .ax(i),
 .ay(j),
