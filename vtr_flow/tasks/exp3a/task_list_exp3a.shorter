@@ -9,6 +9,7 @@ exp3a/agilex.robot_reinforcement_learning
 exp3a/agilex.softmax_p8_fp16
 exp3a/agilex.spmv
 exp3a/agilex.lstm
+exp3a/agilex.bnn_hls
 exp3a/agilex.LU8PEEng
 exp3a/agilex.arm_core
 exp3a/agilex.bgm

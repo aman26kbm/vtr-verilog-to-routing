@@ -31,6 +31,7 @@ clk_names_dict = {
 'clstm_medium' : ['clk'],
 'clstm_small' : ['clk'],
 'lstm' : ['clk'],
+'bnn_hls': ['ap_clk'],
 'LU32PEEng' : ['clk'],
 'LU64PEEng' : ['clk'],
 'LU8PEEng' : ['clk'],

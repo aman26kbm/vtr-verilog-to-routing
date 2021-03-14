@@ -6,10 +6,16 @@ import random
 #list_of_experiments.mar_2021 -> If the runs take more than 3-4 hours
 #list_of_experiments.mar_2021.shorter 
 #
-#2. Generate sdc files:
+#2. add clock information to gen_sdc_files.mar_2021.py
+
+##############################
+# Generate sdc files:
+##############################
 #Run from the tasks directory:
-#python3 gen_sdc_files.mar_2021.py
-#
+cmd = "python3 gen_sdc_files.mar_2021.py"
+print(cmd)
+os.system(cmd)
+
 ##############################
 #For each experiment: 1A, 1B, 2A, 2B, 3A, 3B
 ##############################
@@ -26,8 +32,8 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
     cmd += "python3 ../gen_task_list.mar_2021.py -d ../list_of_experiments.mar_2021 -o task_list_exp{e} -f exp{e} ;".format(e=exp)
     cmd += "python3 ../gen_task_list.mar_2021.py -d ../list_of_experiments.mar_2021.shorter -o task_list_exp{e}.shorter -f exp{e}".format(e=exp)
 
-    os.system(cmd)
     print(cmd)
+    os.system(cmd)
 
 #
 #Create command files:
@@ -46,7 +52,7 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
     os.system("chmod 755 exp{e}/cmds.mar_2021.exp{e}".format(e=exp))
 
 #
-#Run command files:
+#Create run cmd
 #--------------------------
     filename = "exp{e}/run".format(e=exp)
     fh = open(filename, "w")
@@ -56,7 +62,7 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
     os.system("chmod 755 exp{e}/run".format(e=exp))
     
 #
-#Parse logs:
+#Create parse cmd
 #--------------------------
     filename = "exp{e}/parse".format(e=exp)
     fh = open(filename, "w")
