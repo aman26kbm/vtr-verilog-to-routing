@@ -725,10 +725,10 @@ module mode2_sub(
   wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
 
   // 0 add, 1 sub
-  FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
-  FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
-  FPAddSub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
-  FPAddSub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
+  fixed_point_addsub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
+  fixed_point_addsub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
+  fixed_point_addsub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
+  fixed_point_addsub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
 
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub0(.a(a_inp0), .b(b_inp), .z(outp0), .rnd(3'b000), .status());
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub1(.a(a_inp1), .b(b_inp), .z(outp1), .rnd(3'b000), .status());
@@ -867,10 +867,10 @@ end
   wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
 
   // 0 add, 1 sub
-  FPAddSub add0_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp0),	.b(inp1), .operation(1'b0),	.result(add0_out_stage2), .flags(flags_NC0));
-  FPAddSub add1_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp2),	.b(inp3), .operation(1'b0),	.result(add1_out_stage2), .flags(flags_NC1));
-  FPAddSub add0_stage1(.clk(clk_NC), .rst(rst_NC), .a(add0_out_stage2_reg),	.b(add1_out_stage2_reg), .operation(1'b0),	.result(add0_out_stage1), .flags(flags_NC2));
-  FPAddSub add0_stage0(.clk(clk_NC), .rst(rst_NC), .a(outp),	.b(add0_out_stage1_reg), .operation(1'b0),	.result(add0_out_stage0), .flags(flags_NC3));
+  fixed_point_addsub add0_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp0),	.b(inp1), .operation(1'b0),	.result(add0_out_stage2), .flags(flags_NC0));
+  fixed_point_addsub add1_stage2(.clk(clk_NC), .rst(rst_NC), .a(inp2),	.b(inp3), .operation(1'b0),	.result(add1_out_stage2), .flags(flags_NC1));
+  fixed_point_addsub add0_stage1(.clk(clk_NC), .rst(rst_NC), .a(add0_out_stage2_reg),	.b(add1_out_stage2_reg), .operation(1'b0),	.result(add0_out_stage1), .flags(flags_NC2));
+  fixed_point_addsub add0_stage0(.clk(clk_NC), .rst(rst_NC), .a(outp),	.b(add0_out_stage1_reg), .operation(1'b0),	.result(add0_out_stage0), .flags(flags_NC3));
 
   //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add0_stage2(.a(inp0),       .b(inp1),      .z(add0_out_stage2), .rnd(3'b000),    .status());
   //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add1_stage2(.a(inp2),       .b(inp3),      .z(add1_out_stage2), .rnd(3'b000),    .status());
@@ -916,10 +916,10 @@ module mode6_sub(
   wire [4:0] flags_NC0, flags_NC1, flags_NC2, flags_NC3;
   // 0 add, 1 sub
   wire clk_NC, rst_NC;
-  FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
-  FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
-  FPAddSub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
-  FPAddSub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
+  fixed_point_addsub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
+  fixed_point_addsub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
+  fixed_point_addsub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
+  fixed_point_addsub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
 
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub0(.a(a_inp0), .b(b_inp), .z(outp0), .rnd(3'b000), .status());
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub1(.a(a_inp1), .b(b_inp), .z(outp1), .rnd(3'b000), .status());
@@ -963,7 +963,10 @@ module mode7_exp(
   expunit exp3(.a(inp3), .z(outp3), .status(), .stage_run(stage_run), .clk(clk), .reset(reset));
 endmodule
 
-module FPAddSub(
+//============================================================================
+// Fixed point add/sub module
+//============================================================================
+module fixed_point_addsub(
 		clk,
 		rst,
 		a,
@@ -1038,9 +1041,6 @@ agb,
 ageb,
 unordered
 );
-//Default for FP16
-//parameter exp = 5;
-//parameter man = 10;
 
 input [15:0] a;
 input [15:0] b;
@@ -1158,24 +1158,22 @@ endmodule
 
 module logunit (fpin, fpout, status);
 
-	
 	input [15:0] fpin;
 	output [15:0] fpout;
 	output [7:0] status;
 	wire clk,rst;
 
-
 	wire [15: 0] fxout1;
 	wire [15: 0] fxout2;
-    wire [15:0] fpin_f;
-    wire [15:0] fpout_f;
+  wire [15:0] fpin_f;
+  wire [15:0] fpout_f;
 	//reg [15: 0] pipe1;
 	//reg [15: 0] pipe2;
 
   int_to_float_fp16 int_float (.input_a(fpin),.output_z(fpin_f));
-  FPLUT1 lut1 (.addr(fpin_f[14:10]),.log(fxout1)); // LUT for exponent
+  FPLUT1 lut1 (.addr(fpin_f[14:10]),.log(fxout1)); 
   FP8LUT2 lut2 (.addr(fpin_f[9:2]),.log(fxout2)); 
-  FPAddSub_2 add(.a(fxout1), .b(fxout2), .clk(clk),.rst(rst), .operation(1'b0), .result(fpout_f), .flags());
+  FPAddSub add(.a(fxout1), .b(fxout2), .clk(clk),.rst(rst), .operation(1'b0), .result(fpout_f), .flags());
   float_to_int_fp16 float_int (.input_a(fpout_f),.output_z(fpout));
 
 endmodule
@@ -1745,7 +1743,7 @@ module FP8LUT2(addr, log);
     end
 endmodule
 
-module FPAddSub_2(
+module FPAddSub(
 		clk,
 		rst,
 		a,
@@ -2678,7 +2676,7 @@ module expunit (a, z, status, stage_run, clk, reset);
     end
 
     assign a_comp = ~a + 1'b1;
-    LUT lut(.addr(a_comp[14:8]), .exp(LUTout)); 
+    ExpLUT lut(.addr(a_comp[14:8]), .exp(LUTout)); 
     assign Mult_out = ~(a_comp*LUTout[31:16])+1;
     assign z_out = Mult_out_reg[27:12] + LUTout_reg[15:0];
 
@@ -2692,7 +2690,7 @@ module expunit (a, z, status, stage_run, clk, reset);
   
 endmodule
 
-module LUT(addr, exp);
+module ExpLUT(addr, exp);
     input [6:0] addr;
     output reg [31:0] exp;
 
