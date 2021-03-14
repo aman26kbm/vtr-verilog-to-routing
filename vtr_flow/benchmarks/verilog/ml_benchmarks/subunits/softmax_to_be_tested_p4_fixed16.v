@@ -26,7 +26,7 @@ module softmax(
   addr,          //address corresponding to data inp
   sub0_inp_addr, //address corresponding to sub0_inp
   sub1_inp_addr, //address corresponding to sub1_inp
-
+  addr_sel,
   outp0,
   outp1,
   outp2,
@@ -52,7 +52,7 @@ module softmax(
   output [`ADDRSIZE-1 :0] addr;
   output  [`ADDRSIZE-1:0] sub0_inp_addr;
   output  [`ADDRSIZE-1:0] sub1_inp_addr;
-
+  output addr_sel;
   output [`DATAWIDTH-1:0] outp0;
   output [`DATAWIDTH-1:0] outp1;
   output [`DATAWIDTH-1:0] outp2;
@@ -96,6 +96,8 @@ module softmax(
   reg presub_start;
   reg presub_run;
   reg done;
+
+  assign addr_sel = mode1_run & ~mode2_start;
 
   always @(posedge clk)begin
     mode4_stage1_run_a <= mode4_stage1_run;
@@ -346,6 +348,8 @@ module softmax(
       .inp1(inp_reg[`DATAWIDTH*2-1:`DATAWIDTH*1]),
       .inp2(inp_reg[`DATAWIDTH*3-1:`DATAWIDTH*2]),
       .inp3(inp_reg[`DATAWIDTH*4-1:`DATAWIDTH*3]),
+      .mode1_stage2_run(mode1_stage2_run),
+      .mode1_stage1_run(mode1_stage1_run),
       .mode1_stage0_run(mode1_stage0_run),
       .clk(clk),
       .reset(reset),
@@ -573,6 +577,8 @@ module mode1_max_tree(
   inp2, 
   inp3, 
  
+  mode1_stage2_run,
+  mode1_stage1_run,
   mode1_stage0_run,
   clk,
   reset,
