@@ -81,8 +81,8 @@ module softmax(
   reg mode1_stage1_run_a;
   reg mode1_stage0_run;
   reg mode1_stage1_run;
-  reg mode1_stage2_run;
-  //assign mode1_stage2_run = mode1_run;
+  wire mode1_stage2_run;
+  assign mode1_stage2_run = mode1_run;
 
   reg mode4_stage1_run_a;
   reg mode4_stage2_run_a;
@@ -110,7 +110,6 @@ module softmax(
 
   always @(posedge clk) begin
     if(reset) begin
-      inp_reg <= 0;
       addr <= 0;
       mode1_start <= 0;
       mode1_run <= 0;
@@ -126,7 +125,6 @@ module softmax(
     //logic when to finish mode1 and trigger mode2 to latch the mode2 address
     else if(mode1_start && addr < end_addr) begin 
       addr <= addr + 1;
-      inp_reg <= inp;
       mode1_run <= 1;
     end else if(addr == end_addr)begin 
       addr <= 0;
@@ -137,17 +135,17 @@ module softmax(
     end
   end
 
-   always @(posedge clk) begin
-    if(reset) begin
-      mode1_stage2_run <= 0;
-    end
-    else if (mode1_run == 1) begin
-      mode1_stage2_run <= 1;
-    end
-    else begin
-      mode1_stage2_run <= 0;
-    end
-   end
+   //always @(posedge clk) begin
+   // if(reset) begin
+   //   mode1_stage2_run <= 0;
+   // end
+   // else if (mode1_run == 1) begin
+   //   mode1_stage2_run <= 1;
+   // end
+   // else begin
+   //   mode1_stage2_run <= 0;
+   // end
+   //end
 
   always @(posedge clk) begin
     if(reset) begin
@@ -344,10 +342,10 @@ module softmax(
   wire [`DATAWIDTH-1:0] max_outp;
 
   mode1_max_tree mode1_max(
-      .inp0(inp_reg[`DATAWIDTH*1-1:`DATAWIDTH*0]),
-      .inp1(inp_reg[`DATAWIDTH*2-1:`DATAWIDTH*1]),
-      .inp2(inp_reg[`DATAWIDTH*3-1:`DATAWIDTH*2]),
-      .inp3(inp_reg[`DATAWIDTH*4-1:`DATAWIDTH*3]),
+      .inp0(inp[`DATAWIDTH*1-1:`DATAWIDTH*0]),
+      .inp1(inp[`DATAWIDTH*2-1:`DATAWIDTH*1]),
+      .inp2(inp[`DATAWIDTH*3-1:`DATAWIDTH*2]),
+      .inp3(inp[`DATAWIDTH*4-1:`DATAWIDTH*3]),
       .mode1_stage2_run(mode1_stage2_run),
       .mode1_stage1_run(mode1_stage1_run),
       .mode1_stage0_run(mode1_stage0_run),
@@ -598,8 +596,6 @@ module mode1_max_tree(
   input reset;
 
   output reg [`DATAWIDTH-1 : 0] outp;
-      // [`DATAWIDTH-1 : 0] outp;
-
 
   wire   [`DATAWIDTH-1 : 0] cmp0_out_stage2;
   wire   [`DATAWIDTH-1 : 0] cmp1_out_stage2;
@@ -609,7 +605,6 @@ module mode1_max_tree(
   reg   [`DATAWIDTH-1 : 0] cmp0_out_stage2_reg;
   reg   [`DATAWIDTH-1 : 0] cmp1_out_stage2_reg;
   reg   [`DATAWIDTH-1 : 0] cmp0_out_stage1_reg;
-  reg   [`DATAWIDTH-1 : 0] cmp0_out_stage0_reg;
   
   always @(posedge clk) begin
     if (reset) begin
@@ -617,7 +612,7 @@ module mode1_max_tree(
     end
 
     else if(~reset && mode1_stage0_run) begin
-      outp <= cmp0_out_stage0_reg;
+      outp <= cmp0_out_stage0;
     end
 
   end
