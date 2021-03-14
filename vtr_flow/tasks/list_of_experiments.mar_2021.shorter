@@ -4,17 +4,19 @@
 #-------------------
 # ML benchmarks
 #-------------------
-agilex.ml.matmul_8x8_fp16
+#agilex.ml.matmul_8x8_fp16
+agilex.ml.matmul_20x20_fp16
 agilex.ml.tpu.16x16.int8
 agilex.ml.tpu.32x32.int8
 agilex.ml.conv_layer
-agilex.ml.gemm_8x8_int8
+#agilex.ml.gemm_8x8_int8
 agilex.ml.reduction_layer
 agilex.ml.eltwise_layer
 agilex.ml.conv_layer_hls
 agilex.ml.robot_reinforcement_learning
-agilex.ml.softmax
-agilex.ml.mlp_leflow
+#agilex.ml.softmax
+agilex.ml.softmax_p8_fp16
+#agilex.ml.mlp_leflow
 agilex.ml.spmv
 agilex.ml.lstm
 #-------------------

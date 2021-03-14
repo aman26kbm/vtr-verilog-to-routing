@@ -1,14 +1,12 @@
-exp1a/agilex.matmul_8x8_fp16
+exp1a/agilex.matmul_20x20_fp16
 exp1a/agilex.tpu.16x16.int8
 exp1a/agilex.tpu.32x32.int8
 exp1a/agilex.conv_layer
-exp1a/agilex.gemm_8x8_int8
 exp1a/agilex.reduction_layer
 exp1a/agilex.eltwise_layer
 exp1a/agilex.conv_layer_hls
 exp1a/agilex.robot_reinforcement_learning
-exp1a/agilex.softmax
-exp1a/agilex.mlp_leflow
+exp1a/agilex.softmax_p8_fp16
 exp1a/agilex.spmv
 exp1a/agilex.lstm
 exp1a/agilex.LU8PEEng
