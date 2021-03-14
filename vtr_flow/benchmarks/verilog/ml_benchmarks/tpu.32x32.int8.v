@@ -14174,24 +14174,15 @@ wire [2*`DWIDTH-1:0] mul_out_temp;
 reg [2*`DWIDTH-1:0] mul_out_temp_reg;
 
 always @(posedge clk) begin
-  if (reset) begin
-    a_flopped <= 0;
-    b_flopped <= 0;
-  end else begin
     a_flopped <= a;
     b_flopped <= b;
-  end
 end
 
 //assign mul_out = a * b;
 qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
 
 always @(posedge clk) begin
-  if (reset) begin
-    mul_out_temp_reg <= 0;
-  end else begin
     mul_out_temp_reg <= mul_out_temp;
-  end
 end
 
 //we just truncate the higher bits of the product
@@ -14199,11 +14190,7 @@ end
 qadd add_u1(.a(out_temp), .b(mul_out_temp_reg), .c(add_out));
 
 always @(posedge clk) begin
-  if (reset) begin
-    out_temp <= 0;
-  end else begin
     out_temp <= add_out;
-  end
 end
 
 //down cast the result

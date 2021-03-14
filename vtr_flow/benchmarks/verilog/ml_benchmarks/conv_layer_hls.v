@@ -6227,3 +6227,388 @@ assign zext_ln93_83_fu_800_p1 = xor_ln93_32_fu_786_p2;
 assign zext_ln93_fu_155_p1 = tmp_s_fu_147_p3;
 
 endmodule //td_fused_top_tdf3_writeOutputs_unaligned
+
+module top (
+        ap_clk,
+        ap_rst,
+        in_data_address0_0,
+        in_data_address0_1,
+        in_data_address0_2,
+        in_data_ce0_0,
+        in_data_ce0_1,
+        in_data_ce0_2,
+        in_data_d0_0,
+        in_data_d0_1,
+        in_data_d0_2,
+        in_data_q0_0,
+        in_data_q0_1,
+        in_data_q0_2,
+        in_data_we0_0,
+        in_data_we0_1,
+        in_data_we0_2,
+        in_data_address1_0,
+        in_data_address1_1,
+        in_data_address1_2,
+        in_data_ce1_0,
+        in_data_ce1_1,
+        in_data_ce1_2,
+        in_data_d1_0,
+        in_data_d1_1,
+        in_data_d1_2,
+        in_data_q1_0,
+        in_data_q1_1,
+        in_data_q1_2,
+        in_data_we1_0,
+        in_data_we1_1,
+        in_data_we1_2,
+        filter_data_address0_0,
+        filter_data_address0_1,
+        filter_data_address0_2,
+        filter_data_ce0_0,
+        filter_data_ce0_1,
+        filter_data_ce0_2,
+        filter_data_d0_0,
+        filter_data_d0_1,
+        filter_data_d0_2,
+        filter_data_q0_0,
+        filter_data_q0_1,
+        filter_data_q0_2,
+        filter_data_we0_0,
+        filter_data_we0_1,
+        filter_data_we0_2,
+        filter_data_address1_0,
+        filter_data_address1_1,
+        filter_data_address1_2,
+        filter_data_ce1_0,
+        filter_data_ce1_1,
+        filter_data_ce1_2,
+        filter_data_d1_0,
+        filter_data_d1_1,
+        filter_data_d1_2,
+        filter_data_q1_0,
+        filter_data_q1_1,
+        filter_data_q1_2,
+        filter_data_we1_0,
+        filter_data_we1_1,
+        filter_data_we1_2,
+        out_data_address0_0,
+        out_data_address0_1,
+        out_data_address0_2,
+        out_data_ce0_0,
+        out_data_ce0_1,
+        out_data_ce0_2,
+        out_data_d0_0,
+        out_data_d0_1,
+        out_data_d0_2,
+        out_data_q0_0,
+        out_data_q0_1,
+        out_data_q0_2,
+        out_data_we0_0,
+        out_data_we0_1,
+        out_data_we0_2,
+        out_data_address1_0,
+        out_data_address1_1,
+        out_data_address1_2,
+        out_data_ce1_0,
+        out_data_ce1_1,
+        out_data_ce1_2,
+        out_data_d1_0,
+        out_data_d1_1,
+        out_data_d1_2,
+        out_data_q1_0,
+        out_data_q1_1,
+        out_data_q1_2,
+        out_data_we1_0,
+        out_data_we1_1,
+        out_data_we1_2,
+        ap_start_0,
+        ap_start_1,
+        ap_start_2,
+        in_data_empty_n_0,
+        in_data_empty_n_1,
+        in_data_empty_n_2,
+        in_data_read_0,
+        in_data_read_1,
+        in_data_read_2,
+        out_data_full_n_0,
+        out_data_full_n_1,
+        out_data_full_n_2,
+        out_data_write_0,
+        out_data_write_1,
+        out_data_write_2,
+        ap_done_0,
+        ap_done_1,
+        ap_done_2,
+        ap_ready_0,
+        ap_ready_1,
+        ap_ready_2,
+        ap_idle_0,
+        ap_idle_1,
+        ap_idle_2,
+        ap_continue_0,
+        ap_continue_1,
+        ap_continue_2
+);
+
+
+input   ap_clk;
+input   ap_rst;
+/////////////////////////////////////////////////
+output  [14:0] in_data_address0_0;
+output   in_data_ce0_0;
+output  [63:0] in_data_d0_0;
+input  [63:0] in_data_q0_0;
+output   in_data_we0_0;
+output  [14:0] in_data_address1_0;
+output   in_data_ce1_0;
+output  [63:0] in_data_d1_0;
+input  [63:0] in_data_q1_0;
+output   in_data_we1_0;
+output  [8:0] filter_data_address0_0;
+output   filter_data_ce0_0;
+output  [15:0] filter_data_d0_0;
+input  [15:0] filter_data_q0_0;
+output   filter_data_we0_0;
+output  [8:0] filter_data_address1_0;
+output   filter_data_ce1_0;
+output  [15:0] filter_data_d1_0;
+input  [15:0] filter_data_q1_0;
+output   filter_data_we1_0;
+output  [11:0] out_data_address0_0;
+output   out_data_ce0_0;
+output  [255:0] out_data_d0_0;
+input  [255:0] out_data_q0_0;
+output   out_data_we0_0;
+output  [11:0] out_data_address1_0;
+output   out_data_ce1_0;
+output  [255:0] out_data_d1_0;
+input  [255:0] out_data_q1_0;
+output   out_data_we1_0;
+input   ap_start_0;
+input   in_data_empty_n_0;
+output   in_data_read_0;
+input   out_data_full_n_0;
+output   out_data_write_0;
+output   ap_done_0;
+output   ap_ready_0;
+output   ap_idle_0;
+input   ap_continue_0;
+/////////////////////////////////////////////////
+output  [14:0] in_data_address0_1;
+output   in_data_ce0_1;
+output  [63:0] in_data_d0_1;
+input  [63:0] in_data_q0_1;
+output   in_data_we0_1;
+output  [14:0] in_data_address1_1;
+output   in_data_ce1_1;
+output  [63:0] in_data_d1_1;
+input  [63:0] in_data_q1_1;
+output   in_data_we1_1;
+output  [8:0] filter_data_address0_1;
+output   filter_data_ce0_1;
+output  [15:0] filter_data_d0_1;
+input  [15:0] filter_data_q0_1;
+output   filter_data_we0_1;
+output  [8:0] filter_data_address1_1;
+output   filter_data_ce1_1;
+output  [15:0] filter_data_d1_1;
+input  [15:0] filter_data_q1_1;
+output   filter_data_we1_1;
+output  [11:0] out_data_address0_1;
+output   out_data_ce0_1;
+output  [255:0] out_data_d0_1;
+input  [255:0] out_data_q0_1;
+output   out_data_we0_1;
+output  [11:0] out_data_address1_1;
+output   out_data_ce1_1;
+output  [255:0] out_data_d1_1;
+input  [255:0] out_data_q1_1;
+output   out_data_we1_1;
+input   ap_start_1;
+input   in_data_empty_n_1;
+output   in_data_read_1;
+input   out_data_full_n_1;
+output   out_data_write_1;
+output   ap_done_1;
+output   ap_ready_1;
+output   ap_idle_1;
+input   ap_continue_1;
+/////////////////////////////////////////////////
+output  [14:0] in_data_address0_2;
+output   in_data_ce0_2;
+output  [63:0] in_data_d0_2;
+input  [63:0] in_data_q0_2;
+output   in_data_we0_2;
+output  [14:0] in_data_address1_2;
+output   in_data_ce1_2;
+output  [63:0] in_data_d1_2;
+input  [63:0] in_data_q1_2;
+output   in_data_we1_2;
+output  [8:0] filter_data_address0_2;
+output   filter_data_ce0_2;
+output  [15:0] filter_data_d0_2;
+input  [15:0] filter_data_q0_2;
+output   filter_data_we0_2;
+output  [8:0] filter_data_address1_2;
+output   filter_data_ce1_2;
+output  [15:0] filter_data_d1_2;
+input  [15:0] filter_data_q1_2;
+output   filter_data_we1_2;
+output  [11:0] out_data_address0_2;
+output   out_data_ce0_2;
+output  [255:0] out_data_d0_2;
+input  [255:0] out_data_q0_2;
+output   out_data_we0_2;
+output  [11:0] out_data_address1_2;
+output   out_data_ce1_2;
+output  [255:0] out_data_d1_2;
+input  [255:0] out_data_q1_2;
+output   out_data_we1_2;
+input   ap_start_2;
+input   in_data_empty_n_2;
+output   in_data_read_2;
+input   out_data_full_n_2;
+output   out_data_write_2;
+output   ap_done_2;
+output   ap_ready_2;
+output   ap_idle_2;
+input   ap_continue_2;
+
+
+   td_fused_top_dataflow_in_loop_TOP_LOOP49028  i_0 (
+     .ap_clk(ap_clk), 
+     .ap_rst(ap_rst),
+     .in_data_address0(in_data_address0_0),
+     .in_data_ce0(in_data_ce0_0),
+     .in_data_d0(in_data_d0_0),
+     .in_data_q0(in_data_q0_0),
+     .in_data_we0(in_data_we0_0),
+     .in_data_address1(in_data_address1_0),
+     .in_data_ce1(in_data_ce1_0),
+     .in_data_d1(in_data_d1_0),
+     .in_data_q1(in_data_q1_0),
+     .in_data_we1(in_data_we1_0),
+     .filter_data_address0(filter_data_address0_0),
+     .filter_data_ce0(filter_data_ce0_0),
+     .filter_data_d0(filter_data_d0_0),
+     .filter_data_q0(filter_data_q0_0),
+     .filter_data_we0(filter_data_we0_0),
+     .filter_data_address1(filter_data_address1_0),
+     .filter_data_ce1(filter_data_ce1_0),
+     .filter_data_d1(filter_data_d1_0),
+     .filter_data_q1(filter_data_q1_0),
+     .filter_data_we1(filter_data_we1_0),
+     .out_data_address0(out_data_address0_0),
+     .out_data_ce0(out_data_ce0_0),
+     .out_data_d0(out_data_d0_0),
+     .out_data_q0(out_data_q0_0),
+     .out_data_we0(out_data_we0_0),
+     .out_data_address1(out_data_address1_0),
+     .out_data_ce1(out_data_ce1_0),
+     .out_data_d1(out_data_d1_0),
+     .out_data_q1(out_data_q1_0),
+     .out_data_we1(out_data_we1_0),
+     .ap_start(ap_start_0),
+     .in_data_empty_n(in_data_empty_n_0),
+     .in_data_read(in_data_read_0),
+     .out_data_full_n(out_data_full_n_0),
+     .out_data_write(out_data_write_0),
+     .ap_done(ap_done_0),
+     .ap_ready(ap_ready_0),
+     .ap_idle(ap_idle_0),
+     .ap_continue(ap_continue_0)
+   );
+
+
+   td_fused_top_dataflow_in_loop_TOP_LOOP49028  i_1 (
+     .ap_clk(ap_clk), 
+     .ap_rst(ap_rst),
+     .in_data_address0(in_data_address0_1),
+     .in_data_ce0(in_data_ce0_1),
+     .in_data_d0(in_data_d0_1),
+     .in_data_q0(in_data_q0_1),
+     .in_data_we0(in_data_we0_1),
+     .in_data_address1(in_data_address1_1),
+     .in_data_ce1(in_data_ce1_1),
+     .in_data_d1(in_data_d1_1),
+     .in_data_q1(in_data_q1_1),
+     .in_data_we1(in_data_we1_1),
+     .filter_data_address0(filter_data_address0_1),
+     .filter_data_ce0(filter_data_ce0_1),
+     .filter_data_d0(filter_data_d0_1),
+     .filter_data_q0(filter_data_q0_1),
+     .filter_data_we0(filter_data_we0_1),
+     .filter_data_address1(filter_data_address1_1),
+     .filter_data_ce1(filter_data_ce1_1),
+     .filter_data_d1(filter_data_d1_1),
+     .filter_data_q1(filter_data_q1_1),
+     .filter_data_we1(filter_data_we1_1),
+     .out_data_address0(out_data_address0_1),
+     .out_data_ce0(out_data_ce0_1),
+     .out_data_d0(out_data_d0_1),
+     .out_data_q0(out_data_q0_1),
+     .out_data_we0(out_data_we0_1),
+     .out_data_address1(out_data_address1_1),
+     .out_data_ce1(out_data_ce1_1),
+     .out_data_d1(out_data_d1_1),
+     .out_data_q1(out_data_q1_1),
+     .out_data_we1(out_data_we1_1),
+     .ap_start(ap_start_1),
+     .in_data_empty_n(in_data_empty_n_1),
+     .in_data_read(in_data_read_1),
+     .out_data_full_n(out_data_full_n_1),
+     .out_data_write(out_data_write_1),
+     .ap_done(ap_done_1),
+     .ap_ready(ap_ready_1),
+     .ap_idle(ap_idle_1),
+     .ap_continue(ap_continue_1)
+   );
+
+
+   td_fused_top_dataflow_in_loop_TOP_LOOP49028  i_2 (
+     .ap_clk(ap_clk), 
+     .ap_rst(ap_rst),
+     .in_data_address0(in_data_address0_2),
+     .in_data_ce0(in_data_ce0_2),
+     .in_data_d0(in_data_d0_2),
+     .in_data_q0(in_data_q0_2),
+     .in_data_we0(in_data_we0_2),
+     .in_data_address1(in_data_address1_2),
+     .in_data_ce1(in_data_ce1_2),
+     .in_data_d1(in_data_d1_2),
+     .in_data_q1(in_data_q1_2),
+     .in_data_we1(in_data_we1_2),
+     .filter_data_address0(filter_data_address0_2),
+     .filter_data_ce0(filter_data_ce0_2),
+     .filter_data_d0(filter_data_d0_2),
+     .filter_data_q0(filter_data_q0_2),
+     .filter_data_we0(filter_data_we0_2),
+     .filter_data_address1(filter_data_address1_2),
+     .filter_data_ce1(filter_data_ce1_2),
+     .filter_data_d1(filter_data_d1_2),
+     .filter_data_q1(filter_data_q1_2),
+     .filter_data_we1(filter_data_we1_2),
+     .out_data_address0(out_data_address0_2),
+     .out_data_ce0(out_data_ce0_2),
+     .out_data_d0(out_data_d0_2),
+     .out_data_q0(out_data_q0_2),
+     .out_data_we0(out_data_we0_2),
+     .out_data_address1(out_data_address1_2),
+     .out_data_ce1(out_data_ce1_2),
+     .out_data_d1(out_data_d1_2),
+     .out_data_q1(out_data_q1_2),
+     .out_data_we1(out_data_we1_2),
+     .ap_start(ap_start_2),
+     .in_data_empty_n(in_data_empty_n_2),
+     .in_data_read(in_data_read_2),
+     .out_data_full_n(out_data_full_n_2),
+     .out_data_write(out_data_write_2),
+     .ap_done(ap_done_2),
+     .ap_ready(ap_ready_2),
+     .ap_idle(ap_idle_2),
+     .ap_continue(ap_continue_2)
+   );
+
+endmodule
+
+

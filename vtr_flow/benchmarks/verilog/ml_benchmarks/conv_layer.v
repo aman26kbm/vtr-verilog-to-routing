@@ -1,5 +1,6 @@
 
 `timescale 1ns/1ns
+//`define ARCH_SPECIFIC_IMP 1
 `define DWIDTH 16
 `define AWIDTH 10
 `define MEM_SIZE 1024
@@ -26,7 +27,8 @@
 `define ADDRESS_BASE_A 10'd0
 `define ADDRESS_BASE_B 10'd0
 `define ADDRESS_BASE_C 10'd0
-  module conv(
+
+module conv(
   input clk,
   input clk_mem,
   input resetn,
@@ -1323,7 +1325,7 @@ end
       .validity_mask_b_rows(validity_mask_b_0_rows),
       .validity_mask_b_cols(validity_mask_b_0_cols),
       .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
-      .slice_dtype(1'b1), //1 is FP16
+      .slice_dtype(1'b0),
       .op(slice_0_op), 
       .preload(1'b0),
       .final_mat_mul_size(8'd4),
@@ -1363,7 +1365,7 @@ end
       .validity_mask_b_rows(validity_mask_b_1_rows),
       .validity_mask_b_cols(validity_mask_b_1_cols),
       .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
-      .slice_dtype(1'b1), //1 is FP16
+      .slice_dtype(1'b0),
       .op(slice_1_op), 
       .preload(1'b0),
       .final_mat_mul_size(8'd4),
@@ -1403,7 +1405,7 @@ end
       .validity_mask_b_rows(validity_mask_b_2_rows),
       .validity_mask_b_cols(validity_mask_b_2_cols),
       .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
-      .slice_dtype(1'b1), //1 is FP16
+      .slice_dtype(1'b0),
       .op(slice_2_op), 
       .preload(1'b0),
       .final_mat_mul_size(8'd4),
@@ -1443,7 +1445,7 @@ end
       .validity_mask_b_rows(validity_mask_b_3_rows),
       .validity_mask_b_cols(validity_mask_b_3_cols),
       .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
-      .slice_dtype(1'b1), //1 is FP16
+      .slice_dtype(1'b0),
       .op(slice_3_op), 
       .preload(1'b0),
       .final_mat_mul_size(8'd4),
@@ -1483,7 +1485,7 @@ end
       .validity_mask_b_rows(validity_mask_b_4_rows),
       .validity_mask_b_cols(validity_mask_b_4_cols),
       .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
-      .slice_dtype(1'b1), //1 is FP16
+      .slice_dtype(1'b0),
       .op(slice_4_op), 
       .preload(1'b0),
       .final_mat_mul_size(8'd4),
@@ -1523,7 +1525,7 @@ end
       .validity_mask_b_rows(validity_mask_b_5_rows),
       .validity_mask_b_cols(validity_mask_b_5_cols),
       .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
-      .slice_dtype(1'b1), //1 is FP16
+      .slice_dtype(1'b0),
       .op(slice_5_op), 
       .preload(1'b0),
       .final_mat_mul_size(8'd4),
@@ -1563,7 +1565,7 @@ end
       .validity_mask_b_rows(validity_mask_b_6_rows),
       .validity_mask_b_cols(validity_mask_b_6_cols),
       .slice_mode(1'b0), //0 is SLICE_MODE_MATMUL
-      .slice_dtype(1'b1), //1 is FP16
+      .slice_dtype(1'b0),
       .op(slice_6_op), 
       .preload(1'b0),
       .final_mat_mul_size(8'd4),
@@ -1605,7 +1607,7 @@ input clk;
 reg [`MAT_MUL_SIZE*`DWIDTH-1:0] q0;
 reg [`MAT_MUL_SIZE*`DWIDTH-1:0] q1;
 reg [7:0] ram[((1<<`AWIDTH)-1):0];
-integer i;
+reg [31:0] i;
 
 always @(posedge clk)  
 begin 
@@ -2086,7 +2088,7 @@ assign row_latch_en =
 reg c_data_available;
 reg [`AWIDTH-1:0] c_addr;
 reg start_capturing_c_data;
-integer counter;
+reg [31:0] counter;
 reg [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out;
 reg [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out_1;
 reg [`MAT_MUL_SIZE*`DWIDTH-1:0] c_data_out_2;
@@ -2604,8 +2606,7 @@ assign eltwise_sub  =  ( op[1]  &   op[0]);
  //Keep the mac in reset if we're adding 
  wire mac_reset;
  assign mac_reset = reset || (eltwise_mode && (~ready_for_eltwise_op));
- //seq_mac u_mac(.a(in_a), .b(in_b), .out(out_mac), .eltwise_mode(eltwise_mode), .eltwise_add(eltwise_add), .reset(mac_reset), .clk(clk), .flags(flags));
- mac_fp u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(mac_reset), .clk(clk));
+ seq_mac u_mac(.a(in_a), .b(in_b), .out(out_mac), .eltwise_mode(eltwise_mode), .eltwise_add(eltwise_add), .reset(mac_reset), .clk(clk));
 
  always @(posedge clk)begin
     if(reset) begin
@@ -2620,33 +2621,30 @@ assign eltwise_sub  =  ( op[1]  &   op[0]);
  end
  
 endmodule
-/*
+
 //////////////////////////////////////////////////////////////////////////
 // Multiply-and-accumulate (MAC) block
 //////////////////////////////////////////////////////////////////////////
-module seq_mac(a, b, out, eltwise_mode, eltwise_add, reset, clk, flags);
+
+`ifdef ARCH_SPECIFIC_IMP
+
+module seq_mac(a, b, out, eltwise_mode, eltwise_add, reset, clk);
 input [`DWIDTH-1:0] a;
 input [`DWIDTH-1:0] b;
+output [`DWIDTH-1:0] out;
 input eltwise_mode;
 input eltwise_add;
 input reset;
 input clk;
-output [`DWIDTH-1:0] out;
-output [3:0] flags;
 
-reg [2*`DWIDTH-1:0] out_temp;
-wire [2*`DWIDTH-1:0] mul_out;
-wire [2*`DWIDTH-1:0] add_out;
+reg [`DWIDTH-1:0] out;
+wire [`DWIDTH-1:0] add_out;
+wire [2*`DWIDTH-1:0] add_out_temp;
+wire [2*`DWIDTH-1:0] mac_out;
+reg [2*`DWIDTH-1:0] add_out_reg;
 
 reg [`DWIDTH-1:0] a_flopped;
 reg [`DWIDTH-1:0] b_flopped;
-
-wire [2*`DWIDTH-1:0] mul_out_temp;
-reg [2*`DWIDTH-1:0] mul_out_temp_reg;
-
-wire [3:0] mult_flags;
-wire [3:0] add_flags;
-assign flags = mult_flags | add_flags;
 
 always @(posedge clk) begin
   if (reset) begin
@@ -2658,102 +2656,177 @@ always @(posedge clk) begin
   end
 end
 
-//assign mul_out = a * b;
-qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp), .flags(mult_flags));
+wire [17:0] a_in;
+wire [18:0] b_in;
+wire [36:0] c_out;
+assign a_in = {1'b0,a_flopped};
+assign b_in = {1'b0,1'b0,b_flopped};
+mac_int u_mac (.clk(clk), .reset(reset), .a(a_flopped), .b(b_flopped), .out(c_out));
+assign mac_out = c_out[2*`DWIDTH-1:0];
 
-always @(posedge clk) begin
-  if (reset) begin
-    mul_out_temp_reg <= 0;
-  end else begin
-    mul_out_temp_reg <= mul_out_temp;
-  end
-end
-
-assign mul_out = mul_out_temp_reg;
 
 wire [2*`DWIDTH-1:0] add_in1;
 wire [2*`DWIDTH-1:0] add_in2;
-assign add_in1 = (eltwise_mode & eltwise_add) ? {16'b0, a_flopped} : out_temp;
-assign add_in2 = (eltwise_mode & eltwise_add) ? {16'b0, b_flopped} : mul_out;
-
-//qadd add_u1(.a(out_temp), .b(mul_out), .c(add_out));
-qadd add_u1(.a(add_in1), .b(add_in2), .c(add_out), .flags(add_flags));
+assign add_in1 = {{`DWIDTH{1'b0}}, a_flopped};
+assign add_in2 = {{`DWIDTH{1'b0}}, b_flopped};
+qadd add_u1(.a(add_in1), .b(add_in2), .c(add_out_temp));
 
 always @(posedge clk) begin
   if (reset) begin
-    out_temp <= 0;
-  end else begin
-    out_temp <= add_out;
+    add_out_reg <= 0;
+  end
+  else if(eltwise_mode & eltwise_add) begin
+    add_out_reg <= add_out_temp;
+  end
+  else begin
+    add_out_reg <= mac_out;
   end
 end
 
-//fp32 to fp16 conversion
-wire [15:0] fpadd_16_result;
-fp32_to_fp16 u_32to16 (.a(out_temp), .b(out));
+//down cast the result
+assign add_out = 
+    (add_out_reg[2*`DWIDTH-1] == 0) ?  //positive number
+        (
+           (|(add_out_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
+             {add_out_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
+             {add_out_reg[2*`DWIDTH-1] , add_out_reg[`DWIDTH-2:0]} 
+        )
+        : //negative number
+        (
+           (|(add_out_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
+             {add_out_reg[2*`DWIDTH-1] , add_out_reg[`DWIDTH-2:0]} :
+             {add_out_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
+        );
+
+
+always @(posedge clk) begin
+  if (reset) begin
+    out <= 0;
+  end 
+  else begin
+    out <= add_out;
+  end
+end
 
 endmodule
 
 
-//////////////////////////////////////////////////////////////////////////
-// Multiplier
-//////////////////////////////////////////////////////////////////////////
-module qmult(i_multiplicand,i_multiplier,o_result, flags);
-input [`DWIDTH-1:0] i_multiplicand;
-input [`DWIDTH-1:0] i_multiplier;
-output [2*`DWIDTH-1:0] o_result;
-output [3:0] flags;
-
-//assign o_result = i_multiplicand * i_multiplier;
-//DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result));
-
-wire fpmult_16_clk_NC;
-wire fpmult_16_rst_NC;
-wire [15:0] fpmult_16_result;
-wire [4:0] fpmult_16_flags;
-
- FPMult_16 u_fpmult_16(
-    .clk(fpmult_16_clk_NC),
-    .rst(fpmult_16_rst_NC),
-    .a(i_multiplicand[15:0]),
-    .b(i_multiplier[15:0]),
-    .result(fpmult_16_result),
-    .flags(fpmult_16_flags)
-  );
-
-  //Convert fp16 to fp32
-  fp16_to_fp32 u_16to32 (.a(fpmult_16_result), .b(o_result));
-
-  assign flags = fpmult_16_flags;
-
-endmodule
-
-
-//////////////////////////////////////////////////////////////////////////
-// Adder
-//////////////////////////////////////////////////////////////////////////
-module qadd(a,b,c, flags);
+module qadd(a,b,c);
 input [2*`DWIDTH-1:0] a;
 input [2*`DWIDTH-1:0] b;
 output [2*`DWIDTH-1:0] c;
-output [3:0] flags;
 
-//assign c = a + b;
+assign c = a + b;
 //DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
+endmodule
 
-wire fpadd_32_clk_NC;
-wire fpadd_32_rst_NC;
-wire [4:0] fpadd_32_flags;
 
-FPAddSub_single u_fpaddsub_32(
-  .clk(fpadd_32_clk_NC),
-  .rst(fpadd_32_rst_NC),
-  .a(a),
-  .b(b),
-  .operation(1'b0), 
-  .result(c),
-  .flags(fpadd_32_flags));
 
-assign flags = fpadd_32_flags;
+`else
+module seq_mac(a, b, out, eltwise_mode, eltwise_add, reset, clk);
+input [`DWIDTH-1:0] a;
+input [`DWIDTH-1:0] b;
+output [`DWIDTH-1:0] out;
+input eltwise_mode;
+input eltwise_add;
+input reset;
+input clk;
+
+reg [`DWIDTH-1:0] out;
+wire [2*`DWIDTH-1:0] add_out;
+
+reg [`DWIDTH-1:0] a_flopped;
+reg [`DWIDTH-1:0] b_flopped;
+
+wire [2*`DWIDTH-1:0] mul_out;
+reg [2*`DWIDTH-1:0] mul_out_reg;
+
+always @(posedge clk) begin
+  if (reset) begin
+    a_flopped <= 0;
+    b_flopped <= 0;
+  end else begin
+    a_flopped <= a;
+    b_flopped <= b;
+  end
+end
+
+qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out));
+
+always @(posedge clk) begin
+  if (reset) begin
+    mul_out_reg <= 0;
+  end else begin
+    mul_out_reg <= mul_out;
+  end
+end
+
+
+wire [2*`DWIDTH-1:0] add_in1;
+wire [2*`DWIDTH-1:0] add_in2;
+reg [2*`DWIDTH-1:0] add_out_reg;
+assign add_in1 = (eltwise_mode & eltwise_add) ? {{`DWIDTH{1'b0}}, a_flopped} : add_out_reg;
+assign add_in2 = (eltwise_mode & eltwise_add) ? {{`DWIDTH{1'b0}}, b_flopped} : mul_out_reg;
+
+qadd add_u1(.a(add_in1), .b(add_in2), .c(add_out));
+
+always @(posedge clk) begin
+  if (reset) begin
+    add_out_reg <= 0;
+  end else begin
+    add_out_reg <= add_out;
+  end
+end
+
+wire [`DWIDTH-1:0] mac_out;
+
+//down cast the result
+assign mac_out = 
+    (add_out_reg[2*`DWIDTH-1] == 0) ?  //positive number
+        (
+           (|(add_out_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 1, that means overlfow
+             {add_out_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b1}}} : //sign bit and then all 1s
+             {add_out_reg[2*`DWIDTH-1] , add_out_reg[`DWIDTH-2:0]} 
+        )
+        : //negative number
+        (
+           (|(add_out_reg[2*`DWIDTH-2 : `DWIDTH-1])) ?  //is any bit from 14:7 is 0, that means overlfow
+             {add_out_reg[2*`DWIDTH-1] , add_out_reg[`DWIDTH-2:0]} :
+             {add_out_reg[2*`DWIDTH-1] , {(`DWIDTH-1){1'b0}}} //sign bit and then all 0s
+        );
+
+
+always @(posedge clk) begin
+  if (reset) begin
+    out <= 0;
+  end else begin
+    out <= mac_out;
+  end
+end
 
 endmodule
-*/
+
+
+module qmult(i_multiplicand,i_multiplier,o_result);
+input [`DWIDTH-1:0] i_multiplicand;
+input [`DWIDTH-1:0] i_multiplier;
+output [2*`DWIDTH-1:0] o_result;
+
+assign o_result = i_multiplicand * i_multiplier;
+//DW02_mult #(`DWIDTH,`DWIDTH) u_mult(.A(i_multiplicand), .B(i_multiplier), .TC(1'b1), .PRODUCT(o_result));
+
+endmodule
+
+module qadd(a,b,c);
+input [2*`DWIDTH-1:0] a;
+input [2*`DWIDTH-1:0] b;
+output [2*`DWIDTH-1:0] c;
+
+assign c = a + b;
+//DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
+endmodule
+
+
+
+`endif
+
