@@ -19,6 +19,7 @@ agilex.ml.softmax_p8_fp16
 #agilex.ml.mlp_leflow
 agilex.ml.spmv
 agilex.ml.lstm
+agilex.ml.bnn_hls
 #-------------------
 # Non-ML benchmarks
 #-------------------
