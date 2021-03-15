@@ -4,7 +4,7 @@
  command used to run on vtr:
 go to //vtr-verilog-to-routing/vtr_flow/tasks
 ../scripts/run_vtr_task.py robot_RL
-Architecture file used: k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml
+XML file used: k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml
 ////////////////////////////////////////////////////////////////////////////////////////
 /*
 
@@ -27,7 +27,7 @@ alpha = gamma = 0.5
 */
 ////////////////////////////////////////////////////////////////////////////////////////
 
-
+////////////////////SAME//////////////////////
 // Sum_Calc: Calculates the value of the Q expression after accomodating for the different radix forms of the numbers. 
 module Sum_Calc
           (Q,
@@ -101,7 +101,7 @@ module Sum_Calc
 
 endmodule  // Sum_Calc
 
-
+////////////////////////////SAME///////////////////
 //Max: Gives an output of the maximum number from 4 possible numbers (= no. of actions) truncated to fit within 16 bits.
 // A tree approach is used, where 3 comparators are used. 
 module Max
@@ -177,7 +177,7 @@ endmodule  // Max
 
 
 
-// SimpleDualPortRAM_generic : 4 RAM banks ( = no. of actions) with a depth of 6 ( = no. of states). Writes during training. Reads during inferfence.
+// SimpleDualPortRAM_generic : 4 RAM banks ( = no. of actions) with a depth of 12 ( = no. of states). Writes during training. Reads during inferfence.
 module SimpleDualPortRAM_generic
           (clk,
            enb,
@@ -203,7 +203,7 @@ module SimpleDualPortRAM_generic
 
  
   reg  [DataWidth - 1:0] data_int;
-   `ifdef?SIMULATION_MEMORY
+   `ifdef?SIMULATION_MEMORY //vtr_edit
    
    reg  [DataWidth - 1:0] ram [2**AddrWidth - 1:0];
   //integer i;
@@ -235,11 +235,12 @@ module SimpleDualPortRAM_generic
 
   assign rd_dout = data_int;
 
-
+ //vtr_edit
 `else 
  
 wire [DataWidth - 1:0] fake_op_1;
 wire [DataWidth - 1:0] fake_op_2;
+
 
 dual_port_ram u_dual_port_ram( 
 .addr1(wr_addr), 
@@ -254,6 +255,7 @@ dual_port_ram u_dual_port_ram(
 ); 
  
 `endif 
+
 assign rd_dout = data_int;
 
 endmodule  // SimpleDualPortRAM_generic
@@ -280,7 +282,7 @@ module Q_HW
   input   clk;
   input   reset;
   input   clk_enable;
-  input   [2:0] State;  // ufix3
+  input   [3:0] State;  // ufix3
   input   [1:0] Action;  // ufix2
   input   [31:0] Reward;  // sfix32_En4
   input   [7:0] alpha;  // ufix8_En7
@@ -298,8 +300,8 @@ output [31:0] Data_Type_Conversion_out1_3;
   reg [1:0] Delay2_out1;  // ufix2
   reg [1:0] Delay5_out1;  // ufix2
   wire [7:0] Data_Type_Conversion1_out1;  // uint8
-  reg [2:0] Delay1_out1;  // ufix3
-  reg [2:0] Delay4_out1;  // ufix3
+  reg [3:0] Delay1_out1;  // ufix3
+  reg [3:0] Delay4_out1;  // ufix3
   wire Constant3_out1;
   reg [7:0] Delay11_out1;  // ufix8_En7
   reg [7:0] Delay13_out1;  // ufix8_En7
@@ -526,7 +528,7 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
              .out0(Max_out1),  // int16
              .clk(clk));
 
-  SimpleDualPortRAM_generic #(.AddrWidth(3),
+  SimpleDualPortRAM_generic #(.AddrWidth(4),
                               .DataWidth(32)
                               )
                             u_Simple_Dual_Port_RAM_System_bank3 (.clk(clk),
@@ -538,7 +540,7 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
                                                                  .rd_dout(pre_rd_out)
                                                                  );
 
-  SimpleDualPortRAM_generic #(.AddrWidth(3),
+  SimpleDualPortRAM_generic #(.AddrWidth(4),
                               .DataWidth(32)
                               )
                             u_Simple_Dual_Port_RAM_System_bank2 (.clk(clk),
@@ -550,7 +552,7 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
                                                                  .rd_dout(pre_rd_out_1)
                                                                  );
 
-  SimpleDualPortRAM_generic #(.AddrWidth(3),
+  SimpleDualPortRAM_generic #(.AddrWidth(4),
                               .DataWidth(32)
                               )
                             u_Simple_Dual_Port_RAM_System_bank1 (.clk(clk),
@@ -578,7 +580,7 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
 
 
 
-  SimpleDualPortRAM_generic #(.AddrWidth(3),
+  SimpleDualPortRAM_generic #(.AddrWidth(4),
                               .DataWidth(32)
                               )
                             u_Simple_Dual_Port_RAM_System_bank0 (.clk(clk),
@@ -667,14 +669,20 @@ endmodule  // Q_HW
 
 
 // FSM: Mealy state machine for the action-state relation. Reward values have been adjusted to suit the problem statement.
-module FSM ( input clk, input reset, input [1:0] action, output reg [31:0] reward, output reg [2:0] state, output [1:0] next_action);
+module FSM ( input [3:0]final_state, input clk, input reset, input [1:0] action, output reg [31:0] reward, output reg [3:0] state, output [1:0] next_action);
 
-parameter 	region1 = 3'd0,
-		region2 = 3'd1,
-		region3 = 3'd2,
-		region4 = 3'd3,
-		region5 = 3'd4,
-		region6 = 3'd5;
+parameter 	region1 = 4'd0,
+		region2 = 4'd1,
+		region3 = 4'd2,
+		region4 = 4'd3,
+		region5 = 4'd4,
+		region6 = 4'd5,
+		region7 = 4'd6,
+		region8 = 4'd7,
+		region9 = 4'd8,
+		region10 = 4'd9,
+		region11 = 4'd10,
+		region12 = 4'd11;
 
 parameter 	action1 = 2'd0,
 		action2 = 2'd1,
@@ -689,183 +697,4158 @@ state<= region1;
 reward <= 32'b0;
 end
 
-else begin
-	case (state)
-
+else begin 
+	case(final_state)
+		
 		region1:
-		begin
-			case(action)
-				
-				action1: 
-				begin
-					state <= region1;
-					reward <= reward ;
-				end
-				action2: 
-				begin
-					state <= region4;
-					reward <= reward + (32'd100<<4);
-				end
-				action3: 
-				begin
-					state <= region1;
-					reward <= reward;
-				end
-				action4: 
-				begin
-					state <= region2;
-					reward <= reward +  (32'd100<<4);
-				end
-			endcase
-				
-		end
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward -  (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end		
+
 
 		region2:
-		begin
-			case(action)
-				
-				action1: 
-				begin
-					state <= region2;
-					reward <= reward;
-				end
-				action2: 
-				begin
-					state <= region5;
-					reward <= reward + (32'd100<<4);
-				end
-				action3: 
-				begin
-					state <= region1;
-					reward <= reward + (32'd100<<4);
-				end
-				action4: 
-				begin
-					state <= region3;
-					reward <= reward + (32'd100<<4);
-				end
-			endcase
-				
-		end
- 
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end		
+
+
+
 		region3:
-		begin
-			case(action)
-				
-				action1: 
-				begin
-					state <= region3;
-					reward <= reward;
-				end
-				action2: 
-				begin
-					state <= region6;
-					reward <= reward + (32'd1000<<4);
-				end
-				action3: 
-				begin
-					state <= region2;
-					reward <= reward + (32'd100<<4);
-				end
-				action4: 
-				begin
-					state <= region3;
-					reward <= reward;
-				end
-			endcase
-				
-		end
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
 
 		region4:
-		begin
-			case(action)
-				
-				action1: 
-				begin
-					state <= region1;
-					reward <= reward + (32'd100<<4);
-				end
-				action2: 
-				begin
-					state <= region4;
-					reward <= reward;
-				end
-				action3: 
-				begin
-					state <= region4;
-					reward <= reward;
-				end
-				action4: 
-				begin
-					state <= region5;
-					reward <= reward + (32'd100<<4);
-				end
-			endcase
-				
-		end
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
 
 		region5:
-		begin
-			case(action)
-				
-				action1: 
-				begin
-					state <= region2;
-					reward <= reward + (32'd100<<4);
-				end
-				action2: 
-				begin
-					state <= region5;
-					reward <= reward ;
-				end
-				action3: 
-				begin
-					state <= region4;
-					reward <= reward + (32'd100<<4);
-				end
-				action4: 
-				begin
-					state <= region6;
-					reward <= reward + (32'd1000<<4);
-				end
-			endcase
-				
-		end
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
 
 		region6:
-		begin
-			case(action)
-				
-				action1: 
-				begin
-					state <= region3;
-					reward <= reward - (32'd1000<<4);
-				end
-				action2: 
-				begin
-					state <= region6;
-					reward <= reward + (32'd1000<<4);
-				end
-				action3: 
-				begin
-					state <= region5;
-					reward <= reward - (32'd1000<<4);
-				end
-				action4: 
-				begin
-					state <= region6;
-					reward <= reward + (32'd1000<<4);
-				end
-			endcase
-				
-		end
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
 
 
-	endcase
+		region7:
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
+
+		region8:
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd1000<<4) ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
+
+		region9:
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
+
+		region10:
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
+
+		region11:
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+                	end	
+
+
+
+
+
+
+		region12:
+                begin
+                	case (state)
+                
+                		region1:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward ;
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region2;
+                					reward <= reward +  (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region2:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                 
+                		region3:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region4:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region5:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region6:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region6;
+                					reward <= reward;
+                				end
+                			endcase
+                				
+                		end
+                ////////////////////////////////
+                		region7:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region1;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward;
+                				end
+                				action4: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region8:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region2;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region8;
+                					reward <= reward ;
+                				end
+                				action3: 
+                				begin
+                					state <= region7;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region9:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region3;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region9;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region8;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region10:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region4;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region10;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region9;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region11;
+                					reward <= reward + (32'd100<<4);
+                				end
+                			endcase
+                				
+                		end
+                		
+                		region11:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region5;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region11;
+                					reward <= reward;
+                				end
+                				action3: 
+                				begin
+                					state <= region10;
+                					reward <= reward + (32'd100<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                		region12:
+                		begin
+                			case(action)
+                				
+                				action1: 
+                				begin
+                					state <= region6;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action2: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                				action3: 
+                				begin
+                					state <= region11;
+                					reward <= reward - (32'd1000<<4);
+                				end
+                				action4: 
+                				begin
+                					state <= region12;
+                					reward <= reward + (32'd1000<<4);
+                				end
+                			endcase
+                				
+                		end
+                
+                
+                	endcase
+ 	              	end
+endcase
 end
 end
 
 endmodule //robot_fsm
+
 
 // LFSR_2bit: This is used as Policy Generator 1. 2 bit random number generator.  LFSR: Linear Feedback Shift Register.
 // A 2 bit random number generator designed with a LFSR forms a cyclic sequence, hindering the 'random' nature of the module.
@@ -945,11 +4928,13 @@ endmodule
 
 
 //robot_high_level: connects all the modules together
-module robot_high_level ( input clk, input reset, input mode, output [31:0]Q);
+module robot_high_level ( input [3:0] final_state, input clk, input reset, input mode, output [31:0]Q);
+
+//final_state; //0 to 11 corresponds to region 1 to 12
 
 wire [1:0] action;
 wire [31:0]reward;
-wire [2:0] state;
+wire [3:0] state;
 wire [1:0] next_action;
 wire [7:0] alpha;
 wire [7:0] gamma;
@@ -966,7 +4951,7 @@ wire [31:0] Data_Type_Conversion_out1_3;
 assign alpha = 8'b01000000;
 assign gamma = 8'b01000000;
 
-FSM module_1 ( clk, reset, action, reward, state, next_action);
+FSM module_1 ( final_state, clk, reset, action, reward, state, next_action);
 
 Q_HW module_2(mode, clk, reset, 1'b1, state, next_action, reward, alpha,  gamma, , Q, Data_Type_Conversion_out1_0, Data_Type_Conversion_out1_1, Data_Type_Conversion_out1_2, Data_Type_Conversion_out1_3 );
 
@@ -977,6 +4962,43 @@ policy_generator_2 module_6(clk, reset, Data_Type_Conversion_out1_0, Data_Type_C
 assign action = mode ? action_2 : action_1;
 
 endmodule
+
+
+
+
+module robot_maze ( input clk, input reset, input mode, 
+output [31:0] Q_1, 
+output [31:0] Q_2,
+output [31:0] Q_3,
+output [31:0] Q_4,
+output [31:0] Q_5,
+output [31:0] Q_6,
+output [31:0] Q_7,
+output [31:0] Q_8,
+output [31:0] Q_9,
+output [31:0] Q_10,
+output [31:0] Q_11,
+output [31:0] Q_12
+);
+
+
+robot_high_level robot_1 ( 4'd00, clk, reset, mode, Q_1);
+robot_high_level robot_2 ( 4'd01, clk, reset, mode, Q_2);
+robot_high_level robot_3 ( 4'd02, clk, reset, mode, Q_3);
+robot_high_level robot_4 ( 4'd03, clk, reset, mode, Q_4);
+robot_high_level robot_5 ( 4'd04, clk, reset, mode, Q_5);
+robot_high_level robot_6 ( 4'd05, clk, reset, mode, Q_6);
+robot_high_level robot_7 ( 4'd06, clk, reset, mode, Q_7);
+robot_high_level robot_8 ( 4'd07, clk, reset, mode, Q_8);
+robot_high_level robot_9 ( 4'd08, clk, reset, mode, Q_9);
+robot_high_level robot_10 ( 4'd09, clk, reset, mode, Q_10);
+robot_high_level robot_11 ( 4'd10, clk, reset, mode, Q_11);
+robot_high_level robot_12 ( 4'd11, clk, reset, mode, Q_12);
+
+endmodule
+
+
+
 
 /*
 //tb_robot_high_level: testbench 
