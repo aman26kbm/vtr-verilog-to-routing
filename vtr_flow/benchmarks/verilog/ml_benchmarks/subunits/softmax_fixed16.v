@@ -1,4 +1,4 @@
-//softmax_p4_smem_rfloat16_alut_v512_b2_0_10.v
+//softmax_p4_smem_rfixed16_alut_v512_b2_0_10.v
 `ifndef DEFINES_DONE
 `define DEFINES_DONE
 `define EXPONENT 5
@@ -9,6 +9,16 @@
 `define NUM 4
 `define ADDRSIZE 8
 `define ADDRSIZE_FOR_TB 10
+`define ACTUAL_MANTISSA 11
+`define EXPONENT_LSB 10
+`define EXPONENT_MSB 14
+`define MANTISSA_LSB 0
+`define MANTISSA_MSB 9
+`define MANTISSA_MUL_SPLIT_LSB 3
+`define MANTISSA_MUL_SPLIT_MSB 9
+`define SIGN_LOC 15
+`define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
+`define IEEE_COMPLIANCE 1
 `endif
 
 
@@ -1000,10 +1010,7 @@ module fixed_point_addsub(
 
 	
 	always @ (*) begin	
-		if(rst) begin
-			result = 0;
-		end
-		else if (result_t[16] == 1'b1 && operation == 1'b0) begin
+		if (result_t[16] == 1'b1 && operation == 1'b0) begin
 			result = 16'h7000;
 		end
 		else if (result_t[16] == 1'b1 && operation == 1'b1) begin
@@ -1137,19 +1144,6 @@ endmodule
 // Log unit
 //////////////////////////////////////////////////////
 
-`define EXPONENT 5
-`define MANTISSA 10
-`define ACTUAL_MANTISSA 11
-`define EXPONENT_LSB 10
-`define EXPONENT_MSB 14
-`define MANTISSA_LSB 0
-`define MANTISSA_MSB 9
-`define MANTISSA_MUL_SPLIT_LSB 3
-`define MANTISSA_MUL_SPLIT_MSB 9
-`define SIGN 1
-`define SIGN_LOC 15
-`define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
-`define IEEE_COMPLIANCE 1
 
 module logunit (fpin, fpout, status);
 
@@ -1892,18 +1886,6 @@ module FPAddSub(
 		result[`DWIDTH-1:0], flags[4:0]) ;			
 	
 	always @ (*) begin	
-		if(rst) begin
-			pipe_1 = 0;
-			pipe_2 = 0;
-			pipe_3 = 0;
-			pipe_4 = 0;
-			pipe_5 = 0;
-			pipe_6 = 0;
-			pipe_7 = 0;
-			pipe_8 = 0;
-			pipe_9 = 0;
-		end 
-		else begin
 		
 			pipe_1 = {Opout_0, Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Sa_0, Sb_0, ShiftDet_0[9:0], InputExc_0[4:0]} ;	
 			// PIPE_2 :
@@ -2007,7 +1989,6 @@ module FPAddSub(
 			//				
 			pipe_9 = {P_int[`DWIDTH-1:0], pipe_8[2], pipe_8[1], pipe_8[0], pipe_8[`EXPONENT+`MANTISSA+9:`EXPONENT+`MANTISSA+5], EOF} ;	
 		end
-	end		
 	
 endmodule
 
@@ -2168,7 +2149,7 @@ module FPAddSub_AlignShift1(
 	reg	  [`MANTISSA:0]		Lvl1;
 	reg	  [`MANTISSA:0]		Lvl2;
 	wire    [2*`MANTISSA+1:0]    Stage1;	
-	integer           i;                // Loop variable
+	reg [31:0]           i;                // Loop variable
 	
 	always @(*) begin						
 		// Rotate by 16?
@@ -2225,7 +2206,7 @@ module FPAddSub_AlignShift2(
 	// Internal Signal
 	reg	  [`MANTISSA:0]		Lvl3;
 	wire    [2*`MANTISSA+1:0]    Stage2;	
-	integer           j;               // Loop variable
+	reg [31:0]           j;               // Loop variable
 	
 	assign Stage2 = {11'b0, MminP};
 
@@ -2387,7 +2368,7 @@ module FPAddSub_NormalizeShift1(
 	wire    [2*`DWIDTH+1:0]    Stage1;	
 	reg	  [`DWIDTH:0]		Lvl3;
 	wire    [2*`DWIDTH+1:0]    Stage2;	
-	integer           i;               	// Loop variable
+	reg [31:0]           i;               	// Loop variable
 	
 	assign Stage1 = {MminP, MminP};
 
