@@ -158,10 +158,8 @@ reg strt_out_write;
 //output BRAM can store upto 512 elements of `DATA_WIDTH
 dpram_small out_ram (.clk(clk),.address_a(out_wr_addr),.address_b(out_rd_addr),.wren_a(wren_a),.wren_b(wren_b),.data_a(softmulv),.data_b(dummy_b),.out_a(dummy_a),.out_b(out));
 
-//assign rd_addr_12 = soft_rd_addr|soft_sub0_addr|soft_sub1_addr ;
 assign rd_addr_12 = (addr_select)?soft_rd_addr:soft_sub0_addr|soft_sub1_addr ;
 
-//assign wr_data_12 = scaled_qiki<<(`DATA_WIDTH*(word_count));
 
 assign soft_strt_addr = (~choose_buf)?4'd0:4'd8;
 assign soft_end_addr = (~choose_buf)?4'd8:4'd16;
@@ -216,7 +214,7 @@ always @(posedge clk) begin
 					  buff_done <= 1;	//indicates one of the buffers being full
 			
 
-			    //SOFTMAX control   -- Need to Check
+			    //SOFTMAX control   
     		   if(buff_done == 1 && soft_done==0) begin //start softmax after one buffer is full (32 words in in_buffer12)
     				soft_init <= 1;
     				choose_buf <= ~choose_buf;  //to alternate between the two buffers 1 & 2 within one ram
