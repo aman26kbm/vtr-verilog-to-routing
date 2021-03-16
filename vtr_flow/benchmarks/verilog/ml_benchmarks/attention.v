@@ -141,7 +141,6 @@ reg [`DATA_WIDTH-1:0] dummy_b;
 wire [`DATA_WIDTH-1:0] dummy_a;
 reg strt_out_write;
 reg soft_out_strt, soft_out_end;
-reg soft_out_strt, soft_out_end;
 reg first_time,mvm_complete;
 //output BRAM can store upto 512 elements of `DATA_WIDTH
 dpram_small out_ram (.clk(clk),.address_a(out_wr_addr),.address_b(out_rd_addr),.wren_a(wren_a),.wren_b(wren_b),.data_a(softmulv),.data_b(dummy_b),.out_a(dummy_a),.out_b(out));
