@@ -116,7 +116,8 @@ always @(*)begin
          result = dataa - datab;
 end
 
-endmodulemodule branchpredict_32_4096_12_1 ( clk, resetn,
+endmodule
+module branchpredict_32_4096_12_1 ( clk, resetn,
     predict,
     prediction,
     pc_predict,
@@ -272,6 +273,7 @@ dual_port_ram u_dual_port_ram(
 `endif
 
 endmodule
+
 module branchresolve_32 ( en, rs, rt, eq, ne, ltz, lez, gtz, gez, eqz);
 parameter WIDTH=32;
 input en;
@@ -293,7 +295,8 @@ assign lez=(en)&rs[WIDTH-1] | eqz;
 assign gtz=(en)&(~rs[WIDTH-1]) & ~eqz;
 assign gez=(en)&(~rs[WIDTH-1]);
 
-endmodule/****************************************************************************
+endmodule
+/****************************************************************************
           One cycle - Pipeline delay register
 ****************************************************************************/
 module pipedelayreg_32(d,en,clk,resetn,squashn,dst,stalled,q);
@@ -333,7 +336,8 @@ output [32-1:0] q;
   end
 
   assign stalled=(en&~T&(|dst));
-endmodule/*******
+endmodule
+/*******
  * SPREE limitation - by not specifying stall signal name and assuming
  * "stalled" requires you to have only one opcode port which stalls
  *
@@ -472,7 +476,8 @@ output stalled;
       T<=stalled;
 
   assign stalled=(T) ? devwait : request;
-endmodule/*******
+endmodule
+/*******
  * SPREE limitation - by not specifying stall signal name and assuming
  * "stalled" requires you to have only one opcode port which stalls
  *
@@ -524,7 +529,8 @@ output         fromcop2_wait;
 
   assign stalled= (fromcpu_en & tocop2_wait) || (tocpu_en & ~fromcop2_en);
 
-endmodule/******************************************************************************
+endmodule
+/******************************************************************************
             Data memory and interface
 
 Operation table:
@@ -808,7 +814,8 @@ begin
 		q<=d;
 end
 
-endmodulemodule div_0_1_2(en,resetn,stalled,quotient,remainder,dividend,divider,sign,clk);
+endmodule
+module div_0_1_2(en,resetn,stalled,quotient,remainder,dividend,divider,sign,clk);
 
    input         clk;
    input         resetn;
@@ -894,7 +901,8 @@ endmodulemodule div_0_1_2(en,resetn,stalled,quotient,remainder,dividend,divider,
         bits = bits - 1'b1;
 
      end
-endmodule/****************************************************************************
+endmodule
+/****************************************************************************
           Generic Register
 ****************************************************************************/
 module hi_reg_32(d,clk,resetn,squashn,en,q);
@@ -915,7 +923,8 @@ begin
 		q<=d;
 end
 
-endmodule/****************************************************************************
+endmodule
+/****************************************************************************
             Fetch Unit with branch prediction
 
   IMPORTANT: tgt_pc should arrive 1 cycle after instruction to account for delay slot.
@@ -1549,7 +1558,8 @@ dual_port_ram u_dual_port_ram(
 
 `endif
 
-endmodule/****************************************************************************
+endmodule
+/****************************************************************************
           ISA definition file
 
   - The MIPS I ISA has a 6 bit opcode in the upper 6 bits.  
@@ -1687,7 +1697,8 @@ always@(opA or opB or op )
 assign result=logic_result;
 
 
-endmodule/****************************************************************************
+endmodule
+/****************************************************************************
           Generic Register
 ****************************************************************************/
 module lo_reg_32 (d,clk,resetn,squashn,en,q);
@@ -1708,13 +1719,15 @@ begin
 		q<=d;
 end
 
-endmodulemodule merge26lo(in1, in2, out);
+endmodule
+module merge26lo(in1, in2, out);
 input [31:0] in1;
 input [25:0] in2;
 output [31:0] out;
 
 assign out[31:0]={in1[31:28],in2[25:0],2'b0};
-endmodule/****************************************************************************
+endmodule
+/****************************************************************************
           MUL/DIV unit
 
 Operation table
@@ -1915,7 +1928,8 @@ output stalled;
     else    
       T<=Tnext;
   assign stalled=(request&~T);
-endmodulemodule pcadder_32(pc, offset, result);
+endmodule
+module pcadder_32(pc, offset, result);
 
 input [32-1:0] pc;
 input [32-1:0] offset;
@@ -1925,7 +1939,8 @@ wire dum;
 
 assign {dum,result} = pc + {offset[32-3:0],2'b0};
 
-endmodule/****************************************************************************
+endmodule
+/****************************************************************************
           Register File
 
    - Has two read ports (a and b) and one write port (c)
@@ -2224,14 +2239,16 @@ dual_port_ram u_dual_port_ram(
 
 `endif
 
-endmodulemodule signext16 ( in, out);
+endmodule
+module signext16 ( in, out);
 
 input [15:0] in;
 output [31:0] out;
 
 assign out={{{{16{{in[15]}}}},in[15:0]}};
 
-endmodule//`include "bpred_1bittable.v"
+endmodule
+//`include "bpred_1bittable.v"
 //`include "cop0.v"
 //`include "cop2.v"
 //`include "lo_reg.v"
