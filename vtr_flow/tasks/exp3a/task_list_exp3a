@@ -1,5 +1,3 @@
-exp3a/agilex.clstm_large
-exp3a/agilex.clstm_medium
-exp3a/agilex.clstm_small
-exp3a/agilex.LU32PEEng
-exp3a/agilex.mcml
+exp3a/agilex.dla_small
+exp3a/agilex.tiny_darknet_hls
+exp3a/agilex.dla_medium

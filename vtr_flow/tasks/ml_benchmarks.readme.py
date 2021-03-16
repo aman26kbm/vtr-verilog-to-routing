@@ -38,38 +38,38 @@ for exp in ['1a', '1b', '2a', '2b', '3a', '3b']:
 #
 #Create command files:
 #--------------------------
-    filename = "exp{e}/cmds.mar_2021.exp{e}".format(e=exp)
-    fh = open(filename, "w")
-    for i in range(3):
-        fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e} -j 5 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
-    fh.close()
-
-    filename = "exp{e}/cmds.mar_2021.exp{e}.shorter".format(e=exp)
-    fh = open(filename, "w")
-    for i in range(3):
-        fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e}.shorter -j 5 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
-    fh.close()
-    os.system("chmod 755 exp{e}/cmds.mar_2021.exp{e}".format(e=exp))
-
+#    filename = "exp{e}/cmds.mar_2021.exp{e}".format(e=exp)
+#    fh = open(filename, "w")
+#    for i in range(3):
+#        fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e} -j 5 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
+#    fh.close()
 #
-#Create run cmd
-#--------------------------
-    filename = "exp{e}/run".format(e=exp)
-    fh = open(filename, "w")
-    fh.write('nohup ./cmds.mar_2021.exp{e} > log.mar10.exp{e} &\n'.format(e=exp))
-    fh.write('nohup ./cmds.mar_2021.exp{e}.shorter > log.mar10.exp{e}.shorter &\n'.format(e=exp))
-    fh.close()
-    os.system("chmod 755 exp{e}/run".format(e=exp))
-    
+#    filename = "exp{e}/cmds.mar_2021.exp{e}.shorter".format(e=exp)
+#    fh = open(filename, "w")
+#    for i in range(3):
+#        fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e}.shorter -j 5 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
+#    fh.close()
+#    os.system("chmod 755 exp{e}/cmds.mar_2021.exp{e}".format(e=exp))
 #
-#Create parse cmd
-#--------------------------
-    filename = "exp{e}/parse".format(e=exp)
-    fh = open(filename, "w")
-    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e} -o out.mar10.exp{e}.csv -t exp{e}\n'.format(e=exp))
-    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e}.shorter -o out.mar10.exp{e}.shorter.csv -t exp{e}\n'.format(e=exp))
-    fh.close()
-    os.system("chmod 755 exp{e}/parse".format(e=exp))
+##
+##Create run cmd
+##--------------------------
+#    filename = "exp{e}/run".format(e=exp)
+#    fh = open(filename, "w")
+#    fh.write('nohup ./cmds.mar_2021.exp{e} > log.mar10.exp{e} &\n'.format(e=exp))
+#    fh.write('nohup ./cmds.mar_2021.exp{e}.shorter > log.mar10.exp{e}.shorter &\n'.format(e=exp))
+#    fh.close()
+#    os.system("chmod 755 exp{e}/run".format(e=exp))
+#    
+##
+##Create parse cmd
+##--------------------------
+#    filename = "exp{e}/parse".format(e=exp)
+#    fh = open(filename, "w")
+#    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e} -o out.mar10.exp{e}.csv -t exp{e}\n'.format(e=exp))
+#    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar10.exp{e}.shorter -o out.mar10.exp{e}.shorter.csv -t exp{e}\n'.format(e=exp))
+#    fh.close()
+#    os.system("chmod 755 exp{e}/parse".format(e=exp))
 
 #
 #Add to git:
