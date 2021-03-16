@@ -16,7 +16,7 @@ input [4:0] q_rd_addr, //start address of q
 input [4:0] k_rd_addr, //start address of k
 input [4:0] v_rd_addr, //start address of v
 input [2:0] wren_qkv_ext,
-input [4:0] address_ext,
+input [5:0] address_ext,
 input [`VECTOR_BITS-1:0] data_ext,
 input [`OUT_RAM_DEPTH-1:0] out_rd_addr,		//To read stored outputs from outside
 output [`DATA_WIDTH-1:0] out   //16 bit output from out bram
@@ -66,7 +66,7 @@ reg choose_buf;
 reg buff_done;
 //wire addr_select;
 reg [4:0] soft_word_count;
-wire [`BUF_LOC_SIZE*`DATA_WIDTH-1:0] comb_softout;
+wire [8*`BUF_LOC_SIZE*`DATA_WIDTH-1:0] comb_softout;
 reg vector_complete;
 reg strt_softmulv;
 reg [5:0] v_count,v_count_ff;
@@ -134,13 +134,17 @@ softmax soft(
 vecmat_mul_32 rv_mul (.clk(clk),.reset(rst),.vector(data_to_MVM),.matrix(v),.tmp(mul_out2));
 vecmat_add_32 rv_acc (.clk(clk),.reset(rst),.mulout(mul_out2),.data_out(softmulv));
 
-reg [`OUT_RAM_DEPTH-1:0] out_wr_addr;
-reg [`OUT_RAM_DEPTH-1:0] addr_a,addr_b;
+reg [8:0] out_wr_addr;
+reg [8:0] addr_a,addr_b;
 reg wren_a,wren_b;
 reg [`DATA_WIDTH-1:0] dummy_b;
 wire [`DATA_WIDTH-1:0] dummy_a;
 reg strt_out_write;
+<<<<<<< HEAD
+reg soft_out_strt, soft_out_end;
+=======
 wire soft_out_strt, soft_out_end;
+>>>>>>> 0aa5b78a27874ddd96f5582da19a521f4554aeaf
 reg first_time,mvm_complete;
 //output BRAM can store upto 512 elements of `DATA_WIDTH
 dpram_small out_ram (.clk(clk),.address_a(out_wr_addr),.address_b(out_rd_addr),.wren_a(wren_a),.wren_b(wren_b),.data_a(softmulv),.data_b(dummy_b),.out_a(dummy_a),.out_b(out));
@@ -261,7 +265,7 @@ always @(*) begin
 end
 
 //concatenate the 4 outputs from softmax
-assign comb_softout = {soft_out3,soft_out2,soft_out1,soft_out0}; 
+assign comb_softout = {{448{1'b0}},soft_out3,soft_out2,soft_out1,soft_out0}; 
 
 always@(posedge clk) begin
 	if(rst) begin
@@ -816,8 +820,8 @@ endmodule
 
 module dpram_small (	
 input clk,
-input [`OUT_RAM_DEPTH-1:0] address_a,
-input [`OUT_RAM_DEPTH-1:0] address_b,
+input [8:0] address_a,
+input [8:0] address_b,
 input  wren_a,
 input  wren_b,
 input [`DATA_WIDTH-1:0] data_a,
