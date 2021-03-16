@@ -140,11 +140,8 @@ reg wren_a,wren_b;
 reg [`DATA_WIDTH-1:0] dummy_b;
 wire [`DATA_WIDTH-1:0] dummy_a;
 reg strt_out_write;
-<<<<<<< HEAD
 reg soft_out_strt, soft_out_end;
-=======
-wire soft_out_strt, soft_out_end;
->>>>>>> 0aa5b78a27874ddd96f5582da19a521f4554aeaf
+reg soft_out_strt, soft_out_end;
 reg first_time,mvm_complete;
 //output BRAM can store upto 512 elements of `DATA_WIDTH
 dpram_small out_ram (.clk(clk),.address_a(out_wr_addr),.address_b(out_rd_addr),.wren_a(wren_a),.wren_b(wren_b),.data_a(softmulv),.data_b(dummy_b),.out_a(dummy_a),.out_b(out));
@@ -216,15 +213,15 @@ always @(posedge clk) begin
 				//& start softmax only after it finishes outputing previous values
 					if(first_time==1 || soft_out_end==1) begin  
 						first_time <= 0;
-    					soft_init <= 1;
-    					choose_buf <= ~choose_buf;  //to alternate between the two buffers 1 & 2 within one ram
+    						soft_init <= 1;
+    						choose_buf <= ~choose_buf;  //to alternate between the two buffers 1 & 2 within one ram
 					end
-    			end
-    			else if(soft_init==1) begin
+    			   end
+    			   else if(soft_init==1) begin
     				soft_init <= 0;
     				soft_start <= 1;
-    			end
-    			else
+    			   end
+    			   else
     				soft_start <=0;
   			
             end
@@ -241,25 +238,25 @@ always @(posedge clk) begin
 end
 
 
-always @(*) begin
+always @(posedge clk) begin
 
 	//SOFTMAX control
 	if(rst) begin
-	   soft_out_strt = 0;
-	   soft_out_end  = 0;
+	   soft_out_strt <= 0;
+	   soft_out_end  <= 0;
 	 end
 	else begin
 				if(soft_done==1) begin
-					soft_out_strt =1;
-					soft_out_end = 0;
+					soft_out_strt <=1;
+					soft_out_end <= 0;
 				end
 				else begin
 					if(soft_out_strt==1)  begin
-						soft_out_end =1;
-						soft_out_strt =0;
+						soft_out_end <=1;
+						soft_out_strt <=0;
 					end
 					else if(soft_start==1)  //indicates that the next set of inputs have been given to softmax
-						soft_out_end = 0;
+						soft_out_end <= 0;
 				end
 	end
 end
