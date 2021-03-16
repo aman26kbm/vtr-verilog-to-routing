@@ -1,4 +1,3 @@
-
 //`include "bpred_1bittable.v"
 //`include "cop0.v"
 //`include "cop2.v"
@@ -4814,12 +4813,14 @@ register_32 pcrollbacknt( pc, clk, resetn, pcrollbacknt_en, pc_rollbacknottaken)
 
 wire [2-1: 0] buf_predict_d;
 wire buf_predict_en;
+wire [2-1:0] buf_predict_q;
 
 assign buf_predict_d = {prediction,predict_en&(pcwrop!=1'b1)};
 assign buf_predict_en = en&predict_en;
+assign {prediction_saved,predict_en_saved} = buf_predict_q;
 
 register_2 buf_predict(buf_predict_d,clk,resetn,buf_predict_en, 
-    {prediction_saved,predict_en_saved});
+    buf_predict_q);
   //defparam buf_predict.WIDTH=2;
   //predict_en_saved saves if it wa
 
@@ -4997,25 +4998,6 @@ begin
 	else if (en==1)
 		q<=d;
 end
-
-endmodule
-
-/****************************************************************************
-          Branch detector
-****************************************************************************/
-module branch_detector(opcode, func, is_branch);
-input [5:0] opcode;
-input [5:0] func;
-output is_branch;
-
-wire is_special;
-wire [5:0] func_local;
-
-assign func_local = func & 6'b111000;
-
-assign is_special=!(|opcode);
-assign is_branch=((!(|opcode[5:3])) && !is_special) || 
-                  ((is_special)&&(func_local==6'b001000));
 
 endmodule
 
@@ -5250,9 +5232,12 @@ assign opB_mux_out= (is_mul) ? {is_signed&opB[32-1],opB} : decoded_sa;
 `ifdef USE_INHOUSE_LOGIC
 wire [33-1:0] mult_dataa;
 wire mult_aclr;
+wire [66-1:0] mult_result;
 
 assign mult_dataa = {is_signed&opA[32-1],opA};
 assign mult_aclr = ~resetn;
+
+assign {dum2,dum,hi,lo} = mult_result;
 
 local_mult_33_33_66 local_mult_component (
 .dataa(mult_dataa),
@@ -5260,7 +5245,7 @@ local_mult_33_33_66 local_mult_component (
 .clock(clk),
 .clken(1'b1),
 .aclr(mult_aclr),
-.result({dum2,dum,hi,lo})
+.result(mult_result)
 );
 
 `else
@@ -6534,5 +6519,24 @@ begin
   else if (en==1)
     q<=d;
 end
+
+endmodule
+
+/****************************************************************************
+          Branch detector
+****************************************************************************/
+module branch_detector(opcode, func, is_branch);
+input [5:0] opcode;
+input [5:0] func;
+output is_branch;
+
+wire is_special;
+wire [5:0] func_local;
+
+assign func_local = func & 6'b111000;
+
+assign is_special=!(|opcode);
+assign is_branch=((!(|opcode[5:3])) && !is_special) || 
+                  ((is_special)&&(func_local==6'b001000));
 
 endmodule
