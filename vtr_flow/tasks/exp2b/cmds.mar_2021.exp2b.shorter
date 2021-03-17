@@ -1,3 +1,4 @@
-python3 ../../scripts/run_vtr_task.py -l task_list_exp2b.shorter -j 5 -s --seed 2759
-python3 ../../scripts/run_vtr_task.py -l task_list_exp2b.shorter -j 5 -s --seed 1005
-python3 ../../scripts/run_vtr_task.py -l task_list_exp2b.shorter -j 5 -s --seed 2995
+python3 ../../scripts/run_vtr_task.py -l task_list_exp2b.shorter -j 4 -s --seed 6239
+python3 ../../scripts/run_vtr_task.py -l task_list_exp2b.shorter -j 4 -s --seed 6252
+python3 ../../scripts/run_vtr_task.py -l task_list_exp2b.shorter -j 4 -s --seed 6424
+echo '----- All runs completed -----\n'

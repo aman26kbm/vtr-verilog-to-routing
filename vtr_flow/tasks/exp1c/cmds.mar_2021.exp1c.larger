@@ -1,0 +1,4 @@
+python3 ../../scripts/run_vtr_task.py -l task_list_exp1c.larger -j 1 -s --seed 1572 &
+python3 ../../scripts/run_vtr_task.py -l task_list_exp1c.larger -j 1 -s --seed 2040
+python3 ../../scripts/run_vtr_task.py -l task_list_exp1c.larger -j 1 -s --seed 543
+echo '----- All runs completed -----\n'
