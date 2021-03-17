@@ -31,11 +31,11 @@ class GenResults():
                     "logic_area", \
                     "routing_area", \
                     "total_area", \
-                    "area_delay_product", \
                     "channel_width", \
                     "average_net_length", \
                     "max_net_length", \
                     "max_fanout", \
+                    "max_non_global_fanout", \
                     "average_wire_segments_per_net", \
                     "max_segments_used_by_a_net", \
                     "total_routed_wire_length", \
@@ -49,9 +49,15 @@ class GenResults():
                     "ff_to_lut_ratio", \
                     "dsp_to_clb_ratio", \
                     "memory_to_clb_ratio", \
+                    "adder_to_lut_ratio", \
                     "netlist_primitives", \
                     "netlist_primitives>10k", \
                     "vtr_flow_elapsed_time", \
+                    "odin_time", \
+                    "abc_time", \
+                    "pack_time", \
+                    "place_time", \
+                    "route_time", \
                     "vtr_flow_peak_memory_usage", \
                     "near_crit_connections", \
                     "logic_depth", \
@@ -318,6 +324,11 @@ class GenResults():
             max_fanout = max_fanout_match.group(1)
             result_dict['max_fanout'] = round(float(max_fanout)) or 0
 
+          max_non_global_fanout_match = re.search(r'Max Non Global Net Fanout\s*:\s*(.*)', line)
+          if max_non_global_fanout_match is not None:
+            max_non_global_fanout = max_non_global_fanout_match.group(1)
+            result_dict['max_non_global_fanout'] = round(float(max_non_global_fanout)) or 0
+
           near_crit_connections_match = re.search(r'\[        0:      0.1\)\s*\d+\s*\(\s*([\d\.]*)%\)', line)
           if near_crit_connections_match is not None and ("Final Net Connection Criticality Histogram" in prev_line):
             near_crit_connections = near_crit_connections_match.group(1)
@@ -326,7 +337,8 @@ class GenResults():
           prev_line = line 
           
         #calculated metrics
-        if 'logic_area' in result_dict and 'resource_usage_clb' in result_dict and 'resource_usage_dsp' in result_dict and 'resource_usage_memory' in result_dict:
+        if 'logic_area' in result_dict and 'resource_usage_clb' in result_dict \
+          and 'resource_usage_dsp' in result_dict and 'resource_usage_memory' in result_dict:
           routing_area_clb = self.get_routing_area(result_dict["arch"], "clb")
           routing_area_dsp = self.get_routing_area(result_dict["arch"], "dsp")
           routing_area_memory = self.get_routing_area(result_dict["arch"], "memory")
@@ -335,9 +347,13 @@ class GenResults():
                                         (routing_area_memory * result_dict['resource_usage_memory'])
           result_dict['total_area'] = float(result_dict['logic_area']) + float(result_dict['routing_area'])
 
-        result_dict['ff_to_lut_ratio'] = result_dict['ffs'] / result_dict['luts']
-        result_dict['dsp_to_clb_ratio'] = result_dict['resource_usage_dsp'] / result_dict['resource_usage_clb']
-        result_dict['memory_to_clb_ratio'] = result_dict['resource_usage_memory'] / result_dict['resource_usage_clb']
+        if 'ffs' in result_dict and 'luts' in result_dict and 'resource_usage_clb' in result_dict \
+          and 'resource_usage_dsp' in result_dict and 'resource_usage_memory' in result_dict \
+          and 'single_bit_adders' in result_dict:
+          result_dict['ff_to_lut_ratio'] = result_dict['ffs'] / result_dict['luts']
+          result_dict['dsp_to_clb_ratio'] = result_dict['resource_usage_dsp'] / result_dict['resource_usage_clb']
+          result_dict['memory_to_clb_ratio'] = result_dict['resource_usage_memory'] / result_dict['resource_usage_clb']
+          result_dict['adder_to_lut_ratio'] = result_dict['single_bit_adders'] / result_dict['luts']
 
       ##--------------------------
       ##extract information from odin.blif
@@ -396,6 +412,11 @@ class GenResults():
           #print(row.keys())
           #print(row.values())
           result_dict['vtr_flow_elapsed_time'] = row['vtr_flow_elapsed_time']
+          result_dict['odin_time'] = row['odin_synth_time']
+          result_dict['abc_time'] = row['abc_synth_time']
+          result_dict['pack_time'] = row['pack_time']
+          result_dict['place_time'] = row['place_time']
+          result_dict['route_time'] = row['min_chan_width_route_time']
           result_dict['vtr_flow_peak_memory_usage'] = max(float(row['max_odin_mem']), \
                                                           float(row['max_abc_mem']), \
                                                           float(row['max_vpr_mem']))
@@ -406,9 +427,6 @@ class GenResults():
           #result_dict['critical_path'] = row['critical_path_delay']
         parse_results_filehandle.close()
           
-      
-      result_dict['area_delay_product'] = float(result_dict.get('total_area',0)) * float(result_dict.get('critical_path',0))
-
       #--------------------------
       #identify whether this is ml or non-ml design
       #--------------------------

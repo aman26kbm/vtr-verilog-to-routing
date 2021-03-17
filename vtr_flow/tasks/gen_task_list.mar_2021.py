@@ -65,6 +65,12 @@ class GenTaskList():
       info = re.search(r'(agilex|stratix)\.(ml|non_ml)\.(.*)', line)
       if info is not None:
         if self.folder is not None:
+
+          #for experiments 2 and 3, we only want to run ML designs
+          if self.folder in ["exp2a", "exp2b", "exp2c", "exp3a", "exp3b", "exp3c"]:
+            if info.group(2) == "non_ml":
+              continue
+
           dirname = self.folder + "/" + info.group(1) + "." + info.group(3)
         else:
           dirname = info.group(1) + "." + info.group(3)

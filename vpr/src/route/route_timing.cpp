@@ -786,6 +786,22 @@ bool try_timing_driven_route_tmpl(const t_router_opts& router_opts,
             VTR_LOG("Critical path: %g ns\n", 1e9 * best_routing_metrics.critical_path.delay());
         }
 
+        std::map<std::string, double> net_stats;
+        for (auto net_id : cluster_ctx.clb_nlist.nets()) {
+            double fanout = cluster_ctx.clb_nlist.net_sinks(net_id).size();
+             
+            bool is_global = cluster_ctx.clb_nlist.net_is_global(net_id);
+            bool is_ignored = cluster_ctx.clb_nlist.net_is_ignored(net_id);  
+
+            if (!(is_global || is_ignored)) {
+                net_stats["Max Non Global Net Fanout"] = std::max(net_stats["Max Non Global Net Fanout"], fanout);
+            }
+        }
+
+        for (auto kv : net_stats) {
+            VTR_LOG("    %s: %f\n", kv.first.c_str(), kv.second);
+        }
+        
         VTR_LOG("Successfully routed after %d routing iterations.\n", itry);
     } else {
         VTR_LOG("Routing failed.\n");
