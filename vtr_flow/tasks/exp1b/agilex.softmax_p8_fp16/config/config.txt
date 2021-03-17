@@ -21,4 +21,4 @@ parse_file=vpr_standard.txt
 pass_requirements_file=pass_requirements.txt
 
 # VPR parameters
-script_params=--const_gen_inference comb --timing_report_detail aggregated --sdc_file ../../../../../sdc/softmax_p8_fp16.sdc --route_chan_width 300
+script_params=--const_gen_inference comb --timing_report_detail aggregated --sdc_file ../../../../../../sdc/softmax_p8_fp16.sdc --route_chan_width 300
