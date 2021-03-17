@@ -1,0 +1,10 @@
+cd exp1a; ./parse; cd -
+cd exp1b; ./parse; cd -
+cd exp1c; ./parse; cd -
+cd exp2a; ./parse; cd -
+cd exp2b; ./parse; cd -
+cd exp2c; ./parse; cd -
+cd exp3a; ./parse; cd -
+cd exp3b; ./parse; cd -
+cd exp3c; ./parse; cd -
+cat exp*/*.csv |& tee concatenated_results.csv

@@ -3,3 +3,5 @@ find -name "*.net" | xargs rm -rf
 find -name "*.post_routing" | xargs rm -rf
 find -name "*.place" | xargs rm -rf
 find -name "*.route" | xargs rm -rf
+rm -rf exp*/out.mar*.csv
+rm -rf exp*/log.mar*
