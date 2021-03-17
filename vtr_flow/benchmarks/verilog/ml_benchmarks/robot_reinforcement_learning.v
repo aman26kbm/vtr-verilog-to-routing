@@ -30,14 +30,17 @@ alpha = gamma = 0.5
 ////////////////////SAME//////////////////////
 // Sum_Calc: Calculates the value of the Q expression after accomodating for the different radix forms of the numbers. 
 module Sum_Calc
-          (Q,
+          ( clk, 
+			reset, 
+			Q,
            alpha,
            r,
            gamma,
            max,
            Output_rsvd);
 
-
+ input clk;
+ input reset;
   input [31:0] Q;  // int32
   input   [7:0] alpha;  // ufix8_En7
   input  [31:0] r;  // sfix32_En4
@@ -82,17 +85,35 @@ module Sum_Calc
   assign Sum1_stage3_add_cast = {{2{Product_out1[31]}}, {Product_out1, 4'b0000}};
   assign Sum1_stage3_add_temp = Sum1_op_stage2 + Sum1_stage3_add_cast;
   assign Sum1_out1 = Sum1_stage3_add_temp[35:4];
+////
 
+ reg [31:0] Sum1_out1_flopped;
+ reg [7:0] alpha_flopped;
+ reg [31:0] Q_flopped;
+ 
+always @(posedge clk or posedge reset)
+    begin 
+      if (reset == 1'b1) begin
+        Sum1_out1_flopped <= 0;
+		alpha_flopped <= 0;
+		Q_flopped <= 0;
+      end
+      else begin
+        Sum1_out1_flopped <= Sum1_out1;
+		alpha_flopped <= alpha;
+		Q_flopped <= Q;
+      end
+    end
 
-
-  assign Product1_cast = {1'b0, alpha};
-  assign Product1_mul_temp = Sum1_out1 * Product1_cast;
+////
+  assign Product1_cast = {1'b0, alpha_flopped};
+  assign Product1_mul_temp = Sum1_out1_flopped * Product1_cast;
   assign Product1_cast_1 = Product1_mul_temp[39:0];
   assign Product1_out1 = Product1_cast_1[38:7];
 
 
 
-  assign Sum_add_cast = Q[15:0];
+  assign Sum_add_cast = Q_flopped[15:0];
   assign Sum_add_cast_1 = Product1_out1[15:0];
   assign Sum_add_temp = Sum_add_cast + Sum_add_cast_1;
   assign Sum_out1 = {{16{Sum_add_temp[15]}}, Sum_add_temp};
@@ -564,19 +585,6 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
                                                                  .rd_dout(pre_rd_out_2)
                                                                  );
 
-  assign From8_out1_0 = Delay_out1_0;
-  assign From8_out1_1 = Delay_out1_1;
-  assign From8_out1_2 = Delay_out1_2;
-  assign From8_out1_3 = Delay_out1_3;
-
-  assign Assignment_out1_0 = (Data_Type_Conversion1_out1 == 8'b00000000 ? Sum_Calc_out1 :
-              From8_out1_0);
-  assign Assignment_out1_1 = (Data_Type_Conversion1_out1 == 8'b00000001 ? Sum_Calc_out1 :
-              From8_out1_1);
-  assign Assignment_out1_2 = (Data_Type_Conversion1_out1 == 8'b00000010 ? Sum_Calc_out1 :
-              From8_out1_2);
-  assign Assignment_out1_3 = (Data_Type_Conversion1_out1 == 8'b00000011 ? Sum_Calc_out1 :
-              From8_out1_3);
 
 
 
@@ -591,6 +599,21 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
                                                                  .rd_addr(Delay1_out1),
                                                                  .rd_dout(pre_rd_out_3)
                                                                  );
+
+  assign From8_out1_0 = Delay_out1_0;
+  assign From8_out1_1 = Delay_out1_1;
+  assign From8_out1_2 = Delay_out1_2;
+  assign From8_out1_3 = Delay_out1_3;
+
+  assign Assignment_out1_0 = (Data_Type_Conversion1_out1 == 8'b00000000 ? Sum_Calc_out1 :
+              From8_out1_0);
+  assign Assignment_out1_1 = (Data_Type_Conversion1_out1 == 8'b00000001 ? Sum_Calc_out1 :
+              From8_out1_1);
+  assign Assignment_out1_2 = (Data_Type_Conversion1_out1 == 8'b00000010 ? Sum_Calc_out1 :
+              From8_out1_2);
+  assign Assignment_out1_3 = (Data_Type_Conversion1_out1 == 8'b00000011 ? Sum_Calc_out1 :
+              From8_out1_3);
+
 
   assign Simple_Dual_Port_RAM_System_out1_0 = pre_rd_out_3;
   assign Simple_Dual_Port_RAM_System_out1_1 = pre_rd_out_2;
@@ -638,8 +661,38 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
               (Delay5_out1 == 2'b10 ? Delay_out1_2 :
               Delay_out1_3)));
 
+reg [31:0] Multiport_Switch_out1_flopped;
+reg [7:0] Delay13_out1_flopped;
+reg [31:0] Delay6_out1_flopped;
+reg [7:0] Delay7_out1_flopped;
+reg [15:0] Max_out1_flopped;
 
-
+always @(posedge clk or posedge reset)
+    begin 
+      if (reset == 1'b1) begin
+        Multiport_Switch_out1_flopped <= 0;
+		Delay13_out1_flopped <= 0;
+		Delay6_out1_flopped <= 0;
+		Delay7_out1_flopped <= 0;
+		Max_out1_flopped <= 0;
+      end
+      else begin
+        Multiport_Switch_out1_flopped <= Multiport_Switch_out1;
+		Delay13_out1_flopped <= Delay13_out1;
+		Delay6_out1_flopped <= Delay6_out1;
+		Delay7_out1_flopped <= Delay7_out1;
+		Max_out1_flopped <= Max_out1;
+      end
+    end
+	
+	  Sum_Calc u_Sum_Calc (.clk (clk), .reset(reset), .Q(Multiport_Switch_out1_flopped),  // int32
+                       .alpha(Delay13_out1_flopped),  // ufix8_En7
+                       .r(Delay6_out1_flopped),  // sfix32_En4
+                       .gamma(Delay7_out1_flopped),  // ufix8_En7
+                       .max(Max_out1_flopped),  // int16
+                       .Output_rsvd(Sum_Calc_out1)  // int32
+                       );
+/*
   Sum_Calc u_Sum_Calc (.Q(Multiport_Switch_out1),  // int32
                        .alpha(Delay13_out1),  // ufix8_En7
                        .r(Delay6_out1),  // sfix32_En4
@@ -647,6 +700,7 @@ assign Data_Type_Conversion_out1_3 = Data_Type_Conversion_out1_3;
                        .max(Max_out1),  // int16
                        .Output_rsvd(Sum_Calc_out1)  // int32
                        );
+*/
 
   always @(posedge clk or posedge reset)
     begin : Delay9_process
@@ -4921,8 +4975,10 @@ else begin
 	else action <= 2'd3;
 
 	end
-
 end
+
+
+
 
 endmodule
 
@@ -4951,13 +5007,53 @@ wire [31:0] Data_Type_Conversion_out1_3;
 assign alpha = 8'b01000000;
 assign gamma = 8'b01000000;
 
+
+reg [31:0] reward_flopped_1;
+reg [3:0] state_flopped_1;
+reg [1:0] next_action_flopped_1;
+
+reg [31:0]  Data_Type_Conversion_out1_0_flopped;
+reg [31:0] 	Data_Type_Conversion_out1_1_flopped;
+reg [31:0] 	Data_Type_Conversion_out1_2_flopped;
+reg [31:0] 	Data_Type_Conversion_out1_3_flopped;
+
 FSM module_1 ( final_state, clk, reset, action, reward, state, next_action);
 
-Q_HW module_2(mode, clk, reset, 1'b1, state, next_action, reward, alpha,  gamma, , Q, Data_Type_Conversion_out1_0, Data_Type_Conversion_out1_1, Data_Type_Conversion_out1_2, Data_Type_Conversion_out1_3 );
+always @ (posedge clk) begin
+	if (reset) begin
+	reward_flopped_1<=0;
+	state_flopped_1<=0;
+	next_action_flopped_1<=0;
+	end
+	
+	else begin
+	reward_flopped_1<=reward;
+	state_flopped_1<=state;
+	next_action_flopped_1<=next_action;
+	end
+end
+//Q_HW module_2(mode, clk, reset, 1'b1, state, next_action, reward, alpha,  gamma, , Q, Data_Type_Conversion_out1_0, Data_Type_Conversion_out1_1, Data_Type_Conversion_out1_2, Data_Type_Conversion_out1_3 );
+Q_HW module_2(mode, clk, reset, 1'b1, state_flopped_1, next_action_flopped_1, reward_flopped_1, alpha,  gamma, , Q, Data_Type_Conversion_out1_0, Data_Type_Conversion_out1_1, Data_Type_Conversion_out1_2, Data_Type_Conversion_out1_3 );
+
+always @ (posedge clk) begin
+	if (reset) begin
+	Data_Type_Conversion_out1_0_flopped<=0;
+	Data_Type_Conversion_out1_1_flopped<=0;
+	Data_Type_Conversion_out1_2_flopped<=0;
+	Data_Type_Conversion_out1_3_flopped<=0;
+	end
+	
+	else begin
+	Data_Type_Conversion_out1_0_flopped<=Data_Type_Conversion_out1_0;
+	Data_Type_Conversion_out1_1_flopped<=Data_Type_Conversion_out1_1;
+	Data_Type_Conversion_out1_2_flopped<=Data_Type_Conversion_out1_2;
+	Data_Type_Conversion_out1_3_flopped<=Data_Type_Conversion_out1_3;
+	end
+end
 
 LFSR_2bit module_3 (clk, reset, action_1);
 
-policy_generator_2 module_6(clk, reset, Data_Type_Conversion_out1_0, Data_Type_Conversion_out1_1, Data_Type_Conversion_out1_2, Data_Type_Conversion_out1_3 , action_2);
+policy_generator_2 module_6(clk, reset, Data_Type_Conversion_out1_0_flopped, Data_Type_Conversion_out1_1_flopped, Data_Type_Conversion_out1_2_flopped, Data_Type_Conversion_out1_3_flopped , action_2);
 
 assign action = mode ? action_2 : action_1;
 
