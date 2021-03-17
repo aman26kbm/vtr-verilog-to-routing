@@ -548,8 +548,14 @@
       <perimeter type="io" priority="101"/>
       <corners type="EMPTY" priority="102"/>
       <fill type="clb" priority="10"/>
-      <col type="dsp_top" startx="4" starty="1" repeatx="8" priority="20"/>
-      <col type="memory" startx="3" starty="1" repeatx="8" priority="20"/>
+      <col type="dsp_top" startx="13" starty="1" repeatx="16" priority="20"/>
+      <col type="dsp_top" startx="14" starty="1" repeatx="16" priority="20"/>
+      <col type="dsp_top" startx="15" starty="1" repeatx="16" priority="20"/>
+      <col type="dsp_top" startx="16" starty="1" repeatx="16" priority="20"/>
+      <col type="memory" startx="5" starty="1" repeatx="16" priority="20"/>
+      <col type="memory" startx="6" starty="1" repeatx="16" priority="20"/>
+      <col type="memory" startx="7" starty="1" repeatx="16" priority="20"/>
+      <col type="memory" startx="8" starty="1" repeatx="16" priority="20"/>
     </auto_layout>
     <!--
     <fixed_layout name="mylayout" width="178" height="82">
