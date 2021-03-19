@@ -442,6 +442,23 @@ class GenResults():
 
       result_dict["tag"] = self.tag
 
+      #----------------------------
+      #clean up the directory
+      #----------------------------
+      if result_dict['pre_vpr_blif_found'] == "No" \
+        or result_dict['vpr_results_found'] == "No" \
+        or result_dict['parse_results_found'] == "No":
+        print("One of the log files required was not found")
+      else:
+        print("Parsing complete. Can delete logs/temp files")
+        #Delete temp files except the 3 we need
+        os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*odin.blif")
+        os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*abc.blif")
+        os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*.net")
+        os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*.place")
+        os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*.route")
+        os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*.post_routing")
+
       #append the current results to the main result list
       self.result_list.append(result_dict)
   
