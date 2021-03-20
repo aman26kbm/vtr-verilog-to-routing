@@ -7,4 +7,4 @@ cd exp2c; ./parse; cd -
 cd exp3a; ./parse; cd -
 cd exp3b; ./parse; cd -
 cd exp3c; ./parse; cd -
-cat exp*/*.csv |& tee concatenated_results.csv
+cat exp*/*.csv | tee concatenated_results.csv
