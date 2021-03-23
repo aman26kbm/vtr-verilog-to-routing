@@ -4899,7 +4899,7 @@ input clk;
 
 `ifdef SIMULATION
 
-reg [7:0] ram[((1<<`AWIDTH)-1):0];
+reg [`DWIDTH-1:0] ram[((1<<`AWIDTH)-1):0];
 reg [31:0] i;
 
 always @(posedge clk)  
