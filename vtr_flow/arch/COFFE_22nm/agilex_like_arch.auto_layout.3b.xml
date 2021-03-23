@@ -550,19 +550,19 @@
   <!-- ODIN II specific config ends -->
   <layout>
     <!-- Physical descriptions begin -->
-    <auto_layout aspect_ratio="1.0">
+    <fixed_layout name="mylayout" width="130" height="130">
       <perimeter type="io" priority="101"/>
       <corners type="EMPTY" priority="102"/>
       <fill type="clb" priority="10"/>
-      <col type="dsp_top" startx="21" starty="1" repeatx="32" priority="20"/>
-      <col type="dsp_top" startx="22" starty="1" repeatx="32" priority="20"/>
-      <col type="dsp_top" startx="23" starty="1" repeatx="32" priority="20"/>
-      <col type="dsp_top" startx="24" starty="1" repeatx="32" priority="20"/>
-      <col type="memory" startx="5" starty="1" repeatx="32" priority="20"/>
-      <col type="memory" startx="6" starty="1" repeatx="32" priority="20"/>
-      <col type="memory" startx="7" starty="1" repeatx="32" priority="20"/>
-      <col type="memory" startx="8" starty="1" repeatx="32" priority="20"/>
-    </auto_layout>
+      <col type="dsp_top" startx="17" starty="1" repeatx="32" priority="20"/>
+      <col type="dsp_top" startx="18" starty="1" repeatx="32" priority="20"/>
+      <col type="dsp_top" startx="19" starty="1" repeatx="32" priority="20"/>
+      <col type="dsp_top" startx="20" starty="1" repeatx="32" priority="20"/>
+      <col type="memory" startx="1" starty="1" repeatx="32" priority="20"/>
+      <col type="memory" startx="2" starty="1" repeatx="32" priority="20"/>
+      <col type="memory" startx="3" starty="1" repeatx="32" priority="20"/>
+      <col type="memory" startx="4" starty="1" repeatx="32" priority="20"/>
+    </fixed_layout> 
     <!--
     <fixed_layout name="mylayout" width="178" height="82">
       <perimeter type="io" priority="101"/>

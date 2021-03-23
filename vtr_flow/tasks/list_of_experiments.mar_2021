@@ -4,17 +4,17 @@
 #-------------------
 # ML benchmarks
 #-------------------
-agilex.ml.clstm_small
-agilex.ml.dla_small
-agilex.ml.tiny_darknet_hls
-agilex.ml.dla_medium
-agilex.ml.clstm_medium
-#agilex.ml.clstm_large
-#-------------------
-# Non-ML benchmarks
-#-------------------
-agilex.non_ml.LU32PEEng
-agilex.non_ml.mcml
+#agilex.ml.clstm_small
+#agilex.ml.dla_small
+#agilex.ml.tiny_darknet_hls
+#agilex.ml.dla_medium
+#agilex.ml.clstm_medium
+##agilex.ml.clstm_large
+##-------------------
+## Non-ML benchmarks
+##-------------------
+#agilex.non_ml.LU32PEEng
+#agilex.non_ml.mcml
 #####################################
 # Stratix (Flagship)
 #####################################

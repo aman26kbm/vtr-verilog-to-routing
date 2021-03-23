@@ -4,7 +4,7 @@
 #-------------------
 # ML benchmarks
 #-------------------
-agilex.ml.clstm_large
+#agilex.ml.clstm_large
 #-------------------
 # Non-ML benchmarks
 #-------------------
