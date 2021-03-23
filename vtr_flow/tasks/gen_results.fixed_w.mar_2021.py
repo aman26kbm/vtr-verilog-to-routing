@@ -63,6 +63,7 @@ class GenResults():
                     "logic_depth", \
                     "device_height", \
                     "device_width" ,
+                    "grid_size_limiter", \
                     "date", \
                     "tag" , 
                     "order"]
@@ -423,6 +424,7 @@ class GenResults():
           result_dict['logic_depth'] = row['abc_depth']
           result_dict['device_height'] = row['device_height']
           result_dict['device_width'] = row['device_width']
+          result_dict['grid_size_limiter'] = row['device_limiting_resources']
           #result_dict['min_channel_width'] = row['min_chan_width']
           #result_dict['critical_path'] = row['critical_path_delay']
         parse_results_filehandle.close()
