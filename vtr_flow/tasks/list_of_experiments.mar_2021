@@ -13,8 +13,8 @@ agilex.ml.clstm_medium
 #-------------------
 # Non-ML benchmarks
 #-------------------
-agilex.non_ml.LU32PEEng
-agilex.non_ml.mcml
+#agilex.non_ml.LU32PEEng
+#agilex.non_ml.mcml
 #####################################
 # Stratix (Flagship)
 #####################################

@@ -19,7 +19,8 @@ os.system(cmd)
 ##############################
 #For each experiment: 1A, 1B, 1C, 2A, 2B, 2C, 3A, 3B, 3C
 ##############################
-for exp in ['1a', '1b', '1c', '2a', '2b', '2c', '3a', '3b', '3c']:
+#for exp in ['1a', '1b', '1c', '2a', '2b', '2c', '3a', '3b', '3c']:
+for exp in ['4c', '5c']:
     cmd = "cd exp{} ;".format(exp) 
 #Generate task directories:
 #--------------------------
@@ -43,11 +44,7 @@ for exp in ['1a', '1b', '1c', '2a', '2b', '2c', '3a', '3b', '3c']:
     filename = "exp{e}/cmds.mar_2021.exp{e}.larger".format(e=exp)
     fh = open(filename, "w")
     for i in range(3):
-        #First time, lets add & at the end. This allows 2 runs to happen in parallel
-        if (i==0):
-            fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e}.larger -j 1 -s --seed {seed} &\n'.format(e=exp,seed=str(random.randint(1,10000))))
-        else:
-            fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e}.larger -j 1 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
+        fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e}.larger -j 1 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
     fh.write("echo '----- All runs completed -----\\n'\n")
     fh.close()
 
@@ -61,7 +58,7 @@ for exp in ['1a', '1b', '1c', '2a', '2b', '2c', '3a', '3b', '3c']:
     filename = "exp{e}/cmds.mar_2021.exp{e}.shorter".format(e=exp)
     fh = open(filename, "w")
     for i in range(3):
-        fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e}.shorter -j 4 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
+        fh.write('python3 ../../scripts/run_vtr_task.py -l task_list_exp{e}.shorter -j 5 -s --seed {seed}\n'.format(e=exp,seed=str(random.randint(1,10000))))
     fh.write("echo '----- All runs completed -----\\n'\n")
     fh.close()
     os.system("chmod 755 exp{e}/cmds.mar_2021.exp{e}".format(e=exp))
@@ -71,9 +68,9 @@ for exp in ['1a', '1b', '1c', '2a', '2b', '2c', '3a', '3b', '3c']:
 #--------------------------
     filename = "exp{e}/run".format(e=exp)
     fh = open(filename, "w")
-    fh.write('nohup ./cmds.mar_2021.exp{e}.larger > log.mar17.exp{e}.larger &\n'.format(e=exp))
-    fh.write('nohup ./cmds.mar_2021.exp{e} > log.mar17.exp{e} &\n'.format(e=exp))
-    fh.write('nohup ./cmds.mar_2021.exp{e}.shorter > log.mar17.exp{e}.shorter &\n'.format(e=exp))
+    fh.write('nohup ./cmds.mar_2021.exp{e}.larger > log.mar23.exp{e}.larger &\n'.format(e=exp))
+    fh.write('nohup ./cmds.mar_2021.exp{e} > log.mar23.exp{e} &\n'.format(e=exp))
+    fh.write('nohup ./cmds.mar_2021.exp{e}.shorter > log.mar23.exp{e}.shorter &\n'.format(e=exp))
     fh.close()
     os.system("chmod 755 exp{e}/run".format(e=exp))
     
@@ -82,9 +79,9 @@ for exp in ['1a', '1b', '1c', '2a', '2b', '2c', '3a', '3b', '3c']:
 #--------------------------
     filename = "exp{e}/parse".format(e=exp)
     fh = open(filename, "w")
-    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar17.exp{e}.larger -o out.mar17.exp{e}.larger.csv -t exp{e}\n'.format(e=exp))
-    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar17.exp{e} -o out.mar17.exp{e}.csv -t exp{e}\n'.format(e=exp))
-    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar17.exp{e}.shorter -o out.mar17.exp{e}.shorter.csv -t exp{e}\n'.format(e=exp))
+    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar23.exp{e}.larger -o out.mar23.exp{e}.larger.csv -t exp{e}\n'.format(e=exp))
+    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar23.exp{e} -o out.mar23.exp{e}.csv -t exp{e}\n'.format(e=exp))
+    fh.write('python3 ../gen_results.fixed_w.mar_2021.py -i log.mar23.exp{e}.shorter -o out.mar23.exp{e}.shorter.csv -t exp{e}\n'.format(e=exp))
     fh.close()
     os.system("chmod 755 exp{e}/parse".format(e=exp))
 

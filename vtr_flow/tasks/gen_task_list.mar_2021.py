@@ -67,7 +67,7 @@ class GenTaskList():
         if self.folder is not None:
 
           #for experiments 2 and 3, we only want to run ML designs
-          if self.folder in ["exp2a", "exp2b", "exp2c", "exp3a", "exp3b", "exp3c"]:
+          if self.folder in ["exp2a", "exp2b", "exp2c", "exp3a", "exp3b", "exp3c", "exp4c", "exp5c"]:
             if info.group(2) == "non_ml":
               continue
 

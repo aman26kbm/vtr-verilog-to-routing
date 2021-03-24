@@ -1,0 +1,14 @@
+exp4c/agilex.matmul_20x20_fp16
+exp4c/agilex.tpu.16x16.int8
+exp4c/agilex.tpu.32x32.int8
+exp4c/agilex.conv_layer
+exp4c/agilex.reduction_layer
+exp4c/agilex.eltwise_layer
+exp4c/agilex.conv_layer_hls
+exp4c/agilex.robot_reinforcement_learning
+exp4c/agilex.softmax_p8_fp16
+exp4c/agilex.spmv
+exp4c/agilex.lstm
+exp4c/agilex.bnn_hls
+exp4c/agilex.attention
+exp4c/agilex.tpu_v2
