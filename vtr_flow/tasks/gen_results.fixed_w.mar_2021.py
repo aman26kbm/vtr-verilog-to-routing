@@ -39,6 +39,10 @@ class GenResults():
                     "average_wire_segments_per_net", \
                     "max_segments_used_by_a_net", \
                     "total_routed_wire_length", \
+                    "max_routing_channel_util", \
+                    "min_util_for_largest_pct_of_total_channels", \
+                    "max_util_for_largest_pct_of_total_channels", \
+                    "largest_pct_of_total_channels", \
                     "resource_usage_io", \
                     "resource_usage_clb", \
                     "resource_usage_dsp", \
@@ -211,6 +215,8 @@ class GenResults():
         resource_usage_adder = 0
         resource_usage_lut = 0
         pb_types_usage = False
+        routing_channel_util_section = False
+        largest_pct_of_total_channels = 0.0
 
         result_dict['single_bit_adders'] = 0
         result_dict['logic_area'] = 0
@@ -225,6 +231,16 @@ class GenResults():
           create_device_usage_match = re.search('# Create Device', line)
           if create_device_usage_match is not None:
             pb_types_usage = False
+
+          #routing channel utilization section starts with this text
+          routing_channel_util_match = re.search(r'Routing channel utilization histogram:', line)
+          if routing_channel_util_match is not None:
+            routing_channel_util_section = True
+
+          #routing channel utilization section ends with this text
+          max_routing_channel_util_match = re.search(r'Maximum routing channel utilization:', line)
+          if max_routing_channel_util_match is not None:
+            routing_channel_util_section = False
 
           #print(line)
           logic_area_match = re.search(r'Total used logic block area: (.*)', line)
@@ -335,6 +351,21 @@ class GenResults():
             near_crit_connections = near_crit_connections_match.group(1)
             result_dict['near_crit_connections'] = float(near_crit_connections) or 0
 
+          max_routing_channel_util_match = re.search(r'Maximum routing channel utilization:\s+(.*) at \(.*\)', line)
+          if max_routing_channel_util_match is not None:
+            result_dict['max_routing_channel_util'] = max_routing_channel_util_match.group(1)
+
+          if routing_channel_util_section is True:
+            routing_histogram_match = re.search(r'\[\s+(.*):\s+(.*)\)\s*.*\s*\(\s*(.*)%\)', line)
+            if routing_histogram_match is not None:
+              utilization_min = float(routing_histogram_match.group(1))
+              utilization_max = float(routing_histogram_match.group(2))
+              pct_of_total_channels = float(routing_histogram_match.group(3))
+              if pct_of_total_channels > largest_pct_of_total_channels:
+                largest_pct_of_total_channels = pct_of_total_channels
+                min_util_for_largest_pct_of_total_channels = utilization_min
+                max_util_for_largest_pct_of_total_channels = utilization_max
+
           prev_line = line 
           
         #calculated metrics
@@ -355,6 +386,10 @@ class GenResults():
           result_dict['dsp_to_clb_ratio'] = result_dict['resource_usage_dsp'] / result_dict['resource_usage_clb']
           result_dict['memory_to_clb_ratio'] = result_dict['resource_usage_memory'] / result_dict['resource_usage_clb']
           result_dict['adder_to_lut_ratio'] = result_dict['single_bit_adders'] / result_dict['luts']
+
+        result_dict['largest_pct_of_total_channels'] = largest_pct_of_total_channels
+        result_dict['min_util_for_largest_pct_of_total_channels'] = min_util_for_largest_pct_of_total_channels  
+        result_dict['max_util_for_largest_pct_of_total_channels'] = max_util_for_largest_pct_of_total_channels  
 
       ##--------------------------
       ##extract information from odin.blif
@@ -452,7 +487,7 @@ class GenResults():
         or result_dict['parse_results_found'] == "No":
         print("One of the log files required was not found")
       else:
-        print("Parsing complete. Can delete logs/temp files")
+        print("Parsing complete. Deleting logs/temp files")
         #Delete temp files except the 3 we need
         os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*odin.blif")
         os.system("rm -rf " + dirname +"/" + run_num + "/*/*/*/*abc.blif")
