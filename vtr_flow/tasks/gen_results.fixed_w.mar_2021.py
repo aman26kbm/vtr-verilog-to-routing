@@ -43,6 +43,28 @@ class GenResults():
                     "min_util_for_largest_pct_of_total_channels", \
                     "max_util_for_largest_pct_of_total_channels", \
                     "largest_pct_of_total_channels", \
+                    "routing_histogram_1_inf_val",   \
+                    "routing_histogram_09_1_val",  \
+                    "routing_histogram_08_09_val",  \
+                    "routing_histogram_07_08_val",  \
+                    "routing_histogram_06_07_val",  \
+                    "routing_histogram_05_06_val",  \
+                    "routing_histogram_04_05_val",  \
+                    "routing_histogram_03_04_val",  \
+                    "routing_histogram_02_03_val",  \
+                    "routing_histogram_01_02_val",  \
+                    "routing_histogram_00_01_val",  \
+                    "routing_histogram_1_inf_pct",  \
+                    "routing_histogram_09_1_pct",  \
+                    "routing_histogram_08_09_pct",  \
+                    "routing_histogram_07_08_pct",  \
+                    "routing_histogram_06_07_pct",  \
+                    "routing_histogram_05_06_pct",  \
+                    "routing_histogram_04_05_pct",  \
+                    "routing_histogram_03_04_pct",  \
+                    "routing_histogram_02_03_pct",  \
+                    "routing_histogram_01_02_pct",  \
+                    "routing_histogram_00_01_pct",  \
                     "resource_usage_io", \
                     "resource_usage_clb", \
                     "resource_usage_dsp", \
@@ -365,6 +387,51 @@ class GenResults():
                 largest_pct_of_total_channels = pct_of_total_channels
                 min_util_for_largest_pct_of_total_channels = utilization_min
                 max_util_for_largest_pct_of_total_channels = utilization_max
+
+            routing_histogram_1_inf_match = re.search(r'\[\s+1:\s+inf\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_1_inf_match is not None:
+              result_dict["routing_histogram_1_inf_val"] = routing_histogram_1_inf_match.group(1)
+              result_dict["routing_histogram_1_inf_pct"] = routing_histogram_1_inf_match.group(2)
+            routing_histogram_09_1_match  = re.search(r'\[\s+0.9:\s+1\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_09_1_match is not None:
+              result_dict["routing_histogram_09_1_val"] = routing_histogram_09_1_match.group(1)
+              result_dict["routing_histogram_09_1_pct"] = routing_histogram_09_1_match.group(2)
+            routing_histogram_08_09_match = re.search(r'\[\s+0.8:\s+0.9\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_08_09_match is not None:
+              result_dict["routing_histogram_08_09_val"] = routing_histogram_08_09_match.group(1)
+              result_dict["routing_histogram_08_09_pct"] = routing_histogram_08_09_match.group(2)
+            routing_histogram_07_08_match = re.search(r'\[\s+0.7:\s+0.8\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_07_08_match is not None:
+              result_dict["routing_histogram_07_08_val"] = routing_histogram_07_08_match.group(1)
+              result_dict["routing_histogram_07_08_pct"] = routing_histogram_07_08_match.group(2)
+            routing_histogram_06_07_match = re.search(r'\[\s+0.6:\s+0.7\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_06_07_match is not None:
+              result_dict["routing_histogram_06_07_val"] = routing_histogram_06_07_match.group(1)
+              result_dict["routing_histogram_06_07_pct"] = routing_histogram_06_07_match.group(2)
+            routing_histogram_05_06_match = re.search(r'\[\s+0.5:\s+0.6\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_05_06_match is not None:
+              result_dict["routing_histogram_05_06_val"] = routing_histogram_05_06_match.group(1)
+              result_dict["routing_histogram_05_06_pct"] = routing_histogram_05_06_match.group(2)
+            routing_histogram_04_05_match = re.search(r'\[\s+0.4:\s+0.5\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_04_05_match is not None:
+              result_dict["routing_histogram_04_05_val"] = routing_histogram_04_05_match.group(1)
+              result_dict["routing_histogram_04_05_pct"] = routing_histogram_04_05_match.group(2)
+            routing_histogram_03_04_match = re.search(r'\[\s+0.3:\s+0.4\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_03_04_match is not None:
+              result_dict["routing_histogram_03_04_val"] = routing_histogram_03_04_match.group(1)
+              result_dict["routing_histogram_03_04_pct"] = routing_histogram_03_04_match.group(2)
+            routing_histogram_02_03_match = re.search(r'\[\s+0.2:\s+0.3\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_02_03_match is not None:
+              result_dict["routing_histogram_02_03_val"] = routing_histogram_02_03_match.group(1)
+              result_dict["routing_histogram_02_03_pct"] = routing_histogram_02_03_match.group(2)
+            routing_histogram_01_02_match = re.search(r'\[\s+0.1:\s+0.2\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_01_02_match is not None:
+              result_dict["routing_histogram_01_02_val"] = routing_histogram_01_02_match.group(1)
+              result_dict["routing_histogram_01_02_pct"] = routing_histogram_01_02_match.group(2)
+            routing_histogram_00_01_match = re.search(r'\[\s+0:\s+0.1\)\s*(.*)\s*\(\s*(.*)%\)', line)
+            if routing_histogram_00_01_match is not None:
+              result_dict["routing_histogram_00_01_val"] = routing_histogram_00_01_match.group(1)
+              result_dict["routing_histogram_00_01_pct"] = routing_histogram_00_01_match.group(2)
 
           prev_line = line 
           
