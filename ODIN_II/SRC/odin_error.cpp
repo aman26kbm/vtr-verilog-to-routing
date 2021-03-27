@@ -88,6 +88,9 @@ static void print_culprit_line_with_context(int column, int target_line, const c
 }
 
 void _log_message(odin_error error_type, loc_t loc, bool fatal_error, const char* function_file_name, int function_line, const char* function_name, const char* message, ...) {
+    if (!fatal_error && configuration.disable_warning)
+        return;
+    
     fflush(stdout);
 
     va_list ap;

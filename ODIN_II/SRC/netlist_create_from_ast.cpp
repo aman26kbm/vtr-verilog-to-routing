@@ -201,10 +201,14 @@ void create_netlist(ast_t* ast) {
  *-------------------------------------------------------------------------------------------*/
 void look_for_clocks(netlist_t* netlist) {
     int i;
-
+    
     for (i = 0; i < netlist->num_ff_nodes; i++) {
         oassert(netlist->ff_nodes[i]->input_pins[1]->net->num_driver_pins == 1);
-        if (netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->type != CLOCK_NODE) {
+        if (netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->type == BUF_NODE) {
+            if (netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->input_pins[0]->net->driver_pins[0]->node->type != CLOCK_NODE)
+                netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->input_pins[0]->net->driver_pins[0]->node->type = CLOCK_NODE;
+        }
+        else if (netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->type != CLOCK_NODE) {
             netlist->ff_nodes[i]->input_pins[1]->net->driver_pins[0]->node->type = CLOCK_NODE;
         }
     }

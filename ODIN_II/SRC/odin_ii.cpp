@@ -441,6 +441,11 @@ void get_options(int argc, char** argv) {
         .default_value("N/A")
         .metavar("N/A");
 
+    other_grp.add_argument(global_args.disable_warning, "--disable_warning")
+        .help("Disable printing warning messages")
+        .default_value("false")
+        .action(argparse::Action::STORE_TRUE);
+
     other_grp.add_argument(global_args.adder_cin_global, "--adder_cin_global")
         .help("Defines if the first cin of an adder/subtractor is connected to a global gnd/vdd instead of a dummy adder generating a gnd/vdd.")
         .default_value("false")
@@ -607,6 +612,10 @@ void get_options(int argc, char** argv) {
         configuration.adder_cin_global = global_args.adder_cin_global;
     }
 
+    if (global_args.disable_warning.provenance() == argparse::Provenance::SPECIFIED) {
+        configuration.disable_warning = global_args.disable_warning;
+    }
+
     if (global_args.print_parse_tokens.provenance() == argparse::Provenance::SPECIFIED) {
         configuration.print_parse_tokens = global_args.print_parse_tokens;
     }
@@ -641,6 +650,7 @@ void set_default_config() {
     configuration.output_netlist_graphs = 0;
     configuration.print_parse_tokens = 0;
     configuration.output_preproc_source = 0; // TODO: unused
+    configuration.disable_warning = false;
     configuration.debug_output_path = std::string(DEFAULT_OUTPUT);
     configuration.arch_file = "";
 
