@@ -1,19 +1,13 @@
 //`timescale 1 ns / 1 ns
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
- command used to run on vtr:
-go to //vtr-verilog-to-routing/vtr_flow/tasks
-../scripts/run_vtr_task.py robot_RL
-XML file used: k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml
-////////////////////////////////////////////////////////////////////////////////////////
-/*
-
 Author: Samidh Mehta
 Reinforcement Learning benchmark
-Problem statement: There are 6 regions on a board. The robot has to reach Region 6.
+Problem statement: There are 12 robots on a board with 12 regions. The aim is for each robot to get to a particular region using RL.
 Q learning accelerator generated using HDL coder (Simulink / MATLAB)
 4 actions
-6 states
+12 states
 
 The design consists of 2 policy generators. 
 A random number generator is used as a ploicy generator during training .(mode = 0)
@@ -224,7 +218,7 @@ module SimpleDualPortRAM_generic
 
  
   reg  [DataWidth - 1:0] data_int;
-   `ifdef?SIMULATION_MEMORY //vtr_edit
+ `ifdef?SIMULATION_MEMORY //vtr_edit
    
    reg  [DataWidth - 1:0] ram [2**AddrWidth - 1:0];
   //integer i;
@@ -256,7 +250,7 @@ module SimpleDualPortRAM_generic
 
   assign rd_dout = data_int;
 
- //vtr_edit
+  //vtr_edit
 `else 
  
 wire [DataWidth - 1:0] fake_op_1;
@@ -5093,30 +5087,4 @@ robot_high_level robot_12 ( 4'd11, clk, reset, mode, Q_12);
 
 endmodule
 
-
-
-
-/*
-//tb_robot_high_level: testbench 
-module tb_robot_high_level();
-reg clk;
-reg reset;
-wire [31:0] Q;
-reg mode ;
-robot_high_level uut( clk, reset, mode, Q);
-
-initial begin
-clk = 0;
-repeat(100000)
-#10 clk = ~clk; #10 $finish;
-end
-
-initial begin
-reset=1; mode = 1'b0; //training
-#35 reset=0;
-#800000 mode = 1'b1; //inference
-end
-
-endmodule
-*/
 
