@@ -8,6 +8,22 @@
 `define BUF_LOC_SIZE 4 //4 words in each addr location
 `define OUT_RAM_DEPTH 512 //512 entries in output bram
 
+/////////////////////////////////////////////////////////////////////////////
+//Self-Attention Layer
+//Design of the self-attention layer module which is useful 
+//in the Transformer deep learning architecture.
+//Fixed Point 16(4.12) format is used.
+//This design takes in the Query Vector Q,Key Vector K and
+//Value vector V dervied from the word embeddings as input.
+//The Q,K,V matrices are stored and accessed through Dual Port RAMs
+//This is a pipelined design comprising of matrix vector multiplcation,
+//scaling, Softmax layer and a final matrix vector multiplication stage.
+//Double buffering has been used at the input and output of the softmax 
+//inorder to hide the latency of the softmax design.
+//The final outputs also get stored in a DPRAM which is interfaced through I/O.
+//////////////////////////////////////////////////////////////////////////////
+
+
 module attention(
 input clk,
 input rst,
@@ -15,19 +31,21 @@ input start,
 input [4:0] q_rd_addr, //start address of q
 input [4:0] k_rd_addr, //start address of k
 input [4:0] v_rd_addr, //start address of v
-input [2:0] wren_qkv_ext,
-input [5:0] address_ext,
-input [`VECTOR_BITS-1:0] data_ext,
-input [`OUT_RAM_DEPTH-1:0] out_rd_addr,		//To read stored outputs from outside
+input [2:0] wren_qkv_ext, //To write data into Q,K,V BRAMs externally
+input [5:0] address_ext,  //External write address
+input [`VECTOR_BITS-1:0] data_ext,  //Data to be written
+input [`OUT_RAM_DEPTH-1:0] out_rd_addr,	//To read stored outputs from outside
 output [`DATA_WIDTH-1:0] out   //16 bit output from out bram
 );
 
-//brams
+/
 reg q_en,k_en,v_en;
 reg [4:0] q_addr,k_addr;
 reg [5:0] v_addr;
 wire [`VECTOR_BITS-1:0] q,k;
 wire [(`NUM_WORDS*`DATA_WIDTH)-1:0] v;
+
+//Dummy input/ouputs connected to DPRAM to ensure VTR doesn't optimize the BRAM out.
 reg [`VECTOR_BITS-1:0] dummyin_q,dummyin_k;
 reg [(`NUM_WORDS*`DATA_WIDTH)-1:0] dummyin_v;
 wire [`VECTOR_BITS-1:0] dummyout_q,dummyout_k;
@@ -40,7 +58,7 @@ reg flag;
 wire [`NUM_WORDS*`DATA_WIDTH-1:0] mul_out2;
 wire [`DATA_WIDTH-1:0] softmulv;
 
-//buffers
+//Input/output connections of the buffers
 reg [`BUF_AWIDTH-1:0] wr_addr_12;
 reg wr_addr_34;
 wire [`BUF_AWIDTH-1:0] rd_addr_12;
@@ -64,25 +82,36 @@ wire soft_done;
 wire [`BUF_AWIDTH-1:0] soft_strt_addr,soft_end_addr,soft_rd_addr,soft_sub0_addr,soft_sub1_addr;
 reg choose_buf;
 reg buff_done;
-//wire addr_select;
+
 reg [4:0] soft_word_count;
 wire [8*`BUF_LOC_SIZE*`DATA_WIDTH-1:0] comb_softout;
 reg vector_complete;
 reg strt_softmulv;
 reg [5:0] v_count,v_count_ff;
 
+reg [8:0] out_wr_addr;
+reg [8:0] addr_a,addr_b;
+reg wren_a,wren_b;
+reg [`DATA_WIDTH-1:0] dummy_b;
+wire [`DATA_WIDTH-1:0] dummy_a;
+reg strt_out_write;
+reg soft_out_strt, soft_out_end;
+reg first_time,mvm_complete;
 
-
+//BRAMs that hold Q,K,V matrices
 dpram Q(.clk(clk),.address_a(q_addr),.address_b(address_ext),.wren_a(q_en),.wren_b(wren_qkv_ext[0]),.data_a(dummyin_q),.data_b(data_ext),.out_a(q),.out_b(dummyout_q));
 dpram K(.clk(clk),.address_a(k_addr),.address_b(address_ext),.wren_a(k_en),.wren_b(wren_qkv_ext[0]),.data_a(dummyin_k),.data_b(data_ext),.out_a(k),.out_b(dummyout_k));
 dpram_t V(.clk(clk),.address_a(v_addr),.address_b(address_ext),.wren_a(v_en),.wren_b(wren_qkv_ext[0]),.data_a(dummyin_v),.data_b(data_ext),.out_a(v),.out_b(dummyout_v));
 
+//Multiplying Q and K vector
 vecmat_mul qk_mul (.clk(clk),.reset(rst),.vector(q),.matrix(k),.tmp(mul_out));
 vecmat_add qk_acc (.clk(clk),.reset(rst),.mulout(mul_out),.data_out(qiki));
 
+//Scaling (dividing by 8)
 divideby8 scale(.data(qiki),.out(scaled_qiki));
 
-//Buffers at the input to softmax block
+//Buffers 1 and 2 at the input to softmax block (2 buffers are present in a single bram)
+//Each location stores 4 words together to feed to softmax
 wordwise_bram in_buffer12
 (       .addr0(wr_addr_12), 
         .d0(wr_data_12), 
@@ -95,7 +124,8 @@ wordwise_bram in_buffer12
         .clk(clk)
 );
 
-//Buffers at the output of softmax block
+//Buffers 3 and 4 at the output of softmax block
+//Each location stores 32 words to make it easy to feed to MVM
 wordwise_bram_2 out_buffer34
 (       .addr0(wr_addr_34), 
         .d0(wr_data_34), 
@@ -108,7 +138,7 @@ wordwise_bram_2 out_buffer34
         .clk(clk)
 );
 
-
+//Softmax layer has a parallelism of 4
 softmax soft(
 	.inp(data_to_softmax),
 	.sub0_inp(data_to_softmax),
@@ -130,25 +160,18 @@ softmax soft(
 //	.addr_sel(addr_select)
 );
 
-
+//Multiplying output of softmax with V vector
 vecmat_mul_32 rv_mul (.clk(clk),.reset(rst),.vector(data_to_MVM),.matrix(v),.tmp(mul_out2));
 vecmat_add_32 rv_acc (.clk(clk),.reset(rst),.mulout(mul_out2),.data_out(softmulv));
 
-reg [8:0] out_wr_addr;
-reg [8:0] addr_a,addr_b;
-reg wren_a,wren_b;
-reg [`DATA_WIDTH-1:0] dummy_b;
-wire [`DATA_WIDTH-1:0] dummy_a;
-reg strt_out_write;
-reg soft_out_strt, soft_out_end;
-reg first_time,mvm_complete;
+
 //output BRAM can store upto 512 elements of `DATA_WIDTH
 dpram_small out_ram (.clk(clk),.address_a(out_wr_addr),.address_b(out_rd_addr),.wren_a(wren_a),.wren_b(wren_b),.data_a(softmulv),.data_b(dummy_b),.out_a(dummy_a),.out_b(out));
 
 assign rd_addr_12 = soft_rd_addr|soft_sub0_addr|soft_sub1_addr ;
 //assign rd_addr_12 = (addr_select)?soft_rd_addr:soft_sub0_addr|soft_sub1_addr ;
 
-//assign wr_data_12 = scaled_qiki<<(`DATA_WIDTH*(word_count));
+
 
 assign soft_strt_addr = (~choose_buf)?4'd0:4'd8;
 assign soft_end_addr = (~choose_buf)?4'd8:4'd16;
@@ -182,12 +205,15 @@ always @(posedge clk) begin
 			count <= count+1;	
 		end
 		else begin
+			//Reading data from the K,Q BRAMs to feed to MVM 
+			//K vector increments every cycle and Q increments after multiplication with the whole set of K vectors is complete
 			k_addr <= k_addr+1;
 			if(count==0) 
 				q_addr <= q_addr+1;
 			if(count>4) 
 				flag <= 1; //to ensure initially there is a 4 cycle pipeline stage delay
 			
+			//Writing scaled output to the buffers
 			if(flag == 1) begin
 				if(word_count==0) 
 					word_we0_12 <= 4'b0001;
@@ -224,8 +250,6 @@ always @(posedge clk) begin
     				soft_start <=0;
   			
             end
-
-
 	
 			count <= count+1;
 			wr_data_12 <= scaled_qiki<<(`DATA_WIDTH*(word_count));   //word data sent to softmax
@@ -263,6 +287,7 @@ end
 //concatenate the 4 outputs from softmax
 assign comb_softout = {{448{1'b0}},soft_out3,soft_out2,soft_out1,soft_out0}; 
 
+//Control logic for the output side of softmax
 always@(posedge clk) begin
 	if(rst) begin
 		word_we0_34 <= 32'h0000000f;
@@ -328,7 +353,7 @@ end
 endmodule 	
 
 
-	
+//Scaling by arithmetic right shifting	
 module divideby8
 (
   input [`DATA_WIDTH-1:0] data,
@@ -350,7 +375,7 @@ endmodule
 
 
 
-module vecmat_mul #( parameter arraysize=1024,parameter vectdepth=64)  //,matsize=64)   // varraysize=1024 vectwidth=64,matsize=4096
+module vecmat_mul #( parameter arraysize=1024,parameter vectdepth=64)  
 (
  input clk,
  input reset,
@@ -425,8 +450,7 @@ module vecmat_mul #( parameter arraysize=1024,parameter vectdepth=64)  //,matsiz
 	signedmul mult_u63(.clk(clk),.a(vector[63*16+:16]),.b(matrix[63*16+:16]),.c(tmp[63*16+:16]));
 	
 
-  
-	
+
 endmodule                    
 
 module vecmat_add #(parameter arraysize=1024,parameter vectdepth=64)
