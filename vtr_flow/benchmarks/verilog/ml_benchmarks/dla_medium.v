@@ -1,3 +1,4 @@
+//`define complex_dsp
 module DLA (
 	input clk,
 	input i_reset,
@@ -25516,21 +25517,8 @@ int_sop_2 mac_component (
 );
 `else
 assign resulta = ax*ay + bx*by;
-'endif
+`endif
 
-
-int_sop_2 mac_component (
-	.mode_sigs(mode),
-	.clk(clk),
-	.reset(aclr),
-	.ax(ax),
-	.ay(ay),
-	.bx(bx),
-	.by(by),
-	.chainin(chainin),
-	.resulta(resulta),
-	.chainout(chainout)
-);
 
 endmodule
 
@@ -25565,7 +25553,7 @@ int_sop_2 mac_component (
 );
 `else
 assign resulta = ax*ay + bx*by;
-'endif
+`endif
 
 endmodule
 

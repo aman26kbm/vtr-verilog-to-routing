@@ -1,4 +1,4 @@
-`define complex_dsp
+//`define complex_dsp
 module DLA (
 	input clk,
 	input i_reset,
@@ -11679,6 +11679,7 @@ module dsp_block_16_8_false (
 
 wire [10:0] mode;
 assign mode = 11'b1010_1010_011;
+
 `ifdef complex_dsp
 int_sop_2 mac_component (
 	.mode_sigs(mode),
@@ -11695,7 +11696,7 @@ int_sop_2 mac_component (
 
 `else
 assign resulta = ax*ay + bx*by;
-'endif
+`endif
 
 endmodule
 
