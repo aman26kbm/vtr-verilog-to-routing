@@ -1,5 +1,5 @@
 //softmax_p8_smem_rfloat16_alut_v512_b2_-0.1_0.1.v
-//`define complex_dsp
+`define complex_dsp
 `ifndef DEFINES_DONE
 `define DEFINES_DONE
 `define EXPONENT 5
@@ -2143,7 +2143,7 @@ FPMult  u_FPMult (.clk(), .rst(1'b0), .a(a), .b(b), .result(result), .flags());
 	
 		
 endmodule
-
+`ifndef complex_dsp
 
 `define EXPONENT 5
 `define MANTISSA 10
@@ -3374,3 +3374,4 @@ module FPAddSub_ExceptionModule(
 	assign Flags = {Overflow, Underflow, DivideByZero, Invalid, Inexact} ; 	
 	
 endmodule
+`endif

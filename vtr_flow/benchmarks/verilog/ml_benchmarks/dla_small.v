@@ -1,4 +1,4 @@
-//`define complex_dsp
+`define complex_dsp
 module DLA (
 	input clk,
 	input i_reset,

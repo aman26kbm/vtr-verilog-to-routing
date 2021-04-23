@@ -46,7 +46,7 @@
 //section by section. The number of rows will be programmed
 //in the "iterations" register in the design.
 
-//`define complex_dsp
+`define complex_dsp
 `define DWIDTH 16
 `define AWIDTH 10
 `define MEM_SIZE 1024
@@ -1748,6 +1748,9 @@ assign out = sub_out_temp_reg;
 
 endmodule
 
+
+`ifndef complex_dsp
+
 `define EXPONENT 5
 `define MANTISSA 10
 `define ACTUAL_MANTISSA 11
@@ -2977,3 +2980,4 @@ module FPAddSub_ExceptionModule(
 	assign Flags = {Overflow, Underflow, DivideByZero, Invalid, Inexact} ; 	
 	
 endmodule
+`endif

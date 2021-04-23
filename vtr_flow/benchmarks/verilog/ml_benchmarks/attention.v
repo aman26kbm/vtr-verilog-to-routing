@@ -1,6 +1,6 @@
 //`define SIMULATION_MEMORY
 //`define SIMULATION_addfp
-//`define complex_dsp
+`define complex_dsp
 `define VECTOR_DEPTH 64 //Q,K,V vector size
 `define DATA_WIDTH 16
 `define VECTOR_BITS 1024 // 16 bit each (16x64)
@@ -3216,6 +3216,7 @@ module adder_fp(
 endmodule
 `endif
 
+`ifndef complex_dsp
 
 `define EXPONENT 5
 `define MANTISSA 10
@@ -4126,3 +4127,5 @@ module FPAddSub_ExceptionModule(
 	assign Flags = {Overflow, Underflow, DivideByZero, Invalid, Inexact} ; 	
 	
 endmodule
+`endif
+

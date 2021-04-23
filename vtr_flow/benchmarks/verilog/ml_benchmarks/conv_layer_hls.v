@@ -1,4 +1,4 @@
-//`define complex_dsp
+`define complex_dsp
 module dpram ( 
 
     clk, 
@@ -6626,6 +6626,7 @@ input   ap_continue_2;
 
 endmodule
 
+`ifndef complex_dsp
 
 `define EXPONENT 5
 `define MANTISSA 10
@@ -7856,3 +7857,4 @@ module FPAddSub_ExceptionModule(
 	assign Flags = {Overflow, Underflow, DivideByZero, Invalid, Inexact} ; 	
 	
 endmodule
+`endif

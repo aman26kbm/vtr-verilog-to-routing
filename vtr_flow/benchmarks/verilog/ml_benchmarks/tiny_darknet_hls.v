@@ -6,7 +6,7 @@
 // ===========================================================
 
 `timescale 1 ns / 1 ps 
-//`define complex_dsp
+`define complex_dsp
 module td_fused_top_Block_entry_proc_proc392 (
         ap_clk,
         ap_rst,
@@ -113729,6 +113729,9 @@ assign trunc_ln151_fu_1294_p1 = tmp_fu_1280_p5[47:0];
 
 endmodule //td_fused_top
 
+
+`ifndef complex_dsp
+
 `define EXPONENT 5
 `define MANTISSA 10
 `define ACTUAL_MANTISSA 11
@@ -114958,3 +114961,4 @@ module FPAddSub_ExceptionModule(
 	assign Flags = {Overflow, Underflow, DivideByZero, Invalid, Inexact} ; 	
 	
 endmodule
+`endif
