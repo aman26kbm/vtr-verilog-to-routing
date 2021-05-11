@@ -1,3 +1,1 @@
-nohup ./cmds.mar_2021.exp2a.larger > log.mar17.exp2a.larger &
-nohup ./cmds.mar_2021.exp2a > log.mar17.exp2a &
-nohup ./cmds.mar_2021.exp2a.shorter > log.mar17.exp2a.shorter &
+nohup ./cmds.mar_2021.exp2a > log.apr27.exp2a &

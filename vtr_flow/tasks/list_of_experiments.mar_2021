@@ -4,11 +4,12 @@
 #-------------------
 # ML benchmarks
 #-------------------
-agilex.ml.clstm_small
-agilex.ml.dla_small
-agilex.ml.tiny_darknet_hls
-agilex.ml.dla_medium
-agilex.ml.clstm_medium
+agilex.ml.tpu_v2.8x8.bf16
+#agilex.ml.clstm_small
+#agilex.ml.dla_small
+#agilex.ml.tiny_darknet_hls
+#agilex.ml.dla_medium
+#agilex.ml.clstm_medium
 #agilex.ml.clstm_large
 #-------------------
 # Non-ML benchmarks

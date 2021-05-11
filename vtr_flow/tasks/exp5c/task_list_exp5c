@@ -1,5 +1,1 @@
-exp5c/agilex.clstm_small
-exp5c/agilex.dla_small
-exp5c/agilex.tiny_darknet_hls
-exp5c/agilex.dla_medium
-exp5c/agilex.clstm_medium
+exp5c/agilex.tpu_v2.8x8.bf16
