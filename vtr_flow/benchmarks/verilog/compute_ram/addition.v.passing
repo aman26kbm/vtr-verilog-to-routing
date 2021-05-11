@@ -1,0 +1,25 @@
+`define DWIDTH 4
+`define NUM 2
+
+module int4_additions(
+    input [`NUM*`DWIDTH-1:0] in1,
+    input [`NUM*`DWIDTH-1:0] in2,
+    output [`DWIDTH:0] outA,
+    output [`DWIDTH:0] outB
+);
+
+//genvar i;
+//generate
+//    for (i=0; i<`NUM; i=i+1) begin
+//        assign out[i*`DWIDTH +: `DWIDTH] = in1[i*`DWIDTH +: `DWIDTH] + in2[i*`DWIDTH +: `DWIDTH];
+//    end
+//endgenerate
+
+wire [`DWIDTH:0] outA;
+assign outA = in1[`DWIDTH-1:0] + in2[`DWIDTH-1:0];
+wire [`DWIDTH:0] outB;
+assign outB = in1[2*`DWIDTH-1:`DWIDTH] + in2[2*`DWIDTH-1:`DWIDTH];
+
+//assign out = {outB, outA};
+
+endmodule
