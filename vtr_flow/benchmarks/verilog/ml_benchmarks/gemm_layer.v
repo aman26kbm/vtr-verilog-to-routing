@@ -1,14 +1,43 @@
-
 `timescale 1ns / 1ps
-//`define complex_dsp
-`define DWIDTH 16
+
+/////////////////////////////////////////////////////////////////////////
+// GEMM (General Matrix Multiply) layer
+// Precision BF16
+// Size of the layer 20x20
+// AXI interface to control/observe the unit
+// RAMs that store inputs and outputs are not a part of this design
+/////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////
+// When using an FPGA architecture which has a complex DSP block
+// (eg. COFFE_22m/k6n10LB_mem20K_complexDSP_customSB_22nm.xml), define  
+// the following macro. But comment it out if using an FPGA architecture 
+// with a simpler DSP (just a fixed point multiplier) like in the
+// flagship arch timing/k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml
+/////////////////////////////////////////////////////////////////////////
+`define complex_dsp
+`define BFLOAT16 
+
+// IEEE Half Precision => EXPONENT = 5, MANTISSA = 10
+// BFLOAT16 => EXPONENT = 8, MANTISSA = 7 
+
+`ifdef BFLOAT16
+`define EXPONENT 8
+`define MANTISSA 7
+`else // for ieee half precision fp16
+`define EXPONENT 5
+`define MANTISSA 10
+`endif
+
+`define SIGN 1
+`define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
+
 `define AWIDTH 8
 `define MEM_SIZE 256
 
 `define MAT_MUL_SIZE 20
 `define MASK_WIDTH 20
-//This define isn't needed for this design, because we set a_loc and b_loc to
-//0
+//This define isn't needed for this design, because we set a_loc and b_loc to 0
 `define LOG2_MAT_MUL_SIZE 4 
 
 `define BB_MAT_MUL_SIZE `MAT_MUL_SIZE
@@ -16,14 +45,13 @@
 `define MEM_ACCESS_LATENCY 1
 `define ADDR_STRIDE_WIDTH 8
 
-module matmul_v1_0 #
+/////////////////////////////////////////////////////////////////////////
+// The AXI code is taken from the RTL generator by Xilinx Vivado
+// block design.
+/////////////////////////////////////////////////////////////////////////
+
+module gemm_layer #
 	(
-		// Users to add parameters here
-
-		// User parameters ends
-		// Do not modify the parameters beyond this line
-
-
 		// Parameters of Axi Slave Bus Interface S00_AXI
 		parameter C_S00_AXI_DATA_WIDTH	= 32,
 		parameter C_S00_AXI_ADDR_WIDTH	= 6
@@ -74,11 +102,12 @@ module matmul_v1_0 #
 		output wire  s00_axi_rvalid,
 		input wire  s00_axi_rready
 	);
-// Instantiation of Axi Bus Interface S00_AXI
-	matmul_v1_0_S00_AXI # ( 
+
+  // Instantiation of Axi Bus Interface S00_AXI
+	gemm_0_S00_AXI # ( 
 		.C_S_AXI_DATA_WIDTH(C_S00_AXI_DATA_WIDTH),
 		.C_S_AXI_ADDR_WIDTH(C_S00_AXI_ADDR_WIDTH)
-	) matmul_v1_0_S00_AXI_inst (
+	) gemm_0_S00_AXI_inst (
 		.bram_addr_a(bram_addr_a),
 		.bram_rdata_a(bram_rdata_a),
 		.bram_wdata_a(bram_wdata_a),
@@ -117,19 +146,10 @@ module matmul_v1_0 #
 		.S_AXI_RREADY(s00_axi_rready)
 	);
 
-	// Add user logic here
-
-	// User logic ends
-
 	endmodule
 
-	module matmul_v1_0_S00_AXI #
+	module gemm_0_S00_AXI #
 (
-		// Users to add parameters here
-
-		// User parameters ends
-		// Do not modify the parameters beyond this line
-
 		// Width of S_AXI data bus
 		parameter C_S_AXI_DATA_WIDTH	= 32,
 		// Width of S_AXI address bus
@@ -747,23 +767,7 @@ matmul_20x20_systolic u_matmul(
 endmodule
 
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2021-03-13 10:05:56.090127
-// Design Name: 
-// Module Name: matmul_20x20_systolic
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
+// The main matrix multiplication module
 //////////////////////////////////////////////////////////////////////////////////
 
 module matmul_20x20_systolic(
@@ -6684,6 +6688,9 @@ assign b_data_out = {b19_19to20_19,b19_18to20_18,b19_17to20_17,b19_16to20_16,b19
 
 endmodule
 
+//////////////////////////////////////////////////////////////////////////
+// Definition of a processing element (basically a MAC)
+//////////////////////////////////////////////////////////////////////////
 module processing_element(
  reset, 
  clk, 
@@ -6933,31 +6940,13 @@ endmodule
 `endif
 
 `ifndef complex_dsp
-//////////////////////////////////////////////////////////////////////
-// Floating point multiplier
-//////////////////////////////////////////////////////////////////////
 
-`define EXPONENT 5
-`define MANTISSA 10
-`define ACTUAL_MANTISSA 11
-`define EXPONENT_LSB 10
-`define EXPONENT_MSB 14
-`define MANTISSA_LSB 0
-`define MANTISSA_MSB 9
-`define MANTISSA_MUL_SPLIT_LSB 3
-`define MANTISSA_MUL_SPLIT_MSB 9
-`define SIGN 1
-`define SIGN_LOC 15
-//`define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
-`define IEEE_COMPLIANCE 1
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    08:40:21 09/19/2012 
-// Module Name:    FPMult
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
-//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Definition of a 16-bit floating point multiplier
+// This is a heavily modified version of:
+// https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FPMult
+//////////////////////////////////////////////////////////////////////////
+
 
 module FPMult_16(
 		clk,
@@ -6971,16 +6960,16 @@ module FPMult_16(
 	// Input Ports
 	input clk ;							// Clock
 	input rst ;							// Reset signal
-	input [`DWIDTH-1:0] a;					// Input A, a 32-bit floating point number
-	input [`DWIDTH-1:0] b;					// Input B, a 32-bit floating point number
+	input [`DWIDTH-1:0] a;						// Input A, a 32-bit floating point number
+	input [`DWIDTH-1:0] b;						// Input B, a 32-bit floating point number
 	
 	// Output ports
 	output [`DWIDTH-1:0] result ;					// Product, result of the operation, 32-bit FP number
-	output [4:0] flags ;				// Flags indicating exceptions according to IEEE754
+	output [4:0] flags ;						// Flags indicating exceptions according to IEEE754
 	
 	// Internal signals
-	wire [31:0] Z_int ;				// Product, result of the operation, 32-bit FP number
-	wire [4:0] Flags_int ;			// Flags indicating exceptions according to IEEE754
+	wire [`DWIDTH-1:0] Z_int ;					// Product, result of the operation, 32-bit FP number
+	wire [4:0] Flags_int ;						// Flags indicating exceptions according to IEEE754
 	
 	wire Sa ;							// A's sign
 	wire Sb ;							// B's sign
@@ -6988,29 +6977,30 @@ module FPMult_16(
 	wire [`EXPONENT-1:0] Ea ;					// A's exponent
 	wire [`EXPONENT-1:0] Eb ;					// B's exponent
 	wire [2*`MANTISSA+1:0] Mp ;					// Product mantissa
-	wire [4:0] InputExc ;			// Exceptions in inputs
-	wire [`MANTISSA-1:0] NormM ;				// Normalized mantissa
-	wire [`EXPONENT:0] NormE ;				// Normalized exponent
-	wire [`MANTISSA:0] RoundM ;				// Normalized mantissa
-	wire [`EXPONENT:0] RoundE ;				// Normalized exponent
-	wire [`MANTISSA:0] RoundMP ;				// Normalized mantissa
-	wire [`EXPONENT:0] RoundEP ;				// Normalized exponent
+	wire [4:0] InputExc ;						// Exceptions in inputs
+	wire [`MANTISSA-1:0] NormM ;					// Normalized mantissa
+	wire [`EXPONENT:0] NormE ;					// Normalized exponent
+	wire [`MANTISSA:0] RoundM ;					// Normalized mantissa
+	wire [`EXPONENT:0] RoundE ;					// Normalized exponent
+	wire [`MANTISSA:0] RoundMP ;					// Normalized mantissa
+	wire [`EXPONENT:0] RoundEP ;					// Normalized exponent
 	wire GRS ;
 
-	//reg [63:0] pipe_0;			// Pipeline register Input->Prep
-	reg [2*`DWIDTH-1:0] pipe_0;			// Pipeline register Input->Prep
+	//reg [63:0] pipe_0;						// Pipeline register Input->Prep
+	reg [2*`DWIDTH-1:0] pipe_0;					// Pipeline register Input->Prep
 
-	//reg [92:0] pipe_1;			// Pipeline register Prep->Execute
-	reg [3*`MANTISSA+2*`EXPONENT+7:0] pipe_1;			// Pipeline register Prep->Execute
+	//reg [92:0] pipe_1;						// Pipeline register Prep->Execute
+	//reg [3*`MANTISSA+2*`EXPONENT+7:0] pipe_1;			// Pipeline register Prep->Execute
+	reg [3*`MANTISSA+2*`EXPONENT+18:0] pipe_1;
 
-	//reg [38:0] pipe_2;			// Pipeline register Execute->Normalize
-	reg [`MANTISSA+`EXPONENT+7:0] pipe_2;			// Pipeline register Execute->Normalize
+	//reg [38:0] pipe_2;						// Pipeline register Execute->Normalize
+	reg [`MANTISSA+`EXPONENT+7:0] pipe_2;				// Pipeline register Execute->Normalize
 	
-	//reg [72:0] pipe_3;			// Pipeline register Normalize->Round
+	//reg [72:0] pipe_3;						// Pipeline register Normalize->Round
 	reg [2*`MANTISSA+2*`EXPONENT+10:0] pipe_3;			// Pipeline register Normalize->Round
 
-	//reg [36:0] pipe_4;			// Pipeline register Round->Output
-	reg [`DWIDTH+4:0] pipe_4;			// Pipeline register Round->Output
+	//reg [36:0] pipe_4;						// Pipeline register Round->Output
+	reg [`DWIDTH+4:0] pipe_4;					// Pipeline register Round->Output
 	
 	assign result = pipe_4[`DWIDTH+4:5] ;
 	assign flags = pipe_4[4:0] ;
@@ -7028,6 +7018,7 @@ module FPMult_16(
 	//FPMult_RoundModule RoundModule(pipe_3[47:24], pipe_3[23:0], pipe_3[65:57], pipe_3[56:48], pipe_3[66], pipe_3[67], pipe_3[72:68], Z_int[31:0], Flags_int[4:0]) ;		
 	FPMult_RoundModule RoundModule(pipe_3[2*`MANTISSA+1:`MANTISSA+1], pipe_3[`MANTISSA:0], pipe_3[2*`MANTISSA+2*`EXPONENT+3:2*`MANTISSA+`EXPONENT+3], pipe_3[2*`MANTISSA+`EXPONENT+2:2*`MANTISSA+2], pipe_3[2*`MANTISSA+2*`EXPONENT+4], pipe_3[2*`MANTISSA+2*`EXPONENT+5], pipe_3[2*`MANTISSA+2*`EXPONENT+10:2*`MANTISSA+2*`EXPONENT+6], Z_int[`DWIDTH-1:0], Flags_int[4:0]) ;		
 
+//adding always@ (*) instead of posedge clock to make design combinational
 	always @ (*) begin	
 		if(rst) begin
 			pipe_0 = 0;
@@ -7038,41 +7029,45 @@ module FPMult_16(
 		end 
 		else begin		
 			/* PIPE 0
-				[63:32] A
-				[31:0] B
+				[2*`DWIDTH-1:`DWIDTH] A
+				[`DWIDTH-1:0] B
 			*/
-      pipe_0 = {a, b} ;
+                       pipe_0 = {a, b} ;
+
 
 			/* PIPE 1
-				[70] Sa
-				[69] Sb
-				[68:61] Ea
-				[60:53] Eb
-				[52:5] Mp
+				[2*`EXPONENT+3*`MANTISSA + 18: 2*`EXPONENT+2*`MANTISSA + 18] //pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH] , mantissa of A
+				[2*`EXPONENT+2*`MANTISSA + 17 :2*`EXPONENT+2*`MANTISSA + 9] // pipe_0[8:0]
+				[2*`EXPONENT+2*`MANTISSA + 8] Sa
+				[2*`EXPONENT+2*`MANTISSA + 7] Sb
+				[2*`EXPONENT+2*`MANTISSA + 6:`EXPONENT+2*`MANTISSA+7] Ea
+				[`EXPONENT +2*`MANTISSA+6:2*`MANTISSA+7] Eb
+				[2*`MANTISSA+1+5:5] Mp
 				[4:0] InputExc
 			*/
 			//pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[`MANTISSA_MUL_SPLIT_LSB-1:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA-1:0], InputExc[4:0]} ;
 			pipe_1 = {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[8:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]} ;
+			
 			/* PIPE 2
-				[38:34] InputExc
-				[33] GRS
-				[32] Sp
-				[31:23] NormE
-				[22:0] NormM
+				[`EXPONENT + `MANTISSA + 7:`EXPONENT + `MANTISSA + 3] InputExc
+				[`EXPONENT + `MANTISSA + 2] GRS
+				[`EXPONENT + `MANTISSA + 1] Sp
+				[`EXPONENT + `MANTISSA:`MANTISSA] NormE
+				[`MANTISSA-1:0] NormM
 			*/
 			pipe_2 = {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
 			/* PIPE 3
-				[72:68] InputExc
-				[67] GRS
-				[66] Sp	
-				[65:57] RoundE
-				[56:48] RoundEP
-				[47:24] RoundM
-				[23:0] RoundMP
+				[2*`EXPONENT+2*`MANTISSA+10:2*`EXPONENT+2*`MANTISSA+6] InputExc
+				[2*`EXPONENT+2*`MANTISSA+5] GRS
+				[2*`EXPONENT+2*`MANTISSA+4] Sp	
+				[2*`EXPONENT+2*`MANTISSA+3:`EXPONENT+2*`MANTISSA+3] RoundE
+				[`EXPONENT+2*`MANTISSA+2:2*`MANTISSA+2] RoundEP
+				[2*`MANTISSA+1:`MANTISSA+1] RoundM
+				[`MANTISSA:0] RoundMP
 			*/
 			pipe_3 = {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
 			/* PIPE 4
-				[36:5] Z
+				[`DWIDTH+4:5] Z
 				[4:0] Flags
 			*/				
 			pipe_4 = {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
@@ -7080,7 +7075,6 @@ module FPMult_16(
 	end
 		
 endmodule
-
 
 module FPMult_PrepModule (
 		clk,
@@ -7221,8 +7215,16 @@ module FPMult_NormalizeModule(
 	output [`MANTISSA:0] RoundM ;
 	output [`MANTISSA:0] RoundMP ; 
 	
-	assign RoundE = NormE - 15 ;
-	assign RoundEP = NormE - 14 ;
+// EXPONENT = 5 
+// EXPONENT -1 = 4
+// NEED to subtract 2^4 -1 = 15
+
+wire [`EXPONENT-1 : 0] bias;
+
+assign bias =  ((1<< (`EXPONENT -1)) -1);
+
+	assign RoundE = NormE - bias ;
+	assign RoundEP = NormE - bias -1 ;
 	assign RoundM = NormM ;
 	assign RoundMP = NormM ;
 
@@ -7269,8 +7271,13 @@ module FPMult_RoundModule(
 	assign Flags = InputExc[4:0];
 
 endmodule
+
 `endif
 
+ 
+//////////////////////////////////////////////////////////////////////////
+// A floating point 16-bit to floating point 32-bit converter
+//////////////////////////////////////////////////////////////////////////
 `ifndef complex_dsp
 module fp16_to_fp32 (input [15:0] a , output [31:0] b);
 
@@ -7320,6 +7327,9 @@ assign b = b_temp;
 
 endmodule
 
+//////////////////////////////////////////////////////////////////////////
+// A floating point 32-bit to floating point 16-bit converter
+//////////////////////////////////////////////////////////////////////////
 module fp32_to_fp16 (input [31:0] a , output [15:0] b);
 
 reg [15:0]b_temp;
@@ -7361,6 +7371,11 @@ assign b = b_temp;
 endmodule
 `endif
 
+//////////////////////////////////////////////////////////////////////////
+// Definition of a 32-bit floating point adder/subtractor
+// This is a heavily modified version of:
+// https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FP_AddSub
+//////////////////////////////////////////////////////////////////////////
 `ifndef complex_dsp
 module FPAddSub_single(
 		clk,
@@ -7532,13 +7547,8 @@ module FPAddSub_a(
 	
 	//assign DAB = (A[30:23] - B[30:23]) ;
 	//assign DBA = (B[30:23] - A[30:23]) ;
-	`ifndef SYNTHESIS_
   assign DAB = (A[30:23] + ~(B[30:23]) + 1) ;
 	assign DBA = (B[30:23] + ~(A[30:23]) + 1) ;
-  `else
-  DW01_add #(8) u_add1(.A(A[30:23]), .B(~(B[30:23])), .CI(1'b1), .SUM(DAB), .CO());
-  DW01_add #(8) u_add2(.A(B[30:23]), .B(~(A[30:23])), .CI(1'b1), .SUM(DBA), .CO());
-	`endif
 
 	assign Sa = A[31] ;									// A's sign bit
 	assign Sb = B[31] ;									// B's sign	bit
@@ -7672,15 +7682,7 @@ module FpAddSub_b(
 	assign Opr = (OpMode^Sa^Sb); 		// Resolve sign to determine operation
 
 	// Perform effective operation
-  `ifndef SYNTHESIS_
 	assign Sum = (OpMode^Sa^Sb) ? ({1'b1, Mmax, 8'b00000000} - {Mmin, 8'b00000000}) : ({1'b1, Mmax, 8'b00000000} + {Mmin, 8'b00000000}) ;
-	`else
-  wire [32:0] sum;
-  wire [32:0] sub;
-  DW01_add #(32) u_add(.A({1'b1, Mmax, 8'b00000000}), .B({Mmin, 8'b00000000}), .CI(1'b0), .SUM(sum[31:0]), .CO(sum[32]));
-  DW01_sub #(32) u_sub(.A({1'b1, Mmax, 8'b00000000}), .B({Mmin, 8'b00000000}), .CI(1'b0), .DIFF(sub[31:0]), .CO(sub[32]));
-	assign Sum = (OpMode^Sa^Sb) ? (sub) : (sum) ;
-  `endif 
 	// Assign result sign
 	assign PSgn = (MaxAB ? Sb : Sa) ;
 
@@ -7816,17 +7818,9 @@ module FPAddSub_c(
 	// Calculate normalized exponent and mantissa, check for all-zero sum
 	assign MSBShift = SumS_7[32] ;		// Check MSB in unnormalized sum
 	assign ZeroSum = ~|SumS_7 ;			// Check for all zero sum
-  `ifndef SYNTHESIS_
 	assign ExpOK = CExp - Shift ;		// Adjust exponent for new normalized mantissa
-  `else
-  DW01_sub #(8) u_sub(.A(CExp), .B({3'b000, Shift}), .CI(1'b0), .DIFF(ExpOK[7:0]), .CO(ExpOK[8]));
-  `endif
 	assign NegE = ExpOK[8] ;			// Check for exponent overflow
-  `ifndef SYNTHESIS_
 	assign ExpOF = CExp - Shift + 1'b1 ;		// If MSB set, add one to exponent(x2)
-  `else
-  assign ExpOF = ExpOK + 1'b1;
-  `endif
 	assign NormE = MSBShift ? ExpOF : ExpOK ;			// Check for exponent overflow
 	assign NormM = SumS_7[31:9] ;		// The new, normalized mantissa
 	
