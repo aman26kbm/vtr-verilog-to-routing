@@ -11,7 +11,7 @@
     Parameter | Value | Definition
     __________|_______|______________________________
     N         |    10 | Number of BLEs per cluster
-    W         |   320 | Channel width
+    W         |   300 | Channel width
     L         |  4,16 | Wire segment length
     I         |    60 | Number of cluster inputs
     O         |    40 | Number of cluster outputs
@@ -61,11 +61,25 @@
 
     Floating point modes:
     ____________________
-    1. One fp32 multiplier (multiply_fp)
-    2. One fp32 adder/subtractor (adder_fp)
+
+    IMPORTANT:
+    The precisions supported are IEEE floating point 32-bit, IEEE floating point 16-bit and
+    Brain floating point (BF16). In the 16-bit mode descriptions, wherever "fp16" is used, it
+    refers to either IEEE floating point 16-bit or BF16. There are mode bits on the DSP slice
+    that can be used to differentiate between them. Doing this saves the effort of explicitly
+    specifying all the 16-bit modes twice in this file. 
+    Since the goal is architectural exploration and not functional simulation, the mode bits 
+    can be specified to any random value while instantiating the DSP slice in a Verilog benchmark.
+
+    1A. One fp32 multiplier (multiply_fp)
+    1B. One fp32 multiplier, clocked (multiply_fp_clk)
+    2A. One fp32 adder/subtractor (adder_fp)
+    2B. One fp32 adder/subtractor, clocked (adder_fp_clk)
     3. One fp32 mac (mac_fp)
-    4. Two fp16 multipliers (multiply_fp)
-    5. Two fp16 adders (adder_fp)
+    4A. Two fp16 multipliers (multiply_fp)
+    4B. Two fp16 multipliers, clocked (multiply_fp_clk)
+    5A. Two fp16 adders/subtractors (adder_fp)
+    5B. Two fp16 adders/subtractors, clocked (adder_fp_clk)
     6. Two fp16 macs (mac_fp)
     7. floating point fp16 sum-of-products mode (result = fp16_mult_top_a * fp16_mult_top_b + fp16_mult_bot_a * fp16_mult_bot_b. chainout = third_inp or result) (fp16_sum_of_products_mode/fp16_mult_add)
     8. floating point fp16 sum-of-2 mult mode (result = fp16_mult_top_a * fp16_mult_top_b + fp16_mult_bot_a * fp16_mult_bot_b + fp32 chainin or third inp. chainout = third_inp or result) (fp16_sum_of_products_2_mult_mode/fp16_sop2_mult)
@@ -103,20 +117,29 @@
     ##############################
     Routing/Interconnect
     ##############################
-    This architecture uses Wilton type switches with Fs=3. The channel width is 320.
+    The routing channel width is 300. Note that the channel width isn't specified directly in this arch file. 
+    Switch pattern calculations assume that value. During experiments, channel width can be specified using 
+    the command line switch `route_chan_width`.
+    The architecture uses unidirectional routing with wire segments of length 4 (260 out of 300 wires) and 
+    length 16 (40 out of 300 wires). The length 16 wires do not directly connect to block pins and are only 
+    accessible from the length 4 wires. Switches appear after every 4 blocks on the length 16 wires. 
+    The switch blocks use a custom switching pattern based on the Stratix-IV-like architecture used in the 
+    Titan flow [5]. 
 
     ##############################
-    Misc
+    I/Os
     ##############################
-    No area values provided for the IOs.
+    I/O pads are arranged along the perimeter of the FPGA. No area values provided for the I/Os.
 
     ##############################
     What makes this architecture Agilex-like?
     ##############################
     1. The DSP slice supports lower precision modes - int8 (actually 9x9) and 16-bit floating point
        (IEEE half-precision and bfloat16).
-    2. DSPs are chained in vertical direction
-    3. There are wire segments of L=4 and L=16.
+    2. DSPs are chained in vertical direction (currently only chainin-chainout are supported; 
+       in the future, scanin-scanout connections will be added as well)
+    3. Instead of having wires of just one length in the entire FPGA, there are wire segments of L=4 
+       and L=16. And a custom switch pattern (not a standard wilton switch) is used. 
 
     ##############################
     What makes this architecture different from Agilex and Stratix10?
@@ -134,6 +157,8 @@
         See: https://github.com/vaughnbetz/COFFE/blob/master/spice_models/ptm_22nm_bulk_hp.l
     [4] A. Stillmaker and B. Baas, "Scaling equations for the accurate prediction of CMOS device 
         performance from 180 nm to 7 nm" in Integration, the VLSI Journal (2017)
+    [5] K. E. Murray et al., “Timing-Driven Titan: Enabling Large Benchmarks and Exploring the Gap between 
+        Academic and Commercial CAD,” TRETS 2015.
 -->
 
 <architecture>
@@ -210,6 +235,16 @@
         <port name="out"/>
       </output_ports>
     </model>   
+    <model name="multiply_fp_clk">
+      <input_ports>
+        <port name="clk" is_clock="1"/>  
+        <port name="a" clock="clk" combinational_sink_ports="out"/>
+        <port name="b" clock="clk" combinational_sink_ports="out"/>
+      </input_ports>
+      <output_ports>
+        <port name="out" clock="clk"/>
+      </output_ports>
+    </model>
     <!-- Only used inside CLBs for 1-bit adder.
          ODIN infers these when + sign appears in RTL.
          Can't use this inside DSP slice
@@ -234,6 +269,16 @@
       </input_ports>
       <output_ports>
         <port name="out"/>
+      </output_ports>
+    </model>
+    <model name="adder_fp_clk">
+      <input_ports>
+        <port name="clk" is_clock="1"/>  
+        <port name="a" clock="clk" combinational_sink_ports="out"/>
+        <port name="b" clock="clk" combinational_sink_ports="out"/>
+      </input_ports>
+      <output_ports>
+        <port name="out" clock="clk"/>
       </output_ports>
     </model>
     <!--A mode in DSP slice-->
@@ -528,7 +573,7 @@
         </pinlocations>
       </sub_tile>
     </tile>
-    <tile name="memory" height="2" width="1" area="204346">
+    <tile name="memory" height="2" width="1" area="137668">
       <sub_tile name="memory">
         <equivalent_sites>
           <site pb_type="memory" pin_mapping="direct"/>
@@ -1754,20 +1799,20 @@
 
         <!-- floating point adder mode (result = a + b)-->
         <mode name="adder_fp32_mode"> 
-          <pb_type name="adder_pb" blif_model=".subckt adder_fp" num_pb="1">
+          <pb_type name="adder_fp32" blif_model=".subckt adder_fp" num_pb="1">
             <input name="a" num_pins="32"/>
             <input name="b" num_pins="32"/>
             <output name="out" num_pins="32"/>
 
-            <delay_constant max="2.56e-9" in_port="adder_pb.a" out_port="adder_pb.out"/>
-            <delay_constant max="2.56e-9" in_port="adder_pb.b" out_port="adder_pb.out"/>
+            <delay_constant max="2.56e-9" in_port="adder_fp32.a" out_port="adder_fp32.out"/>
+            <delay_constant max="2.56e-9" in_port="adder_fp32.b" out_port="adder_fp32.out"/>
           </pb_type>
           <interconnect>
-            <direct name="atoa" input="dsp_pb.datain[31:0]" output="adder_pb.a">
+            <direct name="atoa" input="dsp_pb.datain[31:0]" output="adder_fp32.a">
             </direct>
-            <direct name="btob" input="dsp_pb.datain[63:32]" output="adder_pb.b">
+            <direct name="btob" input="dsp_pb.datain[63:32]" output="adder_fp32.b">
             </direct>
-            <direct name="sumouttosumout" input="adder_pb.out" output="dsp_pb.resulta[31:0]">
+            <direct name="sumouttosumout" input="adder_fp32.out" output="dsp_pb.resulta[31:0]">
             </direct>
           </interconnect>
         </mode>
@@ -1783,6 +1828,128 @@
             <delay_constant max="2.56e-9" in_port="adder_fp16.b" out_port="adder_fp16.out"/>
           </pb_type>
           <interconnect>
+            <direct name="a2a0" input="dsp_pb.datain[15:0]" output="adder_fp16[0].a"></direct>
+            <direct name="a2a1" input="dsp_pb.datain[31:16]" output="adder_fp16[1].a"></direct>
+            <direct name="b2b0" input="dsp_pb.datain[47:32]" output="adder_fp16[0].b"></direct>
+            <direct name="b2b1" input="dsp_pb.datain[63:48]" output="adder_fp16[1].b"></direct>
+            <direct name="out2out0" input="adder_fp16[0].out" output="dsp_pb.resulta[15:0]"></direct>
+            <direct name="out2out1" input="adder_fp16[1].out" output="dsp_pb.resulta[31:16]"></direct>
+          </interconnect>
+        </mode>
+
+        <!-- clocked floating point multiplier mode (result = a * b)-->
+        <mode name="mult_fp32_clocked_mode">
+          <pb_type name="mult_fp32" blif_model=".subckt multiply_fp_clk" num_pb="1">
+            <input name="a" num_pins="32"/>
+            <input name="b" num_pins="32"/>
+            <output name="out" num_pins="32"/>
+            <clock name="clk" num_pins="1"/>
+
+            <delay_constant max="2.56e-9" in_port="mult_fp32.a" out_port="mult_fp32.out"/>
+            <delay_constant max="2.56e-9" in_port="mult_fp32.b" out_port="mult_fp32.out"/>
+
+            <T_setup value="18.91e-12" port="mult_fp32.a" clock="clk"/>
+            <T_setup value="18.91e-12" port="mult_fp32.b" clock="clk"/>
+            <T_setup value="18.91e-12" port="mult_fp32.out" clock="clk"/>
+
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mult_fp32.a" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mult_fp32.b" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mult_fp32.out" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="clk" input="dsp_pb.clk" output="mult_fp32.clk"/>
+            <direct name="a2a" input="dsp_pb.datain[31:0]" output="mult_fp32.a">
+            </direct>
+            <direct name="b2b" input="dsp_pb.datain[63:32]" output="mult_fp32.b">
+            </direct>
+            <direct name="out2out" input="mult_fp32.out" output="dsp_pb.resulta[31:0]">
+            </direct>
+          </interconnect>
+        </mode>
+
+        <!-- clocked floating point multiplier mode (result = a * b)-->
+        <mode name="mult_fp16_clocked_mode">
+          <pb_type name="mult_fp16" blif_model=".subckt multiply_fp_clk" num_pb="2">
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <output name="out" num_pins="16"/>
+            <clock name="clk" num_pins="1"/>
+
+            <delay_constant max="2.56e-9" in_port="mult_fp16.a" out_port="mult_fp16.out"/>
+            <delay_constant max="2.56e-9" in_port="mult_fp16.b" out_port="mult_fp16.out"/>
+
+            <T_setup value="18.91e-12" port="mult_fp16.a" clock="clk"/>
+            <T_setup value="18.91e-12" port="mult_fp16.b" clock="clk"/>
+            <T_setup value="18.91e-12" port="mult_fp16.out" clock="clk"/>
+
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mult_fp16.a" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mult_fp16.b" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="mult_fp16.out" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="clk0" input="dsp_pb.clk" output="mult_fp16[0].clk"/>
+            <direct name="clk1" input="dsp_pb.clk" output="mult_fp16[1].clk"/>
+            <direct name="a2a0" input="dsp_pb.datain[15:0]" output="mult_fp16[0].a"></direct>
+            <direct name="a2a1" input="dsp_pb.datain[31:16]" output="mult_fp16[1].a"></direct>
+            <direct name="b2b0" input="dsp_pb.datain[47:32]" output="mult_fp16[0].b"></direct>
+            <direct name="b2b1" input="dsp_pb.datain[63:48]" output="mult_fp16[1].b"></direct>
+            <direct name="out2out0" input="mult_fp16[0].out" output="dsp_pb.resulta[15:0]"></direct>
+            <direct name="out2out1" input="mult_fp16[1].out" output="dsp_pb.resulta[31:16]"></direct>
+          </interconnect>
+        </mode>
+
+        <!-- clocked floating point adder mode (result = a + b)-->
+        <mode name="adder_fp32_clocked_mode"> 
+          <pb_type name="adder_fp32" blif_model=".subckt adder_fp_clk" num_pb="1">
+            <input name="a" num_pins="32"/>
+            <input name="b" num_pins="32"/>
+            <output name="out" num_pins="32"/>
+            <clock name="clk" num_pins="1"/>
+
+            <delay_constant max="2.56e-9" in_port="adder_fp32.a" out_port="adder_fp32.out"/>
+            <delay_constant max="2.56e-9" in_port="adder_fp32.b" out_port="adder_fp32.out"/>
+
+            <T_setup value="18.91e-12" port="adder_fp32.a" clock="clk"/>
+            <T_setup value="18.91e-12" port="adder_fp32.b" clock="clk"/>
+            <T_setup value="18.91e-12" port="adder_fp32.out" clock="clk"/>
+
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="adder_fp32.a" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="adder_fp32.b" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="adder_fp32.out" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="clk" input="dsp_pb.clk" output="adder_fp32.clk"/>
+            <direct name="atoa" input="dsp_pb.datain[31:0]" output="adder_fp32.a">
+            </direct>
+            <direct name="btob" input="dsp_pb.datain[63:32]" output="adder_fp32.b">
+            </direct>
+            <direct name="sumouttosumout" input="adder_fp32.out" output="dsp_pb.resulta[31:0]">
+            </direct>
+          </interconnect>
+        </mode>
+
+        <!-- clocked floating point adder mode (result = a + b)-->
+        <mode name="adder_fp16_clocked_mode">
+          <pb_type name="adder_fp16" blif_model=".subckt adder_fp_clk" num_pb="2">
+            <input name="a" num_pins="16"/>
+            <input name="b" num_pins="16"/>
+            <output name="out" num_pins="16"/>
+            <clock name="clk" num_pins="1"/>
+
+            <delay_constant max="2.56e-9" in_port="adder_fp16.a" out_port="adder_fp16.out"/>
+            <delay_constant max="2.56e-9" in_port="adder_fp16.b" out_port="adder_fp16.out"/>
+
+            <T_setup value="18.91e-12" port="adder_fp16.a" clock="clk"/>
+            <T_setup value="18.91e-12" port="adder_fp16.b" clock="clk"/>
+            <T_setup value="18.91e-12" port="adder_fp16.out" clock="clk"/>
+
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="adder_fp16.a" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="adder_fp16.b" clock="clk"/>
+            <T_clock_to_Q max="60.32e-12" min="60.32e-12" port="adder_fp16.out" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="clk0" input="dsp_pb.clk" output="adder_fp16[0].clk"/>
+            <direct name="clk1" input="dsp_pb.clk" output="adder_fp16[1].clk"/>
             <direct name="a2a0" input="dsp_pb.datain[15:0]" output="adder_fp16[0].a"></direct>
             <direct name="a2a1" input="dsp_pb.datain[31:16]" output="adder_fp16[1].a"></direct>
             <direct name="b2b0" input="dsp_pb.datain[47:32]" output="adder_fp16[0].b"></direct>
@@ -2420,7 +2587,18 @@
 
     This RAM block has registered outputs.
 
-    Substituting values from COFFE 22nm runs in the equations below to calculate total delays:
+    The area and delay values of this RAM block were obtained (indirectly) from COFFE simulations.
+    COFFE only support widths and depths that are powers of 2. For M20K (20 Kilobit BRAM), we need
+    the width to be 40 bits and depth to be 512 (for the logically widest mode: 512x40). We can't
+    simulate these dimensions directly in COFFE. So, we simulated and obtained the results for M32K
+    (32 Kilobits BRAM) and (16 Kilobits BRAM). Then we interpolated the results.
+    For delay, a linear interpolation was used, based on the size of the Memory (16K->20K->32K).
+    For area, the value was calculated using two interpolations: (1) port based (change in number of 
+    ports in going from 16K->20K->32K) and (2) number of bits based (change in number of bits in
+    going from 16K->20K->32K). The interpolation that resulted in the larger area was picked.
+    
+
+    Here are the equations used to calculate the delays based on COFFE results:
     T_setup (inputs) = T_level_shifter + T_register_micro_setup = 32.3ps + 18.91ps = 51.21ps
     T_clk_to_q (inputs) = T_register_micro_clk_to_q = 60.32ps
     T_setup (outputs) = T_register_micro_setup = 18.91ps 
@@ -2430,24 +2608,17 @@
 
     T_read = T1 + T2 + T3
     = max (Row decoder, Pre-charge time) + (Wordline driver + Bit line delay) + (Sense amp + Output crossbar)
-    = max (156.8, 163.2) + (245.4 + 0*) + (492.4 + 71.76)
-    = 163.2 + 245.4 + 564.16
-    = 972.76 ps = 0.973 ns
 
     * Bit line delay is included in self.RAM.samp.delay time in COFFE. The Sense amp delay is actually
     self.RAM.samp_part2.delay
 
     T_write = T1 + T2 + T3
     = max (Row decoder, Pre-charge time) + (Wordline driver) + (Write driver)
-    = max (156.8, 163.2) + (245.4) + (337.8)
-    = 163.2 + 245.4 + 337.8
-    = 746.4 ps = 0.746 ns
 
     delay_constant values model the internal limits of a block (the combinatorial delay).
-    delay_constant = max (T_read, T_write) = max(0.973, 0.863) = 0.973ns
+    delay_constant = max (T_read, T_write) 
 
 	  Overall internal delay of the RAM is T_clk_to_q (inputs) + delay_constant + T_setup (outputs)
-    = 60.32 + 972.76 + 18.91 = 1051.99 ps
     -->
     <pb_type name="memory">
       <input name="addr1" num_pins="11"/>
@@ -2476,9 +2647,9 @@
           <T_clock_to_Q max="60.32e-12" port="mem_512x40_sp.we" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_512x40_sp.out" clock="clk"/>
 
-          <delay_constant max="0.973e-9" in_port="mem_512x40_sp.addr" out_port="mem_512x40_sp.out"/>
-          <delay_constant max="0.973e-9" in_port="mem_512x40_sp.data" out_port="mem_512x40_sp.out"/>
-          <delay_constant max="0.973e-9" in_port="mem_512x40_sp.we"   out_port="mem_512x40_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_512x40_sp.addr" out_port="mem_512x40_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_512x40_sp.data" out_port="mem_512x40_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_512x40_sp.we"   out_port="mem_512x40_sp.out"/>
 
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="9.0e-12"/>
@@ -2517,9 +2688,9 @@
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_sp.we" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_sp.out" clock="clk"/>
 
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_sp.addr" out_port="mem_1024x20_sp.out"/>
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_sp.data" out_port="mem_1024x20_sp.out"/>
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_sp.we"   out_port="mem_1024x20_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_sp.addr" out_port="mem_1024x20_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_sp.data" out_port="mem_1024x20_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_sp.we"   out_port="mem_1024x20_sp.out"/>
 
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="9.0e-12"/>
@@ -2558,9 +2729,9 @@
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_sp.we" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_sp.out" clock="clk"/>
 
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_sp.addr" out_port="mem_2048x10_sp.out"/>
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_sp.data" out_port="mem_2048x10_sp.out"/>
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_sp.we"   out_port="mem_2048x10_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_sp.addr" out_port="mem_2048x10_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_sp.data" out_port="mem_2048x10_sp.out"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_sp.we"   out_port="mem_2048x10_sp.out"/>
 
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="9.0e-12"/>
@@ -2612,12 +2783,12 @@
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.out1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_1024x20_dp.out2" clock="clk"/>
 
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.addr1" out_port="mem_1024x20_dp.out1"/>
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.data1" out_port="mem_1024x20_dp.out1"/>
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.we1" out_port="mem_1024x20_dp.out1"/>
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.addr2" out_port="mem_1024x20_dp.out2"/>
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.data2" out_port="mem_1024x20_dp.out2"/>
-          <delay_constant max="0.973e-9" in_port="mem_1024x20_dp.we2" out_port="mem_1024x20_dp.out2"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_dp.addr1" out_port="mem_1024x20_dp.out1"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_dp.data1" out_port="mem_1024x20_dp.out1"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_dp.we1" out_port="mem_1024x20_dp.out1"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_dp.addr2" out_port="mem_1024x20_dp.out2"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_dp.data2" out_port="mem_1024x20_dp.out2"/>
+          <delay_constant max="0.852e-9" in_port="mem_1024x20_dp.we2" out_port="mem_1024x20_dp.out2"/>
 
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="17.9e-12"/>
@@ -2676,12 +2847,12 @@
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.out1" clock="clk"/>
           <T_clock_to_Q max="60.32e-12" port="mem_2048x10_dp.out2" clock="clk"/>
 
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.addr1" out_port="mem_2048x10_dp.out1"/>
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.data1" out_port="mem_2048x10_dp.out1"/>
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.we1" out_port="mem_2048x10_dp.out1"/>
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.addr2" out_port="mem_2048x10_dp.out2"/>
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.data2" out_port="mem_2048x10_dp.out2"/>
-          <delay_constant max="0.973e-9" in_port="mem_2048x10_dp.we2" out_port="mem_2048x10_dp.out2"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_dp.addr1" out_port="mem_2048x10_dp.out1"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_dp.data1" out_port="mem_2048x10_dp.out1"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_dp.we1" out_port="mem_2048x10_dp.out1"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_dp.addr2" out_port="mem_2048x10_dp.out2"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_dp.data2" out_port="mem_2048x10_dp.out2"/>
+          <delay_constant max="0.852e-9" in_port="mem_2048x10_dp.we2" out_port="mem_2048x10_dp.out2"/>
 
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="17.9e-12"/>
