@@ -73,13 +73,13 @@ The designs target different network types (CNNs, RNNs, MLPs, RL) and layer type
 Some of the designs are generated from HLS tools as well.
 These designs use many precisions including binary, different fixed point types int8/16/32, brain floating point (bfloat16), and IEEE half-precision floating point (fp16).
 
-.. _table_koios_benchmarks:
+..  table_koios_benchmarks:
 
-.. table:: The Koios Benchmarks.
-
-    ================    =================
+.. table:: The Koios Benchmarks.  
+  
+    =================   ======================================
     Benchmark           Description
-    ================    =================
+    =================   ======================================
     clstm_like          CLSTM-like accelerator
     dla_like            Intel-DLA-like accelerator
     lstm                LSTM engine
@@ -95,7 +95,7 @@ These designs use many precisions including binary, different fixed point types 
     softmax             Softmax classification layer
     conv_layer_hls      Sliding window convolution
     eltwise_layer       Matrix elementwise add/sub/mult  
-    ================    =================
+    =================   ======================================
 
 Koios benchmarks are fully compatible with the full VTR flow. Some Koios benchmarks use advanced DSP features that are available in only a few FPGA architectures provided with VTR. This is because they instantiate DSP macros to implement native FP16 multiplications or use the hard dedicated chains, and these are architecture-specific. If users want to use a different FPGA architecture file, they can replace the macro instantiations in the benchmarks with their equivalents from the FPGA architectures they wish to use.
 
