@@ -38,9 +38,7 @@ They are suitable for FPGA architecture research and medium-scale CAD research.
     stereovision0       Computer Vision
     stereovision1       Computer Vision
     stereovision2       Computer Vision
-    stereovision3       Computer Vision
-    tpu.32x32.int8      Deep Learning
-    tpu.16x16.int8      Deep Learning
+    stereovision3       Computer Vision    
     ================    =================
 
 The VTR benchmarks are provided as Verilog under: ::
@@ -71,6 +69,9 @@ Koios Benchmarks
 The Koios benchmarks :cite:`koios_benchmarks` are a set of Deep Learning (DL) benchmarks. 
 They are suitable for DL related architecture and CAD research.
 There are 19 designs that include several medium-sized benchmarks and some large benchmarks.
+The designs target different network types (CNNs, RNNs, MLPs, RL) and layer types (fully-connected, convolution, activation, softmax, reduction, eltwise).
+Some of the designs are generated from HLS tools as well.
+These designs use many precisions including binary, different fixed point types int8/16/32, brain floating point (bfloat16), and IEEE half-precision floating point (fp16).
 
 .. _table_koios_benchmarks:
 
@@ -103,7 +104,6 @@ Alternatively, users can disable these advanced features. The macro `complex_dsp
 The VTR benchmarks are provided as Verilog (enabling full flexibility to modify and change how the designs are implemented) under: ::
 
     $VTR_ROOT/vtr_flow/benchmarks/verilog/ml_benchmarks
-
 
 The FPGA architectures with advanced DSP that work out-of-the-box with Koios benchmarks are available here: ::
 
