@@ -1,7 +1,20 @@
 //////////////////////////////////////////////////////////////////////////////
-//Matrix vector multiplication design with sparsity
-//8-bit integer precision is used 
-//Multipliers in channels followed by accumulators, Banked Vector Buffer (RAM and crossbar) to store vector elements. Arbiter to fetch data from RAMs store matrix elements. Uses CISR encoding. Multiple FIFOs.
+// Matrix vector multiplication design with sparsity
+// This is a Sparse Matrix-Vector Multiplication accelerator design. 
+// The mathematical formula is Y = M * X where M is input sparse matrix, 
+// X is input dense vector and Y is output dense vector. We support 8-bit 
+// precision. Vector X is loaded in on-chip banked memory before start of 
+// the operation. The input to the accelerator are 3 values corresponding 
+// to each matrix element: data, col, number of non zero values in a row. 
+// There are 32 channels which can run in parallel. Each channel has a MAC 
+// unit. Computation for each row of the matrix is assigned to a channel 
+// dynamically based on the number of non zero values in that row. The final
+// accumulated value is written in the output memory. The write address is 
+// based on row number. Hence, write is out of order with respect to rows 
+// in output vector.
+// Multipliers in channels followed by accumulators, Banked Vector Buffer 
+// (RAM and crossbar) to store vector elements. Arbiter to fetch data from 
+// RAMs store matrix elements. Uses CISR encoding. Multiple FIFOs.
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
