@@ -1,7 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
 // Accelerator for Softmax classification layer. Based on implementation in:
-// Z. Wei et al., “Design Space Exploration for Softmax Implementations,” in International Conference on Application-specific Systems, Architectures
-and Processors (ASAP), 2020. 
+// Z. Wei et al., “Design Space Exploration for Softmax Implementations,” in 
+// International Conference on Application-specific Systems, Architectures
+// and Processors (ASAP), 2020. 
 // IEEE FP16 precision is used.
 // LUT based log and exp units, Adder tree (reduction), Comparators, Subtractors. 
 // RAM outside of the design.
