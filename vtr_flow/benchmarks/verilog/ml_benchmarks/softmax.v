@@ -424,6 +424,8 @@ module softmax(
   wire [`DATAWIDTH-1:0] mode2_outp_sub6;
   wire [`DATAWIDTH-1:0] mode2_outp_sub7;
   mode2_sub mode2_sub(
+      .clk(clk),
+      .rst(reset),
       .a_inp0(sub0_inp_reg[`DATAWIDTH*1-1:`DATAWIDTH*0]),
       .a_inp1(sub0_inp_reg[`DATAWIDTH*2-1:`DATAWIDTH*1]),
       .a_inp2(sub0_inp_reg[`DATAWIDTH*3-1:`DATAWIDTH*2]),
@@ -560,7 +562,7 @@ module softmax(
   //////------mode5 log---------///////
   wire [`DATAWIDTH-1:0] mode5_outp_log;
   reg  [`DATAWIDTH-1:0] mode5_outp_log_reg;
-  mode5_ln mode5_ln(.inp(mode4_adder_tree_outp), .outp(mode5_outp_log));
+  mode5_ln mode5_ln(.clk(clk), .rst(reset), .inp(mode4_adder_tree_outp), .outp(mode5_outp_log));
 
   always @(posedge clk) begin
     if(reset) begin
@@ -589,6 +591,8 @@ module softmax(
   reg [`DATAWIDTH-1:0] mode6_outp_presub7_reg;
 
   mode6_sub pre_sub(
+      .clk(clk),
+      .rst(reset),
       .a_inp0(sub1_inp_reg[`DATAWIDTH*1-1:`DATAWIDTH*0]),
       .a_inp1(sub1_inp_reg[`DATAWIDTH*2-1:`DATAWIDTH*1]),
       .a_inp2(sub1_inp_reg[`DATAWIDTH*3-1:`DATAWIDTH*2]),
@@ -648,6 +652,8 @@ module softmax(
   reg [`DATAWIDTH-1:0] mode6_outp_logsub7_reg;
 
   mode6_sub log_sub(
+      .clk(clk),
+      .rst(reset),
       .a_inp0(mode6_outp_presub0_reg),
       .a_inp1(mode6_outp_presub1_reg),
       .a_inp2(mode6_outp_presub2_reg),
@@ -950,6 +956,8 @@ endmodule
 
 
 module mode2_sub(
+  clk,
+  rst,
   a_inp0,
   a_inp1,
   a_inp2,
@@ -968,7 +976,9 @@ module mode2_sub(
   outp7,
   b_inp,
 );
-
+  
+  input clk;
+  input rst;
   input  [`DATAWIDTH-1 : 0] a_inp0;
   input  [`DATAWIDTH-1 : 0] a_inp1;
   input  [`DATAWIDTH-1 : 0] a_inp2;
@@ -993,14 +1003,14 @@ module mode2_sub(
   wire [4:0] flags_NC4, flags_NC5, flags_NC6, flags_NC7;
 
   // 0 add, 1 sub
-  FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
-  FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
-  FPAddSub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
-  FPAddSub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
-  FPAddSub sub4(.clk(clk_NC), .rst(rst_NC), .a(a_inp4),	.b(b_inp), .operation(1'b1),	.result(outp4), .flags(flags_NC4));
-  FPAddSub sub5(.clk(clk_NC), .rst(rst_NC), .a(a_inp5),	.b(b_inp), .operation(1'b1),	.result(outp5), .flags(flags_NC5));
-  FPAddSub sub6(.clk(clk_NC), .rst(rst_NC), .a(a_inp6),	.b(b_inp), .operation(1'b1),	.result(outp6), .flags(flags_NC6));
-  FPAddSub sub7(.clk(clk_NC), .rst(rst_NC), .a(a_inp7),	.b(b_inp), .operation(1'b1),	.result(outp7), .flags(flags_NC7));
+  FPAddSub sub0(.clk(clk), .rst(rst), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
+  FPAddSub sub1(.clk(clk), .rst(rst), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
+  FPAddSub sub2(.clk(clk), .rst(rst), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
+  FPAddSub sub3(.clk(clk), .rst(rst), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
+  FPAddSub sub4(.clk(clk), .rst(rst), .a(a_inp4),	.b(b_inp), .operation(1'b1),	.result(outp4), .flags(flags_NC4));
+  FPAddSub sub5(.clk(clk), .rst(rst), .a(a_inp5),	.b(b_inp), .operation(1'b1),	.result(outp5), .flags(flags_NC5));
+  FPAddSub sub6(.clk(clk), .rst(rst), .a(a_inp6),	.b(b_inp), .operation(1'b1),	.result(outp6), .flags(flags_NC6));
+  FPAddSub sub7(.clk(clk), .rst(rst), .a(a_inp7),	.b(b_inp), .operation(1'b1),	.result(outp7), .flags(flags_NC7));
 
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub0(.a(a_inp0), .b(b_inp), .z(outp0), .rnd(3'b000), .status());
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub1(.a(a_inp1), .b(b_inp), .z(outp1), .rnd(3'b000), .status());
@@ -1213,17 +1223,17 @@ end
   wire [4:0] flags_NC4, flags_NC5, flags_NC6, flags_NC7;
 
   // 0 add, 1 sub
-  FPAddSub add0_stage3(.clk(clk_NC), .rst(rst_NC), .a(inp0),	.b(inp1), .operation(1'b0),	.result(add0_out_stage3), .flags(flags_NC0));
-  FPAddSub add1_stage3(.clk(clk_NC), .rst(rst_NC), .a(inp2),	.b(inp3), .operation(1'b0),	.result(add1_out_stage3), .flags(flags_NC1));
-  FPAddSub add2_stage3(.clk(clk_NC), .rst(rst_NC), .a(inp4),	.b(inp5), .operation(1'b0),	.result(add2_out_stage3), .flags(flags_NC2));
-  FPAddSub add3_stage3(.clk(clk_NC), .rst(rst_NC), .a(inp6),	.b(inp7), .operation(1'b0),	.result(add3_out_stage3), .flags(flags_NC3));
+  FPAddSub add0_stage3(.clk(clk), .rst(reset), .a(inp0),	.b(inp1), .operation(1'b0),	.result(add0_out_stage3), .flags(flags_NC0));
+  FPAddSub add1_stage3(.clk(clk), .rst(reset), .a(inp2),	.b(inp3), .operation(1'b0),	.result(add1_out_stage3), .flags(flags_NC1));
+  FPAddSub add2_stage3(.clk(clk), .rst(reset), .a(inp4),	.b(inp5), .operation(1'b0),	.result(add2_out_stage3), .flags(flags_NC2));
+  FPAddSub add3_stage3(.clk(clk), .rst(reset), .a(inp6),	.b(inp7), .operation(1'b0),	.result(add3_out_stage3), .flags(flags_NC3));
 
-  FPAddSub add0_stage2(.clk(clk_NC), .rst(rst_NC), .a(add0_out_stage3_reg),	.b(add1_out_stage3_reg), .operation(1'b0),	.result(add0_out_stage2), .flags(flags_NC4));
-  FPAddSub add1_stage2(.clk(clk_NC), .rst(rst_NC), .a(add2_out_stage3_reg),	.b(add3_out_stage3_reg), .operation(1'b0),	.result(add1_out_stage2), .flags(flags_NC5));
+  FPAddSub add0_stage2(.clk(clk), .rst(reset), .a(add0_out_stage3_reg),	.b(add1_out_stage3_reg), .operation(1'b0),	.result(add0_out_stage2), .flags(flags_NC4));
+  FPAddSub add1_stage2(.clk(clk), .rst(reset), .a(add2_out_stage3_reg),	.b(add3_out_stage3_reg), .operation(1'b0),	.result(add1_out_stage2), .flags(flags_NC5));
 
-  FPAddSub add0_stage1(.clk(clk_NC), .rst(rst_NC), .a(add0_out_stage2_reg),	.b(add1_out_stage2_reg), .operation(1'b0),	.result(add0_out_stage1), .flags(flags_NC6));
+  FPAddSub add0_stage1(.clk(clk), .rst(reset), .a(add0_out_stage2_reg),	.b(add1_out_stage2_reg), .operation(1'b0),	.result(add0_out_stage1), .flags(flags_NC6));
 
-  FPAddSub add0_stage0(.clk(clk_NC), .rst(rst_NC), .a(outp),	.b(add0_out_stage1_reg), .operation(1'b0),	.result(add0_out_stage0), .flags(flags_NC7));
+  FPAddSub add0_stage0(.clk(clk), .rst(reset), .a(outp),	.b(add0_out_stage1_reg), .operation(1'b0),	.result(add0_out_stage0), .flags(flags_NC7));
 
 
 //  DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add0_stage3(.a(inp0),       .b(inp1),      .z(add0_out_stage3), .rnd(3'b000),    .status());
@@ -1242,16 +1252,22 @@ endmodule
 
 
 module mode5_ln(
+clk,
+rst,
 inp,
 outp
 );
+  input clk;
+  input rst; 
   input  [`DATAWIDTH-1 : 0] inp;
   output [`DATAWIDTH-1 : 0] outp;
-  logunit ln(.a(inp), .z(outp), .status());
+  logunit ln(.clk(clk), .rst(rst), .a(inp), .z(outp), .status());
 endmodule
 
 
 module mode6_sub(
+  clk,
+  rst,
   a_inp0,
   a_inp1,
   a_inp2,
@@ -1270,7 +1286,9 @@ module mode6_sub(
   outp6,
   outp7
 );
-
+  
+  input clk;
+  input rst;
   input  [`DATAWIDTH-1 : 0] a_inp0;
   input  [`DATAWIDTH-1 : 0] a_inp1;
   input  [`DATAWIDTH-1 : 0] a_inp2;
@@ -1295,14 +1313,14 @@ module mode6_sub(
   wire [4:0] flags_NC4, flags_NC5, flags_NC6, flags_NC7;
 
   // 0 add, 1 sub
-  FPAddSub sub0(.clk(clk_NC), .rst(rst_NC), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
-  FPAddSub sub1(.clk(clk_NC), .rst(rst_NC), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
-  FPAddSub sub2(.clk(clk_NC), .rst(rst_NC), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
-  FPAddSub sub3(.clk(clk_NC), .rst(rst_NC), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
-  FPAddSub sub4(.clk(clk_NC), .rst(rst_NC), .a(a_inp4),	.b(b_inp), .operation(1'b1),	.result(outp4), .flags(flags_NC4));
-  FPAddSub sub5(.clk(clk_NC), .rst(rst_NC), .a(a_inp5),	.b(b_inp), .operation(1'b1),	.result(outp5), .flags(flags_NC5));
-  FPAddSub sub6(.clk(clk_NC), .rst(rst_NC), .a(a_inp6),	.b(b_inp), .operation(1'b1),	.result(outp6), .flags(flags_NC6));
-  FPAddSub sub7(.clk(clk_NC), .rst(rst_NC), .a(a_inp7),	.b(b_inp), .operation(1'b1),	.result(outp7), .flags(flags_NC7));
+  FPAddSub sub0(.clk(clk), .rst(rst), .a(a_inp0),	.b(b_inp), .operation(1'b1),	.result(outp0), .flags(flags_NC0));
+  FPAddSub sub1(.clk(clk), .rst(rst), .a(a_inp1),	.b(b_inp), .operation(1'b1),	.result(outp1), .flags(flags_NC1));
+  FPAddSub sub2(.clk(clk), .rst(rst), .a(a_inp2),	.b(b_inp), .operation(1'b1),	.result(outp2), .flags(flags_NC2));
+  FPAddSub sub3(.clk(clk), .rst(rst), .a(a_inp3),	.b(b_inp), .operation(1'b1),	.result(outp3), .flags(flags_NC3));
+  FPAddSub sub4(.clk(clk), .rst(rst), .a(a_inp4),	.b(b_inp), .operation(1'b1),	.result(outp4), .flags(flags_NC4));
+  FPAddSub sub5(.clk(clk), .rst(rst), .a(a_inp5),	.b(b_inp), .operation(1'b1),	.result(outp5), .flags(flags_NC5));
+  FPAddSub sub6(.clk(clk), .rst(rst), .a(a_inp6),	.b(b_inp), .operation(1'b1),	.result(outp6), .flags(flags_NC6));
+  FPAddSub sub7(.clk(clk), .rst(rst), .a(a_inp7),	.b(b_inp), .operation(1'b1),	.result(outp7), .flags(flags_NC7));
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub0(.a(a_inp0), .b(b_inp), .z(outp0), .rnd(3'b000), .status());
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub1(.a(a_inp1), .b(b_inp), .z(outp1), .rnd(3'b000), .status());
 //  DW_fp_sub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) sub2(.a(a_inp2), .b(b_inp), .z(outp2), .rnd(3'b000), .status());
@@ -1420,9 +1438,9 @@ module FPAddSub(
 	assign flags = 5'b0;
 	
 `ifdef complex_dsp
-adder_fp u_add(.a(a), .b(b),.out(result));
+adder_fp_clk u_add(.clk(clk), .a(a), .b(b),.out(result));
 `else
-FPAddSub_16 u_FPAddSub (.clk(), .rst(1'b0), .a(a), .b(b), .operation(1'b0), .result(result), .flags());
+FPAddSub_16 u_FPAddSub (.clk(clk), .rst(rst), .a(a), .b(b), .operation(1'b0), .result(result), .flags());
 `endif
 endmodule
 
@@ -1786,9 +1804,10 @@ endmodule
 // Log unit
 //////////////////////////////////////////////////////
 
-module logunit (a, z, status);
+module logunit (clk, rst, a, z, status);
 
-	
+	input clk;
+  input rst;
 	input [15:0] a;
 	output [15:0] z;
 	output [4:0] status;
@@ -1804,7 +1823,7 @@ module logunit (a, z, status);
   wire rst_NC;
 
 	//DW_fp_addsub #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) add(.a(fxout1), .b(fxout2), .rnd(3'b0), .op(1'b0), .z(z), .status(status[7:0]));
-  FPAddSub add (.clk(clk_NC), .rst(rst_NC), .a(fxout1),	.b(fxout2), .operation(1'b1),	.result(z), .flags());
+  FPAddSub add (.clk(clk), .rst(rst), .a(fxout1),	.b(fxout2), .operation(1'b1),	.result(z), .flags());
 endmodule
 
 module LUT1(addr, log);
@@ -1973,9 +1992,9 @@ module expunit (a, z, status, stage_run, stage_run2, clk, reset);
   fptofixed_para fpfx (.fp(a), .fx(fxout));
   LUT lut(.addr(fxout[int_width + frac_width - 1 : 0]), .exp(LUTout)); 
   //DW_fp_mult #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) fpmult (.a(a), .b(LUTout[31:16]), .rnd(3'b000), .z(Mult_out), .status());
-  FPMult_16 fpmult (.clk(clk_NC), .rst(rst_NC), .a(a_reg), .b(LUTout_reg2[31:16]), .result(Mult_out), .flags());
+  FPMult fpmult (.clk(clk), .rst(rst), .a(a_reg), .b(LUTout_reg2[31:16]), .result(Mult_out), .flags());
   //DW_fp_add #(`MANTISSA, `EXPONENT, `IEEE_COMPLIANCE) fpsub (.a(Mult_out_reg), .b(LUTout_reg[15:0]), .rnd(3'b000), .z(z), .status(status[7:0]));
-  FPAddSub fpsub (.clk(clk_NC), .rst(rst_NC), .a(Mult_out_reg),	.b(LUTout_reg[15:0]), .operation(1'b0),	.result(z), .flags());
+  FPAddSub fpsub (.clk(clk), .rst(rst), .a(Mult_out_reg),	.b(LUTout_reg[15:0]), .operation(1'b0),	.result(z), .flags());
 endmodule
 
 module fptofixed_para (
@@ -2132,7 +2151,7 @@ endmodule
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
 
-module FPMult_16(
+module FPMult(
 		clk,
 		rst,
 		a,
@@ -2152,9 +2171,9 @@ module FPMult_16(
 	output [4:0] flags ;				// Flags indicating exceptions according to IEEE754
 	assign flags = 5'b0;
 `ifdef complex_dsp
-	multiply_fp u_mult_fp(.a(a), .b(b), .out(result)); 
+	multiply_fp_clk u_mult_fp(.clk(clk), .a(a), .b(b), .out(result)); 
 `else
-FPMult  u_FPMult (.clk(), .rst(1'b0), .a(a), .b(b), .result(result), .flags());
+FPMult_16 u_FPMult (.clk(clk), .rst(1'b0), .a(a), .b(b), .result(result), .flags());
 `endif
 	
 		
@@ -2175,7 +2194,7 @@ endmodule
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
 
-module FPMult(
+module FPMult_16(
 		clk,
 		rst,
 		a,
@@ -2187,16 +2206,16 @@ module FPMult(
 	// Input Ports
 	input clk ;							// Clock
 	input rst ;							// Reset signal
-	input [`DWIDTH-1:0] a;					// Input A, a 32-bit floating point number
-	input [`DWIDTH-1:0] b;					// Input B, a 32-bit floating point number
+	input [`DWIDTH-1:0] a;						// Input A, a 32-bit floating point number
+	input [`DWIDTH-1:0] b;						// Input B, a 32-bit floating point number
 	
 	// Output ports
 	output [`DWIDTH-1:0] result ;					// Product, result of the operation, 32-bit FP number
-	output [4:0] flags ;				// Flags indicating exceptions according to IEEE754
+	output [4:0] flags ;						// Flags indicating exceptions according to IEEE754
 	
 	// Internal signals
-	wire [31:0] Z_int ;				// Product, result of the operation, 32-bit FP number
-	wire [4:0] Flags_int ;			// Flags indicating exceptions according to IEEE754
+	wire [`DWIDTH-1:0] Z_int ;					// Product, result of the operation, 32-bit FP number
+	wire [4:0] Flags_int ;						// Flags indicating exceptions according to IEEE754
 	
 	wire Sa ;							// A's sign
 	wire Sb ;							// B's sign
@@ -2204,29 +2223,30 @@ module FPMult(
 	wire [`EXPONENT-1:0] Ea ;					// A's exponent
 	wire [`EXPONENT-1:0] Eb ;					// B's exponent
 	wire [2*`MANTISSA+1:0] Mp ;					// Product mantissa
-	wire [4:0] InputExc ;			// Exceptions in inputs
-	wire [`MANTISSA-1:0] NormM ;				// Normalized mantissa
-	wire [`EXPONENT:0] NormE ;				// Normalized exponent
-	wire [`MANTISSA:0] RoundM ;				// Normalized mantissa
-	wire [`EXPONENT:0] RoundE ;				// Normalized exponent
-	wire [`MANTISSA:0] RoundMP ;				// Normalized mantissa
-	wire [`EXPONENT:0] RoundEP ;				// Normalized exponent
+	wire [4:0] InputExc ;						// Exceptions in inputs
+	wire [`MANTISSA-1:0] NormM ;					// Normalized mantissa
+	wire [`EXPONENT:0] NormE ;					// Normalized exponent
+	wire [`MANTISSA:0] RoundM ;					// Normalized mantissa
+	wire [`EXPONENT:0] RoundE ;					// Normalized exponent
+	wire [`MANTISSA:0] RoundMP ;					// Normalized mantissa
+	wire [`EXPONENT:0] RoundEP ;					// Normalized exponent
 	wire GRS ;
 
-	//reg [63:0] pipe_0;			// Pipeline register Input->Prep
-	reg [2*`DWIDTH-1:0] pipe_0;			// Pipeline register Input->Prep
+	//reg [63:0] pipe_0;						// Pipeline register Input->Prep
+	reg [2*`DWIDTH-1:0] pipe_0;					// Pipeline register Input->Prep
 
-	//reg [92:0] pipe_1;			// Pipeline register Prep->Execute
-	reg [3*`MANTISSA+2*`EXPONENT+7:0] pipe_1;			// Pipeline register Prep->Execute
+	//reg [92:0] pipe_1;						// Pipeline register Prep->Execute
+	//reg [3*`MANTISSA+2*`EXPONENT+7:0] pipe_1;			// Pipeline register Prep->Execute
+	reg [3*`MANTISSA+2*`EXPONENT+18:0] pipe_1;
 
-	//reg [38:0] pipe_2;			// Pipeline register Execute->Normalize
-	reg [`MANTISSA+`EXPONENT+7:0] pipe_2;			// Pipeline register Execute->Normalize
+	//reg [38:0] pipe_2;						// Pipeline register Execute->Normalize
+	reg [`MANTISSA+`EXPONENT+7:0] pipe_2;				// Pipeline register Execute->Normalize
 	
-	//reg [72:0] pipe_3;			// Pipeline register Normalize->Round
+	//reg [72:0] pipe_3;						// Pipeline register Normalize->Round
 	reg [2*`MANTISSA+2*`EXPONENT+10:0] pipe_3;			// Pipeline register Normalize->Round
 
-	//reg [36:0] pipe_4;			// Pipeline register Round->Output
-	reg [`DWIDTH+4:0] pipe_4;			// Pipeline register Round->Output
+	//reg [36:0] pipe_4;						// Pipeline register Round->Output
+	reg [`DWIDTH+4:0] pipe_4;					// Pipeline register Round->Output
 	
 	assign result = pipe_4[`DWIDTH+4:5] ;
 	assign flags = pipe_4[4:0] ;
@@ -2244,58 +2264,64 @@ module FPMult(
 	//FPMult_RoundModule RoundModule(pipe_3[47:24], pipe_3[23:0], pipe_3[65:57], pipe_3[56:48], pipe_3[66], pipe_3[67], pipe_3[72:68], Z_int[31:0], Flags_int[4:0]) ;		
 	FPMult_RoundModule RoundModule(pipe_3[2*`MANTISSA+1:`MANTISSA+1], pipe_3[`MANTISSA:0], pipe_3[2*`MANTISSA+2*`EXPONENT+3:2*`MANTISSA+`EXPONENT+3], pipe_3[2*`MANTISSA+`EXPONENT+2:2*`MANTISSA+2], pipe_3[2*`MANTISSA+2*`EXPONENT+4], pipe_3[2*`MANTISSA+2*`EXPONENT+5], pipe_3[2*`MANTISSA+2*`EXPONENT+10:2*`MANTISSA+2*`EXPONENT+6], Z_int[`DWIDTH-1:0], Flags_int[4:0]) ;		
 
-	always @ (*) begin	
+//adding always@ (*) instead of posedge clock to make design combinational
+	always @ (posedge clk) begin	
 		if(rst) begin
-			pipe_0 = 0;
-			pipe_1 = 0;
-			pipe_2 = 0; 
-			pipe_3 = 0;
-			pipe_4 = 0;
+			pipe_0 <= 0;
+			pipe_1 <= 0;
+			pipe_2 <= 0; 
+			pipe_3 <= 0;
+			pipe_4 <= 0;
 		end 
 		else begin		
 			/* PIPE 0
-				[63:32] A
-				[31:0] B
+				[2*`DWIDTH-1:`DWIDTH] A
+				[`DWIDTH-1:0] B
 			*/
-      pipe_0 = {a, b} ;
+                       pipe_0 <= {a, b} ;
+
 
 			/* PIPE 1
-				[70] Sa
-				[69] Sb
-				[68:61] Ea
-				[60:53] Eb
-				[52:5] Mp
+				[2*`EXPONENT+3*`MANTISSA + 18: 2*`EXPONENT+2*`MANTISSA + 18] //pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH] , mantissa of A
+				[2*`EXPONENT+2*`MANTISSA + 17 :2*`EXPONENT+2*`MANTISSA + 9] // pipe_0[8:0]
+				[2*`EXPONENT+2*`MANTISSA + 8] Sa
+				[2*`EXPONENT+2*`MANTISSA + 7] Sb
+				[2*`EXPONENT+2*`MANTISSA + 6:`EXPONENT+2*`MANTISSA+7] Ea
+				[`EXPONENT +2*`MANTISSA+6:2*`MANTISSA+7] Eb
+				[2*`MANTISSA+1+5:5] Mp
 				[4:0] InputExc
 			*/
 			//pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[`MANTISSA_MUL_SPLIT_LSB-1:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA-1:0], InputExc[4:0]} ;
-			pipe_1 = {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[8:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]} ;
+			pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[8:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]} ;
+			
 			/* PIPE 2
-				[38:34] InputExc
-				[33] GRS
-				[32] Sp
-				[31:23] NormE
-				[22:0] NormM
+				[`EXPONENT + `MANTISSA + 7:`EXPONENT + `MANTISSA + 3] InputExc
+				[`EXPONENT + `MANTISSA + 2] GRS
+				[`EXPONENT + `MANTISSA + 1] Sp
+				[`EXPONENT + `MANTISSA:`MANTISSA] NormE
+				[`MANTISSA-1:0] NormM
 			*/
-			pipe_2 = {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
+			pipe_2 <= {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
 			/* PIPE 3
-				[72:68] InputExc
-				[67] GRS
-				[66] Sp	
-				[65:57] RoundE
-				[56:48] RoundEP
-				[47:24] RoundM
-				[23:0] RoundMP
+				[2*`EXPONENT+2*`MANTISSA+10:2*`EXPONENT+2*`MANTISSA+6] InputExc
+				[2*`EXPONENT+2*`MANTISSA+5] GRS
+				[2*`EXPONENT+2*`MANTISSA+4] Sp	
+				[2*`EXPONENT+2*`MANTISSA+3:`EXPONENT+2*`MANTISSA+3] RoundE
+				[`EXPONENT+2*`MANTISSA+2:2*`MANTISSA+2] RoundEP
+				[2*`MANTISSA+1:`MANTISSA+1] RoundM
+				[`MANTISSA:0] RoundMP
 			*/
-			pipe_3 = {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
+			pipe_3 <= {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
 			/* PIPE 4
-				[36:5] Z
+				[`DWIDTH+4:5] Z
 				[4:0] Flags
 			*/				
-			pipe_4 = {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
+			pipe_4 <= {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
 		end
 	end
 		
 endmodule
+
 
 
 module FPMult_PrepModule (
@@ -2437,8 +2463,16 @@ module FPMult_NormalizeModule(
 	output [`MANTISSA:0] RoundM ;
 	output [`MANTISSA:0] RoundMP ; 
 	
-	assign RoundE = NormE - 15 ;
-	assign RoundEP = NormE - 14 ;
+// EXPONENT = 5 
+// EXPONENT -1 = 4
+// NEED to subtract 2^4 -1 = 15
+
+wire [`EXPONENT-1 : 0] bias;
+
+assign bias =  ((1<< (`EXPONENT -1)) -1);
+
+	assign RoundE = NormE - bias ;
+	assign RoundEP = NormE - bias -1 ;
 	assign RoundM = NormM ;
 	assign RoundMP = NormM ;
 
@@ -2497,6 +2531,7 @@ endmodule
 //////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_16(
+		//bf16,
 		clk,
 		rst,
 		a,
@@ -2505,7 +2540,8 @@ module FPAddSub_16(
 		result,
 		flags
 	);
-	
+	//input bf16; //1 for Bfloat16, 0 for IEEE half precision
+
 	// Clock and reset
 	input clk ;										// Clock signal
 	input rst ;										// Reset (active high, resets pipeline registers)
@@ -2521,32 +2557,36 @@ module FPAddSub_16(
 	
 	// Pipeline Registers
 	//reg [79:0] pipe_1;							// Pipeline register PreAlign->Align1
-	reg [`DWIDTH*2+15:0] pipe_1;							// Pipeline register PreAlign->Align1
+	reg [2*`EXPONENT + 2*`DWIDTH + 5:0] pipe_1;							// Pipeline register PreAlign->Align1
 
 	//reg [67:0] pipe_2;							// Pipeline register Align1->Align3
-	reg [`MANTISSA*2+`EXPONENT+13:0] pipe_2;							// Pipeline register Align1->Align3
+	//reg [2*`EXPONENT+ 2*`MANTISSA + 8:0] pipe_2;							// Pipeline register Align1->Align3
+	wire [2*`EXPONENT+ 2*`MANTISSA + 8:0] pipe_2;
 
 	//reg [76:0] pipe_3;	68						// Pipeline register Align1->Align3
-	reg [`MANTISSA*2+`EXPONENT+14:0] pipe_3;							// Pipeline register Align1->Align3
+	reg [2*`EXPONENT+ 2*`MANTISSA + 9:0] pipe_3;							// Pipeline register Align1->Align3
 
 	//reg [69:0] pipe_4;							// Pipeline register Align3->Execute
-	reg [`MANTISSA*2+`EXPONENT+15:0] pipe_4;							// Pipeline register Align3->Execute
-
+	//reg [2*`EXPONENT+ 2*`MANTISSA + 9:0] pipe_4;							// Pipeline register Align3->Execute
+	wire [2*`EXPONENT+ 2*`MANTISSA + 9:0] pipe_4;
+	
 	//reg [51:0] pipe_5;							// Pipeline register Execute->Normalize
 	reg [`DWIDTH+`EXPONENT+11:0] pipe_5;							// Pipeline register Execute->Normalize
 
 	//reg [56:0] pipe_6;							// Pipeline register Nomalize->NormalizeShift1
-	reg [`DWIDTH+`EXPONENT+16:0] pipe_6;							// Pipeline register Nomalize->NormalizeShift1
+	//reg [`DWIDTH+`EXPONENT+16:0] pipe_6;							// Pipeline register Nomalize->NormalizeShift1
+	wire [`DWIDTH+`EXPONENT+16:0] pipe_6;
 
 	//reg [56:0] pipe_7;							// Pipeline register NormalizeShift2->NormalizeShift3
-	reg [`DWIDTH+`EXPONENT+16:0] pipe_7;							// Pipeline register NormalizeShift2->NormalizeShift3
-
+	//reg [`DWIDTH+`EXPONENT+16:0] pipe_7;							// Pipeline register NormalizeShift2->NormalizeShift3
+	wire [`DWIDTH+`EXPONENT+16:0] pipe_7;
 	//reg [54:0] pipe_8;							// Pipeline register NormalizeShift3->Round
 	reg [`EXPONENT*2+`MANTISSA+15:0] pipe_8;							// Pipeline register NormalizeShift3->Round
 
 	//reg [40:0] pipe_9;							// Pipeline register NormalizeShift3->Round
-	reg [`DWIDTH+8:0] pipe_9;							// Pipeline register NormalizeShift3->Round
-	
+	//reg [`DWIDTH+8:0] pipe_9;							// Pipeline register NormalizeShift3->Round
+	wire [`DWIDTH+8:0] pipe_9;
+
 	// Internal wires between modules
 	wire [`DWIDTH-2:0] Aout_0 ;							// A - sign
 	wire [`DWIDTH-2:0] Bout_0 ;							// B - sign
@@ -2555,17 +2595,17 @@ module FPAddSub_16(
 	wire Sb_0 ;										// B's sign
 	wire MaxAB_1 ;									// Indicates the larger of A and B(0/A, 1/B)
 	wire [`EXPONENT-1:0] CExp_1 ;							// Common Exponent
-	wire [4:0] Shift_1 ;							// Number of steps to smaller mantissa shift right (align)
+	wire [`EXPONENT-1:0] Shift_1 ;							// Number of steps to smaller mantissa shift right (align)
 	wire [`MANTISSA-1:0] Mmax_1 ;							// Larger mantissa
 	wire [4:0] InputExc_0 ;						// Input numbers are exceptions
-	wire [9:0] ShiftDet_0 ;
+	wire [2*`EXPONENT-1:0] ShiftDet_0 ;
 	wire [`MANTISSA-1:0] MminS_1 ;						// Smaller mantissa after 0/16 shift
 	wire [`MANTISSA:0] MminS_2 ;						// Smaller mantissa after 0/4/8/12 shift
 	wire [`MANTISSA:0] Mmin_3 ;							// Smaller mantissa after 0/1/2/3 shift
 	wire [`DWIDTH:0] Sum_4 ;
 	wire PSgn_4 ;
 	wire Opr_4 ;
-	wire [4:0] Shift_5 ;							// Number of steps to shift sum left (normalize)
+	wire [`EXPONENT-1:0] Shift_5 ;							// Number of steps to shift sum left (normalize)
 	wire [`DWIDTH:0] SumS_5 ;							// Sum after 0/16 shift
 	wire [`DWIDTH:0] SumS_6 ;							// Sum after 0/16 shift
 	wire [`DWIDTH:0] SumS_7 ;							// Sum after 0/16 shift
@@ -2584,19 +2624,20 @@ module FPAddSub_16(
 	(	// Inputs
 		a, b, operation,
 		// Outputs
-		Sa_0, Sb_0, ShiftDet_0[9:0], InputExc_0[4:0], Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Opout_0) ;
+		Sa_0, Sb_0, ShiftDet_0[2*`EXPONENT-1:0], InputExc_0[4:0], Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Opout_0) ;
 		
 	// Prepare the operands for alignment and check for exceptions
 	FPAddSub_AlignModule AlignModule
 	(	// Inputs
-		pipe_1[14+2*`DWIDTH:16+`DWIDTH], pipe_1[15+`DWIDTH:17], pipe_1[14:5],
+		pipe_1[2*`EXPONENT + 2*`DWIDTH + 4: 2*`EXPONENT +`DWIDTH + 6], pipe_1[2*`EXPONENT +`DWIDTH + 5 :  2*`EXPONENT +7], pipe_1[2*`EXPONENT+4:5],
 		// Outputs
-		CExp_1[`EXPONENT-1:0], MaxAB_1, Shift_1[4:0], MminS_1[`MANTISSA-1:0], Mmax_1[`MANTISSA-1:0]) ;	
+		CExp_1[`EXPONENT-1:0], MaxAB_1, Shift_1[`EXPONENT-1:0], MminS_1[`MANTISSA-1:0], Mmax_1[`MANTISSA-1:0]) ;	
 
 	// Alignment Shift Stage 1
 	FPAddSub_AlignShift1 AlignShift1
 	(  // Inputs
-		pipe_2[`MANTISSA-1:0], pipe_2[2*`MANTISSA+9:2*`MANTISSA+7],
+		//bf16, 
+		pipe_2[`MANTISSA-1:0], pipe_2[`EXPONENT+ 2*`MANTISSA + 4 : 2*`MANTISSA + 7],
 		// Outputs
 		MminS_2[`MANTISSA:0]) ;
 
@@ -2610,7 +2651,7 @@ module FPAddSub_16(
 	// Perform mantissa addition
 	FPAddSub_ExecutionModule ExecutionModule
 	(  // Inputs
-		pipe_4[`MANTISSA*2+5:`MANTISSA+6], pipe_4[`MANTISSA:0], pipe_4[`MANTISSA*2+`EXPONENT+13], pipe_4[`MANTISSA*2+`EXPONENT+12], pipe_4[`MANTISSA*2+`EXPONENT+11], pipe_4[`MANTISSA*2+`EXPONENT+14],
+		pipe_4[`MANTISSA*2+5:`MANTISSA+6], pipe_4[`MANTISSA:0], pipe_4[2*`EXPONENT+ 2*`MANTISSA + 8], pipe_4[2*`EXPONENT+ 2*`MANTISSA + 7], pipe_4[2*`EXPONENT+ 2*`MANTISSA + 6], pipe_4[2*`EXPONENT+ 2*`MANTISSA + 9],
 		// Outputs
 		Sum_4[`DWIDTH:0], PSgn_4, Opr_4) ;
 	
@@ -2649,129 +2690,148 @@ module FPAddSub_16(
 		// Outputs
 		result[`DWIDTH-1:0], flags[4:0]) ;			
 	
-	always @ (*) begin	
+
+assign pipe_2 = {pipe_1[2*`EXPONENT + 2*`DWIDTH + 5], pipe_1[2*`EXPONENT +6:2*`EXPONENT +5], MaxAB_1, CExp_1[`EXPONENT-1:0], Shift_1[`EXPONENT-1:0], Mmax_1[`MANTISSA-1:0], pipe_1[4:0], MminS_1[`MANTISSA-1:0]} ;
+assign pipe_4 = {pipe_3[2*`EXPONENT+ 2*`MANTISSA + 9:`MANTISSA+1], Mmin_3[`MANTISSA:0]} ;
+assign pipe_6 = {pipe_5[`DWIDTH+`EXPONENT+11], Shift_5[4:0], pipe_5[`DWIDTH+`EXPONENT+10:`DWIDTH+1], SumS_5[`DWIDTH:0]} ;
+assign pipe_7 = {pipe_6[`DWIDTH+`EXPONENT+16:`DWIDTH+1], SumS_7[`DWIDTH:0]} ;
+assign pipe_9 = {P_int[`DWIDTH-1:0], pipe_8[2], pipe_8[1], pipe_8[0], pipe_8[`EXPONENT+`MANTISSA+9:`EXPONENT+`MANTISSA+5], EOF} ;
+
+	always @ (posedge clk) begin	
 		if(rst) begin
-			pipe_1 = 0;
-			pipe_2 = 0;
-			pipe_3 = 0;
-			pipe_4 = 0;
-			pipe_5 = 0;
-			pipe_6 = 0;
-			pipe_7 = 0;
-			pipe_8 = 0;
-			pipe_9 = 0;
+			pipe_1 <= 0;
+			//pipe_2 <= 0;
+			pipe_3 <= 0;
+			//pipe_4 <= 0;
+			pipe_5 <= 0;
+			//pipe_6 <= 0;
+			//pipe_7 <= 0;
+			pipe_8 <= 0;
+			//pipe_9 <= 0;
 		end 
 		else begin
-		
-			pipe_1 = {Opout_0, Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Sa_0, Sb_0, ShiftDet_0[9:0], InputExc_0[4:0]} ;	
-			// PIPE_2 :
-			//[67] operation
-			//[66] Sa_0
-			//[65] Sb_0
-			//[64] MaxAB_0
-			//[63:56] CExp_0
-			//[55:51] Shift_0
-			//[50:28] Mmax_0
-			//[27:23] InputExc_0
-			//[22:0] MminS_1
-			//
-			pipe_2 = {pipe_1[`DWIDTH*2+15], pipe_1[16:15], MaxAB_1, CExp_1[`EXPONENT-1:0], Shift_1[4:0], Mmax_1[`MANTISSA-1:0], pipe_1[4:0], MminS_1[`MANTISSA-1:0]} ;	
-			// PIPE_3 :
-			//[68] operation
-			//[67] Sa_0
-			//[66] Sb_0
-			//[65] MaxAB_0
-			//[64:57] CExp_0
-			//[56:52] Shift_0
-			//[51:29] Mmax_0
-			//[28:24] InputExc_0
-			//[23:0] MminS_1
-			//
-			pipe_3 = {pipe_2[`MANTISSA*2+`EXPONENT+13:`MANTISSA], MminS_2[`MANTISSA:0]} ;	
-			// PIPE_4 :
-			//[68] operation
-			//[67] Sa_0
-			//[66] Sb_0
-			//[65] MaxAB_0
-			//[64:57] CExp_0
-			//[56:52] Shift_0
-			//[51:29] Mmax_0
-			//[28:24] InputExc_0
-			//[23:0] Mmin_3
-			//					
-			pipe_4 = {pipe_3[`MANTISSA*2+`EXPONENT+14:`MANTISSA+1], Mmin_3[`MANTISSA:0]} ;	
-			// PIPE_5 :
-			//[51] operation
-			//[50] PSgn_4
-			//[49] Opr_4
-			//[48] Sa_0
-			//[47] Sb_0
-			//[46] MaxAB_0
-			//[45:38] CExp_0
-			//[37:33] InputExc_0
-			//[32:0] Sum_4
-			//					
-			pipe_5 = {pipe_4[2*`MANTISSA+`EXPONENT+14], PSgn_4, Opr_4, pipe_4[2*`MANTISSA+`EXPONENT+13:2*`MANTISSA+11], pipe_4[`MANTISSA+5:`MANTISSA+1], Sum_4[`DWIDTH:0]} ;
-			// PIPE_6 :
-			//[56] operation
-			//[55:51] Shift_5
-			//[50] PSgn_4
-			//[49] Opr_4
-			//[48] Sa_0
-			//[47] Sb_0
-			//[46] MaxAB_0
-			//[45:38] CExp_0
-			//[37:33] InputExc_0
-			//[32:0] Sum_4
-			//					
-			pipe_6 = {pipe_5[`EXPONENT+`EXPONENT+11], Shift_5[4:0], pipe_5[`DWIDTH+`EXPONENT+10:`DWIDTH+1], SumS_5[`DWIDTH:0]} ;	
-			// pipe_7 :
-			//[56] operation
-			//[55:51] Shift_5
-			//[50] PSgn_4
-			//[49] Opr_4
-			//[48] Sa_0
-			//[47] Sb_0
-			//[46] MaxAB_0
-			//[45:38] CExp_0
-			//[37:33] InputExc_0
-			//[32:0] Sum_4
-			//						
-			pipe_7 = {pipe_6[`DWIDTH+`EXPONENT+16:`DWIDTH+1], SumS_7[`DWIDTH:0]} ;	
-			// pipe_8:
-			//[54] FG_8 
-			//[53] operation
-			//[52] PSgn_4
-			//[51] Sa_0
-			//[50] Sb_0
-			//[49] MaxAB_0
-			//[48:41] CExp_0
-			//[40:36] InputExc_8
-			//[35:13] NormM_8 
-			//[12:4] NormE_8
-			//[3] ZeroSum_8
-			//[2] NegE_8
-			//[1] R_8
-			//[0] S_8
-			//				
-			pipe_8 = {FG_8, pipe_7[`DWIDTH+`EXPONENT+16], pipe_7[`DWIDTH+`EXPONENT+10], pipe_7[`DWIDTH+`EXPONENT+8:`DWIDTH+1], NormM_8[`MANTISSA-1:0], NormE_8[`EXPONENT:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
-			// pipe_9:
-			//[40:9] P_int
-			//[8] NegE_8
-			//[7] R_8
-			//[6] S_8
-			//[5:1] InputExc_8
-			//[0] EOF
-			//				
-			pipe_9 = {P_int[`DWIDTH-1:0], pipe_8[2], pipe_8[1], pipe_8[0], pipe_8[`EXPONENT+`MANTISSA+9:`EXPONENT+`MANTISSA+5], EOF} ;	
+/* PIPE_1:
+	[2*`EXPONENT + 2*`DWIDTH + 5]  Opout_0
+	[2*`EXPONENT + 2*`DWIDTH + 4: 2*`EXPONENT +`DWIDTH + 6] A_out0
+	[2*`EXPONENT +`DWIDTH + 5 :  2*`EXPONENT +7] Bout_0
+	[2*`EXPONENT +6] Sa_0
+	[2*`EXPONENT +5] Sb_0
+	[2*`EXPONENT +4 : 5] ShiftDet_0
+	[4:0] Input Exc
+*/
+			pipe_1 <= {Opout_0, Aout_0[`DWIDTH-2:0], Bout_0[`DWIDTH-2:0], Sa_0, Sb_0, ShiftDet_0[2*`EXPONENT -1:0], InputExc_0[4:0]} ;	
+/* PIPE_2
+[2*`EXPONENT+ 2*`MANTISSA + 8] operation
+[2*`EXPONENT+ 2*`MANTISSA + 7] Sa_0
+[2*`EXPONENT+ 2*`MANTISSA + 6] Sb_0
+[2*`EXPONENT+ 2*`MANTISSA + 5] MaxAB_0
+[2*`EXPONENT+ 2*`MANTISSA + 4:`EXPONENT+ 2*`MANTISSA + 5] CExp_0
+[`EXPONENT+ 2*`MANTISSA + 4 : 2*`MANTISSA + 5] Shift_0
+[2*`MANTISSA + 4:`MANTISSA + 5] Mmax_0
+[`MANTISSA + 4 : `MANTISSA] InputExc_0
+[`MANTISSA-1:0] MminS_1
+*/
+			//pipe_2 <= {pipe_1[2*`EXPONENT + 2*`DWIDTH + 5], pipe_1[2*`EXPONENT +6:2*`EXPONENT +5], MaxAB_1, CExp_1[`EXPONENT-1:0], Shift_1[`EXPONENT-1:0], Mmax_1[`MANTISSA-1:0], pipe_1[4:0], MminS_1[`MANTISSA-1:0]} ;	
+/* PIPE_3
+[2*`EXPONENT+ 2*`MANTISSA + 9] operation
+[2*`EXPONENT+ 2*`MANTISSA + 8] Sa_0
+[2*`EXPONENT+ 2*`MANTISSA + 7] Sb_0
+[2*`EXPONENT+ 2*`MANTISSA + 6] MaxAB_0
+[2*`EXPONENT+ 2*`MANTISSA + 5:`EXPONENT+ 2*`MANTISSA + 6] CExp_0
+[`EXPONENT+ 2*`MANTISSA + 5 : 2*`MANTISSA + 6] Shift_0
+[2*`MANTISSA + 5:`MANTISSA + 6] Mmax_0
+[`MANTISSA + 5 : `MANTISSA + 1] InputExc_0
+[`MANTISSA:0] MminS_2
+*/
+			pipe_3 <= {pipe_2[2*`EXPONENT+ 2*`MANTISSA + 8:`MANTISSA], MminS_2[`MANTISSA:0]} ;	
+/* PIPE_4
+[2*`EXPONENT+ 2*`MANTISSA + 9] operation
+[2*`EXPONENT+ 2*`MANTISSA + 8] Sa_0
+[2*`EXPONENT+ 2*`MANTISSA + 7] Sb_0
+[2*`EXPONENT+ 2*`MANTISSA + 6] MaxAB_0
+[2*`EXPONENT+ 2*`MANTISSA + 5:`EXPONENT+ 2*`MANTISSA + 6] CExp_0
+[`EXPONENT+ 2*`MANTISSA + 5 : 2*`MANTISSA + 6] Shift_0
+[2*`MANTISSA + 5:`MANTISSA + 6] Mmax_0
+[`MANTISSA + 5 : `MANTISSA + 1] InputExc_0
+[`MANTISSA:0] MminS_3
+*/				
+			//pipe_4 <= {pipe_3[2*`EXPONENT+ 2*`MANTISSA + 9:`MANTISSA+1], Mmin_3[`MANTISSA:0]} ;	
+/* PIPE_5 :
+[`DWIDTH+ `EXPONENT + 11] operation
+[`DWIDTH+ `EXPONENT + 10] PSgn_4
+[`DWIDTH+ `EXPONENT + 9] Opr_4
+[`DWIDTH+ `EXPONENT + 8] Sa_0
+[`DWIDTH+ `EXPONENT + 7] Sb_0
+[`DWIDTH+ `EXPONENT + 6] MaxAB_0
+[`DWIDTH+ `EXPONENT + 5 :`DWIDTH+6] CExp_0
+[`DWIDTH+5:`DWIDTH+1] InputExc_0
+[`DWIDTH:0] Sum_4
+*/					
+			pipe_5 <= {pipe_4[2*`EXPONENT+ 2*`MANTISSA + 9], PSgn_4, Opr_4, pipe_4[2*`EXPONENT+ 2*`MANTISSA + 8:`EXPONENT+ 2*`MANTISSA + 6], pipe_4[`MANTISSA+5:`MANTISSA+1], Sum_4[`DWIDTH:0]} ;
+/* PIPE_6 :
+[`DWIDTH+ `EXPONENT + 16] operation
+[`DWIDTH+ `EXPONENT + 15:`DWIDTH+ `EXPONENT + 11] Shift_5
+[`DWIDTH+ `EXPONENT + 10] PSgn_4
+[`DWIDTH+ `EXPONENT + 9] Opr_4
+[`DWIDTH+ `EXPONENT + 8] Sa_0
+[`DWIDTH+ `EXPONENT + 7] Sb_0
+[`DWIDTH+ `EXPONENT + 6] MaxAB_0
+[`DWIDTH+ `EXPONENT + 5 :`DWIDTH+6] CExp_0
+[`DWIDTH+5:`DWIDTH+1] InputExc_0
+[`DWIDTH:0] Sum_4
+*/				
+			//pipe_6 <= {pipe_5[`DWIDTH+`EXPONENT+11], Shift_5[4:0], pipe_5[`DWIDTH+`EXPONENT+10:`DWIDTH+1], SumS_5[`DWIDTH:0]} ;	
+/* PIPE_7 :
+[`DWIDTH+ `EXPONENT + 16] operation
+[`DWIDTH+ `EXPONENT + 15:`DWIDTH+ `EXPONENT + 11] Shift_5
+[`DWIDTH+ `EXPONENT + 10] PSgn_4
+[`DWIDTH+ `EXPONENT + 9] Opr_4
+[`DWIDTH+ `EXPONENT + 8] Sa_0
+[`DWIDTH+ `EXPONENT + 7] Sb_0
+[`DWIDTH+ `EXPONENT + 6] MaxAB_0
+[`DWIDTH+ `EXPONENT + 5 :`DWIDTH+6] CExp_0
+[`DWIDTH+5:`DWIDTH+1] InputExc_0
+[`DWIDTH:0] Sum_4
+*/						
+			//pipe_7 <= {pipe_6[`DWIDTH+`EXPONENT+16:`DWIDTH+1], SumS_7[`DWIDTH:0]} ;	
+/* PIPE_8:
+[2*`EXPONENT + `MANTISSA + 15] FG_8 
+[2*`EXPONENT + `MANTISSA + 14] operation
+[2*`EXPONENT + `MANTISSA + 13] PSgn_4
+[2*`EXPONENT + `MANTISSA + 12] Sa_0
+[2*`EXPONENT + `MANTISSA + 11] Sb_0
+[2*`EXPONENT + `MANTISSA + 10] MaxAB_0
+[2*`EXPONENT + `MANTISSA + 9:`EXPONENT + `MANTISSA + 10] CExp_0
+[`EXPONENT + `MANTISSA + 9:`EXPONENT + `MANTISSA + 5] InputExc_8
+[`EXPONENT + `MANTISSA + 4 :`EXPONENT + 5] NormM_8 
+[`EXPONENT + 4 :4] NormE_8
+[3] ZeroSum_8
+[2] NegE_8
+[1] R_8
+[0] S_8
+*/				
+			pipe_8 <= {FG_8, pipe_7[`DWIDTH+`EXPONENT+16], pipe_7[`DWIDTH+`EXPONENT+10], pipe_7[`DWIDTH+`EXPONENT+8:`DWIDTH+1], NormM_8[`MANTISSA-1:0], NormE_8[`EXPONENT:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
+/* pipe_9:
+[`DWIDTH + 8 :9] P_int
+[8] NegE_8
+[7] R_8
+[6] S_8
+[5:1] InputExc_8
+[0] EOF
+*/				
+			//pipe_9 <= {P_int[`DWIDTH-1:0], pipe_8[2], pipe_8[1], pipe_8[0], pipe_8[`EXPONENT+`MANTISSA+9:`EXPONENT+`MANTISSA+5], EOF} ;	
 		end
 	end		
 	
 endmodule
 
+
+//
 // Description:	 	The pre-alignment module is responsible for taking the inputs
 //							apart and checking the parts for exceptions.
 //							The exponent difference is also calculated in this module.
+//
+
 
 module FPAddSub_PrealignModule(
 		A,
@@ -2794,7 +2854,7 @@ module FPAddSub_PrealignModule(
 	// Output ports
 	output Sa ;												// A's sign
 	output Sb ;												// B's sign
-	output [9:0] ShiftDet ;
+	output [2*`EXPONENT-1:0] ShiftDet ;
 	output [4:0] InputExc ;								// Input numbers are exceptions
 	output [`DWIDTH-2:0] Aout ;
 	output [`DWIDTH-2:0] Bout ;
@@ -2823,15 +2883,19 @@ module FPAddSub_PrealignModule(
 	
 	assign Sa = A[`DWIDTH-1] ;									// A's sign bit
 	assign Sb = B[`DWIDTH-1] ;									// B's sign	bit
-	assign ShiftDet = {DBA[4:0], DAB[4:0]} ;		// Shift data
+	assign ShiftDet = {DBA[`EXPONENT-1:0], DAB[`EXPONENT-1:0]} ;		// Shift data
 	assign Opout = operation ;
 	assign Aout = A[`DWIDTH-2:0] ;
 	assign Bout = B[`DWIDTH-2:0] ;
 	
 endmodule
 
+
+//
 // Description:	 	The alignment module determines the larger input operand and
 //							sets the mantissas, shift and common exponent accordingly.
+//
+
 
 module FPAddSub_AlignModule (
 		A,
@@ -2847,12 +2911,12 @@ module FPAddSub_AlignModule (
 	// Input ports
 	input [`DWIDTH-2:0] A ;								// Input A, a 32-bit floating point number
 	input [`DWIDTH-2:0] B ;								// Input B, a 32-bit floating point number
-	input [9:0] ShiftDet ;
+	input [2*`EXPONENT-1:0] ShiftDet ;
 	
 	// Output ports
 	output [`EXPONENT-1:0] CExp ;							// Common Exponent
 	output MaxAB ;									// Incidates larger of A and B (0/A, 1/B)
-	output [4:0] Shift ;							// Number of steps to smaller mantissa shift right
+	output [`EXPONENT-1:0] Shift ;							// Number of steps to smaller mantissa shift right
 	output [`MANTISSA-1:0] Mmin ;							// Smaller mantissa 
 	output [`MANTISSA-1:0] Mmax ;							// Larger mantissa
 	
@@ -2867,7 +2931,7 @@ module FPAddSub_AlignModule (
 	// Determine final shift value
 	//assign Shift = MaxAB ? (BOF ? ShiftDet[9:5] : 5'b11001) : (AOF ? ShiftDet[4:0] : 5'b11001) ;
 	
-	assign Shift = MaxAB ? ShiftDet[9:5] : ShiftDet[4:0] ;
+	assign Shift = MaxAB ? ShiftDet[2*`EXPONENT-1:`EXPONENT] : ShiftDet[`EXPONENT-1:0] ;
 	
 	// Take out smaller mantissa and append shift space
 	assign Mmin = MaxAB ? A[`MANTISSA-1:0] : B[`MANTISSA-1:0] ; 
@@ -2880,56 +2944,90 @@ module FPAddSub_AlignModule (
 	
 endmodule
 
-// Description:	 Alignment shift stage 1, performs 16|12|8|4 shift
 
+// Description:	 Alignment shift stage 1, performs 16|12|8|4 shift
+//
+
+
+// ONLY THIS MODULE IS HARDCODED for half precision fp16 and bfloat16
 module FPAddSub_AlignShift1(
+		//bf16,
 		MminP,
 		Shift,
 		Mmin
 	);
 	
 	// Input ports
+	//input bf16;
 	input [`MANTISSA-1:0] MminP ;						// Smaller mantissa after 16|12|8|4 shift
-	input [2:0] Shift ;						// Shift amount
+	input [`EXPONENT-3:0] Shift ;						// Shift amount. Last 2 bits of shifting are done in next stage. Hence, we have [`EXPONENT - 2] bits
 	
 	// Output ports
 	output [`MANTISSA:0] Mmin ;						// The smaller mantissa
 	
+
+	wire bf16;
+	assign bf16 = 1'b1; //hardcoding to 1, to avoid ODIN issue. a `ifdef here wasn't working. apparently, nested `ifdefs don't work
+
 	// Internal signals
 	reg	  [`MANTISSA:0]		Lvl1;
 	reg	  [`MANTISSA:0]		Lvl2;
 	wire    [2*`MANTISSA+1:0]    Stage1;	
 	integer           i;                // Loop variable
-	
-	always @(*) begin						
-		// Rotate by 16?
-		//Lvl1 <= Shift[2] ? {17'b00000000000000001, MminP[22:16]} : {1'b1, MminP}; 
-		Lvl1 <= Shift[2] ? {11'b0000000000} : {1'b1, MminP}; 
-		
+
+	wire [`MANTISSA:0] temp_0; 
+
+assign temp_0 = 0;
+
+	always @(*) begin
+		if (bf16 == 1'b1) begin						
+//hardcoding for bfloat16
+	//For bfloat16, we can shift the mantissa by a max of 7 bits since mantissa has a width of 7. 
+	//Hence if either, bit[3]/bit[4]/bit[5]/bit[6]/bit[7] is 1, we can make it 0. This corresponds to bits [5:1] in our updated shift which doesn't contain last 2 bits.
+		//Lvl1 <= (Shift[1]|Shift[2]|Shift[3]|Shift[4]|Shift[5]) ? {temp_0} : {1'b1, MminP};  // MANTISSA + 1 width	
+		Lvl1 <= (|Shift[`EXPONENT-3:1]) ? {temp_0} : {1'b1, MminP};  // MANTISSA + 1 width	
+		end
+		else begin
+		//for half precision fp16, 10 bits can be shifted. Hence, only shifts till 10 (01010)can be made. 
+		Lvl1 <= Shift[2] ? {temp_0} : {1'b1, MminP};
+		end
 	end
 	
-	assign Stage1 = { 11'b0, Lvl1};
-	
-	always @(*) begin    					// Rotate {0 | 4 | 8 | 12} bits
-	  case (Shift[1:0])
+	assign Stage1 = { temp_0, Lvl1}; //2*MANTISSA + 2 width
+
+	always @(*) begin    					// Rotate {0 | 4 } bits
+	if(bf16 == 1'b1) begin
+	  case (Shift[0])
+			// Rotate by 0	
+			1'b0:  Lvl2 <= Stage1[`MANTISSA:0];       			
+			// Rotate by 4	
+			1'b1:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end Lvl2[`MANTISSA:`MANTISSA-3] <= 0; end
+	  endcase
+	end
+	else begin
+	  case (Shift[1:0])					// Rotate {0 | 4 | 8} bits
 			// Rotate by 0	
 			2'b00:  Lvl2 <= Stage1[`MANTISSA:0];       			
 			// Rotate by 4	
-			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end /*Lvl2[`MANTISSA:`MANTISSA-3] <= 0;*/ end
+			2'b01:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+4]; end Lvl2[`MANTISSA:`MANTISSA-3] <= 0; end
 			// Rotate by 8
-			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end /*Lvl2[`MANTISSA:`MANTISSA-7] <= 0;*/ end
+			2'b10:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+8]; end Lvl2[`MANTISSA:`MANTISSA-7] <= 0; end
 			// Rotate by 12	
 			2'b11: Lvl2[`MANTISSA: 0] <= 0; 
 			//2'b11:  begin for (i=0; i<=`MANTISSA; i=i+1) begin Lvl2[i] <= Stage1[i+12]; end Lvl2[`MANTISSA:`MANTISSA-12] <= 0; end
 	  endcase
 	end
-	
+	end
+
 	// Assign output to next shift stage
 	assign Mmin = Lvl2;
 	
 endmodule
 
+
 // Description:	 Alignment shift stage 2, performs 3|2|1 shift
+//
+
 
 module FPAddSub_AlignShift2(
 		MminP,
@@ -2939,7 +3037,7 @@ module FPAddSub_AlignShift2(
 	
 	// Input ports
 	input [`MANTISSA:0] MminP ;						// Smaller mantissa after 16|12|8|4 shift
-	input [1:0] Shift ;						// Shift amount
+	input [1:0] Shift ;						// Shift amount. Last 2 bits
 	
 	// Output ports
 	output [`MANTISSA:0] Mmin ;						// The smaller mantissa
@@ -2956,11 +3054,11 @@ module FPAddSub_AlignShift2(
 			// Rotate by 0
 			2'b00:  Lvl3 <= Stage2[`MANTISSA:0];   
 			// Rotate by 1
-			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end /*Lvl3[`MANTISSA] <= 0; */end 
+			2'b01:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+1]; end Lvl3[`MANTISSA] <= 0; end 
 			// Rotate by 2
-			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end /*Lvl3[`MANTISSA:`MANTISSA-1] <= 0;*/ end 
+			2'b10:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+2]; end Lvl3[`MANTISSA:`MANTISSA-1] <= 0; end 
 			// Rotate by 3
-			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end /*Lvl3[`MANTISSA:`MANTISSA-2] <= 0;*/ end 	  
+			2'b11:  begin for (j=0; j<=`MANTISSA; j=j+1)  begin Lvl3[j] <= Stage2[j+3]; end Lvl3[`MANTISSA:`MANTISSA-2] <= 0; end 	  
 	  endcase
 	end
 	
@@ -2969,7 +3067,11 @@ module FPAddSub_AlignShift2(
 
 endmodule
 
+
+//
 // Description:	 Module that executes the addition or subtraction on mantissas.
+//
+
 
 module FPAddSub_ExecutionModule(
 		Mmax,
@@ -2996,17 +3098,25 @@ module FPAddSub_ExecutionModule(
 	output PSgn ;							// The sign for the result
 	output Opr ;							// The effective (performed) operation
 
-	assign Opr = (OpMode^Sa^Sb); 		// Resolve sign to determine operation
+	wire [`EXPONENT-1:0]temp_1;
 
+	assign Opr = (OpMode^Sa^Sb); 		// Resolve sign to determine operation
+	assign temp_1 = 0;
 	// Perform effective operation
-	assign Sum = (OpMode^Sa^Sb) ? ({1'b1, Mmax, 5'b00000} - {Mmin, 5'b00000}) : ({1'b1, Mmax, 5'b00000} + {Mmin, 5'b00000}) ;
+//SAMIDH_UNSURE 5--> 8
+
+	assign Sum = (OpMode^Sa^Sb) ? ({1'b1, Mmax, temp_1} - {Mmin, temp_1}) : ({1'b1, Mmax, temp_1} + {Mmin, temp_1}) ;
 	
 	// Assign result sign
 	assign PSgn = (MaxAB ? Sb : Sa) ;
 
 endmodule
 
+
+//
 // Description:	 Determine the normalization shift amount and perform 16-shift
+//
+
 
 module FPAddSub_NormalizeModule(
 		Sum,
@@ -3020,7 +3130,7 @@ module FPAddSub_NormalizeModule(
 	// Output ports
 	output [`DWIDTH:0] Mmin ;					// Mantissa after 16|0 shift
 	output [4:0] Shift ;					// Shift amount
-	
+	//Changes in this doesn't matter since even Bfloat16 can't go beyond 7 shift to the mantissa (only 3 bits valid here)  
 	// Determine normalization shift amount by finding leading nought
 	assign Shift =  ( 
 		Sum[16] ? 5'b00000 :	 
@@ -3063,7 +3173,10 @@ module FPAddSub_NormalizeModule(
 
 endmodule
 
+
 // Description:	 Normalization shift stage 1, performs 12|8|4|3|2|1|0 shift
+//
+//Hardcoding loop start and end values of i. To avoid ODIN limitations. i=`DWIDTH*2+1 wasn't working.
 
 module FPAddSub_NormalizeShift1(
 		MminP,
@@ -3089,17 +3202,13 @@ module FPAddSub_NormalizeShift1(
 	always @(*) begin    					// Rotate {0 | 4 | 8 | 12} bits
 	  case (Shift[3:2])
 			// Rotate by 0
-			2'b00: //Lvl2 <= Stage1[`DWIDTH:0];       		
-      begin Lvl2 = Stage1[`DWIDTH:0];  end
+			2'b00: Lvl2 <= Stage1[`DWIDTH:0];       		
 			// Rotate by 4
-			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-4)] = Stage1[3:0]; Lvl2[`DWIDTH-4-1:0] = Stage1[`DWIDTH-4]; end
+			2'b01: begin for (i=33; i>=17; i=i-1) begin Lvl2[i-33] <= Stage1[i-4]; end Lvl2[3:0] <= 0; end
 			// Rotate by 8
-			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-8)] = Stage1[3:0]; Lvl2[`DWIDTH-8-1:0] = Stage1[`DWIDTH-8]; end
+			2'b10: begin for (i=33; i>=17; i=i-1) begin Lvl2[i-33] <= Stage1[i-8]; end Lvl2[7:0] <= 0; end
 			// Rotate by 12
-			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
-      begin Lvl2[`DWIDTH: (`DWIDTH-12)] = Stage1[3:0]; Lvl2[`DWIDTH-12-1:0] = Stage1[`DWIDTH-12]; end
+			2'b11: begin for (i=33; i>=17; i=i-1) begin Lvl2[i-33] <= Stage1[i-12]; end Lvl2[11:0] <= 0; end
 	  endcase
 	end
 	
@@ -3108,17 +3217,13 @@ module FPAddSub_NormalizeShift1(
 	always @(*) begin   				 		// Rotate {0 | 1 | 2 | 3} bits
 	  case (Shift[1:0])
 			// Rotate by 0
-			2'b00:  //Lvl3 <= Stage2[`DWIDTH:0];
-      begin Lvl3 = Stage2[`DWIDTH:0]; end
+			2'b00:  Lvl3 <= Stage2[`DWIDTH:0];
 			// Rotate by 1
-			2'b01: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
-      begin Lvl3[`DWIDTH: (`DWIDTH-1)] = Stage2[3:0]; Lvl3[`DWIDTH-1-1:0] = Stage2[`DWIDTH-1]; end
+			2'b01: begin for (i=33; i>=17; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-1]; end Lvl3[0] <= 0; end 
 			// Rotate by 2
-			2'b10: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
-      begin Lvl3[`DWIDTH: (`DWIDTH-2)] = Stage2[3:0]; Lvl3[`DWIDTH-2-1:0] = Stage2[`DWIDTH-2]; end
+			2'b10: begin for (i=33; i>=17; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end
 			// Rotate by 3
-			2'b11: //begin for (i=2*`DWIDTH+1; i>=`DWIDTH+1; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
-      begin Lvl3[`DWIDTH: (`DWIDTH-3)] = Stage2[3:0]; Lvl3[`DWIDTH-3-1:0] = Stage2[`DWIDTH-3]; end
+			2'b11: begin for (i=33; i>=17; i=i-1) begin Lvl3[i-`DWIDTH-1] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end
 	  endcase
 	end
 	
@@ -3127,8 +3232,11 @@ module FPAddSub_NormalizeShift1(
 	
 endmodule
 
+
 // Description:	 Normalization shift stage 2, calculates post-normalization
 //						 mantissa and exponent, as well as the bits used in rounding		
+//
+
 
 module FPAddSub_NormalizeShift2(
 		PSSum,
@@ -3178,9 +3286,12 @@ module FPAddSub_NormalizeShift2(
 	
 endmodule
 
+
 // Description:	 Performs 'Round to nearest, tie to even'-rounding on the
 //						 normalized mantissa according to the G, R, S bits. Calculates
 //						 final result and checks for exponent overflow.
+//
+
 
 module FPAddSub_RoundModule(
 		ZeroSum,
@@ -3222,6 +3333,8 @@ module FPAddSub_RoundModule(
 	wire ExpAdd ;						// May have to add 1 to compensate for overflow 
 	wire RoundOF ;						// Rounding overflow
 	
+	wire [`EXPONENT:0]temp_2;
+	assign temp_2 = 0;
 	// The cases where we need to round upwards (= adding one) in Round to nearest, tie to even
 	assign RoundUp = (G & ((R | S) | NormM[0])) ;
 	
@@ -3232,7 +3345,7 @@ module FPAddSub_RoundModule(
 
 	// Calculate post-rounding exponent
 	assign ExpAdd = (RoundOF ? 1'b1 : 1'b0) ; 				// Add 1 to exponent to compensate for overflow
-	assign RoundE = ZeroSum ? 5'b00000 : (NormE + ExpAdd) ; 							// Final exponent
+	assign RoundE = ZeroSum ? temp_2 : (NormE + ExpAdd) ; 							// Final exponent
 
 	// If zero, need to determine sign according to rounding
 	assign FSgn = (ZeroSum & (Sa ^ Sb)) | (ZeroSum ? (Sa & Sb & ~Ctrl) : ((~MaxAB & Sa) | ((Ctrl ^ Sb) & (MaxAB | Sa)))) ;
@@ -3245,8 +3358,12 @@ module FPAddSub_RoundModule(
 	
 endmodule
 
+
+//
 // Description:	 Check the final result for exception conditions and set
 //						 flags accordingly.
+//
+
 
 module FPAddSub_ExceptionModule(
 		Z,
