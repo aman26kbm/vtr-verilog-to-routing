@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////
+// Accelerator for Softmax classification layer. Based on implementation in:
+// Z. Wei et al., “Design Space Exploration for Softmax Implementations,” in International Conference on Application-specific Systems, Architectures
+and Processors (ASAP), 2020. 
+// IEEE FP16 precision is used.
+// LUT based log and exp units, Adder tree (reduction), Comparators, Subtractors. 
+// RAM outside of the design.
+//////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Authors: Pragnesh Patel and Aman Arora
+//////////////////////////////////////////////////////////////////////////////
+
 //softmax_p8_smem_rfloat16_alut_v512_b2_-0.1_0.1.v
 `define complex_dsp
 `ifndef DEFINES_DONE
@@ -1356,11 +1370,14 @@ module mode7_exp(
   expunit exp7(.a(inp7), .z(outp7), .status(), .stage_run(stage_run), .stage_run2(stage_run2), .clk(clk), .reset(reset));
 endmodule
 
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Definition of a 16-bit floating point adder/subtractor
+// This is a heavily modified version of:
+// https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FP_AddSub
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
-
-///////////////////////////////////////////////////
-//Definition of FP16 adder/subtractor (so we'll use CLBs here)
-///////////////////////////////////////////////////
 `define EXPONENT 5
 `define MANTISSA 10
 `define ACTUAL_MANTISSA 11
@@ -1908,6 +1925,7 @@ endmodule
 
 //////////////////////////////////////////////////////
 // Exponential unit
+// Author: Pragnesh Patel
 //////////////////////////////////////////////////////
 
 module expunit (a, z, status, stage_run, stage_run2, clk, reset);
@@ -2089,10 +2107,15 @@ module LUT(addr, exp);
 endmodule
 
 
-//////////////////////////////////////////////////////////////////////
-// Floating point multiplier
-//////////////////////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Floating point 16-bit multiplier
+// This is a heavily modified version of:
+// https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FPMult
+// Original author: Fredrik Brosser
+// Abridged by: Samidh Mehta
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 `define EXPONENT 5
 `define MANTISSA 10
@@ -2107,14 +2130,6 @@ endmodule
 `define SIGN_LOC 15
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    08:40:21 09/19/2012 
-// Module Name:    FPMult
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPMult_16(
 		clk,
@@ -2158,14 +2173,6 @@ endmodule
 `define SIGN_LOC 15
 `define DWIDTH (`SIGN+`EXPONENT+`MANTISSA)
 `define IEEE_COMPLIANCE 1
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    08:40:21 09/19/2012 
-// Module Name:    FPMult
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPMult(
 		clk,
@@ -2478,6 +2485,16 @@ module FPMult_RoundModule(
 
 endmodule
 
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Definition of a 16-bit floating point adder/subtractor
+// This is a heavily modified version of:
+// https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FP_AddSub
+// Original author: Fredrik Brosser
+// Abridged by: Samidh Mehta
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 module FPAddSub_16(
 		clk,
 		rst,
@@ -2751,18 +2768,9 @@ module FPAddSub_16(
 	
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    	16:49:15 10/16/2012 
-// Module Name:    	FPAddSub_PrealignModule
-// Project Name: 	 	Floating Point Project
-// Author:			 	Fredrik Brosser
-//
 // Description:	 	The pre-alignment module is responsible for taking the inputs
 //							apart and checking the parts for exceptions.
 //							The exponent difference is also calculated in this module.
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_PrealignModule(
 		A,
@@ -2821,17 +2829,8 @@ module FPAddSub_PrealignModule(
 	
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    	16:49:15 10/16/2012 
-// Module Name:    	FPAddSub_AlignModule
-// Project Name: 	 	Floating Point Project
-// Author:			 	Fredrik Brosser
-//
 // Description:	 	The alignment module determines the larger input operand and
 //							sets the mantissas, shift and common exponent accordingly.
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_AlignModule (
 		A,
@@ -2880,16 +2879,7 @@ module FPAddSub_AlignModule (
 	
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    16:49:36 10/16/2012 
-// Module Name:    FPAddSub_AlignShift1
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Alignment shift stage 1, performs 16|12|8|4 shift
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_AlignShift1(
 		MminP,
@@ -2938,16 +2928,7 @@ module FPAddSub_AlignShift1(
 	
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    16:50:05 10/16/2012 
-// Module Name:    FPAddSub_AlignShift2
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Alignment shift stage 2, performs 3|2|1 shift
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_AlignShift2(
 		MminP,
@@ -2987,16 +2968,7 @@ module FPAddSub_AlignShift2(
 
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    11:35:05 09/05/2012 
-// Module Name:    FPAddSub_ExecutionModule 
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Module that executes the addition or subtraction on mantissas.
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_ExecutionModule(
 		Mmax,
@@ -3033,16 +3005,7 @@ module FPAddSub_ExecutionModule(
 
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    16:05:07 09/07/2012
-// Module Name:    FBAddSub_NormalizeModule
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Determine the normalization shift amount and perform 16-shift
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_NormalizeModule(
 		Sum,
@@ -3099,16 +3062,7 @@ module FPAddSub_NormalizeModule(
 
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    16:49:36 10/16/2012 
-// Module Name:    FPAddSub_NormalizeShift1 
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Normalization shift stage 1, performs 12|8|4|3|2|1|0 shift
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_NormalizeShift1(
 		MminP,
@@ -3172,17 +3126,8 @@ module FPAddSub_NormalizeShift1(
 	
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    17:34:18 10/16/2012 
-// Module Name:    FPAddSub_NormalizeShift2 
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Normalization shift stage 2, calculates post-normalization
 //						 mantissa and exponent, as well as the bits used in rounding		
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_NormalizeShift2(
 		PSSum,
@@ -3232,18 +3177,9 @@ module FPAddSub_NormalizeShift2(
 	
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    11:33:28 09/11/2012 
-// Module Name:    FPAddSub_RoundModule 
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Performs 'Round to nearest, tie to even'-rounding on the
 //						 normalized mantissa according to the G, R, S bits. Calculates
 //						 final result and checks for exponent overflow.
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_RoundModule(
 		ZeroSum,
@@ -3308,17 +3244,8 @@ module FPAddSub_RoundModule(
 	
 endmodule
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Create Date:    13:00:02 16/11/2012 
-// Module Name:    FPAddSub_ExceptionModule 
-// Project Name: 	 Floating Point Project
-// Author:			 Fredrik Brosser
-//
 // Description:	 Check the final result for exception conditions and set
 //						 flags accordingly.
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_ExceptionModule(
 		Z,

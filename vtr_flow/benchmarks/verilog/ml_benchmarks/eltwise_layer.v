@@ -1,3 +1,6 @@
+//////////////////////////////////////////////////////////////////////////////
+// Author: Aman Arora
+//////////////////////////////////////////////////////////////////////////////
 
 `timescale 1ns/1ns
 ///////////////////////////////////////////////////////////
@@ -9,6 +12,7 @@
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
+// Precision BF16
 //Each PE has 1 multiplier, an adder and a subtractor.
 //There are 4 PEs in each compute unit. 
 //There are 6 such compute units in the whole layer.
@@ -1765,7 +1769,7 @@ end
 //We don't provide the name of the mode here though.
 
 `ifdef complex_dsp
-adder_fp sub_u1(.clk(clk), .a(a_flopped), .b(b_flopped), .out(sub_out_temp));
+adder_fp_clk sub_u1(.clk(clk), .a(a_flopped), .b(b_flopped), .out(sub_out_temp));
 `else
 FPAddSub u_FPAddSub2(.clk(clk), .rst(1'b0), .a(a_flopped), .b(b_flopped), .operation(1'b0), .result(sub_out_temp), .flags());
 `endif
@@ -1790,8 +1794,11 @@ endmodule
 // Floating point 16-bit multiplier
 // This is a heavily modified version of:
 // https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FPMult
+// Original author: Fredrik Brosser
+// Abridged by: Samidh Mehta
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
+
 module FPMult_16(
 		clk,
 		rst,
@@ -2124,6 +2131,8 @@ endmodule
 // Floating point 16-bit adder
 // This is a heavily modified version of:
 // https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FP_AddSub
+// Original author: Fredrik Brosser
+// Abridged by: Samidh Mehta
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 `ifndef complex_dsp

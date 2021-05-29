@@ -1,3 +1,7 @@
+//////////////////////////////////////////////////////////////////////////////
+// Author: Aman Arora
+//////////////////////////////////////////////////////////////////////////////
+
 `timescale 1ns / 1ps
 
 /////////////////////////////////////////////////////////////////////////
@@ -6858,7 +6862,7 @@ always @(posedge clk) begin
 end
 
 //assign mul_out = a * b;
-qmult mult_u1(.i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
+qmult mult_u1(.clk(clk), .rst(reset), .i_multiplicand(a_flopped), .i_multiplier(b_flopped), .o_result(mul_out_temp));
 
 always @(posedge clk) begin
   if (reset) begin
@@ -6870,7 +6874,7 @@ end
 
 assign mul_out = mul_out_temp_reg;
 
-qadd add_u1(.a(out_temp), .b(mul_out), .c(add_out));
+qadd add_u1(.clk(clk), .rst(reset), .a(out_temp), .b(mul_out), .c(add_out));
 
 always @(posedge clk) begin
   if (reset) begin
@@ -6890,7 +6894,9 @@ endmodule
 //////////////////////////////////////////////////////////////////////////
 // Multiplier
 //////////////////////////////////////////////////////////////////////////
-module qmult(i_multiplicand,i_multiplier,o_result);
+module qmult(clk,rst,i_multiplicand,i_multiplier,o_result);
+input clk;
+input rst;
 input [`DWIDTH-1:0] i_multiplicand;
 input [`DWIDTH-1:0] i_multiplier;
 output [2*`DWIDTH-1:0] o_result;
@@ -6901,8 +6907,8 @@ wire [15:0] fpmult_16_result;
 wire [4:0] fpmult_16_flags;
 
 FPMult_16 u_fpmult_16(
-   .clk(fpmult_16_clk_NC),
-   .rst(fpmult_16_rst_NC),
+   .clk(clk),
+   .rst(rst),
    .a(i_multiplicand[15:0]),
    .b(i_multiplier[15:0]),
    .result(fpmult_16_result),
@@ -6918,7 +6924,9 @@ endmodule
 //////////////////////////////////////////////////////////////////////////
 // Adder
 //////////////////////////////////////////////////////////////////////////
-module qadd(a,b,c);
+module qadd(clk,rst,a,b,c);
+input clk;
+input rst;
 input [2*`DWIDTH-1:0] a;
 input [2*`DWIDTH-1:0] b;
 output [2*`DWIDTH-1:0] c;
@@ -6928,8 +6936,8 @@ wire fpadd_32_rst_NC;
 wire [4:0] fpadd_32_flags;
 
 FPAddSub_single u_fpaddsub_32(
-  .clk(fpadd_32_clk_NC),
-  .rst(fpadd_32_rst_NC),
+  .clk(clk),
+  .rst(rst),
   .a(a),
   .b(b),
   .operation(1'b0), 
@@ -6942,9 +6950,13 @@ endmodule
 `ifndef complex_dsp
 
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 // Definition of a 16-bit floating point multiplier
 // This is a heavily modified version of:
 // https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FPMult
+// Original author: Fredrik Brosser
+// Abridged by: Samidh Mehta
+//////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
 module FPMult_16(
@@ -7373,10 +7385,15 @@ endmodule
 `endif
 
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 // Definition of a 32-bit floating point adder/subtractor
 // This is a heavily modified version of:
 // https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FP_AddSub
+// Original author: Fredrik Brosser
+// Abridged by: Samidh Mehta
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 `ifndef complex_dsp
 module FPAddSub_single(
 		clk,

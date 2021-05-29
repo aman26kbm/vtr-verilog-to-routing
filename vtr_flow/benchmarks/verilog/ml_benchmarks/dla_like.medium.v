@@ -1,3 +1,20 @@
+//////////////////////////////////////////////////////////////////////////////
+// Author: Andrew Boutros
+//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+//A CNN accelerator overlay called DLA from Intel based on the paper:
+//U. Aydonat et al., “An OpenCL Deep Learning Accelerator on Arria10,” in International Symposium on Field-Programmable Gate Arrays (FPGA), 2017.
+//This design was also used in this paper: 
+//A. Boutros et al., “You Cannot Improve What You Do Not Measure: FPGA vs. ASIC Efficiency Gaps for Convolutional Neural Network Inference,” ACM Transactions on Reconfigurable Technology Systems (TRETS), vol. 11, no. 3, 2018
+//
+//Some properties of the design are:
+//1. 16-bit fixed point for activations, 8-bit fixed point for weights 
+//2. Winograd Transform based convolution. 
+//3. 2D mac array. Centralized weight buffer for processing elements. 
+//4. Double-buffering after each layer. 
+///////////////////////////////////////////////////////////////////////////////
+
 `define complex_dsp
 module DLA (
 	input clk,

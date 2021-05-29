@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////////////////////////////////
+// Author: Andrew Boutros
+//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+//An accelerator overlay for LSTMs based on the C-LSTM paper:
+//S. Wang et al., “C-LSTM: Enabling Efficient LSTM Using Structured Compression Techniques on FPGAs,” in International Symposium on Field-Programmable Gate Arrays (FPGA), 2018.
+//Some properties of the design are:
+//1. 18-bit fixed point is used. 
+//2. FFT based circulant convolution 
+//3. On-chip weight storage (compressed weights). 
+//4. Double buffering of intermediate results between stages. 
+//5. Element-wise addition, multiplication and activation blocks. 
+///////////////////////////////////////////////////////////////////////////////
+
 module C_LSTM_datapath (
 	input clk,
 	input reset,
