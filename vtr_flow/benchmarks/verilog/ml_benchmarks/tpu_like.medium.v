@@ -1,3 +1,7 @@
+//////////////////////////////////////////////////////////////////////////////
+// Author: Aman Arora
+//////////////////////////////////////////////////////////////////////////////
+
 `timescale 1ns / 1ps
 
 ///////////////////////////////////
@@ -58,6 +62,7 @@
 //      Logic area (used): 1.72408e+08 MWTAs
 //      Resource usage: 5033 LBs, 26 RAMs, 1072 Multipliers
 //      Runtime (on Intel Xeon E5-2430 2.5GHz with single thread): 12500 sec
+// 3. 22nm architectures generated from COFFE. Example: arch/COFFE_22nm/k6n10LB_mem20K_complexDSP_customSB_22nm*
 
 //////////////////////////////////////
 // Parameters
@@ -287,26 +292,6 @@
 /////////////////////////////////////
 // Matrix multiplication unit
 ////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2020-09-27 21:12:45.762386
-// Design Name: 
-// Module Name: matmul_32x32_systolic
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 module matmul_32x32_systolic(
  clk,
