@@ -1,11 +1,39 @@
 //`define SIMULATION_MEMORY
-`define INWEIGHT_DEPTH 6400   //100x64
-`define HWEIGHT_DEPTH 4096    //64x64
-`define ARRAY_DEPTH 64       //64
-`define INPUT_DEPTH 100	    //100
-`define DATA_WIDTH 16
+`define ARRAY_DEPTH 64      //Number of Hidden neurons
+`define INPUT_DEPTH 100	    //LSTM input vector dimensions
+`define DATA_WIDTH 16		//16 bit representation
+`define INWEIGHT_DEPTH 6400 //100x64
+`define HWEIGHT_DEPTH 4096  //64x64
 `define varraysize 1600   //100x16
 `define uarraysize 1024  //64x16
+
+/////////////////////////////////////////////////////////////////////////////////
+//LSTM layer design
+//Author: Aishwarya Rajen
+//
+//This verilog implementation can be used for LSTM inference applications.
+//LSTM contains four gates :Input,Output,Forget and Cell State.
+//The architecture is such that the four gates can be parallelized for the 
+//most part except for the ending few stages were previous cycle output is 
+//required. The weights of the gates (obtained from training using Python or
+//other sources) is stored and accessed through BRAMs on the FPGA.
+//Fixed Point 16 (4.12) format is used
+//This is a pipelined LSTM network design with the following blocks:
+//1.MVM - Matrix vector multiplication Block
+//	Every cycle one row of the matrix gets multiplied with the vector producing 
+//	one 16 bit output which can get processed by further stages.
+//2.ELEMENT WISE ADD 
+//	16 bit addition
+//3.SIGMOID
+//	LUT based Sigmoid approximation
+//4.ELEMENT WISE MULTIPLICATION
+//	2s complement based signed multiplication
+//5.TANH
+//	LUT based tanH approximation
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+
 
 module top(
 input clk,
@@ -29,9 +57,7 @@ wire [`uarraysize-1:0] Uc_in;
 wire [`varraysize-1:0] Wc_in;
 wire [`varraysize-1:0] x_in;
 reg [`uarraysize-1:0] h_in;
-//wire [`uarraysize-1:0] dummyo0,dummyo1,dummyo2,dummyo3;
-//wire [`varraysize-1:0] dummyo4,dummyo5,dummyo6,dummyo7,dummyo8;
-//wire [`DATA_WIDTH-1:0] dummyo9,dummyo10,dummyo11,dummyo12,dummyo13;
+
 
 reg [`uarraysize-1:0] dummyin_u;
 reg [`varraysize-1:0] dummyin_v;
@@ -65,14 +91,13 @@ reg wren_a_ct, wren_b_cin;
 
 assign ht_out = ht;
 
-//Instead of having very wide Input ports of uarraysize and varraysize,
-//we are replicating data from `DATA_WIDTH size external port to get the wide input to BRAMs.
-//assign xdata_b_ext={`INPUT_DEPTH{data_b_ext}};
-//assign hdata_b_ext={`ARRAY_DEPTH{data_b_ext}};
 
 //indicates that the ht_out output is valid 
 assign ht_valid = (count>16)?1:0;
 
+
+//BRAMs storing the input and hidden weights of each of the gates
+//Hidden weights are represented by U and Input weights by W
 spram_u Ui_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_u),.out_a(Ui_in));
 spram_u Uf_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_u),.out_a(Uf_in));
 spram_u Uo_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_u),.out_a(Uo_in));
@@ -81,7 +106,11 @@ spram_v Wi_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.o
 spram_v Wf_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(Wf_in));
 spram_v Wo_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(Wo_in));
 spram_v Wc_mem(.clk(clk),.address_a(waddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(Wc_in));
+
+//BRAM of the input vectors to LSTM
 spram_v Xi_mem(.clk(clk),.address_a(inaddr),.wren_a(wren_a),.data_a(dummyin_v),.out_a(x_in));
+
+//BRAM storing Bias of each gate
 spram_b bi_mem(.clk(clk),.address_a(b_count),.wren_a(wren_a),.data_a(dummyin_b),.out_a(bi_in));
 spram_b bf_mem(.clk(clk),.address_a(b_count),.wren_a(wren_a),.data_a(dummyin_b),.out_a(bf_in));
 spram_b bo_mem(.clk(clk),.address_a(b_count),.wren_a(wren_a),.data_a(dummyin_b),.out_a(bo_in));
@@ -139,7 +168,7 @@ always @(posedge clk) begin
 	 else begin
 		cycle_complete <= 0;
     	waddr <= waddr+1;
-	  	  count <= count+1;
+	  	count <= count+1;
 	 
 		if(count>7)     //delay before bias add
 			b_count <= b_count+1; 
