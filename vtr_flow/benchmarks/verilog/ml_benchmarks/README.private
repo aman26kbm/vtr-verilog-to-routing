@@ -73,3 +73,13 @@ Andrew Boutros from U of Toronto generated this design. He has all the collatera
 
 15. DLA
 Andrew Boutros from U of Toronto generated this design. He has all the collateral.
+
+---------------------------------------------------------
+Usage of local FP modules when complex_dsp is not defined
+---------------------------------------------------------
+attention_layer.v -> Changed to use pipelined addsub
+conv_layer_hls.v -> Not changing to use pipelined FP units. Original HLS generated code doesn't generated pipelined fp blocks.
+eltwise_layer.v -> Changed to use pipelined addsub and mult
+gemm_layer.v -> Changed to use pipelined addsub and mult
+softmax.v -> Not changing to use pipelined FP units. 
+tiny_darknet_like.*.v -> Not changing to use pipelined FP units. Original HLS generated code doesn't generated pipelined fp blocks.

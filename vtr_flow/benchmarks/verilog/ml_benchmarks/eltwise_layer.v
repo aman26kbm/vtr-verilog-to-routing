@@ -1667,9 +1667,9 @@ end
 
 //assign mul_out_temp = a * b;
 `ifdef complex_dsp
-multiply_fp mul_u1(.a(a_flopped), .b(b_flopped), .out(mul_out_temp));
+multiply_fp_clk mul_u1(.clk(clk), .a(a_flopped), .b(b_flopped), .out(mul_out_temp));
 `else
-FPMult_16 u_FPMult (.clk(), .rst(1'b0), .a(a_flopped), .b(b_flopped), .result(mul_out_temp), .flags());
+FPMult_16 u_FPMult (.clk(clk), .rst(1'b0), .a(a_flopped), .b(b_flopped), .result(mul_out_temp), .flags());
 `endif
 
 always @(posedge clk) begin
@@ -1714,9 +1714,9 @@ end
 
 //assign sum_out_temp = a + b;
 `ifdef complex_dsp
-adder_fp add_u1(.a(a_flopped), .b(b_flopped), .out(sum_out_temp));
+adder_fp_clk add_u1(.clk(clk), .a(a_flopped), .b(b_flopped), .out(sum_out_temp));
 `else
-FPAddSub u_FPAddSub (.clk(), .rst(1'b0), .a(a_flopped), .b(b_flopped), .operation(1'b0), .result(sum_out_temp), .flags());
+FPAddSub u_FPAddSub (.clk(clk), .rst(1'b0), .a(a_flopped), .b(b_flopped), .operation(1'b0), .result(sum_out_temp), .flags());
 `endif
 
 always @(posedge clk) begin
@@ -1765,9 +1765,9 @@ end
 //We don't provide the name of the mode here though.
 
 `ifdef complex_dsp
-adder_fp sub_u1(.a(a_flopped), .b(b_flopped), .out(sub_out_temp));
+adder_fp sub_u1(.clk(clk), .a(a_flopped), .b(b_flopped), .out(sub_out_temp));
 `else
-FPAddSub u_FPAddSub2(.clk(), .rst(1'b0), .a(a_flopped), .b(b_flopped), .operation(1'b0), .result(sub_out_temp), .flags());
+FPAddSub u_FPAddSub2(.clk(clk), .rst(1'b0), .a(a_flopped), .b(b_flopped), .operation(1'b0), .result(sub_out_temp), .flags());
 `endif
 
 always @(posedge clk) begin

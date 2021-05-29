@@ -15,7 +15,7 @@
 // with a simpler DSP (just a fixed point multiplier) like in the
 // flagship arch timing/k6_frac_N10_frac_chain_depop50_mem32K_40nm.xml
 /////////////////////////////////////////////////////////////////////////
-`define complex_dsp
+//`define complex_dsp
 `define BFLOAT16 
 
 // IEEE Half Precision => EXPONENT = 5, MANTISSA = 10
@@ -6947,7 +6947,6 @@ endmodule
 // https://github.com/fbrosser/DSP48E1-FP/tree/master/src/FPMult
 //////////////////////////////////////////////////////////////////////////
 
-
 module FPMult_16(
 		clk,
 		rst,
@@ -7019,20 +7018,20 @@ module FPMult_16(
 	FPMult_RoundModule RoundModule(pipe_3[2*`MANTISSA+1:`MANTISSA+1], pipe_3[`MANTISSA:0], pipe_3[2*`MANTISSA+2*`EXPONENT+3:2*`MANTISSA+`EXPONENT+3], pipe_3[2*`MANTISSA+`EXPONENT+2:2*`MANTISSA+2], pipe_3[2*`MANTISSA+2*`EXPONENT+4], pipe_3[2*`MANTISSA+2*`EXPONENT+5], pipe_3[2*`MANTISSA+2*`EXPONENT+10:2*`MANTISSA+2*`EXPONENT+6], Z_int[`DWIDTH-1:0], Flags_int[4:0]) ;		
 
 //adding always@ (*) instead of posedge clock to make design combinational
-	always @ (*) begin	
+	always @ (posedge clk) begin	
 		if(rst) begin
-			pipe_0 = 0;
-			pipe_1 = 0;
-			pipe_2 = 0; 
-			pipe_3 = 0;
-			pipe_4 = 0;
+			pipe_0 <= 0;
+			pipe_1 <= 0;
+			pipe_2 <= 0; 
+			pipe_3 <= 0;
+			pipe_4 <= 0;
 		end 
 		else begin		
 			/* PIPE 0
 				[2*`DWIDTH-1:`DWIDTH] A
 				[`DWIDTH-1:0] B
 			*/
-                       pipe_0 = {a, b} ;
+                       pipe_0 <= {a, b} ;
 
 
 			/* PIPE 1
@@ -7046,7 +7045,7 @@ module FPMult_16(
 				[4:0] InputExc
 			*/
 			//pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[`MANTISSA_MUL_SPLIT_LSB-1:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA-1:0], InputExc[4:0]} ;
-			pipe_1 = {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[8:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]} ;
+			pipe_1 <= {pipe_0[`DWIDTH+`MANTISSA-1:`DWIDTH], pipe_0[8:0], Sa, Sb, Ea[`EXPONENT-1:0], Eb[`EXPONENT-1:0], Mp[2*`MANTISSA+1:0], InputExc[4:0]} ;
 			
 			/* PIPE 2
 				[`EXPONENT + `MANTISSA + 7:`EXPONENT + `MANTISSA + 3] InputExc
@@ -7055,7 +7054,7 @@ module FPMult_16(
 				[`EXPONENT + `MANTISSA:`MANTISSA] NormE
 				[`MANTISSA-1:0] NormM
 			*/
-			pipe_2 = {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
+			pipe_2 <= {pipe_1[4:0], GRS, Sp, NormE[`EXPONENT:0], NormM[`MANTISSA-1:0]} ;
 			/* PIPE 3
 				[2*`EXPONENT+2*`MANTISSA+10:2*`EXPONENT+2*`MANTISSA+6] InputExc
 				[2*`EXPONENT+2*`MANTISSA+5] GRS
@@ -7065,16 +7064,18 @@ module FPMult_16(
 				[2*`MANTISSA+1:`MANTISSA+1] RoundM
 				[`MANTISSA:0] RoundMP
 			*/
-			pipe_3 = {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
+			pipe_3 <= {pipe_2[`EXPONENT+`MANTISSA+7:`EXPONENT+`MANTISSA+1], RoundE[`EXPONENT:0], RoundEP[`EXPONENT:0], RoundM[`MANTISSA:0], RoundMP[`MANTISSA:0]} ;
 			/* PIPE 4
 				[`DWIDTH+4:5] Z
 				[4:0] Flags
 			*/				
-			pipe_4 = {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
+			pipe_4 <= {Z_int[`DWIDTH-1:0], Flags_int[4:0]} ;
 		end
 	end
 		
 endmodule
+
+
 
 module FPMult_PrepModule (
 		clk,
@@ -7400,9 +7401,9 @@ module FPAddSub_single(
 	output [31:0] result ;						// Result of the operation
 	output [4:0] flags ;							// Flags indicating exceptions according to IEEE754
 
-	wire [68:0]pipe_1;
-	wire [54:0]pipe_2;
-	wire [45:0]pipe_3;
+	reg [68:0]pipe_1;
+	reg [54:0]pipe_2;
+	reg [45:0]pipe_3;
 
 
 //internal module wires
@@ -7440,6 +7441,13 @@ FPAddSub_c M3(pipe_2[54:22],pipe_2[21:17],pipe_2[16:9],NormM,NormE,ZeroSum,NegE,
 FPAddSub_d M4(pipe_3[13],pipe_3[22:14],pipe_3[45:23],pipe_3[11],pipe_3[10],pipe_3[9],pipe_3[8],pipe_3[7],pipe_3[6],pipe_3[5],pipe_3[12],pipe_3[4:0],result,flags );
 
 
+always @ (posedge clk) begin	
+		if(rst) begin
+			pipe_1 <= 0;
+			pipe_2 <= 0;
+			pipe_3 <= 0;
+		end 
+		else begin
 /*
 pipe_1:
 	[68] Opout;
@@ -7451,9 +7459,10 @@ pipe_1:
 	[51:29] Mmax;
 	[28:24] InputExc;
 	[23:0] Mmin_3;	
+
 */
 
-assign pipe_1 = {Opout,Sa,Sb,MaxAB,CExp,Shift,Mmax,InputExc,Mmin_3};
+pipe_1 <= {Opout,Sa,Sb,MaxAB,CExp,Shift,Mmax,InputExc,Mmin_3};
 
 /*
 pipe_2:
@@ -7467,7 +7476,7 @@ pipe_2:
 	[4:0]InputExc
 */
 
-assign pipe_2 = {SumS_5,Shift_1,pipe_1[64:57], pipe_1[67], pipe_1[66], pipe_1[68], pipe_1[65], pipe_1[28:24] };
+pipe_2 <= {SumS_5,Shift_1,pipe_1[64:57], pipe_1[67], pipe_1[66], pipe_1[68], pipe_1[65], pipe_1[28:24] };
 
 /*
 pipe_3:
@@ -7485,8 +7494,10 @@ pipe_3:
 	[4:0]InputExc
 */
 
-assign pipe_3 = {NormM,NormE,ZeroSum,NegE,R,S,FG, pipe_2[8], pipe_2[7], pipe_2[6], pipe_2[5], pipe_2[4:0] };
+pipe_3 <= {NormM,NormE,ZeroSum,NegE,R,S,FG, pipe_2[8], pipe_2[7], pipe_2[6], pipe_2[5], pipe_2[4:0] };
 
+end
+end
 
 endmodule
 
