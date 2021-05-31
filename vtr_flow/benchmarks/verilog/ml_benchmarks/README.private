@@ -69,10 +69,12 @@ I've checked in the files I used here:
 https://github.com/aman26kbm/mycores/tree/main/hls4ml
 
 14. CLSTM
-Andrew Boutros from U of Toronto generated this design. He has all the collateral.
+Original repo with Zach's design in SystemVerilog
+https://github.com/zachzzc/DL_FPGA_benchmark_suite/tree/master/C_LSTM
 
 15. DLA
-Andrew Boutros from U of Toronto generated this design. He has all the collateral.
+Original repo with Andrew's design in SystemVerilog
+https://github.com/andrewboutros/FPGA-DL-benchmarks
 
 ---------------------------------------------------------
 Usage of local FP modules when complex_dsp is not defined
