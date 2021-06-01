@@ -21,8 +21,13 @@ Bibtex:
 }
 ```
 
+## License
+Koios benchmarks are distributed under the [same license as VTR](https://github.com/verilog-to-routing/vtr-verilog-to-routing/blob/master/LICENSE.md). 
+
 ## Contact
 If you have questions, email [Aman Arora](mailto:aman.kbm@utexas.edu). 
+
+If you find any bugs, please file an issue [here](https://github.com/verilog-to-routing/vtr-verilog-to-routing/issues) and tag @aman26kbm in the description.
 
 ## Contributing to Koios
 We welcome contributions to this benchmark suite. If you'd like to contribute to Koios, contact [Aman Arora](mailto:aman.kbm@utexas.edu). 
