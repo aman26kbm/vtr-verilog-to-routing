@@ -39,6 +39,6 @@ We welcome contributions to this benchmark suite. If you'd like to contribute to
 
 **Doctoral Students:** Aman Arora (University of Texas at Austin), Andrew Boutros (University of Toronto)
 
-**Graduate Students: **Daniel Rauch (University of Texas at Austin), Aishwarya Rajen (University of Texas at Austin), Seyed Alireza Damghani (University of New Brunswick), Sangram Kate (University of Texas at Austin)
+**Graduate Students:** Daniel Rauch (University of Texas at Austin), Aishwarya Rajen (University of Texas at Austin), Seyed Alireza Damghani (University of New Brunswick), Sangram Kate (University of Texas at Austin)
 
 **Undergraduate Students:** Aatman Borda (University of Texas at Austin), Samidh Mehta (University of Texas at Austin), Pragnesh Patel (University of Texas at Austin)
