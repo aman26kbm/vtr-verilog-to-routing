@@ -4,7 +4,7 @@
 Koios benchmarks are a set of Deep Learning (DL) benchmarks for FPGA architecture and CAD research. They are suitable for DL related architecture and CAD research. There are 19 designs that include several medium-sized benchmarks and some large benchmarks. The designs target different network types (CNNs, RNNs, MLPs, RL) and layer types (fully-connected, convolution, activation, softmax, reduction, eltwise). Some of the designs are generated from HLS tools as well. These designs use many precisions including binary, different fixed point types int8/16/32, brain floating point (bfloat16), and IEEE half-precision floating point (fp16).
 
 ## Documentation
-A brief documentation of Koios benchmarks is available [here](https://docs.verilogtorouting.org/en/latest/vtr/benchmarks/#koios).
+A brief documentation of Koios benchmarks is available [here](https://docs.verilogtorouting.org/en/latest/vtr/benchmarks/#koios-benchmarks).
 
 ## How to Cite
 The following paper may be used as a citation for Koios:
