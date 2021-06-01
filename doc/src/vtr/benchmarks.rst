@@ -107,7 +107,7 @@ The VTR benchmarks are provided as Verilog (enabling full flexibility to modify 
 
 The FPGA architectures with advanced DSP that work out-of-the-box with Koios benchmarks are available here: ::
 
-    $VTR_ROOT/vtr_flow/arch/COFFE_22nm/k6n10LB_mem20K_complexDSP_customSB_22nm.*
+    $VTR_ROOT/vtr_flow/arch/COFFE_22nm/k6FracN10LB_mem20K_complexDSP_customSB_22nm.*
 
 MCNC20 Benchmarks
 -----------------
