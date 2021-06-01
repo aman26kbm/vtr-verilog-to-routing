@@ -6,9 +6,6 @@ Koios benchmarks are a set of Deep Learning (DL) benchmarks for FPGA architectur
 ## Documentation
 A brief documentation of Koios benchmarks is available [here](https://docs.verilogtorouting.org/en/latest/vtr/benchmarks/#koios)
 
-## License
-See VTR license.
-
 ## How to Cite
 The following paper may be used as a citation for Koios:
 
@@ -34,6 +31,9 @@ We welcome contributions to this benchmark suite. If you'd like to contribute to
 *Please keep this up-to-date*
 
 Professors: Lizy K. John, Vaughn Betz, Kenneth B. Kent
+
 Doctoral Students: Aman Arora (University of Texas at Austin), Andrew Boutros (University of Toronto)
+
 Graduate Students: Daniel Rauch (University of Texas at Austin), Aishwarya Rajen (University of Texas at Austin), Seyed Alireza Damghani (University of New Brunswick), Sangram Kate (University of Texas at Austin)
+
 Undergraduate Students: Aatman Borda (University of Texas at Austin), Samidh Mehta (University of Texas at Austin), Pragnesh Patel (University of Texas at Austin)
