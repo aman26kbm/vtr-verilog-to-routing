@@ -25533,7 +25533,28 @@ int_sop_2 mac_component (
 	.chainout(chainout)
 );
 `else
-assign resulta = ax*ay + bx*by;
+reg [15:0] ax_reg;
+reg [7:0] ay_reg;
+reg [15:0] bx_reg;
+reg [7:0] by_reg;
+reg [23:0] resulta;
+always @(posedge clk) begin
+  if(aclr) begin
+    resulta <= 0;
+    ax_reg <= 0;
+    ay_reg <= 0;
+    bx_reg <= 0;
+    by_reg <= 0;
+  end
+  else begin
+    ax_reg <= ax;
+    ay_reg <= ay;
+    bx_reg <= bx;
+    by_reg <= by;
+    resulta <= ax_reg * ay_reg + bx_reg * by_reg + chainin;
+  end
+end
+assign chainout = {40'b0, resulta};
 `endif
 
 
@@ -25569,7 +25590,28 @@ int_sop_2 mac_component (
 	.chainout(chainout)
 );
 `else
-assign resulta = ax*ay + bx*by;
+reg [15:0] ax_reg;
+reg [7:0] ay_reg;
+reg [15:0] bx_reg;
+reg [7:0] by_reg;
+reg [23:0] resulta;
+always @(posedge clk) begin
+  if(aclr) begin
+    resulta <= 0;
+    ax_reg <= 0;
+    ay_reg <= 0;
+    bx_reg <= 0;
+    by_reg <= 0;
+  end
+  else begin
+    ax_reg <= ax;
+    ay_reg <= ay;
+    bx_reg <= bx;
+    by_reg <= by;
+    resulta <= ax_reg * ay_reg + bx_reg * by_reg + chainin;
+  end
+end
+assign chainout = {40'b0, resulta};
 `endif
 
 endmodule
