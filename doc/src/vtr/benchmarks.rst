@@ -99,11 +99,11 @@ These designs use many precisions including binary, different fixed point types 
 
 Koios benchmarks are fully compatible with the full VTR flow. Some Koios benchmarks use advanced DSP features that are available in only a few FPGA architectures provided with VTR. This is because they instantiate DSP macros to implement native FP16 multiplications or use the hard dedicated chains, and these are architecture-specific. If users want to use a different FPGA architecture file, they can replace the macro instantiations in the benchmarks with their equivalents from the FPGA architectures they wish to use.
 
-Alternatively, users can disable these advanced features. The macro `complex_dsp` can be used for this purpose. If complex_dsp is defined in a benchmark file (using `define complex_dsp in the beginning of the benchmark file), then advanced DSP features mentioned above will be used. If a user wants to run a Koios benchmark with FPGA architectures that don't have these advanced DSP features (for example, the flagship architectures: $VTR_ROOT/vtr_flow/arch/timing/k6_frac_N10_*_mem32K_40nm*), then they can remove the line defining the complex_dsp macro. This enables the same functionality with behavioral Verilog that is mapped to the FPGA soft logic when an architecture without the required macro definitions is used.
+Alternatively, users can disable these advanced features. The macro ``complex_dsp`` can be used for this purpose. If complex_dsp is defined in a benchmark file (using ```define complex_dsp`` in the beginning of the benchmark file), then advanced DSP features mentioned above will be used. If a user wants to run a Koios benchmark with FPGA architectures that don't have these advanced DSP features (for example, the flagship architectures: ``$VTR_ROOT/vtr_flow/arch/timing/k6_frac_N10_*_mem32K_40nm*``), then they can remove the line defining the complex_dsp macro. This enables the same functionality with behavioral Verilog that is mapped to the FPGA soft logic when an architecture without the required macro definitions is used.
 
 The VTR benchmarks are provided as Verilog (enabling full flexibility to modify and change how the designs are implemented) under: ::
 
-    $VTR_ROOT/vtr_flow/benchmarks/verilog/ml_benchmarks
+    $VTR_ROOT/vtr_flow/benchmarks/verilog/koios
 
 The FPGA architectures with advanced DSP that work out-of-the-box with Koios benchmarks are available here: ::
 
