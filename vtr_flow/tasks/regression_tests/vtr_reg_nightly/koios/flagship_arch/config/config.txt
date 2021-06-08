@@ -7,17 +7,19 @@
 circuits_dir=benchmarks/verilog/koios
 
 # Path to directory of architectures to use
-archs_dir=arch/COFFE_22nm
+archs_dir=arch/timing
 
 # Add circuits to list to sweep
-circuit_list_add=eltwise_layer_complex_dsp.vh
-circuit_list_add=generic_circuits/robot_rl.v
-circuit_list_add=softmax_complex_dsp.vh
-circuit_list_add=generic_circuits/reduction_layer.v
-circuit_list_add=generic_circuits/spmv.v
+circuit_list_add=generic_circuits/tpu_like.small.v
+circuit_list_add=generic_circuits/dla_like.small.v
+circuit_list_add=generic_circuits/bnn.v
+circuit_list_add=generic_circuits/attention_layer.v
+circuit_list_add=generic_circuits/conv_layer_hls.v
+circuit_list_add=generic_circuits/conv_layer.v
+circuit_list_add=generic_circuits/gemm_layer.v
 
 # Add architectures to list to sweep
-arch_list_add=k6FracN10LB_mem20K_complexDSP_customSB_22nm.xml
+arch_list_add=k6_frac_N10_frac_chain_mem32K_40nm.xml
 
 # Parse info and how to parse
 parse_file=vpr_standard.txt

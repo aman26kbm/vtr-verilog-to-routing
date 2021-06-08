@@ -10,7 +10,7 @@ circuits_dir=benchmarks/verilog/koios
 archs_dir=arch/COFFE_22nm
 
 # Add circuits to list to sweep
-circuit_list_add=conv_layer.v
+circuit_list_add=conv_layer_complex_dsp.vh
 
 # Add architectures to list to sweep
 arch_list_add=k6FracN10LB_mem20K_complexDSP_customSB_22nm.xml

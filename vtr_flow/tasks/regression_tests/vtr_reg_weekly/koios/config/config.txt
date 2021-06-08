@@ -10,14 +10,14 @@ circuits_dir=benchmarks/verilog/koios
 archs_dir=arch/COFFE_22nm
 
 # Add circuits to list to sweep
-circuit_list_add=clstm_like.small.v
-circuit_list_add=clstm_like.medium.v
-circuit_list_add=clstm_like.large.v
-circuit_list_add=lstm.v
-circuit_list_add=tpu_like.medium.v
-circuit_list_add=tiny_darknet_like.small.v
-circuit_list_add=tiny_darknet_like.medium.v
-circuit_list_add=dla_like.medium.v
+circuit_list_add=generic_circuits/clstm_like.small.v
+circuit_list_add=generic_circuits/clstm_like.medium.v
+circuit_list_add=generic_circuits/clstm_like.large.v
+circuit_list_add=generic_circuits/lstm.v
+circuit_list_add=generic_circuits/tpu_like.medium.v
+circuit_list_add=tiny_darknet_like.small_complex_dsp.vh
+circuit_list_add=generic_circuits/tiny_darknet_like.medium.v
+circuit_list_add=dla_like.medium_complex_dsp.vh
 
 # Add architectures to list to sweep
 arch_list_add=k6FracN10LB_mem20K_complexDSP_customSB_22nm.xml

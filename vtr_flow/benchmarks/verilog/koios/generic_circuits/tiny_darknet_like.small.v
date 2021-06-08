@@ -16,18 +16,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 `timescale 1 ns / 1 ps 
-`define complex_dsp
-module td_fused_top_Block_entry_proc_proc392 (
-        ap_clk,
-        ap_rst,
-        ap_start,
-        ap_done,
-        ap_continue,
-        ap_idle,
-        ap_ready,
-        tmp,
-        ap_return
-);
 
 parameter    ap_ST_fsm_state1 = 1'd1;
 
