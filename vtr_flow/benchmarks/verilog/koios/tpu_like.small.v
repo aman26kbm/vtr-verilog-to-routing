@@ -4087,22 +4087,22 @@ wire [`DWIDTH-1:0] a13_0to13_1, a13_1to13_2, a13_2to13_3, a13_3to13_4, a13_4to13
 wire [`DWIDTH-1:0] a14_0to14_1, a14_1to14_2, a14_2to14_3, a14_3to14_4, a14_4to14_5, a14_5to14_6, a14_6to14_7, a14_7to14_8, a14_8to14_9, a14_9to14_10, a14_10to14_11, a14_11to14_12, a14_12to14_13, a14_13to14_14, a14_14to14_15, a14_15to14_16;
 wire [`DWIDTH-1:0] a15_0to15_1, a15_1to15_2, a15_2to15_3, a15_3to15_4, a15_4to15_5, a15_5to15_6, a15_6to15_7, a15_7to15_8, a15_8to15_9, a15_9to15_10, a15_10to15_11, a15_11to15_12, a15_12to15_13, a15_13to15_14, a15_14to15_15, a15_15to15_16;
 
-wire [`DWIDTH-1:0] b0_0to1_0, b1_0to2_0, b2_0to3_0, b3_0to4_0, b4_0to5_0, b5_0to6_0, b6_0to7_0, b7_0to8_0, b8_0to9_0, b9_0to10_0, b10_0to11_0, b11_0to12_0, b12_0to13_0, b13_0to14_0, b14_0to15_0, b15_0to16_0;
-wire [`DWIDTH-1:0] b0_1to1_1, b1_1to2_1, b2_1to3_1, b3_1to4_1, b4_1to5_1, b5_1to6_1, b6_1to7_1, b7_1to8_1, b8_1to9_1, b9_1to10_1, b10_1to11_1, b11_1to12_1, b12_1to13_1, b13_1to14_1, b14_1to15_1, b15_1to16_1;
-wire [`DWIDTH-1:0] b0_2to1_2, b1_2to2_2, b2_2to3_2, b3_2to4_2, b4_2to5_2, b5_2to6_2, b6_2to7_2, b7_2to8_2, b8_2to9_2, b9_2to10_2, b10_2to11_2, b11_2to12_2, b12_2to13_2, b13_2to14_2, b14_2to15_2, b15_2to16_2;
-wire [`DWIDTH-1:0] b0_3to1_3, b1_3to2_3, b2_3to3_3, b3_3to4_3, b4_3to5_3, b5_3to6_3, b6_3to7_3, b7_3to8_3, b8_3to9_3, b9_3to10_3, b10_3to11_3, b11_3to12_3, b12_3to13_3, b13_3to14_3, b14_3to15_3, b15_3to16_3;
-wire [`DWIDTH-1:0] b0_4to1_4, b1_4to2_4, b2_4to3_4, b3_4to4_4, b4_4to5_4, b5_4to6_4, b6_4to7_4, b7_4to8_4, b8_4to9_4, b9_4to10_4, b10_4to11_4, b11_4to12_4, b12_4to13_4, b13_4to14_4, b14_4to15_4, b15_4to16_4;
-wire [`DWIDTH-1:0] b0_5to1_5, b1_5to2_5, b2_5to3_5, b3_5to4_5, b4_5to5_5, b5_5to6_5, b6_5to7_5, b7_5to8_5, b8_5to9_5, b9_5to10_5, b10_5to11_5, b11_5to12_5, b12_5to13_5, b13_5to14_5, b14_5to15_5, b15_5to16_5;
-wire [`DWIDTH-1:0] b0_6to1_6, b1_6to2_6, b2_6to3_6, b3_6to4_6, b4_6to5_6, b5_6to6_6, b6_6to7_6, b7_6to8_6, b8_6to9_6, b9_6to10_6, b10_6to11_6, b11_6to12_6, b12_6to13_6, b13_6to14_6, b14_6to15_6, b15_6to16_6;
-wire [`DWIDTH-1:0] b0_7to1_7, b1_7to2_7, b2_7to3_7, b3_7to4_7, b4_7to5_7, b5_7to6_7, b6_7to7_7, b7_7to8_7, b8_7to9_7, b9_7to10_7, b10_7to11_7, b11_7to12_7, b12_7to13_7, b13_7to14_7, b14_7to15_7, b15_7to16_7;
-wire [`DWIDTH-1:0] b0_8to1_8, b1_8to2_8, b2_8to3_8, b3_8to4_8, b4_8to5_8, b5_8to6_8, b6_8to7_8, b7_8to8_8, b8_8to9_8, b9_8to10_8, b10_8to11_8, b11_8to12_8, b12_8to13_8, b13_8to14_8, b14_8to15_8, b15_8to16_8;
-wire [`DWIDTH-1:0] b0_9to1_9, b1_9to2_9, b2_9to3_9, b3_9to4_9, b4_9to5_9, b5_9to6_9, b6_9to7_9, b7_9to8_9, b8_9to9_9, b9_9to10_9, b10_9to11_9, b11_9to12_9, b12_9to13_9, b13_9to14_9, b14_9to15_9, b15_9to16_9;
-wire [`DWIDTH-1:0] b0_10to1_10, b1_10to2_10, b2_10to3_10, b3_10to4_10, b4_10to5_10, b5_10to6_10, b6_10to7_10, b7_10to8_10, b8_10to9_10, b9_10to10_10, b10_10to11_10, b11_10to12_10, b12_10to13_10, b13_10to14_10, b14_10to15_10, b15_10to16_10;
-wire [`DWIDTH-1:0] b0_11to1_11, b1_11to2_11, b2_11to3_11, b3_11to4_11, b4_11to5_11, b5_11to6_11, b6_11to7_11, b7_11to8_11, b8_11to9_11, b9_11to10_11, b10_11to11_11, b11_11to12_11, b12_11to13_11, b13_11to14_11, b14_11to15_11, b15_11to16_11;
-wire [`DWIDTH-1:0] b0_12to1_12, b1_12to2_12, b2_12to3_12, b3_12to4_12, b4_12to5_12, b5_12to6_12, b6_12to7_12, b7_12to8_12, b8_12to9_12, b9_12to10_12, b10_12to11_12, b11_12to12_12, b12_12to13_12, b13_12to14_12, b14_12to15_12, b15_12to16_12;
-wire [`DWIDTH-1:0] b0_13to1_13, b1_13to2_13, b2_13to3_13, b3_13to4_13, b4_13to5_13, b5_13to6_13, b6_13to7_13, b7_13to8_13, b8_13to9_13, b9_13to10_13, b10_13to11_13, b11_13to12_13, b12_13to13_13, b13_13to14_13, b14_13to15_13, b15_13to16_13;
-wire [`DWIDTH-1:0] b0_14to1_14, b1_14to2_14, b2_14to3_14, b3_14to4_14, b4_14to5_14, b5_14to6_14, b6_14to7_14, b7_14to8_14, b8_14to9_14, b9_14to10_14, b10_14to11_14, b11_14to12_14, b12_14to13_14, b13_14to14_14, b14_14to15_14, b15_14to16_14;
-wire [`DWIDTH-1:0] b0_15to1_15, b1_15to2_15, b2_15to3_15, b3_15to4_15, b4_15to5_15, b5_15to6_15, b6_15to7_15, b7_15to8_15, b8_15to9_15, b9_15to10_15, b10_15to11_15, b11_15to12_15, b12_15to13_15, b13_15to14_15, b14_15to15_15, b15_15to16_15;
+wire [18:0] b0_0to1_0, b1_0to2_0, b2_0to3_0, b3_0to4_0, b4_0to5_0, b5_0to6_0, b6_0to7_0, b7_0to8_0, b8_0to9_0, b9_0to10_0, b10_0to11_0, b11_0to12_0, b12_0to13_0, b13_0to14_0, b14_0to15_0, b15_0to16_0;
+wire [18:0] b0_1to1_1, b1_1to2_1, b2_1to3_1, b3_1to4_1, b4_1to5_1, b5_1to6_1, b6_1to7_1, b7_1to8_1, b8_1to9_1, b9_1to10_1, b10_1to11_1, b11_1to12_1, b12_1to13_1, b13_1to14_1, b14_1to15_1, b15_1to16_1;
+wire [18:0] b0_2to1_2, b1_2to2_2, b2_2to3_2, b3_2to4_2, b4_2to5_2, b5_2to6_2, b6_2to7_2, b7_2to8_2, b8_2to9_2, b9_2to10_2, b10_2to11_2, b11_2to12_2, b12_2to13_2, b13_2to14_2, b14_2to15_2, b15_2to16_2;
+wire [18:0] b0_3to1_3, b1_3to2_3, b2_3to3_3, b3_3to4_3, b4_3to5_3, b5_3to6_3, b6_3to7_3, b7_3to8_3, b8_3to9_3, b9_3to10_3, b10_3to11_3, b11_3to12_3, b12_3to13_3, b13_3to14_3, b14_3to15_3, b15_3to16_3;
+wire [18:0] b0_4to1_4, b1_4to2_4, b2_4to3_4, b3_4to4_4, b4_4to5_4, b5_4to6_4, b6_4to7_4, b7_4to8_4, b8_4to9_4, b9_4to10_4, b10_4to11_4, b11_4to12_4, b12_4to13_4, b13_4to14_4, b14_4to15_4, b15_4to16_4;
+wire [18:0] b0_5to1_5, b1_5to2_5, b2_5to3_5, b3_5to4_5, b4_5to5_5, b5_5to6_5, b6_5to7_5, b7_5to8_5, b8_5to9_5, b9_5to10_5, b10_5to11_5, b11_5to12_5, b12_5to13_5, b13_5to14_5, b14_5to15_5, b15_5to16_5;
+wire [18:0] b0_6to1_6, b1_6to2_6, b2_6to3_6, b3_6to4_6, b4_6to5_6, b5_6to6_6, b6_6to7_6, b7_6to8_6, b8_6to9_6, b9_6to10_6, b10_6to11_6, b11_6to12_6, b12_6to13_6, b13_6to14_6, b14_6to15_6, b15_6to16_6;
+wire [18:0] b0_7to1_7, b1_7to2_7, b2_7to3_7, b3_7to4_7, b4_7to5_7, b5_7to6_7, b6_7to7_7, b7_7to8_7, b8_7to9_7, b9_7to10_7, b10_7to11_7, b11_7to12_7, b12_7to13_7, b13_7to14_7, b14_7to15_7, b15_7to16_7;
+wire [18:0] b0_8to1_8, b1_8to2_8, b2_8to3_8, b3_8to4_8, b4_8to5_8, b5_8to6_8, b6_8to7_8, b7_8to8_8, b8_8to9_8, b9_8to10_8, b10_8to11_8, b11_8to12_8, b12_8to13_8, b13_8to14_8, b14_8to15_8, b15_8to16_8;
+wire [18:0] b0_9to1_9, b1_9to2_9, b2_9to3_9, b3_9to4_9, b4_9to5_9, b5_9to6_9, b6_9to7_9, b7_9to8_9, b8_9to9_9, b9_9to10_9, b10_9to11_9, b11_9to12_9, b12_9to13_9, b13_9to14_9, b14_9to15_9, b15_9to16_9;
+wire [18:0] b0_10to1_10, b1_10to2_10, b2_10to3_10, b3_10to4_10, b4_10to5_10, b5_10to6_10, b6_10to7_10, b7_10to8_10, b8_10to9_10, b9_10to10_10, b10_10to11_10, b11_10to12_10, b12_10to13_10, b13_10to14_10, b14_10to15_10, b15_10to16_10;
+wire [18:0] b0_11to1_11, b1_11to2_11, b2_11to3_11, b3_11to4_11, b4_11to5_11, b5_11to6_11, b6_11to7_11, b7_11to8_11, b8_11to9_11, b9_11to10_11, b10_11to11_11, b11_11to12_11, b12_11to13_11, b13_11to14_11, b14_11to15_11, b15_11to16_11;
+wire [18:0] b0_12to1_12, b1_12to2_12, b2_12to3_12, b3_12to4_12, b4_12to5_12, b5_12to6_12, b6_12to7_12, b7_12to8_12, b8_12to9_12, b9_12to10_12, b10_12to11_12, b11_12to12_12, b12_12to13_12, b13_12to14_12, b14_12to15_12, b15_12to16_12;
+wire [18:0] b0_13to1_13, b1_13to2_13, b2_13to3_13, b3_13to4_13, b4_13to5_13, b5_13to6_13, b6_13to7_13, b7_13to8_13, b8_13to9_13, b9_13to10_13, b10_13to11_13, b11_13to12_13, b12_13to13_13, b13_13to14_13, b14_13to15_13, b15_13to16_13;
+wire [18:0] b0_14to1_14, b1_14to2_14, b2_14to3_14, b3_14to4_14, b4_14to5_14, b5_14to6_14, b6_14to7_14, b7_14to8_14, b8_14to9_14, b9_14to10_14, b10_14to11_14, b11_14to12_14, b12_14to13_14, b13_14to14_14, b14_14to15_14, b15_14to16_14;
+wire [18:0] b0_15to1_15, b1_15to2_15, b2_15to3_15, b3_15to4_15, b4_15to5_15, b5_15to6_15, b6_15to7_15, b7_15to8_15, b8_15to9_15, b9_15to10_15, b10_15to11_15, b11_15to12_15, b12_15to13_15, b13_15to14_15, b14_15to15_15, b15_15to16_15;
 
 //////////////////////////////////////////////////////////////////////////
 // Instantiations of the actual PEs
@@ -4111,22 +4111,22 @@ wire [`DWIDTH-1:0] b0_15to1_15, b1_15to2_15, b2_15to3_15, b3_15to4_15, b4_15to5_
 wire effective_rst;
 assign effective_rst = reset | pe_reset;
 
-processing_element pe0_0(.reset(effective_rst), .clk(clk),  .in_a(a0),      .in_b(b0),  .out_a(a0_0to0_1), .out_b(b0_0to1_0), .out_c(matrixC0_0));
-processing_element pe0_1(.reset(effective_rst), .clk(clk),  .in_a(a0_0to0_1), .in_b(b1),  .out_a(a0_1to0_2), .out_b(b0_1to1_1), .out_c(matrixC0_1));
-processing_element pe0_2(.reset(effective_rst), .clk(clk),  .in_a(a0_1to0_2), .in_b(b2),  .out_a(a0_2to0_3), .out_b(b0_2to1_2), .out_c(matrixC0_2));
-processing_element pe0_3(.reset(effective_rst), .clk(clk),  .in_a(a0_2to0_3), .in_b(b3),  .out_a(a0_3to0_4), .out_b(b0_3to1_3), .out_c(matrixC0_3));
-processing_element pe0_4(.reset(effective_rst), .clk(clk),  .in_a(a0_3to0_4), .in_b(b4),  .out_a(a0_4to0_5), .out_b(b0_4to1_4), .out_c(matrixC0_4));
-processing_element pe0_5(.reset(effective_rst), .clk(clk),  .in_a(a0_4to0_5), .in_b(b5),  .out_a(a0_5to0_6), .out_b(b0_5to1_5), .out_c(matrixC0_5));
-processing_element pe0_6(.reset(effective_rst), .clk(clk),  .in_a(a0_5to0_6), .in_b(b6),  .out_a(a0_6to0_7), .out_b(b0_6to1_6), .out_c(matrixC0_6));
-processing_element pe0_7(.reset(effective_rst), .clk(clk),  .in_a(a0_6to0_7), .in_b(b7),  .out_a(a0_7to0_8), .out_b(b0_7to1_7), .out_c(matrixC0_7));
-processing_element pe0_8(.reset(effective_rst), .clk(clk),  .in_a(a0_7to0_8), .in_b(b8),  .out_a(a0_8to0_9), .out_b(b0_8to1_8), .out_c(matrixC0_8));
-processing_element pe0_9(.reset(effective_rst), .clk(clk),  .in_a(a0_8to0_9), .in_b(b9),  .out_a(a0_9to0_10), .out_b(b0_9to1_9), .out_c(matrixC0_9));
-processing_element pe0_10(.reset(effective_rst), .clk(clk),  .in_a(a0_9to0_10), .in_b(b10),  .out_a(a0_10to0_11), .out_b(b0_10to1_10), .out_c(matrixC0_10));
-processing_element pe0_11(.reset(effective_rst), .clk(clk),  .in_a(a0_10to0_11), .in_b(b11),  .out_a(a0_11to0_12), .out_b(b0_11to1_11), .out_c(matrixC0_11));
-processing_element pe0_12(.reset(effective_rst), .clk(clk),  .in_a(a0_11to0_12), .in_b(b12),  .out_a(a0_12to0_13), .out_b(b0_12to1_12), .out_c(matrixC0_12));
-processing_element pe0_13(.reset(effective_rst), .clk(clk),  .in_a(a0_12to0_13), .in_b(b13),  .out_a(a0_13to0_14), .out_b(b0_13to1_13), .out_c(matrixC0_13));
-processing_element pe0_14(.reset(effective_rst), .clk(clk),  .in_a(a0_13to0_14), .in_b(b14),  .out_a(a0_14to0_15), .out_b(b0_14to1_14), .out_c(matrixC0_14));
-processing_element pe0_15(.reset(effective_rst), .clk(clk),  .in_a(a0_14to0_15), .in_b(b15),  .out_a(a0_15to0_16), .out_b(b0_15to1_15), .out_c(matrixC0_15));
+processing_element_top_edge pe0_0(.reset(effective_rst), .clk(clk),  .in_a(a0),      .in_b(b0),  .out_a(a0_0to0_1), .out_b(b0_0to1_0), .out_c(matrixC0_0));
+processing_element_top_edge pe0_1(.reset(effective_rst), .clk(clk),  .in_a(a0_0to0_1), .in_b(b1),  .out_a(a0_1to0_2), .out_b(b0_1to1_1), .out_c(matrixC0_1));
+processing_element_top_edge pe0_2(.reset(effective_rst), .clk(clk),  .in_a(a0_1to0_2), .in_b(b2),  .out_a(a0_2to0_3), .out_b(b0_2to1_2), .out_c(matrixC0_2));
+processing_element_top_edge pe0_3(.reset(effective_rst), .clk(clk),  .in_a(a0_2to0_3), .in_b(b3),  .out_a(a0_3to0_4), .out_b(b0_3to1_3), .out_c(matrixC0_3));
+processing_element_top_edge pe0_4(.reset(effective_rst), .clk(clk),  .in_a(a0_3to0_4), .in_b(b4),  .out_a(a0_4to0_5), .out_b(b0_4to1_4), .out_c(matrixC0_4));
+processing_element_top_edge pe0_5(.reset(effective_rst), .clk(clk),  .in_a(a0_4to0_5), .in_b(b5),  .out_a(a0_5to0_6), .out_b(b0_5to1_5), .out_c(matrixC0_5));
+processing_element_top_edge pe0_6(.reset(effective_rst), .clk(clk),  .in_a(a0_5to0_6), .in_b(b6),  .out_a(a0_6to0_7), .out_b(b0_6to1_6), .out_c(matrixC0_6));
+processing_element_top_edge pe0_7(.reset(effective_rst), .clk(clk),  .in_a(a0_6to0_7), .in_b(b7),  .out_a(a0_7to0_8), .out_b(b0_7to1_7), .out_c(matrixC0_7));
+processing_element_top_edge pe0_8(.reset(effective_rst), .clk(clk),  .in_a(a0_7to0_8), .in_b(b8),  .out_a(a0_8to0_9), .out_b(b0_8to1_8), .out_c(matrixC0_8));
+processing_element_top_edge pe0_9(.reset(effective_rst), .clk(clk),  .in_a(a0_8to0_9), .in_b(b9),  .out_a(a0_9to0_10), .out_b(b0_9to1_9), .out_c(matrixC0_9));
+processing_element_top_edge pe0_10(.reset(effective_rst), .clk(clk),  .in_a(a0_9to0_10), .in_b(b10),  .out_a(a0_10to0_11), .out_b(b0_10to1_10), .out_c(matrixC0_10));
+processing_element_top_edge pe0_11(.reset(effective_rst), .clk(clk),  .in_a(a0_10to0_11), .in_b(b11),  .out_a(a0_11to0_12), .out_b(b0_11to1_11), .out_c(matrixC0_11));
+processing_element_top_edge pe0_12(.reset(effective_rst), .clk(clk),  .in_a(a0_11to0_12), .in_b(b12),  .out_a(a0_12to0_13), .out_b(b0_12to1_12), .out_c(matrixC0_12));
+processing_element_top_edge pe0_13(.reset(effective_rst), .clk(clk),  .in_a(a0_12to0_13), .in_b(b13),  .out_a(a0_13to0_14), .out_b(b0_13to1_13), .out_c(matrixC0_13));
+processing_element_top_edge pe0_14(.reset(effective_rst), .clk(clk),  .in_a(a0_13to0_14), .in_b(b14),  .out_a(a0_14to0_15), .out_b(b0_14to1_14), .out_c(matrixC0_14));
+processing_element_top_edge pe0_15(.reset(effective_rst), .clk(clk),  .in_a(a0_14to0_15), .in_b(b15),  .out_a(a0_15to0_16), .out_b(b0_15to1_15), .out_c(matrixC0_15));
 
 processing_element pe1_0(.reset(effective_rst), .clk(clk),  .in_a(a1), .in_b(b0_0to1_0),  .out_a(a1_0to1_1), .out_b(b1_0to2_0), .out_c(matrixC1_0));
 processing_element pe2_0(.reset(effective_rst), .clk(clk),  .in_a(a2), .in_b(b1_0to2_0),  .out_a(a2_0to2_1), .out_b(b2_0to3_0), .out_c(matrixC2_0));
@@ -4142,7 +4142,7 @@ processing_element pe11_0(.reset(effective_rst), .clk(clk),  .in_a(a11), .in_b(b
 processing_element pe12_0(.reset(effective_rst), .clk(clk),  .in_a(a12), .in_b(b11_0to12_0),  .out_a(a12_0to12_1), .out_b(b12_0to13_0), .out_c(matrixC12_0));
 processing_element pe13_0(.reset(effective_rst), .clk(clk),  .in_a(a13), .in_b(b12_0to13_0),  .out_a(a13_0to13_1), .out_b(b13_0to14_0), .out_c(matrixC13_0));
 processing_element pe14_0(.reset(effective_rst), .clk(clk),  .in_a(a14), .in_b(b13_0to14_0),  .out_a(a14_0to14_1), .out_b(b14_0to15_0), .out_c(matrixC14_0));
-processing_element pe15_0(.reset(effective_rst), .clk(clk),  .in_a(a15), .in_b(b14_0to15_0),  .out_a(a15_0to15_1), .out_b(b15_0to16_0), .out_c(matrixC15_0));
+processing_element_bottom_edge pe15_0(.reset(effective_rst), .clk(clk),  .in_a(a15), .in_b(b14_0to15_0),  .out_a(a15_0to15_1), .out_b(b15_0to16_0), .out_c(matrixC15_0));
 
 processing_element pe1_1(.reset(effective_rst), .clk(clk),  .in_a(a1_0to1_1), .in_b(b0_1to1_1),  .out_a(a1_1to1_2), .out_b(b1_1to2_1), .out_c(matrixC1_1));
 processing_element pe1_2(.reset(effective_rst), .clk(clk),  .in_a(a1_1to1_2), .in_b(b0_2to1_2),  .out_a(a1_2to1_3), .out_b(b1_2to2_2), .out_c(matrixC1_2));
@@ -4354,23 +4354,23 @@ processing_element pe14_12(.reset(effective_rst), .clk(clk),  .in_a(a14_11to14_1
 processing_element pe14_13(.reset(effective_rst), .clk(clk),  .in_a(a14_12to14_13), .in_b(b13_13to14_13),  .out_a(a14_13to14_14), .out_b(b14_13to15_13), .out_c(matrixC14_13));
 processing_element pe14_14(.reset(effective_rst), .clk(clk),  .in_a(a14_13to14_14), .in_b(b13_14to14_14),  .out_a(a14_14to14_15), .out_b(b14_14to15_14), .out_c(matrixC14_14));
 processing_element pe14_15(.reset(effective_rst), .clk(clk),  .in_a(a14_14to14_15), .in_b(b13_15to14_15),  .out_a(a14_15to14_16), .out_b(b14_15to15_15), .out_c(matrixC14_15));
-processing_element pe15_1(.reset(effective_rst), .clk(clk),  .in_a(a15_0to15_1), .in_b(b14_1to15_1),  .out_a(a15_1to15_2), .out_b(b15_1to16_1), .out_c(matrixC15_1));
-processing_element pe15_2(.reset(effective_rst), .clk(clk),  .in_a(a15_1to15_2), .in_b(b14_2to15_2),  .out_a(a15_2to15_3), .out_b(b15_2to16_2), .out_c(matrixC15_2));
-processing_element pe15_3(.reset(effective_rst), .clk(clk),  .in_a(a15_2to15_3), .in_b(b14_3to15_3),  .out_a(a15_3to15_4), .out_b(b15_3to16_3), .out_c(matrixC15_3));
-processing_element pe15_4(.reset(effective_rst), .clk(clk),  .in_a(a15_3to15_4), .in_b(b14_4to15_4),  .out_a(a15_4to15_5), .out_b(b15_4to16_4), .out_c(matrixC15_4));
-processing_element pe15_5(.reset(effective_rst), .clk(clk),  .in_a(a15_4to15_5), .in_b(b14_5to15_5),  .out_a(a15_5to15_6), .out_b(b15_5to16_5), .out_c(matrixC15_5));
-processing_element pe15_6(.reset(effective_rst), .clk(clk),  .in_a(a15_5to15_6), .in_b(b14_6to15_6),  .out_a(a15_6to15_7), .out_b(b15_6to16_6), .out_c(matrixC15_6));
-processing_element pe15_7(.reset(effective_rst), .clk(clk),  .in_a(a15_6to15_7), .in_b(b14_7to15_7),  .out_a(a15_7to15_8), .out_b(b15_7to16_7), .out_c(matrixC15_7));
-processing_element pe15_8(.reset(effective_rst), .clk(clk),  .in_a(a15_7to15_8), .in_b(b14_8to15_8),  .out_a(a15_8to15_9), .out_b(b15_8to16_8), .out_c(matrixC15_8));
-processing_element pe15_9(.reset(effective_rst), .clk(clk),  .in_a(a15_8to15_9), .in_b(b14_9to15_9),  .out_a(a15_9to15_10), .out_b(b15_9to16_9), .out_c(matrixC15_9));
-processing_element pe15_10(.reset(effective_rst), .clk(clk),  .in_a(a15_9to15_10), .in_b(b14_10to15_10),  .out_a(a15_10to15_11), .out_b(b15_10to16_10), .out_c(matrixC15_10));
-processing_element pe15_11(.reset(effective_rst), .clk(clk),  .in_a(a15_10to15_11), .in_b(b14_11to15_11),  .out_a(a15_11to15_12), .out_b(b15_11to16_11), .out_c(matrixC15_11));
-processing_element pe15_12(.reset(effective_rst), .clk(clk),  .in_a(a15_11to15_12), .in_b(b14_12to15_12),  .out_a(a15_12to15_13), .out_b(b15_12to16_12), .out_c(matrixC15_12));
-processing_element pe15_13(.reset(effective_rst), .clk(clk),  .in_a(a15_12to15_13), .in_b(b14_13to15_13),  .out_a(a15_13to15_14), .out_b(b15_13to16_13), .out_c(matrixC15_13));
-processing_element pe15_14(.reset(effective_rst), .clk(clk),  .in_a(a15_13to15_14), .in_b(b14_14to15_14),  .out_a(a15_14to15_15), .out_b(b15_14to16_14), .out_c(matrixC15_14));
-processing_element pe15_15(.reset(effective_rst), .clk(clk),  .in_a(a15_14to15_15), .in_b(b14_15to15_15),  .out_a(a15_15to15_16), .out_b(b15_15to16_15), .out_c(matrixC15_15));
-assign a_data_out = {a15_15to15_16,a14_15to14_16,a13_15to13_16,a12_15to12_16,a11_15to11_16,a10_15to10_16,a9_15to9_16,a8_15to8_16,a7_15to7_16,a6_15to6_16,a5_15to5_16,a4_15to4_16,a3_15to3_16,a2_15to2_16,a1_15to1_16,a0_15to0_16};
-assign b_data_out = {b15_15to16_15,b15_14to16_14,b15_13to16_13,b15_12to16_12,b15_11to16_11,b15_10to16_10,b15_9to16_9,b15_8to16_8,b15_7to16_7,b15_6to16_6,b15_5to16_5,b15_4to16_4,b15_3to16_3,b15_2to16_2,b15_1to16_1,b15_0to16_0};
+processing_element_bottom_edge pe15_1(.reset(effective_rst), .clk(clk),  .in_a(a15_0to15_1), .in_b(b14_1to15_1),  .out_a(a15_1to15_2), .out_b(b15_1to16_1), .out_c(matrixC15_1));
+processing_element_bottom_edge pe15_2(.reset(effective_rst), .clk(clk),  .in_a(a15_1to15_2), .in_b(b14_2to15_2),  .out_a(a15_2to15_3), .out_b(b15_2to16_2), .out_c(matrixC15_2));
+processing_element_bottom_edge pe15_3(.reset(effective_rst), .clk(clk),  .in_a(a15_2to15_3), .in_b(b14_3to15_3),  .out_a(a15_3to15_4), .out_b(b15_3to16_3), .out_c(matrixC15_3));
+processing_element_bottom_edge pe15_4(.reset(effective_rst), .clk(clk),  .in_a(a15_3to15_4), .in_b(b14_4to15_4),  .out_a(a15_4to15_5), .out_b(b15_4to16_4), .out_c(matrixC15_4));
+processing_element_bottom_edge pe15_5(.reset(effective_rst), .clk(clk),  .in_a(a15_4to15_5), .in_b(b14_5to15_5),  .out_a(a15_5to15_6), .out_b(b15_5to16_5), .out_c(matrixC15_5));
+processing_element_bottom_edge pe15_6(.reset(effective_rst), .clk(clk),  .in_a(a15_5to15_6), .in_b(b14_6to15_6),  .out_a(a15_6to15_7), .out_b(b15_6to16_6), .out_c(matrixC15_6));
+processing_element_bottom_edge pe15_7(.reset(effective_rst), .clk(clk),  .in_a(a15_6to15_7), .in_b(b14_7to15_7),  .out_a(a15_7to15_8), .out_b(b15_7to16_7), .out_c(matrixC15_7));
+processing_element_bottom_edge pe15_8(.reset(effective_rst), .clk(clk),  .in_a(a15_7to15_8), .in_b(b14_8to15_8),  .out_a(a15_8to15_9), .out_b(b15_8to16_8), .out_c(matrixC15_8));
+processing_element_bottom_edge pe15_9(.reset(effective_rst), .clk(clk),  .in_a(a15_8to15_9), .in_b(b14_9to15_9),  .out_a(a15_9to15_10), .out_b(b15_9to16_9), .out_c(matrixC15_9));
+processing_element_bottom_edge pe15_10(.reset(effective_rst), .clk(clk),  .in_a(a15_9to15_10), .in_b(b14_10to15_10),  .out_a(a15_10to15_11), .out_b(b15_10to16_10), .out_c(matrixC15_10));
+processing_element_bottom_edge pe15_11(.reset(effective_rst), .clk(clk),  .in_a(a15_10to15_11), .in_b(b14_11to15_11),  .out_a(a15_11to15_12), .out_b(b15_11to16_11), .out_c(matrixC15_11));
+processing_element_bottom_edge pe15_12(.reset(effective_rst), .clk(clk),  .in_a(a15_11to15_12), .in_b(b14_12to15_12),  .out_a(a15_12to15_13), .out_b(b15_12to16_12), .out_c(matrixC15_12));
+processing_element_bottom_edge pe15_13(.reset(effective_rst), .clk(clk),  .in_a(a15_12to15_13), .in_b(b14_13to15_13),  .out_a(a15_13to15_14), .out_b(b15_13to16_13), .out_c(matrixC15_13));
+processing_element_bottom_edge pe15_14(.reset(effective_rst), .clk(clk),  .in_a(a15_13to15_14), .in_b(b14_14to15_14),  .out_a(a15_14to15_15), .out_b(b15_14to16_14), .out_c(matrixC15_14));
+processing_element_bottom_edge pe15_15(.reset(effective_rst), .clk(clk),  .in_a(a15_14to15_15), .in_b(b14_15to15_15),  .out_a(a15_15to15_16), .out_b(b15_15to16_15), .out_c(matrixC15_15));
+//assign a_data_out = {a15_15to15_16,a14_15to14_16,a13_15to13_16,a12_15to12_16,a11_15to11_16,a10_15to10_16,a9_15to9_16,a8_15to8_16,a7_15to7_16,a6_15to6_16,a5_15to5_16,a4_15to4_16,a3_15to3_16,a2_15to2_16,a1_15to1_16,a0_15to0_16};
+//assign b_data_out = {b15_15to16_15,b15_14to16_14,b15_13to16_13,b15_12to16_12,b15_11to16_11,b15_10to16_10,b15_9to16_9,b15_8to16_8,b15_7to16_7,b15_6to16_6,b15_5to16_5,b15_4to16_4,b15_3to16_3,b15_2to16_2,b15_1to16_1,b15_0to16_0};
 
 endmodule
 
@@ -4387,9 +4387,9 @@ module processing_element(
  input reset;
  input clk;
  input  [`DWIDTH-1:0] in_a;
- input  [`DWIDTH-1:0] in_b;
+ input  [18:0] in_b;
  output [`DWIDTH-1:0] out_a;
- output [`DWIDTH-1:0] out_b;
+ output [18:0] out_b;
  output [`DWIDTH-1:0] out_c;  //reduced precision
 
 `ifdef complex_dsp
@@ -4398,23 +4398,35 @@ module processing_element(
  wire [18:0] scanout;
  wire [63:0] chainout; //unconnected
  wire [63:0] result;
+ wire [17:0] ax;
+ wire [18:0] ay;
+ wire [35:0] bx;
+ wire [63:0] chainin; //unconnected
+ wire [18:0] scanin;
+ wire [11:0] mode_sigs;
+
+ assign mode_sigs = 12'b010101010101;  //Any value of mode_sigs (structural, not functional, correctness)
+ assign ax = {{(18-`DWIDTH){1'b0}}, in_a};
+ assign ay = {{(19-`DWIDTH){1'b0}}, in_b};
+ assign bx = 36'b0;
+ assign scanin = ay;
 
   //We will instantiate DSP slices with input chaining.
   //Input chaining is only supported in the 18x19 mode or the 27x27 mode.
   //We will use the input chain provided by the DSP for the B input. For A, the chain will be manual.
 
   mult_add_int u_pe(
+    .clk(clk),
     .reset(reset),
-    .mode_sigs(11'b10101010101),  //Any value of mode_sigs (structural, not functional, correctness)
-    .ax({{(18-`DWIDTH){1'b0}}, in_a}),
-    .ay({{(19-`DWIDTH){1'b0}}, in_b}),
-    .bx(36'b0),
-    .chainin(64'b0),
-    .scanin({{(19-`DWIDTH){1'b0}}, in_b}),
+    .mode_sigs(mode_sigs),
+    .ax(ax),
+    .ay(ay),
+    .bx(bx),
+    .chainin(chainin),
+    .scanin(scanin),
     .result(result),
     .chainout(chainout),
-    .scanout(scanout),
-    .clk(clk)
+    .scanout(scanout)
   );
 
  always @(posedge clk)begin
@@ -4426,7 +4438,194 @@ module processing_element(
     end
  end
 
- assign out_b = scanout[`DWIDTH-1:0];
+ //assign out_b = scanout;
+ assign out_c = result[`DWIDTH-1:0];
+
+`else
+
+ reg [`DWIDTH-1:0] out_a;
+ reg [`DWIDTH-1:0] out_b;
+ wire [`DWIDTH-1:0] out_c;
+
+ wire [`DWIDTH-1:0] out_mac;
+
+ assign out_c = out_mac;
+
+ seq_mac u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(reset), .clk(clk));
+
+ always @(posedge clk)begin
+    if(reset) begin
+      out_a<=0;
+      out_b<=0;
+    end
+    else begin  
+      out_a<=in_a;
+      out_b<=in_b;
+    end
+ end
+
+`endif
+ 
+endmodule
+
+module processing_element_top_edge(
+ reset, 
+ clk, 
+ in_a,
+ in_b, 
+ out_a, 
+ out_b, 
+ out_c
+ );
+
+ input reset;
+ input clk;
+ input  [`DWIDTH-1:0] in_a;
+ input  [18:0] in_b;
+ output [`DWIDTH-1:0] out_a;
+ output [18:0] out_b;
+ output [`DWIDTH-1:0] out_c;  //reduced precision
+
+`ifdef complex_dsp
+
+ reg [`DWIDTH-1:0] out_a;
+ wire [18:0] scanout;
+ wire [63:0] chainout; //unconnected
+ wire [63:0] result;
+ wire [17:0] ax;
+ wire [18:0] ay;
+ wire [35:0] bx;
+ wire [63:0] chainin; //unconnected
+ wire [18:0] scanin; //unconnected
+ wire [11:0] mode_sigs;
+
+ assign mode_sigs = 12'b010101010101;  //Any value of mode_sigs (structural, not functional, correctness)
+ assign ax = {{(18-`DWIDTH){1'b0}}, in_a};
+ assign ay = {{(19-`DWIDTH){1'b0}}, in_b};
+ assign bx = 36'b0;
+
+  //We will instantiate DSP slices with input chaining.
+  //Input chaining is only supported in the 18x19 mode or the 27x27 mode.
+  //We will use the input chain provided by the DSP for the B input. For A, the chain will be manual.
+
+  mult_add_int u_pe(
+    .clk(clk),
+    .reset(reset),
+    .mode_sigs(mode_sigs),
+    .ax(ax),
+    .ay(ay),
+    .bx(bx),
+    .chainin(chainin),
+    .scanin(scanin),
+    .result(result),
+    .chainout(chainout),
+    .scanout(scanout)
+  );
+
+ always @(posedge clk)begin
+    if(reset) begin
+      out_a<=0;
+    end
+    else begin  
+      out_a<=in_a;
+    end
+ end
+
+ assign out_b = scanout;
+ assign out_c = result[`DWIDTH-1:0];
+
+`else
+
+ reg [`DWIDTH-1:0] out_a;
+ reg [`DWIDTH-1:0] out_b;
+ wire [`DWIDTH-1:0] out_c;
+
+ wire [`DWIDTH-1:0] out_mac;
+
+ assign out_c = out_mac;
+
+ seq_mac u_mac(.a(in_a), .b(in_b), .out(out_mac), .reset(reset), .clk(clk));
+
+ always @(posedge clk)begin
+    if(reset) begin
+      out_a<=0;
+      out_b<=0;
+    end
+    else begin  
+      out_a<=in_a;
+      out_b<=in_b;
+    end
+ end
+
+`endif
+ 
+endmodule
+
+module processing_element_bottom_edge(
+ reset, 
+ clk, 
+ in_a,
+ in_b, 
+ out_a, 
+ out_b, 
+ out_c
+ );
+
+ input reset;
+ input clk;
+ input  [`DWIDTH-1:0] in_a;
+ input  [18:0] in_b;
+ output [`DWIDTH-1:0] out_a;
+ output [18:0] out_b;
+ output [`DWIDTH-1:0] out_c;  //reduced precision
+
+`ifdef complex_dsp
+
+ reg [`DWIDTH-1:0] out_a;
+ wire [18:0] scanout; //unconnected
+ wire [63:0] chainout; //unconnected
+ wire [63:0] result;
+ wire [17:0] ax;
+ wire [18:0] ay;
+ wire [35:0] bx;
+ wire [63:0] chainin; //unconnected
+ wire [18:0] scanin; 
+ wire [11:0] mode_sigs;
+
+ assign mode_sigs = 12'b010101010101;  //Any value of mode_sigs (structural, not functional, correctness)
+ assign ax = {{(18-`DWIDTH){1'b0}}, in_a};
+ assign ay = {{(19-`DWIDTH){1'b0}}, in_b};
+ assign bx = 36'b0;
+ assign scanin = ay;
+
+  //We will instantiate DSP slices with input chaining.
+  //Input chaining is only supported in the 18x19 mode or the 27x27 mode.
+  //We will use the input chain provided by the DSP for the B input. For A, the chain will be manual.
+
+  mult_add_int u_pe(
+    .clk(clk),
+    .reset(reset),
+    .mode_sigs(mode_sigs),
+    .ax(ax),
+    .ay(ay),
+    .bx(bx),
+    .chainin(chainin),
+    .scanin(scanin),
+    .result(result),
+    .chainout(chainout),
+    .scanout(scanout)
+  );
+
+ always @(posedge clk)begin
+    if(reset) begin
+      out_a<=0;
+    end
+    else begin  
+      out_a<=in_a;
+    end
+ end
+
+ //assign out_b = scanout;
  assign out_c = result[`DWIDTH-1:0];
 
 `else
