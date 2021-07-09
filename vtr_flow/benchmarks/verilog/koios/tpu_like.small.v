@@ -4392,6 +4392,45 @@ module processing_element(
  output [`DWIDTH-1:0] out_b;
  output [`DWIDTH-1:0] out_c;  //reduced precision
 
+`ifdef complex_dsp
+
+ reg [`DWIDTH-1:0] out_a;
+ wire [18:0] scanout;
+ wire [63:0] chainout; //unconnected
+ wire [63:0] result;
+
+  //We will instantiate DSP slices with input chaining.
+  //Input chaining is only supported in the 18x19 mode or the 27x27 mode.
+  //We will use the input chain provided by the DSP for the B input. For A, the chain will be manual.
+
+  mult_add_int u_pe(
+    .reset(reset),
+    .mode_sigs(11'b10101010101),  //Any value of mode_sigs (structural, not functional, correctness)
+    .ax({{(18-`DWIDTH){1'b0}}, in_a}),
+    .ay({{(19-`DWIDTH){1'b0}}, in_b}),
+    .bx(36'b0),
+    .chainin(64'b0),
+    .scanin({{(19-`DWIDTH){1'b0}}, in_b}),
+    .result(result),
+    .chainout(chainout),
+    .scanout(scanout),
+    .clk(clk)
+  );
+
+ always @(posedge clk)begin
+    if(reset) begin
+      out_a<=0;
+    end
+    else begin  
+      out_a<=in_a;
+    end
+ end
+
+ assign out_b = scanout[`DWIDTH-1:0];
+ assign out_c = result[`DWIDTH-1:0];
+
+`else
+
  reg [`DWIDTH-1:0] out_a;
  reg [`DWIDTH-1:0] out_b;
  wire [`DWIDTH-1:0] out_c;
@@ -4412,9 +4451,12 @@ module processing_element(
       out_b<=in_b;
     end
  end
+
+`endif
  
 endmodule
 
+`ifndef complex_dsp
 module seq_mac(a, b, out, reset, clk);
 input [`DWIDTH-1:0] a;
 input [`DWIDTH-1:0] b;
@@ -4487,7 +4529,7 @@ output [2*`DWIDTH-1:0] c;
 assign c = a + b;
 //DW01_add #(`DWIDTH) u_add(.A(a), .B(b), .CI(1'b0), .SUM(c), .CO());
 endmodule
-
+`endif
 
 //////////////////////////////////////////////
 // Configuration block
